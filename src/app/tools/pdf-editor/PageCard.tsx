@@ -62,6 +62,9 @@ export default function PageCard({
     isDragging,
   } = useSortable({ id: page.id });
 
+  // dnd-kit の attributes にも aria-pressed があるため、選択状態の指定と重複しないよう除外する
+  const { "aria-pressed": _dndAriaPressed, ...dndAttributes } = attributes;
+
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -110,7 +113,7 @@ export default function PageCard({
           if (isDragging) return;
           onPreview();
         }}
-        {...attributes}
+        {...dndAttributes}
       />
 
       <div
