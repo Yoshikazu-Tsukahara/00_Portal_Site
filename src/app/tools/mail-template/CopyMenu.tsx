@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { fmt, useI18n } from "@/i18n";
 
 export type CopyMode = "both" | "body" | "subject";
 
@@ -19,28 +20,6 @@ async function writeClipboard(text: string): Promise<void> {
   }
 }
 
-const MENU_ITEMS: {
-  mode: CopyMode;
-  label: string;
-  hint: string;
-}[] = [
-  {
-    mode: "both",
-    label: "件名と本文をまとめてコピー",
-    hint: "件名・本文を結合",
-  },
-  {
-    mode: "body",
-    label: "本文のみコピー",
-    hint: "本文だけ",
-  },
-  {
-    mode: "subject",
-    label: "件名のみコピー",
-    hint: "件名だけ",
-  },
-];
-
 /** コピー種別を選ぶドロップダウン（未入力警告付き） */
 export default function CopyMenu({
   subjectText,
@@ -53,9 +32,20 @@ export default function CopyMenu({
   combinedText: string;
   emptyLabels: string[];
 }) {
+  const { t } = useI18n();
+  const mt = t.apps.mailTemplate;
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
+  const menuItems: { mode: CopyMode; label: string; hint: string }[] = [
+    { mode: "both", label: mt.copy.both, hint: mt.copy.bothHint },
+    { mode: "body", label: mt.copy.bodyOnly, hint: mt.copy.bodyHint },
+    {
+      mode: "subject",
+      label: mt.copy.subjectOnly,
+      hint: mt.copy.subjectHint,
+    },
+  ];
 
   useEffect(() => {
     if (!copied) return;
@@ -102,9 +92,11 @@ export default function CopyMenu({
     if (emptyLabels.length > 0) {
       const names = emptyLabels.slice(0, 5).join("、");
       const more =
-        emptyLabels.length > 5 ? ` ほか${emptyLabels.length - 5}件` : "";
+        emptyLabels.length > 5
+          ? fmt(mt.copy.confirmMore, { count: emptyLabels.length - 5 })
+          : "";
       const ok = window.confirm(
-        `未入力の変数がありますが、このままコピーしますか？\n（${names}${more}）`,
+        fmt(mt.copy.confirmEmpty, { names, more }),
       );
       if (!ok) return;
     }
@@ -126,7 +118,7 @@ export default function CopyMenu({
           copied ? "!scale-[1.02] !bg-emerald-600 hover:!bg-emerald-600" : ""
         }`}
       >
-        {copied ? "コピー完了！" : "コピー"}
+        {copied ? mt.copy.done : mt.copy.button}
         {!copied ? (
           <svg
             width="12"
@@ -150,7 +142,7 @@ export default function CopyMenu({
           role="menu"
           className="absolute right-0 z-20 mt-1.5 w-64 overflow-hidden rounded-md border border-zinc-200 bg-white py-1 shadow-lg"
         >
-          {MENU_ITEMS.map((item) => {
+          {menuItems.map((item) => {
             const text = resolveText(item.mode);
             const disabled = !text;
             return (

@@ -17,7 +17,12 @@ export {
   readBackupFile,
   type ParseBackupResult,
 } from "./backup";
-export { DATA_SAFETY_MESSAGE, DATA_SAFETY_SHORT } from "./messages";
+export {
+  DATA_PERSISTENCE_NOTICE,
+  DATA_SAFETY_MESSAGE,
+  DATA_SAFETY_SHORT,
+  SITE_ENVIRONMENT_MESSAGE,
+} from "./messages";
 export {
   loadLocalJson,
   removeLocalJson,

@@ -3,11 +3,11 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import {
   createBackupEnvelope,
-  DATA_SAFETY_MESSAGE,
   downloadBackupJson,
   readBackupFile,
   type DataManagerConfig,
 } from "@/lib/localData";
+import { useI18n } from "@/i18n";
 
 /**
  * ヘッダー用「データ管理（バックアップ）」ボタン＋モーダル。
@@ -19,6 +19,8 @@ export default function DataManager({
   getData,
   onImport,
 }: DataManagerConfig) {
+  const { t } = useI18n();
+  const dm = t.dataManager;
   const [open, setOpen] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -45,11 +47,11 @@ export default function DataManager({
       const data = getData();
       const envelope = createBackupEnvelope(appId, data);
       downloadBackupJson(fileNamePrefix, envelope);
-      setStatus("バックアップファイルをダウンロードしました。");
+      setStatus(dm.exportOk);
     } catch {
-      setStatus("書き出しに失敗しました。");
+      setStatus(dm.exportFail);
     }
-  }, [appId, fileNamePrefix, getData]);
+  }, [appId, fileNamePrefix, getData, dm.exportOk, dm.exportFail]);
 
   const handleImportClick = useCallback(() => {
     if (!onImport) return;
@@ -62,9 +64,7 @@ export default function DataManager({
       e.target.value = "";
       if (!file || !onImport) return;
 
-      const confirmed = window.confirm(
-        "現在のデータが上書きされますがよろしいですか？",
-      );
+      const confirmed = window.confirm(dm.importConfirm);
       if (!confirmed) return;
 
       setBusy(true);
@@ -77,17 +77,17 @@ export default function DataManager({
         }
         const applied = onImport(result.data);
         if (applied === false) {
-          setStatus("データの内容を反映できませんでした。");
+          setStatus(dm.importInvalid);
           return;
         }
-        setStatus("データを読み込みました。");
+        setStatus(dm.importOk);
       } catch {
-        setStatus("読み込みに失敗しました。");
+        setStatus(dm.importFail);
       } finally {
         setBusy(false);
       }
     },
-    [appId, onImport],
+    [appId, onImport, dm],
   );
 
   return (
@@ -95,9 +95,9 @@ export default function DataManager({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        title="データ管理（バックアップ・復元）"
+        title={dm.buttonTitle}
         aria-haspopup="dialog"
-        aria-label="データ管理（バックアップ・復元）"
+        aria-label={dm.buttonAria}
         className="group inline-flex items-center gap-1.5 rounded-full border border-zinc-200/90 bg-zinc-100/80 px-2.5 py-1 text-[11px] font-medium tracking-tight text-zinc-600 shadow-[0_1px_0_rgba(24,24,27,0.04)] transition-all duration-200 ease-out hover:-translate-y-px hover:border-zinc-300 hover:bg-white hover:text-zinc-900 hover:shadow-sm active:translate-y-0 active:shadow-none sm:gap-1.5 sm:px-3 sm:py-1 sm:text-xs"
       >
         <span
@@ -106,8 +106,8 @@ export default function DataManager({
         >
           💾
         </span>
-        <span className="hidden sm:inline">バックアップ</span>
-        <span className="sm:hidden">データ</span>
+        <span className="hidden sm:inline">{dm.buttonLabel}</span>
+        <span className="sm:hidden">{dm.buttonLabelShort}</span>
       </button>
 
       {open ? (
@@ -129,41 +129,51 @@ export default function DataManager({
                 id={titleId}
                 className="text-sm font-semibold tracking-tight text-zinc-900"
               >
-                データ管理（バックアップ・復元）
+                {dm.dialogTitle}
               </h2>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
                 className="rounded-md px-2 py-1 text-sm text-zinc-400 transition-colors hover:bg-zinc-50 hover:text-zinc-700"
-                aria-label="閉じる"
+                aria-label={dm.close}
               >
                 ✕
               </button>
             </div>
 
             <div className="space-y-4 px-4 py-4">
-              {/* 安心メッセージ */}
               <section
                 className="rounded-md border border-zinc-100 bg-zinc-50 px-3 py-3"
-                aria-label="データの安全性について"
+                aria-label={dm.safetyHeading}
               >
                 <p className="mb-1.5 text-[11px] font-medium text-zinc-700">
-                  データの安全性について
+                  {dm.safetyHeading}
                 </p>
                 <p className="text-[11px] leading-relaxed text-zinc-500">
-                  {DATA_SAFETY_MESSAGE}
+                  {t.messages.safety}
                 </p>
               </section>
 
               {canTransfer ? (
                 <div className="space-y-2">
+                  <section
+                    className="rounded-md border border-amber-200/70 bg-amber-50/50 px-3 py-2.5"
+                    aria-label={dm.backupReasonHeading}
+                  >
+                    <p className="mb-1 text-[11px] font-medium text-zinc-700">
+                      {dm.backupReasonHeading}
+                    </p>
+                    <p className="text-[11px] leading-relaxed text-zinc-500">
+                      {t.messages.persistence}
+                    </p>
+                  </section>
                   <button
                     type="button"
                     onClick={handleExport}
                     disabled={busy}
                     className="btn-primary w-full !py-2.5 text-sm"
                   >
-                    📥 データを書き出す（セーブ）
+                    {dm.export}
                   </button>
                   <button
                     type="button"
@@ -171,7 +181,7 @@ export default function DataManager({
                     disabled={busy}
                     className="btn-secondary w-full !py-2.5 text-sm"
                   >
-                    📤 データを読み込む（ロード）
+                    {dm.import}
                   </button>
                   <input
                     ref={fileRef}
@@ -183,7 +193,7 @@ export default function DataManager({
                 </div>
               ) : (
                 <p className="text-[11px] leading-relaxed text-zinc-400">
-                  このツールはセッション内でのみ動作し、保存する設定データはありません。処理内容が外部に送られることもありません。
+                  {dm.noData}
                 </p>
               )}
 

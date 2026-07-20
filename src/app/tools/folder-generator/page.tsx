@@ -17,6 +17,7 @@ import {
 import { arrayMove } from "@dnd-kit/sortable";
 
 import AppShell from "@/components/AppShell";
+import { useI18n } from "@/i18n";
 import Toolbox from "./Toolbox";
 import FormatBuilder, { DragOverlayBadge } from "./FormatBuilder";
 import SettingsPanel from "./SettingsPanel";
@@ -84,6 +85,8 @@ function addTreeToZip(
 }
 
 export default function FolderGeneratorPage() {
+  const { t } = useI18n();
+  const copy = t.apps.folderGenerator;
   const dndId = useId();
   const [root, setRoot] = useState<FolderNode>(() =>
     createFolderNode(createId("root")),
@@ -371,14 +374,14 @@ export default function FolderGeneratorPage() {
       className="btn-primary"
       aria-disabled={!canGenerate}
     >
-      {isGenerating ? "出力中…" : "ZIPを出力"}
+      {isGenerating ? copy.exporting : copy.exportZip}
     </button>
   );
 
   return (
     <AppShell
-      title="フォルダ自動生成アプリ"
-      description="命名規則を組み立て、複数フォルダを一括生成。"
+      title={copy.shell.title}
+      description={copy.shell.description}
       dataManager={{
         appId: "folder-generator",
         fileNamePrefix: "folder-generator",
@@ -398,7 +401,7 @@ export default function FolderGeneratorPage() {
           className="btn-primary !px-3 !py-1.5 text-xs sm:text-sm"
           aria-disabled={!canGenerate}
         >
-          {isGenerating ? "出力中…" : "ZIPを出力"}
+          {isGenerating ? copy.exporting : copy.exportZip}
         </button>
       }
     >
@@ -415,7 +418,7 @@ export default function FolderGeneratorPage() {
             <Toolbox />
             <div className="space-y-1 px-0.5">
               <p className="text-[10px] text-zinc-400">
-                選択行へ追加
+                {copy.addToRow}
               </p>
               <div className="flex flex-wrap gap-1">
                 {(
@@ -452,7 +455,7 @@ export default function FolderGeneratorPage() {
 
             <section className="rounded-lg border border-zinc-200/60 bg-white px-2.5 py-2 shadow-sm">
               <h2 className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-zinc-400">
-                プレビュー
+                {copy.preview}
               </h2>
               <PreviewTree
                 lines={preview.lines}
@@ -504,7 +507,7 @@ export default function FolderGeneratorPage() {
         )}
         {!canGenerate && !isGenerating && (
           <p className="text-[11px] text-zinc-400">
-            親の配置と子の命名で出力可
+            {copy.previewHint}
           </p>
         )}
       </div>

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import AppShell from "@/components/AppShell";
+import { fmt, useI18n } from "@/i18n";
 import {
   cleanText,
   computeDiffChunks,
@@ -28,6 +29,8 @@ import {
 type PreviewTab = "result" | "diff";
 
 export default function TextCleanerPage() {
+  const { t } = useI18n();
+  const copy = t.apps.textCleaner;
   const [input, setInput] = useState("");
   const [options, setOptions] = useState<CleanOptions | null>(null);
   const [rules, setRules] = useState<ReplaceRule[]>([]);
@@ -126,6 +129,7 @@ export default function TextCleanerPage() {
   }
 
   function removeRule(id: string) {
+    if (!window.confirm(copy.confirm.deleteRule)) return;
     updateRules(rules.filter((r) => r.id !== id));
   }
 
@@ -177,7 +181,7 @@ export default function TextCleanerPage() {
 
   function deleteActivePreset() {
     if (!options || !activePresetId) return;
-    if (!window.confirm("このルールセットを削除しますか？")) return;
+    if (!window.confirm(copy.confirm.deleteSet)) return;
     const nextPresets = presets.filter((p) => p.id !== activePresetId);
     persist({
       options,
@@ -195,19 +199,19 @@ export default function TextCleanerPage() {
   if (!hydrated || !options) {
     return (
       <AppShell
-        title="テキスト・クレンジング"
-        description="読み込み中…"
+        title={copy.shell.title}
+        description={copy.loading}
         fillViewport
       >
-        <p className="text-sm text-zinc-400">読み込み中…</p>
+        <p className="text-sm text-zinc-400">{copy.loading}</p>
       </AppShell>
     );
   }
 
   return (
     <AppShell
-      title="テキスト・クレンジング"
-      description="不要な改行・空白・制御文字を一発掃除。独自の一括置換も。"
+      title={copy.shell.title}
+      description={copy.shell.description}
       fillViewport
       dataManager={{
         appId: "text-cleaner",
@@ -233,15 +237,17 @@ export default function TextCleanerPage() {
                 htmlFor="text-cleaner-input"
                 className="text-[11px] font-medium text-zinc-500"
               >
-                入力テキスト
+                {copy.input.heading}
               </label>
               {input ? (
                 <button
                   type="button"
-                  onClick={() => setInput("")}
+                  onClick={() => {
+                    if (window.confirm(copy.confirm.clearInput)) setInput("");
+                  }}
                   className="text-[10px] text-zinc-400 transition-colors hover:text-zinc-700"
                 >
-                  クリア
+                  {copy.input.clear}
                 </button>
               ) : null}
             </div>
@@ -249,7 +255,7 @@ export default function TextCleanerPage() {
               id="text-cleaner-input"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="PDFやWebからコピーした文章を貼り付け…"
+              placeholder={copy.input.placeholder}
               className="input-field min-h-[9rem] w-full resize-y font-mono text-[13px] leading-relaxed lg:min-h-[11rem]"
               spellCheck={false}
             />
@@ -258,16 +264,16 @@ export default function TextCleanerPage() {
           {/* 特殊クレンジング */}
           <fieldset className="shrink-0 space-y-2 border-t border-zinc-100 pt-3">
             <legend className="text-[11px] font-medium text-zinc-500">
-              特殊クレンジング（ワンタップ）
+              {copy.special.heading}
             </legend>
             <div className="flex flex-wrap gap-1.5">
               {(
                 [
-                  ["stripHtml", "HTMLタグの除去", options.stripHtml],
-                  ["stripUrls", "URLの削除", options.stripUrls],
+                  ["stripHtml", copy.special.stripHtml, options.stripHtml],
+                  ["stripUrls", copy.special.stripUrls, options.stripUrls],
                   [
                     "tidyEmailsAndSymbols",
-                    "メール・記号の整理",
+                    copy.special.tidyMail,
                     options.tidyEmailsAndSymbols,
                   ],
                 ] as const
@@ -291,7 +297,7 @@ export default function TextCleanerPage() {
 
           <fieldset className="shrink-0 space-y-2.5 border-t border-zinc-100 pt-3">
             <legend className="text-[11px] font-medium text-zinc-500">
-              クレンジング設定
+              {copy.settings.heading}
             </legend>
 
             <label className="flex cursor-pointer items-start gap-2.5 text-sm text-zinc-700">
@@ -304,9 +310,9 @@ export default function TextCleanerPage() {
                 className="mt-0.5 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-950"
               />
               <span>
-                <span className="font-medium">制御文字を除去</span>
+                <span className="font-medium">{copy.settings.controlChars}</span>
                 <span className="mt-0.5 block text-[11px] text-zinc-400">
-                  タブ・改行以外の不可視制御文字を削除
+                  {copy.settings.controlCharsHint}
                 </span>
               </span>
             </label>
@@ -320,7 +326,7 @@ export default function TextCleanerPage() {
                 }
                 className="mt-0.5 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-950"
               />
-              <span className="font-medium">行末の空白を除去</span>
+              <span className="font-medium">{copy.settings.trimLineEnds}</span>
             </label>
 
             <label className="flex cursor-pointer items-start gap-2.5 text-sm text-zinc-700">
@@ -333,20 +339,20 @@ export default function TextCleanerPage() {
                 className="mt-0.5 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-950"
               />
               <span className="font-medium">
-                全角の英数・記号を半角に一括変換
+                {copy.settings.toHalfWidth}
               </span>
             </label>
 
             <div className="space-y-1.5">
               <p className="text-[11px] font-medium text-zinc-500">
-                改行・空行
+                {copy.settings.newlines}
               </p>
               <div className="flex flex-col gap-1.5">
                 {(
                   [
-                    ["keep", "そのまま残す"],
-                    ["collapse", "連続する空行を1行にまとめる"],
-                    ["remove", "改行をすべて削除"],
+                    ["keep", copy.settings.keepNewlines],
+                    ["collapse", copy.settings.collapseBlank],
+                    ["remove", copy.settings.removeNewlines],
                   ] as const satisfies ReadonlyArray<
                     readonly [LineBreakMode, string]
                   >
@@ -370,14 +376,14 @@ export default function TextCleanerPage() {
 
             <div className="space-y-1.5">
               <p className="text-[11px] font-medium text-zinc-500">
-                空白（スペース・タブ）
+                {copy.settings.whitespace}
               </p>
               <div className="flex flex-col gap-1.5">
                 {(
                   [
-                    ["keep", "そのまま残す"],
-                    ["normalize", "半角スペース1つに統一"],
-                    ["remove", "すべての空白を削除"],
+                    ["keep", copy.settings.keepNewlines],
+                    ["normalize", copy.settings.collapseSpaces],
+                    ["remove", copy.settings.removeSpaces],
                   ] as const satisfies ReadonlyArray<
                     readonly [WhitespaceMode, string]
                   >
@@ -403,12 +409,12 @@ export default function TextCleanerPage() {
           {/* プリセット */}
           <div className="shrink-0 space-y-2.5 border-t border-zinc-100 pt-3">
             <p className="text-[11px] font-medium text-zinc-500">
-              置換ルール・パターン集
+              {copy.presets.heading}
             </p>
 
             <div className="space-y-1.5">
               <p className="text-[10px] text-zinc-400">
-                よく使うパターン（ワンクリック適用）
+                {copy.presets.patterns}
               </p>
               <div className="flex flex-wrap gap-1.5">
                 {BUILTIN_PACKS.map((pack) => (
@@ -437,7 +443,7 @@ export default function TextCleanerPage() {
                       }}
                       className="border-l border-zinc-200 bg-white px-1.5 py-1 text-[10px] text-zinc-400 transition-colors hover:text-zinc-700"
                     >
-                      差替
+                      {copy.presets.replace}
                     </button>
                   </div>
                 ))}
@@ -445,10 +451,12 @@ export default function TextCleanerPage() {
             </div>
 
             <div className="space-y-1.5 rounded-md border border-zinc-100 bg-zinc-50/70 p-2">
-              <p className="text-[10px] text-zinc-400">保存したセット</p>
+              <p className="text-[10px] text-zinc-400">
+                {copy.presets.savedSets}
+              </p>
               {presets.length === 0 ? (
                 <p className="text-[11px] text-zinc-400">
-                  まだありません。下で名前を付けて保存できます。
+                  {copy.presets.noneYet}
                 </p>
               ) : (
                 <div className="flex flex-wrap gap-1.5">
@@ -476,7 +484,7 @@ export default function TextCleanerPage() {
                   type="text"
                   value={presetNameDraft}
                   onChange={(e) => setPresetNameDraft(e.target.value)}
-                  placeholder="セット名（例: ビジネス用）"
+                  placeholder={copy.presets.setNamePlaceholder}
                   className="input-field min-w-[8rem] flex-1 !py-1 !text-xs"
                 />
                 <button
@@ -484,7 +492,7 @@ export default function TextCleanerPage() {
                   onClick={saveCurrentAsPreset}
                   className="btn-secondary !px-2 !py-1 text-[10px]"
                 >
-                  現在のルールを保存
+                  {copy.presets.saveCurrent}
                 </button>
                 {activePresetId ? (
                   <>
@@ -500,21 +508,21 @@ export default function TextCleanerPage() {
                       }}
                       className="text-[10px] text-zinc-400 hover:text-zinc-700"
                     >
-                      改名
+                      {copy.presets.rename}
                     </button>
                     <button
                       type="button"
                       onClick={deleteActivePreset}
                       className="text-[10px] text-zinc-400 hover:text-red-600"
                     >
-                      削除
+                      {copy.presets.delete}
                     </button>
                     <button
                       type="button"
                       onClick={clearActivePresetLink}
                       className="text-[10px] text-zinc-400 hover:text-zinc-700"
                     >
-                      選択解除
+                      {copy.presets.deselect}
                     </button>
                   </>
                 ) : null}
@@ -526,7 +534,7 @@ export default function TextCleanerPage() {
           <div className="shrink-0 space-y-2 border-t border-zinc-100 pt-3">
             <div className="flex items-center justify-between gap-2">
               <p className="text-[11px] font-medium text-zinc-500">
-                一括置換ルール
+                {copy.rules.heading}
                 {activePresetId ? (
                   <span className="ml-1.5 font-normal text-zinc-400">
                     （
@@ -541,7 +549,7 @@ export default function TextCleanerPage() {
                 onClick={addRule}
                 className="btn-secondary !px-2 !py-1 text-[10px]"
               >
-                ＋ ルール追加
+                {copy.rules.add}
               </button>
             </div>
 
@@ -566,14 +574,14 @@ export default function TextCleanerPage() {
                           }
                           className="rounded border-zinc-300 text-zinc-900 focus:ring-zinc-950"
                         />
-                        有効
+                        {copy.rules.enabled}
                       </label>
                       <button
                         type="button"
                         onClick={() => removeRule(rule.id)}
                         className="text-[10px] text-zinc-400 transition-colors hover:text-red-600"
                       >
-                        削除
+                        {copy.rules.delete}
                       </button>
                     </div>
                     <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
@@ -583,7 +591,7 @@ export default function TextCleanerPage() {
                         onChange={(e) =>
                           patchRule(rule.id, { find: e.target.value })
                         }
-                        placeholder="検索ワード"
+                        placeholder={copy.rules.find}
                         className="input-field !py-1.5 !text-xs"
                       />
                       <input
@@ -592,7 +600,7 @@ export default function TextCleanerPage() {
                         onChange={(e) =>
                           patchRule(rule.id, { replace: e.target.value })
                         }
-                        placeholder="置換ワード"
+                        placeholder={copy.rules.replaceWith}
                         className="input-field !py-1.5 !text-xs"
                       />
                     </div>
@@ -610,8 +618,8 @@ export default function TextCleanerPage() {
               <div className="inline-flex w-fit shrink-0 items-center gap-1 rounded-md border border-zinc-200 bg-zinc-50 p-0.5">
                 {(
                   [
-                    ["result", "結果"],
-                    ["diff", "差分"],
+                    ["result", copy.preview.result],
+                    ["diff", copy.preview.diff],
                   ] as const
                 ).map(([id, label]) => (
                   <button
@@ -629,8 +637,10 @@ export default function TextCleanerPage() {
                 ))}
               </div>
               <p className="mt-1.5 text-[10px] text-zinc-400">
-                {stats.originalChars.toLocaleString()} 字 →{" "}
-                {stats.cleanedChars.toLocaleString()} 字
+                {fmt(copy.preview.stats, {
+                  from: stats.originalChars.toLocaleString(),
+                  to: stats.cleanedChars.toLocaleString(),
+                })}
                 {stats.delta !== 0 ? (
                   <span className="ml-1 text-zinc-500">
                     （{stats.delta > 0 ? "+" : ""}
@@ -645,7 +655,7 @@ export default function TextCleanerPage() {
               disabled={!cleaned}
               className="btn-primary !px-3 !py-1.5 text-xs"
             >
-              {copied ? "コピー完了！" : "クリーンなテキストをコピー"}
+              {copied ? copy.preview.copied : copy.preview.copy}
             </button>
           </div>
 
@@ -657,14 +667,14 @@ export default function TextCleanerPage() {
                 </pre>
               ) : (
                 <p className="text-sm text-zinc-400">
-                  左側にテキストを入力すると、ここに整形結果が表示されます。
+                  {copy.preview.emptyLeft}
                 </p>
               )
             ) : input || cleaned ? (
               <DiffView chunks={diffChunks} />
             ) : (
               <p className="text-sm text-zinc-400">
-                入力があると、削除・追加箇所が色分けされます。
+                {copy.preview.emptyReady}
               </p>
             )}
           </div>
@@ -674,7 +684,7 @@ export default function TextCleanerPage() {
               className="shrink-0 text-center text-[11px] font-medium text-emerald-600"
               role="status"
             >
-              クリップボードにコピーしました
+              {copy.preview.toastCopied}
             </p>
           ) : null}
         </section>

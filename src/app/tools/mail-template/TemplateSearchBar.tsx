@@ -1,5 +1,7 @@
 "use client";
 
+import { useI18n } from "@/i18n";
+
 function SearchIcon() {
   return (
     <svg
@@ -28,6 +30,9 @@ export default function TemplateSearchBar({
   value: string;
   onChange: (value: string) => void;
 }) {
+  const { t } = useI18n();
+  const mt = t.apps.mailTemplate;
+
   return (
     <div className="relative">
       <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2">
@@ -37,8 +42,8 @@ export default function TemplateSearchBar({
         type="search"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="テンプレートを検索..."
-        aria-label="テンプレートを検索"
+        placeholder={mt.search.placeholder}
+        aria-label={mt.search.aria}
         className="input-field w-full !py-1.5 !pl-8 !pr-2 !text-xs"
         autoComplete="off"
       />

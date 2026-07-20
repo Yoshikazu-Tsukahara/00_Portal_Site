@@ -1,5 +1,6 @@
 "use client";
 
+import { useI18n } from "@/i18n";
 import { getTagColorStyle } from "./tagColors";
 import type { TagMasterItem } from "./types";
 
@@ -13,12 +14,15 @@ export default function TagFilterBar({
   selectedTagId: string | null;
   onChange: (tagId: string | null) => void;
 }) {
+  const { t } = useI18n();
+  const mt = t.apps.mailTemplate;
+
   if (tags.length === 0) return null;
 
   return (
     <div
       role="group"
-      aria-label="ラベルで絞り込み"
+      aria-label={mt.tags.filterAria}
       className="flex flex-wrap gap-1"
     >
       <button
@@ -30,7 +34,7 @@ export default function TagFilterBar({
             : "border-zinc-200 bg-white text-zinc-600 hover:border-zinc-300 hover:bg-zinc-50"
         }`}
       >
-        すべて
+        {mt.tags.all}
       </button>
       {tags.map((tag) => {
         const style = getTagColorStyle(tag.color);

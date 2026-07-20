@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useI18n } from "@/i18n";
 
 /** PDF のドラッグ＆ドロップ / ファイル選択ゾーン */
 export default function PdfUploadZone({
@@ -13,6 +14,8 @@ export default function PdfUploadZone({
   /** 1画面完結向けの低背レイアウト */
   compact?: boolean;
 }) {
+  const { t } = useI18n();
+  const copy = t.apps.pdfEditor;
   const inputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -82,14 +85,14 @@ export default function PdfUploadZone({
           compact ? "text-xs" : "text-sm"
         }`}
       >
-        PDFをドロップ、または選択
+        {copy.dropHint}
       </p>
       {!compact ? (
         <p className="mt-1 text-[11px] text-zinc-400">
-          複数ファイル可 · ブラウザ内で処理
+          {copy.dropSub}
         </p>
       ) : (
-        <p className="mt-0.5 text-[10px] text-zinc-400">複数可 · ブラウザ内処理</p>
+        <p className="mt-0.5 text-[10px] text-zinc-400">{copy.dropSub}</p>
       )}
       <input
         ref={inputRef}

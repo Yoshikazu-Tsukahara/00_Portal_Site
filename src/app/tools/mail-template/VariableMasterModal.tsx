@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useState } from "react";
+import { fmt, useI18n } from "@/i18n";
 import { isValidVariableKey } from "./templateUtils";
 import { createId, type VariableMasterItem } from "./types";
 
@@ -16,6 +17,8 @@ export default function VariableMasterModal({
   onClose: () => void;
   onChange: (next: VariableMasterItem[]) => void;
 }) {
+  const { t } = useI18n();
+  const mt = t.apps.mailTemplate;
   const titleId = useId();
   const [draftKey, setDraftKey] = useState("");
   const [draftLabel, setDraftLabel] = useState("");
@@ -61,18 +64,18 @@ export default function VariableMasterModal({
     setError(null);
 
     if (!key) {
-      setError("キーを入力");
+      setError(mt.variableMaster.errorEmptyKey);
       return;
     }
     if (!isValidVariableKey(key)) {
-      setError("英数字と _ のみ（先頭は英字）");
+      setError(mt.variableMaster.errorKeyFormat);
       return;
     }
     const dup = variables.find(
       (v) => v.key === key && v.id !== editingId,
     );
     if (dup) {
-      setError("同じキーが既に存在");
+      setError(mt.variableMaster.errorDuplicate);
       return;
     }
 
@@ -94,7 +97,12 @@ export default function VariableMasterModal({
   function handleDelete(id: string) {
     const target = variables.find((v) => v.id === id);
     if (!target) return;
-    if (!window.confirm(`変数「${target.label}」を削除しますか？`)) return;
+    if (
+      !window.confirm(
+        fmt(mt.variableMaster.confirmDelete, { label: target.label }),
+      )
+    )
+      return;
     onChange(variables.filter((v) => v.id !== id));
     if (editingId === id) resetForm();
   }
@@ -113,35 +121,37 @@ export default function VariableMasterModal({
       >
         <div className="flex items-center justify-between border-b border-zinc-200/70 px-4 py-3">
           <h2 id={titleId} className="text-sm font-semibold text-zinc-900">
-            変数マスタ
+            {mt.variableMaster.title}
           </h2>
           <button
             type="button"
             onClick={onClose}
             className="text-xs text-zinc-400 transition-colors hover:text-zinc-700"
           >
-            閉じる
+            {mt.variableMaster.close}
           </button>
         </div>
 
         <div className="space-y-3 overflow-y-auto px-4 py-3">
           <div className="rounded-md border border-zinc-200/80 bg-zinc-50/60 p-3">
             <p className="mb-2 text-[11px] font-medium text-zinc-600">
-              {editingId ? "変数を編集" : "変数を追加"}
+              {editingId
+                ? mt.variableMaster.editHeading
+                : mt.variableMaster.addHeading}
             </p>
             <div className="flex flex-col gap-2 sm:flex-row">
               <input
                 type="text"
                 value={draftKey}
                 onChange={(e) => setDraftKey(e.target.value)}
-                placeholder="キー（例: company）"
+                placeholder={mt.variableMaster.keyPlaceholder}
                 className="input-field flex-1 !py-1.5 !text-xs font-mono"
               />
               <input
                 type="text"
                 value={draftLabel}
                 onChange={(e) => setDraftLabel(e.target.value)}
-                placeholder="ラベル（例: 会社名）"
+                placeholder={mt.variableMaster.labelPlaceholder}
                 className="input-field flex-1 !py-1.5 !text-xs"
               />
             </div>
@@ -154,7 +164,7 @@ export default function VariableMasterModal({
                 onClick={handleSubmit}
                 className="btn-primary !px-3 !py-1.5 !text-xs"
               >
-                {editingId ? "更新" : "追加"}
+                {editingId ? mt.variableMaster.update : mt.variableMaster.add}
               </button>
               {editingId ? (
                 <button
@@ -162,7 +172,7 @@ export default function VariableMasterModal({
                   onClick={resetForm}
                   className="btn-secondary !px-3 !py-1.5 !text-xs"
                 >
-                  取消
+                  {mt.variableMaster.cancel}
                 </button>
               ) : null}
             </div>
@@ -171,7 +181,7 @@ export default function VariableMasterModal({
           <ul className="divide-y divide-zinc-100 rounded-md border border-zinc-200/80">
             {variables.length === 0 ? (
               <li className="px-3 py-4 text-center text-xs text-zinc-400">
-                変数なし
+                {mt.variableMaster.empty}
               </li>
             ) : (
               variables.map((v) => (
@@ -192,14 +202,14 @@ export default function VariableMasterModal({
                     onClick={() => startEdit(v)}
                     className="text-[11px] text-zinc-500 transition-colors hover:text-zinc-900"
                   >
-                    編集
+                    {mt.variableMaster.edit}
                   </button>
                   <button
                     type="button"
                     onClick={() => handleDelete(v.id)}
                     className="text-[11px] text-zinc-400 transition-colors hover:text-red-600"
                   >
-                    削除
+                    {mt.variableMaster.delete}
                   </button>
                 </li>
               ))

@@ -1,5 +1,6 @@
 "use client";
 
+import { fmt, useI18n } from "@/i18n";
 import TagBadge from "./TagBadge";
 import { resolveTags } from "./tagColors";
 import type { MailTemplate, TagMasterItem } from "./types";
@@ -83,13 +84,16 @@ export default function TemplateList({
   onDelete: (id: string) => void;
   onTogglePin: (id: string) => void;
 }) {
+  const { t } = useI18n();
+  const mt = t.apps.mailTemplate;
+
   if (templates.length === 0) {
     return (
       <div className="flex h-full min-h-[120px] items-center justify-center rounded-md border border-dashed border-zinc-200 bg-zinc-50/50 px-3">
         <p className="text-center text-xs text-zinc-400">
           {isFilterActive
-            ? "一致するテンプレートが見つかりません"
-            : "テンプレートなし"}
+            ? mt.list.emptyFilter
+            : mt.list.empty}
         </p>
       </div>
     );
@@ -139,7 +143,7 @@ export default function TemplateList({
                   selected ? "text-zinc-400" : "text-zinc-400"
                 }`}
               >
-                {tpl.subject || "件名なし"}
+                {tpl.subject || mt.list.noSubject}
               </p>
               {tplTags.length > 0 ? (
                 <div className="mt-1.5 flex flex-wrap gap-1 pr-12">
@@ -158,11 +162,11 @@ export default function TemplateList({
               >
                 <button
                   type="button"
-                  title={pinned ? "ピン留め解除" : "ピン留め"}
+                  title={pinned ? mt.pin.unpin : mt.pin.pin}
                   aria-label={
                     pinned
-                      ? `${tpl.title} のピン留めを解除`
-                      : `${tpl.title} をピン留め`
+                      ? fmt(mt.pin.unpinAria, { title: tpl.title })
+                      : fmt(mt.pin.pinAria, { title: tpl.title })
                   }
                   aria-pressed={pinned}
                   onClick={(e) => {
@@ -183,8 +187,8 @@ export default function TemplateList({
                 </button>
                 <button
                   type="button"
-                  title="編集"
-                  aria-label={`${tpl.title} を編集`}
+                  title={mt.row.edit}
+                  aria-label={fmt(mt.row.editAria, { title: tpl.title })}
                   onClick={(e) => {
                     e.stopPropagation();
                     onEdit(tpl.id);
@@ -199,8 +203,8 @@ export default function TemplateList({
                 </button>
                 <button
                   type="button"
-                  title="削除"
-                  aria-label={`${tpl.title} を削除`}
+                  title={mt.row.delete}
+                  aria-label={fmt(mt.row.deleteAria, { title: tpl.title })}
                   onClick={(e) => {
                     e.stopPropagation();
                     onDelete(tpl.id);

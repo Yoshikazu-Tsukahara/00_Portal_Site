@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useState } from "react";
+import { fmt, useI18n } from "@/i18n";
 import { TAG_COLORS } from "./tagColors";
 import { createId, type TagColorId, type TagMasterItem } from "./types";
 
@@ -16,6 +17,8 @@ export default function TagMasterModal({
   onClose: () => void;
   onChange: (next: TagMasterItem[]) => void;
 }) {
+  const { t } = useI18n();
+  const mt = t.apps.mailTemplate;
   const titleId = useId();
   const [draftName, setDraftName] = useState("");
   const [draftColor, setDraftColor] = useState<TagColorId>("blue");
@@ -56,14 +59,14 @@ export default function TagMasterModal({
     const name = draftName.trim();
     setError(null);
     if (!name) {
-      setError("ラベル名を入力");
+      setError(mt.tagMaster.errorEmpty);
       return;
     }
     const dup = tags.find(
       (t) => t.name === name && t.id !== editingId,
     );
     if (dup) {
-      setError("同じラベル名が既に存在");
+      setError(mt.tagMaster.errorDuplicate);
       return;
     }
 
@@ -85,7 +88,10 @@ export default function TagMasterModal({
   function handleDelete(id: string) {
     const target = tags.find((t) => t.id === id);
     if (!target) return;
-    if (!window.confirm(`ラベル「${target.name}」を削除しますか？`)) return;
+    if (
+      !window.confirm(fmt(mt.tagMaster.confirmDelete, { name: target.name }))
+    )
+      return;
     onChange(tags.filter((t) => t.id !== id));
     if (editingId === id) resetForm();
   }
@@ -104,31 +110,33 @@ export default function TagMasterModal({
       >
         <div className="flex items-center justify-between border-b border-zinc-200/70 px-4 py-3">
           <h2 id={titleId} className="text-sm font-semibold text-zinc-900">
-            ラベル管理
+            {mt.tagMaster.title}
           </h2>
           <button
             type="button"
             onClick={onClose}
             className="text-xs text-zinc-400 transition-colors hover:text-zinc-700"
           >
-            閉じる
+            {mt.tagMaster.close}
           </button>
         </div>
 
         <div className="space-y-3 overflow-y-auto px-4 py-3">
           <div className="rounded-md border border-zinc-200/80 bg-zinc-50/60 p-3">
             <p className="mb-2 text-[11px] font-medium text-zinc-600">
-              {editingId ? "ラベルを編集" : "ラベルを追加"}
+              {editingId
+                ? mt.tagMaster.editHeading
+                : mt.tagMaster.addHeading}
             </p>
             <input
               type="text"
               value={draftName}
               onChange={(e) => setDraftName(e.target.value)}
-              placeholder="ラベル名（例: 重要）"
+              placeholder={mt.tagMaster.namePlaceholder}
               className="input-field mb-2 w-full !py-1.5 !text-xs"
             />
             <p className="mb-1.5 text-[10px] font-medium text-zinc-500">
-              カラー（10色）
+              {mt.tagMaster.colorLabel}
             </p>
             <div className="flex flex-wrap gap-1.5">
               {TAG_COLORS.map((c) => {
@@ -164,7 +172,7 @@ export default function TagMasterModal({
                 onClick={handleSubmit}
                 className="btn-primary !px-3 !py-1.5 !text-xs"
               >
-                {editingId ? "更新" : "追加"}
+                {editingId ? mt.tagMaster.update : mt.tagMaster.add}
               </button>
               {editingId ? (
                 <button
@@ -172,7 +180,7 @@ export default function TagMasterModal({
                   onClick={resetForm}
                   className="btn-secondary !px-3 !py-1.5 !text-xs"
                 >
-                  取消
+                  {mt.tagMaster.cancel}
                 </button>
               ) : null}
             </div>
@@ -181,7 +189,7 @@ export default function TagMasterModal({
           <ul className="divide-y divide-zinc-100 rounded-md border border-zinc-200/80">
             {tags.length === 0 ? (
               <li className="px-3 py-4 text-center text-xs text-zinc-400">
-                ラベルなし
+                {mt.tagMaster.empty}
               </li>
             ) : (
               tags.map((tag) => {
@@ -208,14 +216,14 @@ export default function TagMasterModal({
                       onClick={() => startEdit(tag)}
                       className="text-[11px] text-zinc-500 transition-colors hover:text-zinc-900"
                     >
-                      編集
+                      {mt.tagMaster.edit}
                     </button>
                     <button
                       type="button"
                       onClick={() => handleDelete(tag.id)}
                       className="text-[11px] text-zinc-400 transition-colors hover:text-red-600"
                     >
-                      削除
+                      {mt.tagMaster.delete}
                     </button>
                   </li>
                 );

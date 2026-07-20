@@ -1,4 +1,7 @@
+"use client";
+
 import type { Tool } from "@/data/tools";
+import { useI18n } from "@/i18n";
 
 /** カード共通：ベース＋ホバー時の質感 */
 const CARD_BASE =
@@ -8,7 +11,13 @@ const CARD_HOVER =
   "hover:-translate-y-1 hover:border-zinc-300/90 hover:bg-white hover:shadow-xl hover:shadow-zinc-900/5";
 
 /** Coming Soon 用：具体的内容を持たない汎用プレースホルダー */
-function ComingSoonCard() {
+function ComingSoonCard({
+  label,
+  hint,
+}: {
+  label: string;
+  hint: string;
+}) {
   return (
     <div
       className={`${CARD_BASE} cursor-default border-dashed border-zinc-200/90 bg-zinc-50/40 opacity-70`}
@@ -26,10 +35,10 @@ function ComingSoonCard() {
           ···
         </span>
         <p className="text-sm font-medium tracking-tight text-zinc-400">
-          準備中
+          {label}
         </p>
         <p className="mt-1.5 text-[12px] leading-relaxed text-zinc-400/90">
-          近日公開予定
+          {hint}
         </p>
       </div>
     </div>
@@ -37,11 +46,20 @@ function ComingSoonCard() {
 }
 
 export default function ToolCard({ tool }: { tool: Tool }) {
-  const { icon, title, description, href, comingSoon } = tool;
+  const { t } = useI18n();
+  const { icon, href, comingSoon, id } = tool;
 
   if (comingSoon) {
-    return <ComingSoonCard />;
+    return (
+      <ComingSoonCard
+        label={t.card.comingSoon}
+        hint={t.card.comingSoonHint}
+      />
+    );
   }
+
+  const copy = t.tools[id] ?? { title: id, description: "" };
+  const { title, description } = copy;
 
   const content = (
     <>
@@ -65,7 +83,7 @@ export default function ToolCard({ tool }: { tool: Tool }) {
       </p>
 
       <span className="mt-auto inline-flex items-center text-[13px] font-medium text-zinc-600 transition-colors duration-300 group-hover:text-zinc-900 sm:text-sm">
-        開く
+        {t.card.open}
         <span
           aria-hidden
           className="ml-1.5 transition-transform duration-300 group-hover:translate-x-0.5"

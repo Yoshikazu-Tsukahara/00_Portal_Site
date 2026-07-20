@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { fmt, useI18n } from "@/i18n";
 import {
   getSuggestions,
   pushInputHistory,
@@ -25,6 +26,8 @@ function VariableInputField({
   onCommitHistory: (key: string, value: string) => void;
   onRemoveHistoryItem: (key: string, value: string) => void;
 }) {
+  const { t } = useI18n();
+  const mt = t.apps.mailTemplate;
   const [focused, setFocused] = useState(false);
 
   const suggestions = useMemo(
@@ -83,8 +86,8 @@ function VariableInputField({
               </button>
               <button
                 type="button"
-                title="履歴から削除"
-                aria-label={`「${s}」を履歴から削除`}
+                title={mt.variables.removeHistory}
+                aria-label={fmt(mt.variables.removeHistoryAria, { value: s })}
                 onMouseDown={(e) => {
                   e.preventDefault();
                   onRemoveHistoryItem(item.key, s);
@@ -115,10 +118,13 @@ export default function VariableForm({
   onChange: (key: string, value: string) => void;
   onHistoryChange: (next: InputHistoryMap) => void;
 }) {
+  const { t } = useI18n();
+  const mt = t.apps.mailTemplate;
+
   if (variables.length === 0) {
     return (
       <p className="text-xs text-zinc-400">
-        有効な変数なし · 編集でマスタから選択
+        {mt.variables.empty}
       </p>
     );
   }
@@ -133,7 +139,9 @@ export default function VariableForm({
 
   return (
     <div className="space-y-2">
-      <p className="text-[11px] font-medium text-zinc-500">変数入力</p>
+      <p className="text-[11px] font-medium text-zinc-500">
+        {mt.variables.heading}
+      </p>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {variables.map((item) => (
           <VariableInputField

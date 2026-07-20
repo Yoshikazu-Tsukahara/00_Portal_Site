@@ -1,8 +1,11 @@
+"use client";
+
 import Link from "next/link";
 import type { ReactNode } from "react";
 
 import DataManager from "@/components/DataManager";
 import type { DataManagerConfig } from "@/lib/localData";
+import { useI18n } from "@/i18n";
 
 type AppShellProps = {
   /** アプリ名（ヘッダー1行目に表示） */
@@ -21,6 +24,8 @@ type AppShellProps = {
    * 子を縦方向に伸縮できるレイアウトにする（1画面完結アプリ向け）
    */
   fillViewport?: boolean;
+  /** 相関図など広めのキャンバス向け */
+  wide?: boolean;
   children: ReactNode;
 };
 
@@ -34,15 +39,16 @@ export default function AppShell({
   actions,
   dataManager,
   fillViewport = false,
+  wide = false,
   children,
 }: AppShellProps) {
+  const { t } = useI18n();
+
   return (
     <main
-      className={`mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 sm:px-6 ${
-        fillViewport
-          ? "min-h-0 overflow-hidden py-2"
-          : "py-4"
-      }`}
+      className={`mx-auto flex w-full flex-1 flex-col px-4 sm:px-6 ${
+        wide ? "max-w-[min(100%,90rem)]" : "max-w-6xl"
+      } ${fillViewport ? "min-h-0 overflow-hidden py-2" : "py-4"}`}
     >
       <header
         className={`shrink-0 border-b border-zinc-200/70 ${
@@ -54,10 +60,9 @@ export default function AppShell({
             href="/"
             className="shrink-0 text-sm text-zinc-500 transition-colors hover:text-zinc-900"
           >
-            ← ポータルに戻る
+            {t.common.backToPortal}
           </Link>
           <span aria-hidden className="h-4 w-px shrink-0 bg-zinc-200" />
-          {/* タイトル＋データ管理をインラインで並べる */}
           <div className="flex min-w-0 flex-1 items-center gap-2">
             <h1 className="min-w-0 truncate text-base font-semibold tracking-tight text-zinc-900">
               {title}

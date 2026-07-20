@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import AppShell from "@/components/AppShell";
+import { fmt, useI18n } from "@/i18n";
 import PreviewPane from "./PreviewPane";
 import TagFilterBar from "./TagFilterBar";
 import TagMasterModal from "./TagMasterModal";
@@ -37,6 +38,8 @@ import {
 } from "./types";
 
 export default function MailTemplatePage() {
+  const { t } = useI18n();
+  const mt = t.apps.mailTemplate;
   const [templates, setTemplates] = useState<MailTemplate[]>([]);
   const [variables, setVariables] = useState<VariableMasterItem[]>([]);
   const [tags, setTags] = useState<TagMasterItem[]>([]);
@@ -221,7 +224,8 @@ export default function MailTemplatePage() {
   function handleDelete(id: string) {
     const target = templates.find((t) => t.id === id);
     if (!target) return;
-    if (!window.confirm(`「${target.title}」を削除しますか？`)) return;
+    if (!window.confirm(fmt(mt.confirm.deleteTemplate, { title: target.title })))
+      return;
     const next = templates.filter((t) => t.id !== id);
     persistAll(next, variables, tags);
     if (selectedId === id) {
@@ -273,8 +277,8 @@ export default function MailTemplatePage() {
 
   return (
     <AppShell
-      title="スマートメールテンプレ管理"
-      description="変数・ラベルで返信を即作成。データはブラウザ内に保存。"
+      title={mt.shell.title}
+      description={mt.shell.description}
       fillViewport
       dataManager={{
         appId: "mail-template",
@@ -307,33 +311,33 @@ export default function MailTemplatePage() {
             onClick={() => setTagMasterOpen(true)}
             className="btn-secondary !px-3 !py-1.5 text-xs sm:text-sm"
           >
-            ラベル管理
+            {mt.actions.tagMaster}
           </button>
           <button
             type="button"
             onClick={() => setMasterOpen(true)}
             className="btn-secondary !px-3 !py-1.5 text-xs sm:text-sm"
           >
-            変数マスタ
+            {mt.actions.variableMaster}
           </button>
           <button
             type="button"
             onClick={openCreate}
             className="btn-primary !px-3 !py-1.5 text-xs sm:text-sm"
           >
-            ＋ 新規テンプレート追加
+            {mt.actions.newTemplate}
           </button>
         </div>
       }
     >
       {!hydrated ? (
-        <p className="text-sm text-zinc-400">読込中…</p>
+        <p className="text-sm text-zinc-400">{mt.loading}</p>
       ) : (
         <div className="grid min-h-0 flex-1 gap-3 md:grid-cols-[minmax(0,17rem)_minmax(0,1fr)] lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)]">
           <aside className="flex min-h-0 flex-col rounded-md border border-zinc-200/80 bg-white p-2 shadow-sm">
             <div className="mb-2 shrink-0 space-y-2 px-1">
               <p className="text-[11px] font-medium text-zinc-500">
-                テンプレート一覧
+                {mt.list.heading}
                 <span className="ml-1 tabular-nums text-zinc-400">
                   {isFilterActive
                     ? `${filteredTemplates.length} / ${templates.length}`
@@ -392,7 +396,9 @@ export default function MailTemplatePage() {
               </>
             ) : (
               <div className="flex flex-1 items-center justify-center">
-                <p className="text-sm text-zinc-400">テンプレートを選択</p>
+                <p className="text-sm text-zinc-400">
+                  {mt.list.selectPrompt}
+                </p>
               </div>
             )}
           </section>

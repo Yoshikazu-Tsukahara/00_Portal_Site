@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useState } from "react";
+import { useI18n } from "@/i18n";
 import { getTagColorStyle } from "./tagColors";
 import type { TagMasterItem, VariableMasterItem } from "./types";
 
@@ -38,6 +39,8 @@ export default function TemplateEditorModal({
   onClose: () => void;
   onSave: (draft: Draft) => void;
 }) {
+  const { t } = useI18n();
+  const mt = t.apps.mailTemplate;
   const titleId = useId();
   const [draft, setDraft] = useState<Draft>(EMPTY_DRAFT);
 
@@ -108,14 +111,14 @@ export default function TemplateEditorModal({
       >
         <div className="flex items-center justify-between border-b border-zinc-200/70 px-4 py-3">
           <h2 id={titleId} className="text-sm font-semibold text-zinc-900">
-            {mode === "create" ? "新規テンプレート" : "テンプレート編集"}
+            {mode === "create" ? mt.editor.createTitle : mt.editor.editTitle}
           </h2>
           <button
             type="button"
             onClick={onClose}
             className="text-xs text-zinc-400 transition-colors hover:text-zinc-700"
           >
-            閉じる
+            {mt.editor.close}
           </button>
         </div>
 
@@ -125,7 +128,7 @@ export default function TemplateEditorModal({
               htmlFor="tpl-title"
               className="mb-1 block text-[11px] font-medium text-zinc-500"
             >
-              タイトル
+              {mt.editor.fieldTitle}
             </label>
             <input
               id="tpl-title"
@@ -134,7 +137,7 @@ export default function TemplateEditorModal({
               onChange={(e) =>
                 setDraft((d) => ({ ...d, title: e.target.value }))
               }
-              placeholder="例: お問い合わせへの初回返信"
+              placeholder={mt.editor.titlePlaceholder}
             />
           </div>
           <div>
@@ -142,7 +145,7 @@ export default function TemplateEditorModal({
               htmlFor="tpl-subject"
               className="mb-1 block text-[11px] font-medium text-zinc-500"
             >
-              件名
+              {mt.editor.fieldSubject}
             </label>
             <input
               id="tpl-subject"
@@ -151,7 +154,7 @@ export default function TemplateEditorModal({
               onChange={(e) =>
                 setDraft((d) => ({ ...d, subject: e.target.value }))
               }
-              placeholder="例: 【ご連絡】{{company}}様"
+              placeholder={mt.editor.subjectPlaceholder}
             />
           </div>
           <div>
@@ -159,9 +162,9 @@ export default function TemplateEditorModal({
               htmlFor="tpl-body"
               className="mb-1 block text-[11px] font-medium text-zinc-500"
             >
-              本文
+              {mt.editor.fieldBody}
               <span className="ml-1 font-normal text-zinc-400">
-                {"{{キー}} で差し込み"}
+                {mt.editor.bodyHint}
               </span>
             </label>
             <textarea
@@ -172,7 +175,7 @@ export default function TemplateEditorModal({
               onChange={(e) =>
                 setDraft((d) => ({ ...d, body: e.target.value }))
               }
-              placeholder={"{{name}} 様\n\nお世話になっております。"}
+              placeholder={mt.editor.bodyPlaceholder}
             />
           </div>
 
@@ -180,9 +183,9 @@ export default function TemplateEditorModal({
           <div className="rounded-md border border-zinc-200/80 bg-zinc-50/50 p-3">
             <div className="mb-2 flex items-center justify-between gap-2">
               <p className="text-[11px] font-medium text-zinc-600">
-                ラベル
+                {mt.editor.labels}
                 <span className="ml-1 font-normal text-zinc-400">
-                  複数選択可
+                  {mt.editor.labelsMulti}
                 </span>
               </p>
               <span className="text-[10px] tabular-nums text-zinc-400">
@@ -191,7 +194,7 @@ export default function TemplateEditorModal({
             </div>
             {tags.length === 0 ? (
               <p className="text-[11px] text-zinc-400">
-                ラベルが空です。先に「ラベル管理」で追加してください。
+                {mt.editor.labelsEmpty}
               </p>
             ) : (
               <div className="flex flex-wrap gap-1.5">
@@ -231,9 +234,9 @@ export default function TemplateEditorModal({
           <div className="rounded-md border border-zinc-200/80 bg-zinc-50/50 p-3">
             <div className="mb-2 flex items-center justify-between gap-2">
               <p className="text-[11px] font-medium text-zinc-600">
-                使用する変数
+                {mt.editor.variables}
                 <span className="ml-1 font-normal text-zinc-400">
-                  マスタから選択
+                  {mt.editor.variablesHint}
                 </span>
               </p>
               <span className="text-[10px] tabular-nums text-zinc-400">
@@ -243,7 +246,7 @@ export default function TemplateEditorModal({
 
             {masterVariables.length === 0 ? (
               <p className="text-[11px] text-zinc-400">
-                変数マスタが空です。先にマスタへ追加してください。
+                {mt.editor.variablesEmpty}
               </p>
             ) : (
               <div className="grid max-h-48 grid-cols-1 gap-1.5 overflow-y-auto sm:grid-cols-2">
@@ -284,7 +287,7 @@ export default function TemplateEditorModal({
 
         <div className="flex justify-end gap-2 border-t border-zinc-200/70 px-4 py-3">
           <button type="button" onClick={onClose} className="btn-secondary">
-            キャンセル
+            {mt.editor.cancel}
           </button>
           <button
             type="button"
@@ -301,7 +304,7 @@ export default function TemplateEditorModal({
               });
             }}
           >
-            保存
+            {mt.editor.save}
           </button>
         </div>
       </div>

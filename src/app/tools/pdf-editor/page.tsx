@@ -14,6 +14,7 @@ import {
 import { arrayMove } from "@dnd-kit/sortable";
 
 import AppShell from "@/components/AppShell";
+import { useI18n } from "@/i18n";
 import ExportDialog, {
   type ExportDialogMode,
   type ExportDialogValues,
@@ -70,6 +71,8 @@ function isEditableTarget(target: EventTarget | null): boolean {
 }
 
 export default function PdfEditorPage() {
+  const { t } = useI18n();
+  const copy = t.apps.pdfEditor;
   const dndId = useId();
   const [viewMode, setViewMode] = useState<ViewMode>("page");
   const [pages, setPages] = useState<PdfPageItem[]>([]);
@@ -528,17 +531,17 @@ export default function PdfEditorPage() {
         className="btn-primary !px-3 !py-1.5 text-xs sm:text-sm"
         aria-disabled={!canExport}
       >
-        PDFを出力
+        {copy.exportPdf}
       </button>
     </div>
   );
 
   const pageStatusText = isLoading
-    ? "読込中…"
+    ? copy.loading
     : viewMode === "file"
       ? fileGroups.length > 0
         ? `${fileGroups.length} ファイル · ${pages.length} ページ`
-        : "PDFを追加"
+        : copy.addPdf
       : pages.length > 0
         ? selectedCount > 0
           ? selectedCount > 1
@@ -547,12 +550,12 @@ export default function PdfEditorPage() {
           : hasClipboard
             ? `${pages.length} ページ · ${clipboardCount} 件コピー中`
             : `${pages.length} ページ`
-        : "PDFを追加";
+        : copy.addPdf;
 
   return (
     <AppShell
-      title="PDF編集"
-      description="結合・並び替え・回転・白紙挿入。ブラウザ内で完結。"
+      title={copy.shell.title}
+      description={copy.shell.description}
       actions={headerActions}
       fillViewport
       dataManager={{
@@ -595,7 +598,7 @@ export default function PdfEditorPage() {
                   onClick={clearAll}
                   className="text-[11px] text-zinc-400 transition-colors hover:text-zinc-700"
                 >
-                  すべてクリア
+                  {copy.clearAll}
                 </button>
               ) : null}
             </div>

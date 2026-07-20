@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import JSZip from "jszip";
 
 import AppShell from "@/components/AppShell";
+import { useI18n } from "@/i18n";
 import { useLocalStorageState } from "@/lib/localData";
 import ImageGrid from "./ImageGrid";
 import ImageUploadZone from "./ImageUploadZone";
@@ -24,6 +25,8 @@ import {
 const SETTINGS_KEY = "image-compressor-settings:v1";
 
 export default function ImageCompressorPage() {
+  const { t } = useI18n();
+  const copy = t.apps.imageCompressor;
   const [items, setItems] = useState<ImageItem[]>([]);
   const [settings, setSettings, { hydrated: settingsHydrated }] =
     useLocalStorageState<CompressSettings>(SETTINGS_KEY, DEFAULT_SETTINGS);
@@ -258,21 +261,21 @@ export default function ImageCompressorPage() {
       className="btn-primary !px-3 !py-1.5 text-xs sm:text-sm"
       aria-disabled={!canDownload}
     >
-      {isZipping ? "ZIP生成中…" : "一括ダウンロード（ZIP）"}
+      {isZipping ? copy.zipping : copy.downloadZip}
     </button>
   );
 
   const statusText =
     items.length === 0
-      ? "画像を追加"
+      ? copy.addImages
       : readyCount < items.length
         ? `${items.length} 枚 · 推定サイズ算出中…`
         : `${items.length} 枚 · 圧縮準備完了`;
 
   return (
     <AppShell
-      title="画像一括軽量化"
-      description="リサイズ・圧縮をブラウザ内で一括処理。ZIPで保存。"
+      title={copy.shell.title}
+      description={copy.shell.description}
       dataManager={{
         appId: "image-compressor",
         fileNamePrefix: "image-compressor",
@@ -322,7 +325,7 @@ export default function ImageCompressorPage() {
                 onClick={clearAll}
                 className="text-[11px] text-zinc-400 transition-colors hover:text-zinc-700"
               >
-                すべてクリア
+                {copy.clearAll}
               </button>
             ) : null}
           </div>
@@ -338,7 +341,7 @@ export default function ImageCompressorPage() {
             className="btn-primary"
             aria-disabled={!canDownload}
           >
-            {isZipping ? "ZIP生成中…" : "一括ダウンロード（ZIP）"}
+            {isZipping ? copy.zipping : copy.downloadZip}
           </button>
           {!canDownload && items.length === 0 ? (
             <p className="text-[11px] text-zinc-400">画像追加でZIP可</p>

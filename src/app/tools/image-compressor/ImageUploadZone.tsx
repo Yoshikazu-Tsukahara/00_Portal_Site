@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useI18n } from "@/i18n";
 import { isImageFile } from "./imageUtils";
 
 /** 画像の D&D / 複数選択ゾーン */
@@ -11,6 +12,8 @@ export default function ImageUploadZone({
   onFiles: (files: File[]) => void;
   disabled?: boolean;
 }) {
+  const { t } = useI18n();
+  const copy = t.apps.imageCompressor;
   const inputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -70,10 +73,10 @@ export default function ImageUploadZone({
       }`}
     >
       <p className="text-sm font-medium text-zinc-800">
-        画像をドロップ、または選択
+        {copy.dropHint}
       </p>
       <p className="mt-0.5 text-[11px] text-zinc-400">
-        JPEG / PNG / WebP · 複数可 · ブラウザ内処理
+        {copy.dropSub}
       </p>
       <input
         ref={inputRef}
