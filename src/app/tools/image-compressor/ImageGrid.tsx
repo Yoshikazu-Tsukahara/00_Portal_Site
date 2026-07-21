@@ -1,5 +1,6 @@
 "use client";
 
+import { fmt, useI18n } from "@/i18n";
 import {
   calcSizeReduction,
   formatBytes,
@@ -36,10 +37,13 @@ export default function ImageGrid({
   items: ImageItem[];
   onRemove: (id: string) => void;
 }) {
+  const { t } = useI18n();
+  const copy = t.apps.imageCompressor.grid;
+
   if (items.length === 0) {
     return (
       <div className="flex min-h-[200px] items-center justify-center rounded-lg border border-dashed border-zinc-200 bg-zinc-50/40">
-        <p className="text-sm text-zinc-400">画像なし</p>
+        <p className="text-sm text-zinc-400">{copy.empty}</p>
       </div>
     );
   }
@@ -67,8 +71,8 @@ export default function ImageGrid({
               />
               <button
                 type="button"
-                title="削除"
-                aria-label={`${item.name} を削除`}
+                title={copy.delete}
+                aria-label={fmt(copy.deleteAria, { name: item.name })}
                 onClick={() => onRemove(item.id)}
                 className="absolute right-1 top-1 rounded bg-white/90 p-1 text-zinc-400 opacity-0 shadow-sm transition-opacity hover:bg-red-50 hover:text-red-600 group-hover:opacity-100"
               >
@@ -89,9 +93,9 @@ export default function ImageGrid({
                 <span className="text-zinc-300">→</span>
                 <span className="font-medium text-zinc-800">
                   {item.status === "pending"
-                    ? "算出中…"
+                    ? copy.calculating
                     : item.status === "error"
-                      ? "失敗"
+                      ? copy.failed
                       : item.estimatedSize !== null
                         ? formatBytes(item.estimatedSize)
                         : "—"}

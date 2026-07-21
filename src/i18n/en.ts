@@ -16,9 +16,8 @@ export const en: Dictionary = {
   header: {
     support: "Support the developer",
     supportShort: "Support",
-    supportAria: "Support the developer (coming soon)",
-    supportTitle: "Coming soon",
-    preparing: "Soon",
+    supportAria: "Support the developer (opens Stripe Checkout)",
+    supportTitle: "Open support page",
     langToggleAria: "Switch display language",
   },
   home: {
@@ -50,7 +49,7 @@ export const en: Dictionary = {
     "folder-generator": {
       title: "Folder Generator",
       description:
-        "Enter folder names line by line to batch-generate a ZIP of empty folders.",
+        "Build naming rules with dates, numbers, and lists—then export nested folders as a ZIP.",
     },
     "pdf-editor": {
       title: "Simple PDF Editor",
@@ -75,6 +74,11 @@ export const en: Dictionary = {
       title: "Character Relation Editor",
       description:
         "Place character cards and draw labeled links to map story relationships.",
+    },
+    "lunch-savings": {
+      title: "Lunch Savings",
+      description:
+        "Tap to log lunch spend vs budget and watch your savings grow—built for phones.",
     },
   },
   card: {

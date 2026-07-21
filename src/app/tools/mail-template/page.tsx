@@ -38,7 +38,7 @@ import {
 } from "./types";
 
 export default function MailTemplatePage() {
-  const { t } = useI18n();
+  const { t, ready } = useI18n();
   const mt = t.apps.mailTemplate;
   const [templates, setTemplates] = useState<MailTemplate[]>([]);
   const [variables, setVariables] = useState<VariableMasterItem[]>([]);
@@ -57,7 +57,8 @@ export default function MailTemplatePage() {
   const [filterTagId, setFilterTagId] = useState<string | null>(null);
 
   useEffect(() => {
-    const data = loadAppData();
+    if (!ready) return;
+    const data = loadAppData(mt.defaults);
     const sorted = filterTemplates(data.templates, "", null);
     setTemplates(data.templates);
     setVariables(data.variables);
@@ -65,7 +66,7 @@ export default function MailTemplatePage() {
     setInputHistory(loadInputHistory());
     setSelectedId(sorted[0]?.id ?? null);
     setHydrated(true);
-  }, []);
+  }, [ready, mt.defaults]);
 
   const persistAll = useCallback(
     (
@@ -154,7 +155,7 @@ export default function MailTemplatePage() {
     : "";
   const previewBody = selected ? applyVariables(selected.body, values) : "";
   const finalText = selected
-    ? buildFinalText(selected.subject, selected.body, values)
+    ? buildFinalText(selected.subject, selected.body, values, mt.combinedText)
     : "";
   const emptyLabels = findEmptyVariableLabels(enabledVariables, values);
 
@@ -288,7 +289,7 @@ export default function MailTemplatePage() {
           inputHistory,
         }),
         onImport: (raw) => {
-          const nextApp = parseImportedAppData(raw);
+          const nextApp = parseImportedAppData(raw, mt.defaults);
           if (!nextApp) return false;
           const nextHistory = parseImportedInputHistory(raw);
           saveAppData(nextApp);

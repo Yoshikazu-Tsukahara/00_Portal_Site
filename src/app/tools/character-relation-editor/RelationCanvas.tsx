@@ -10,17 +10,16 @@ import {
 } from "react";
 import { useI18n } from "@/i18n";
 import { loadLocalJson, saveLocalJson } from "@/lib/localData";
-import AvatarBubble from "./AvatarBubble";
+import CharacterCard from "./CharacterCard";
 import {
   cardConnectionPoints,
   readableLabelAngle,
   snapToGrid,
 } from "./geometry";
-import { ACCENT_CLASSES, CARD_H, CARD_W, GRID_SIZE } from "./styles";
+import { CARD_H, CARD_W, GRID_SIZE } from "./styles";
 import {
   clampZoom,
   DEFAULT_ZOOM,
-  getCardDisplayLines,
   MAX_ZOOM,
   MIN_ZOOM,
   normalizeCanvasUiPrefs,
@@ -560,73 +559,23 @@ export default function RelationCanvas({
               {characters.map((ch) => {
                 const active = ch.id === selectedCharacterId;
                 const linkingFrom = linkFromId === ch.id;
-                const accent = ACCENT_CLASSES[ch.accent];
-                const lines = getCardDisplayLines(ch);
                 return (
-                  <div
+                  <CharacterCard
                     key={ch.id}
-                    role="button"
-                    tabIndex={0}
-                    ref={(el) => {
-                      if (!el) return;
-                      const h = Math.round(el.offsetHeight);
-                      if (h > 0) setCardHeight(ch.id, h);
-                    }}
+                    character={ch}
+                    active={active}
+                    linkingFrom={linkingFrom}
+                    dragging={drag?.id === ch.id}
+                    noNoteLabel={copy.canvas.noNote}
+                    pickTargetLabel={copy.canvas.pickTarget}
                     onPointerDown={(e) => startDrag(e, ch)}
-                    onClick={(e) => e.stopPropagation()}
                     onDoubleClick={(e) => {
                       e.stopPropagation();
                       onOpenDetail(ch.id);
                     }}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") onSelectCharacter(ch.id);
-                    }}
-                    className={`absolute select-none rounded-lg border border-zinc-200/90 border-l-4 bg-white p-3 shadow-md transition-[box-shadow] duration-200 ${accent.border} ${
-                      active || linkingFrom
-                        ? "z-20 shadow-lg shadow-zinc-900/10 ring-1 ring-zinc-300"
-                        : "z-10 hover:shadow-lg hover:shadow-zinc-900/8"
-                    } ${drag?.id === ch.id ? "cursor-grabbing" : "cursor-grab"}`}
-                    style={{
-                      left: ch.x,
-                      top: ch.y,
-                      width: CARD_W,
-                      minHeight: CARD_H,
-                    }}
-                  >
-                    <div className="flex items-start gap-2.5">
-                      <AvatarBubble
-                        src={ch.avatarDataUrl}
-                        preset={ch.avatarPreset}
-                        size="md"
-                      />
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-[13px] font-semibold tracking-tight text-zinc-900">
-                          {ch.name}
-                        </p>
-                        {lines.length > 0 ? (
-                          <ul className="mt-1 space-y-0.5">
-                            {lines.map((line) => (
-                              <li
-                                key={line}
-                                className="truncate text-[11px] leading-snug text-zinc-500"
-                              >
-                                {line}
-                              </li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <p className="mt-0.5 text-[11px] text-zinc-400">
-                            {copy.canvas.noNote}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    {linkingFrom ? (
-                      <p className="mt-2 text-[10px] font-medium text-zinc-500">
-                        {copy.canvas.pickTarget}
-                      </p>
-                    ) : null}
-                  </div>
+                    onSelect={() => onSelectCharacter(ch.id)}
+                    onHeightChange={(h) => setCardHeight(ch.id, h)}
+                  />
                 );
               })}
             </div>

@@ -3,6 +3,13 @@
 import { useEffect, useState } from "react";
 import { useI18n } from "@/i18n";
 import AvatarBubble from "./AvatarBubble";
+import RelationLinkGlyph from "./RelationLinkGlyph";
+import {
+  IconLink,
+  IconPencil,
+  IconTrash,
+  SidebarIconButton,
+} from "./SidebarIcons";
 import type { Character, Relation } from "./types";
 
 type SidebarTab = "characters" | "relations";
@@ -93,28 +100,26 @@ export default function Sidebar({
 
       {tab === "characters" ? (
         <>
-          <div className="flex shrink-0 items-center justify-between border-b border-zinc-100 px-3 py-2">
-            <p className="text-[11px] text-zinc-400">
-              {copy.sidebar.charactersHint}
-            </p>
+          <div className="flex shrink-0 items-center justify-between border-b border-zinc-100 px-2.5 py-1.5">
+            <p className="text-[10px] text-zinc-400">{copy.sidebar.charactersHint}</p>
             <button
               type="button"
               onClick={onAddCharacter}
-              className="rounded-md bg-zinc-950 px-2 py-1 text-[11px] font-medium text-zinc-50 transition-colors hover:bg-zinc-800"
+              className="rounded-md bg-zinc-950 px-2 py-0.5 text-[10px] font-medium text-zinc-50 transition-colors hover:bg-zinc-800"
             >
               {copy.sidebar.addCharacter}
             </button>
           </div>
 
           {linkFromId ? (
-            <p className="border-b border-amber-100 bg-amber-50/80 px-3 py-2 text-[11px] leading-relaxed text-amber-800">
+            <p className="border-b border-amber-100 bg-amber-50/80 px-2.5 py-1.5 text-[10px] leading-relaxed text-amber-800">
               {copy.sidebar.linkHint}
             </p>
           ) : null}
 
           <div className="min-h-0 flex-1 overflow-y-auto" role="tabpanel">
             {characters.length === 0 ? (
-              <p className="px-3 py-8 text-center text-[11px] text-zinc-400">
+              <p className="px-2.5 py-6 text-center text-[11px] text-zinc-400">
                 {copy.sidebar.emptyCharacters}
               </p>
             ) : (
@@ -125,62 +130,56 @@ export default function Sidebar({
                   return (
                     <li key={ch.id}>
                       <div
-                        className={`flex items-start gap-2 px-2.5 py-2 transition-colors ${
+                        className={`flex items-center gap-1.5 px-2 py-1 transition-colors ${
                           active ? "bg-zinc-100" : "hover:bg-zinc-50"
                         }`}
                       >
                         <button
                           type="button"
                           onClick={() => onSelectCharacter(ch.id)}
-                          className="min-w-0 flex-1 text-left"
+                          className="flex min-w-0 flex-1 items-center gap-1.5 text-left"
                         >
-                          <div className="flex items-center gap-2">
-                            <AvatarBubble
-                              src={ch.avatarDataUrl}
-                              preset={ch.avatarPreset}
-                              size="sm"
-                            />
-                            <div className="min-w-0">
-                              <p className="truncate text-[13px] font-medium text-zinc-900">
-                                {ch.name}
+                          <AvatarBubble
+                            src={ch.avatarDataUrl}
+                            preset={ch.avatarPreset}
+                            size="sm"
+                          />
+                          <div className="min-w-0">
+                            <p className="truncate text-[12px] font-medium leading-tight text-zinc-900">
+                              {ch.name}
+                            </p>
+                            {ch.details.note ? (
+                              <p className="truncate text-[10px] leading-tight text-zinc-400">
+                                {ch.details.note}
                               </p>
-                              {ch.details.note ? (
-                                <p className="truncate text-[11px] text-zinc-400">
-                                  {ch.details.note}
-                                </p>
-                              ) : null}
-                            </div>
+                            ) : null}
                           </div>
                         </button>
-                        <div className="flex shrink-0 flex-col gap-0.5">
-                          <button
-                            type="button"
-                            title={copy.sidebar.link}
+                        <div className="flex shrink-0 items-center gap-0.5">
+                          <SidebarIconButton
+                            label={
+                              linking ? copy.sidebar.linking : copy.sidebar.link
+                            }
+                            active={linking}
                             onClick={() =>
                               linking ? onCancelLink() : onStartLink(ch.id)
                             }
-                            className={`rounded px-1.5 py-0.5 text-[10px] ${
-                              linking
-                                ? "bg-zinc-900 text-white"
-                                : "text-zinc-400 hover:bg-white hover:text-zinc-700"
-                            }`}
                           >
-                            {linking ? copy.sidebar.linking : copy.sidebar.link}
-                          </button>
-                          <button
-                            type="button"
+                            <IconLink />
+                          </SidebarIconButton>
+                          <SidebarIconButton
+                            label={copy.edit}
                             onClick={() => onEditCharacter(ch.id)}
-                            className="rounded px-1.5 py-0.5 text-[10px] text-zinc-400 hover:bg-white hover:text-zinc-700"
                           >
-                            {copy.edit}
-                          </button>
-                          <button
-                            type="button"
+                            <IconPencil />
+                          </SidebarIconButton>
+                          <SidebarIconButton
+                            label={copy.delete}
+                            danger
                             onClick={() => onDeleteCharacter(ch.id)}
-                            className="rounded px-1.5 py-0.5 text-[10px] text-zinc-400 hover:bg-white hover:text-rose-600"
                           >
-                            {copy.delete}
-                          </button>
+                            <IconTrash />
+                          </SidebarIconButton>
                         </div>
                       </div>
                     </li>
@@ -216,7 +215,7 @@ export default function Sidebar({
                   return (
                     <li key={rel.id}>
                       <div
-                        className={`flex items-start gap-2 px-2.5 py-2 ${
+                        className={`flex items-center gap-1.5 px-2 py-1 ${
                           active ? "bg-zinc-100" : "hover:bg-zinc-50"
                         }`}
                       >
@@ -225,40 +224,30 @@ export default function Sidebar({
                           onClick={() => onSelectRelation(rel.id)}
                           className="min-w-0 flex-1 text-left"
                         >
-                          <p className="text-[12px] font-medium text-zinc-800">
-                            {nameOf(rel.fromId)}
-                            <span className="mx-1 text-zinc-300">→</span>
-                            {nameOf(rel.toId)}
-                          </p>
-                          <p className="mt-0.5 truncate text-[11px] text-zinc-500">
-                            {rel.label || copy.sidebar.noLabel}
-                            <span className="ml-1.5 text-zinc-300">·</span>
-                            <span className="ml-1.5 text-zinc-400">
-                              {rel.strokeStyle === "dashed"
-                                ? copy.lineStyles.dashed
-                                : rel.strokeStyle === "dotted"
-                                  ? copy.lineStyles.dotted
-                                  : copy.lineStyles.solid}
-                              {rel.arrowHead !== "none" ? (
-                                <>
-                                  <span className="mx-1 text-zinc-300">/</span>
-                                  {rel.arrowHead === "end"
-                                    ? copy.arrowHead.end
-                                    : rel.arrowHead === "start"
-                                      ? copy.arrowHead.start
-                                      : copy.arrowHead.both}
-                                </>
-                              ) : null}
+                          <p className="flex min-w-0 items-center text-[11px] font-medium leading-tight text-zinc-800">
+                            <span className="min-w-0 truncate">
+                              {nameOf(rel.fromId)}
+                            </span>
+                            <RelationLinkGlyph
+                              strokeStyle={rel.strokeStyle}
+                              arrowHead={rel.arrowHead}
+                              active={active}
+                            />
+                            <span className="min-w-0 truncate">
+                              {nameOf(rel.toId)}
                             </span>
                           </p>
+                          <p className="mt-0.5 truncate text-[10px] text-zinc-500">
+                            {rel.label || copy.sidebar.noLabel}
+                          </p>
                         </button>
-                        <button
-                          type="button"
+                        <SidebarIconButton
+                          label={copy.delete}
+                          danger
                           onClick={() => onDeleteRelation(rel.id)}
-                          className="shrink-0 rounded px-1.5 py-0.5 text-[10px] text-zinc-400 hover:bg-white hover:text-rose-600"
                         >
-                          {copy.delete}
-                        </button>
+                          <IconTrash />
+                        </SidebarIconButton>
                       </div>
                     </li>
                   );

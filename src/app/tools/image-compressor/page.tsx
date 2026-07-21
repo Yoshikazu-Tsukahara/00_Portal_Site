@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import JSZip from "jszip";
 
 import AppShell from "@/components/AppShell";
-import { useI18n } from "@/i18n";
+import { fmt, useI18n } from "@/i18n";
 import { useLocalStorageState } from "@/lib/localData";
 import ImageGrid from "./ImageGrid";
 import ImageUploadZone from "./ImageUploadZone";
@@ -169,9 +169,9 @@ export default function ImageCompressorPage() {
     try {
       const created = await Promise.all(files.map((f) => createImageItem(f)));
       setItems((prev) => [...prev, ...created]);
-      setMessage(`${created.length} 枚を追加`);
+      setMessage(fmt(copy.messages.added, { count: created.length }));
     } catch {
-      setError("画像読込に失敗");
+      setError(copy.errors.loadFailed);
     }
   }
 
@@ -235,9 +235,9 @@ export default function ImageCompressorPage() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      setMessage(`${items.length} 枚をZIP保存`);
+      setMessage(fmt(copy.messages.zipped, { count: items.length }));
     } catch {
-      setError("ZIP生成に失敗");
+      setError(copy.errors.zipFailed);
     } finally {
       setIsZipping(false);
     }
@@ -269,8 +269,8 @@ export default function ImageCompressorPage() {
     items.length === 0
       ? copy.addImages
       : readyCount < items.length
-        ? `${items.length} 枚 · 推定サイズ算出中…`
-        : `${items.length} 枚 · 圧縮準備完了`;
+        ? fmt(copy.status.estimating, { count: items.length })
+        : fmt(copy.status.ready, { count: items.length });
 
   return (
     <AppShell
@@ -344,7 +344,7 @@ export default function ImageCompressorPage() {
             {isZipping ? copy.zipping : copy.downloadZip}
           </button>
           {!canDownload && items.length === 0 ? (
-            <p className="text-[11px] text-zinc-400">画像追加でZIP可</p>
+            <p className="text-[11px] text-zinc-400">{copy.status.zipHint}</p>
           ) : null}
         </div>
       </div>

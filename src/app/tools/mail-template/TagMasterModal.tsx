@@ -141,12 +141,13 @@ export default function TagMasterModal({
             <div className="flex flex-wrap gap-1.5">
               {TAG_COLORS.map((c) => {
                 const selected = draftColor === c.id;
+                const colorLabel = mt.colorLabels[c.id];
                 return (
                   <button
                     key={c.id}
                     type="button"
-                    title={c.label}
-                    aria-label={c.label}
+                    title={colorLabel}
+                    aria-label={colorLabel}
                     aria-pressed={selected}
                     onClick={() => setDraftColor(c.id)}
                     className={`flex size-7 items-center justify-center rounded-md border transition-all ${
@@ -208,7 +209,7 @@ export default function TagMasterModal({
                         {tag.name}
                       </p>
                       <p className="text-[10px] text-zinc-400">
-                        {color?.label ?? tag.color}
+                        {mt.colorLabels[tag.color] ?? tag.color}
                       </p>
                     </div>
                     <button

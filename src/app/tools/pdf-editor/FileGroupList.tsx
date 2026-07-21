@@ -4,6 +4,7 @@ import {
   SortableContext,
   rectSortingStrategy,
 } from "@dnd-kit/sortable";
+import { useI18n } from "@/i18n";
 import FileCard from "./FileCard";
 import type { FileGroup } from "./fileGroups";
 
@@ -19,10 +20,13 @@ export default function FileGroupList({
   onRemove: (sourceId: string) => void;
   onDuplicate: (sourceId: string) => void;
 }) {
+  const { t } = useI18n();
+  const copy = t.apps.pdfEditor.fileList;
+
   if (groups.length === 0) {
     return (
       <div className="flex h-[60vh] max-h-[650px] items-center justify-center rounded-lg border border-dashed border-zinc-200 bg-zinc-50/30">
-        <p className="text-sm text-zinc-400">ファイルなし</p>
+        <p className="text-sm text-zinc-400">{copy.noFiles}</p>
       </div>
     );
   }

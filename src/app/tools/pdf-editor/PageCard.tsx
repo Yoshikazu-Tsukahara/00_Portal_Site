@@ -3,6 +3,7 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { PointerEvent as ReactPointerEvent, MouseEvent } from "react";
+import { fmt, useI18n } from "@/i18n";
 import type { PdfPageItem } from "./types";
 
 function TrashIcon() {
@@ -53,6 +54,10 @@ export default function PageCard({
   onRotate: () => void;
   onPreview: () => void;
 }) {
+  const { t } = useI18n();
+  const labels = t.apps.pdfEditor;
+  const card = labels.pageCard;
+  const blankLabel = labels.blank;
   const {
     attributes,
     listeners,
@@ -101,7 +106,7 @@ export default function PageCard({
         className={`absolute inset-0 touch-none ${
           isDragging ? "cursor-grabbing" : "cursor-pointer"
         }`}
-        aria-label={`ページ ${displayIndex}${isSelected ? "（選択中）" : ""}`}
+        aria-label={`${fmt(card.pageAria, { index: displayIndex })}${isSelected ? card.pageSelected : ""}`}
         aria-pressed={isSelected}
         onPointerDown={handlePointerDown}
         onClick={(e) => {
@@ -125,7 +130,7 @@ export default function PageCard({
         }
       >
         {isBlank ? (
-          <span className="text-[11px] font-medium text-zinc-400">白紙</span>
+          <span className="text-[11px] font-medium text-zinc-400">{blankLabel}</span>
         ) : (
           /* eslint-disable-next-line @next/next/no-img-element */
           <img
@@ -145,8 +150,8 @@ export default function PageCard({
       <div className="absolute right-1 top-1 z-10 flex gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
         <button
           type="button"
-          title="回転"
-          aria-label={`ページ ${displayIndex} を回転`}
+          title={card.rotate}
+          aria-label={fmt(card.rotateAria, { index: displayIndex })}
           onPointerDown={(e) => e.stopPropagation()}
           onClick={(e) => {
             e.stopPropagation();
@@ -158,8 +163,8 @@ export default function PageCard({
         </button>
         <button
           type="button"
-          title="削除"
-          aria-label={`ページ ${displayIndex} を削除`}
+          title={card.delete}
+          aria-label={fmt(card.deleteAria, { index: displayIndex })}
           onPointerDown={(e) => e.stopPropagation()}
           onClick={(e) => {
             e.stopPropagation();

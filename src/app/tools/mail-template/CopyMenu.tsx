@@ -90,7 +90,7 @@ export default function CopyMenu({
     }
 
     if (emptyLabels.length > 0) {
-      const names = emptyLabels.slice(0, 5).join("、");
+      const names = emptyLabels.slice(0, 5).join(mt.copy.listSeparator);
       const more =
         emptyLabels.length > 5
           ? fmt(mt.copy.confirmMore, { count: emptyLabels.length - 5 })

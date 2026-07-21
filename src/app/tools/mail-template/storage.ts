@@ -1,3 +1,4 @@
+import type { MailTemplateDefaults } from "@/i18n/apps/mailTemplate";
 import {
   createDefaultVariableMaster,
   extractVariables,
@@ -115,15 +116,22 @@ function readJson(key: string): unknown {
   }
 }
 
-function createFreshData(): AppData {
-  const variables = createDefaultVariableMaster();
-  const tags = createDefaultTagMaster();
-  const templates = createSampleTemplates(variables, tags);
+function createFreshData(defaults: MailTemplateDefaults): AppData {
+  const variables = createDefaultVariableMaster(defaults.variables);
+  const tags = createDefaultTagMaster(defaults.tags);
+  const templates = createSampleTemplates(
+    variables,
+    tags,
+    defaults.templates,
+  );
   return { templates, variables, tags };
 }
 
-function migrateFromLegacy(parsed: unknown): AppData {
-  const tags = createDefaultTagMaster();
+function migrateFromLegacy(
+  parsed: unknown,
+  defaults: MailTemplateDefaults,
+): AppData {
+  const tags = createDefaultTagMaster(defaults.tags);
   const tagIdSet = new Set(tags.map((t) => t.id));
 
   // v4 / v3 object form
@@ -140,7 +148,7 @@ function migrateFromLegacy(parsed: unknown): AppData {
     };
     let variables = (raw.variables ?? []).filter(isVariableItem);
     if (variables.length === 0) {
-      variables = createDefaultVariableMaster();
+      variables = createDefaultVariableMaster(defaults.variables);
     }
     let loadedTags = (raw.tags ?? []).filter(isTagItem);
     if (loadedTags.length === 0) {
@@ -157,13 +165,13 @@ function migrateFromLegacy(parsed: unknown): AppData {
       templates:
         templates.length > 0
           ? templates
-          : createSampleTemplates(variables, loadedTags),
+          : createSampleTemplates(variables, loadedTags, defaults.templates),
     };
   }
 
   // 旧配列形式
   if (Array.isArray(parsed)) {
-    let variables = createDefaultVariableMaster();
+    let variables = createDefaultVariableMaster(defaults.variables);
     for (const item of parsed) {
       if (!item || typeof item !== "object") continue;
       const labels = (item as Record<string, unknown>).variableLabels;
@@ -190,15 +198,17 @@ function migrateFromLegacy(parsed: unknown): AppData {
       variables,
       tags,
       templates:
-        templates.length > 0 ? templates : createSampleTemplates(variables, tags),
+        templates.length > 0
+          ? templates
+          : createSampleTemplates(variables, tags, defaults.templates),
     };
   }
 
-  return createFreshData();
+  return createFreshData(defaults);
 }
 
 /** LocalStorage から読み込み */
-export function loadAppData(): AppData {
+export function loadAppData(defaults: MailTemplateDefaults): AppData {
   if (typeof window === "undefined") {
     return { templates: [], variables: [], tags: [] };
   }
@@ -213,16 +223,16 @@ export function loadAppData(): AppData {
     }
 
     if (parsed === null) {
-      const fresh = createFreshData();
+      const fresh = createFreshData(defaults);
       saveAppData(fresh);
       return fresh;
     }
 
-    const data = migrateFromLegacy(parsed);
+    const data = migrateFromLegacy(parsed, defaults);
     saveAppData(data);
     return data;
   } catch {
-    const fresh = createFreshData();
+    const fresh = createFreshData(defaults);
     saveAppData(fresh);
     return fresh;
   }
@@ -237,7 +247,10 @@ export function saveAppData(data: AppData): void {
  * バックアップ JSON の data 部を AppData に正規化。
  * `{ app, inputHistory? }` 形式と、AppData 直置きの両方に対応。
  */
-export function parseImportedAppData(raw: unknown): AppData | null {
+export function parseImportedAppData(
+  raw: unknown,
+  defaults: MailTemplateDefaults,
+): AppData | null {
   if (raw === null || raw === undefined) return null;
   try {
     let payload: unknown = raw;
@@ -249,7 +262,7 @@ export function parseImportedAppData(raw: unknown): AppData | null {
     ) {
       payload = (payload as { app: unknown }).app;
     }
-    const data = migrateFromLegacy(payload);
+    const data = migrateFromLegacy(payload, defaults);
     if (!data.templates || !data.variables || !data.tags) return null;
     return data;
   } catch {

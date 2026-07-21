@@ -39,11 +39,12 @@ export function createId(prefix: string): string {
 /** 白紙ページを生成（参照ページと同サイズ・同向き） */
 export function createBlankPage(
   ref: Pick<PdfPageItem, "width" | "height" | "rotation">,
+  blankLabel = "Blank",
 ): PdfPageItem {
   return {
     id: createId("blank"),
     kind: "blank",
-    sourceName: "白紙",
+    sourceName: blankLabel,
     thumbnailUrl: "",
     width: ref.width,
     height: ref.height,

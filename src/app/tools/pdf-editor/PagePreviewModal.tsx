@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { fmt, useI18n } from "@/i18n";
 import { renderPagePreviewHighRes } from "./pdfUtils";
 import type { PdfPageItem, PdfSource } from "./types";
 
@@ -61,6 +62,9 @@ export default function PagePreviewModal({
   onClose: () => void;
   onNavigate: (index: number) => void;
 }) {
+  const { t } = useI18n();
+  const labels = t.apps.pdfEditor;
+  const preview = labels.preview;
   const [mounted, setMounted] = useState(false);
   const [visible, setVisible] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -183,12 +187,12 @@ export default function PagePreviewModal({
       }`}
       role="dialog"
       aria-modal="true"
-      aria-label={`ページ ${displayIndex} のプレビュー`}
+      aria-label={fmt(preview.aria, { index: displayIndex })}
     >
       <button
         type="button"
         className="absolute inset-0 bg-zinc-950/45 backdrop-blur-[2px]"
-        aria-label="閉じる"
+        aria-label={preview.close}
         onClick={handleClose}
       />
 
@@ -201,7 +205,7 @@ export default function PagePreviewModal({
           type="button"
           onClick={goPrev}
           disabled={!canGoPrev}
-          aria-label="前のページ"
+          aria-label={preview.prev}
           className="pointer-events-auto btn-secondary !p-2 disabled:pointer-events-none disabled:opacity-35"
         >
           <ChevronIcon direction="left" />
@@ -211,11 +215,14 @@ export default function PagePreviewModal({
           <header className="flex shrink-0 items-center gap-3 border-b border-zinc-200/80 px-3 py-2">
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium text-zinc-900">
-                {displayIndex} / {totalPages} ページ
+                {fmt(preview.pageOf, {
+                  current: displayIndex,
+                  total: totalPages,
+                })}
               </p>
               <p className="truncate text-[11px] text-zinc-500">
                 {isBlank
-                  ? "白紙"
+                  ? labels.blank
                   : `${page.sourceName} · p.${(page.pageIndex ?? 0) + 1}`}
               </p>
             </div>
@@ -223,7 +230,7 @@ export default function PagePreviewModal({
               type="button"
               onClick={handleClose}
               className="btn-secondary !p-1.5"
-              aria-label="閉じる"
+              aria-label={preview.close}
             >
               <CloseIcon />
             </button>
@@ -231,9 +238,9 @@ export default function PagePreviewModal({
 
           <div className="flex min-h-[min(60vh,520px)] flex-1 items-center justify-center overflow-auto bg-zinc-50 p-4">
             {loading ? (
-              <p className="text-sm text-zinc-400">読込中…</p>
+              <p className="text-sm text-zinc-400">{labels.loading}</p>
             ) : error ? (
-              <p className="text-sm text-red-600">プレビュー読込に失敗</p>
+              <p className="text-sm text-red-600">{preview.failed}</p>
             ) : isBlank ? (
               <div
                 className="flex items-center justify-center rounded-lg border border-dashed border-zinc-300 bg-white shadow-sm"
@@ -243,7 +250,7 @@ export default function PagePreviewModal({
                   transform: `rotate(${page.rotation}deg)`,
                 }}
               >
-                <span className="text-sm font-medium text-zinc-400">白紙</span>
+                <span className="text-sm font-medium text-zinc-400">{labels.blank}</span>
               </div>
             ) : imageSrc ? (
               /* eslint-disable-next-line @next/next/no-img-element */
@@ -261,7 +268,7 @@ export default function PagePreviewModal({
           type="button"
           onClick={goNext}
           disabled={!canGoNext}
-          aria-label="次のページ"
+          aria-label={preview.next}
           className="pointer-events-auto btn-secondary !p-2 disabled:pointer-events-none disabled:opacity-35"
         >
           <ChevronIcon direction="right" />

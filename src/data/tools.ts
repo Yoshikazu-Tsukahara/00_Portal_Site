@@ -81,6 +81,13 @@ export const genres: Genre[] = [
   {
     id: "utilities",
     label: "Utilities",
-    tools: [comingSoonPlaceholder],
+    tools: [
+      {
+        id: "lunch-savings",
+        icon: "🍱",
+        href: "/tools/lunch-savings",
+      },
+      comingSoonPlaceholder,
+    ],
   },
 ];

@@ -3,23 +3,26 @@ import {
   characterRelationEn,
   characterRelationJa,
 } from "./characterRelation";
+import type { FolderGeneratorDict } from "./folderGenerator";
+import {
+  folderGeneratorEn,
+  folderGeneratorJa,
+} from "./folderGenerator";
+import type { ImageCompressorDict } from "./imageCompressor";
+import {
+  imageCompressorEn,
+  imageCompressorJa,
+} from "./imageCompressor";
+import type { LunchSavingsDict } from "./lunchSavings";
+import { lunchSavingsEn, lunchSavingsJa } from "./lunchSavings";
 import type { MailTemplateDict } from "./mailTemplate";
 import { mailTemplateEn, mailTemplateJa } from "./mailTemplate";
 import type { MediaMetadataDict } from "./mediaMetadata";
 import { mediaMetadataEn, mediaMetadataJa } from "./mediaMetadata";
-import type {
-  FolderGeneratorDict,
-  ImageCompressorDict,
-  PdfEditorDict,
-  TextCleanerDict,
-} from "./otherApps";
+import type { PdfEditorDict } from "./pdfEditor";
+import { pdfEditorEn, pdfEditorJa } from "./pdfEditor";
+import type { TextCleanerDict } from "./otherApps";
 import {
-  folderGeneratorEn,
-  folderGeneratorJa,
-  imageCompressorEn,
-  imageCompressorJa,
-  pdfEditorEn,
-  pdfEditorJa,
   textCleanerEn,
   textCleanerJa,
 } from "./otherApps";
@@ -32,6 +35,7 @@ export type AppsDictionary = {
   pdfEditor: PdfEditorDict;
   mediaMetadata: MediaMetadataDict;
   characterRelation: CharacterRelationDict;
+  lunchSavings: LunchSavingsDict;
 };
 
 export const appsJa: AppsDictionary = {
@@ -42,6 +46,7 @@ export const appsJa: AppsDictionary = {
   pdfEditor: pdfEditorJa,
   mediaMetadata: mediaMetadataJa,
   characterRelation: characterRelationJa,
+  lunchSavings: lunchSavingsJa,
 };
 
 export const appsEn: AppsDictionary = {
@@ -52,4 +57,5 @@ export const appsEn: AppsDictionary = {
   pdfEditor: pdfEditorEn,
   mediaMetadata: mediaMetadataEn,
   characterRelation: characterRelationEn,
+  lunchSavings: lunchSavingsEn,
 };

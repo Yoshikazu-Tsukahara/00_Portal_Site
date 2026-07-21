@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { fmt, useI18n } from "@/i18n";
 
 export type ExportDialogMode = "full" | "extract";
 
@@ -26,6 +27,8 @@ export default function ExportDialog({
   onClose: () => void;
   onConfirm: (values: ExportDialogValues) => void;
 }) {
+  const { t } = useI18n();
+  const copy = t.apps.pdfEditor.exportDialog;
   const [mounted, setMounted] = useState(false);
   const [visible, setVisible] = useState(false);
   const [addPageNumbers, setAddPageNumbers] = useState(false);
@@ -59,16 +62,16 @@ export default function ExportDialog({
 
   const title =
     mode === "extract"
-      ? `選択した ${pageCount} ページを抽出`
-      : "PDFを出力";
+      ? fmt(copy.extractTitle, { count: pageCount })
+      : copy.fullTitle;
   const confirmLabel =
     mode === "extract"
       ? isExporting
-        ? "抽出中…"
-        : "抽出してダウンロード"
+        ? copy.extracting
+        : copy.extractDownload
       : isExporting
-        ? "出力中…"
-        : "ダウンロード";
+        ? copy.exporting
+        : copy.download;
 
   return createPortal(
     <div
@@ -82,7 +85,7 @@ export default function ExportDialog({
       <button
         type="button"
         className="absolute inset-0 bg-zinc-950/40 backdrop-blur-[1px]"
-        aria-label="閉じる"
+        aria-label={copy.close}
         disabled={isExporting}
         onClick={() => {
           if (!isExporting) onClose();
@@ -98,7 +101,7 @@ export default function ExportDialog({
           <div>
             <h2 className="text-sm font-semibold text-zinc-900">{title}</h2>
             <p className="mt-0.5 text-[11px] text-zinc-500">
-              {pageCount} ページ · 出力設定
+              {fmt(copy.settingsLine, { count: pageCount })}
             </p>
           </div>
           <button
@@ -107,13 +110,13 @@ export default function ExportDialog({
             disabled={isExporting}
             className="btn-secondary !px-2 !py-1 text-xs disabled:opacity-40"
           >
-            閉じる
+            {copy.close}
           </button>
         </header>
 
         <div className="space-y-4 px-4 py-4">
           <label className="flex cursor-pointer items-center justify-between gap-3">
-            <span className="text-xs text-zinc-700">ページ番号を自動付与</span>
+            <span className="text-xs text-zinc-700">{copy.addPageNumbers}</span>
             <button
               type="button"
               role="switch"
@@ -132,7 +135,7 @@ export default function ExportDialog({
           </label>
           {addPageNumbers ? (
             <p className="text-[11px] text-zinc-400">
-              各ページ下部中央に「1 / {pageCount}」形式で印字
+              {fmt(copy.pageNumbersHint, { count: pageCount })}
             </p>
           ) : null}
 
@@ -141,7 +144,7 @@ export default function ExportDialog({
               htmlFor="export-password"
               className="mb-1 block text-xs text-zinc-700"
             >
-              閲覧パスワード
+              {copy.viewPassword}
             </label>
             <input
               id="export-password"
@@ -149,12 +152,10 @@ export default function ExportDialog({
               autoComplete="new-password"
               value={userPassword}
               onChange={(e) => setUserPassword(e.target.value)}
-              placeholder="閲覧パスワード (任意)"
+              placeholder={copy.viewPasswordPlaceholder}
               className="input-field !py-1.5 !text-xs"
             />
-            <p className="mt-1 text-[11px] text-zinc-400">
-              入力時のみ、開封にパスワードが必要な PDF を生成
-            </p>
+            <p className="mt-1 text-[11px] text-zinc-400">{copy.passwordHint}</p>
           </div>
         </div>
 
@@ -165,7 +166,7 @@ export default function ExportDialog({
             disabled={isExporting}
             className="btn-secondary !px-3 !py-1.5 text-xs disabled:opacity-40"
           >
-            キャンセル
+            {copy.cancel}
           </button>
           <button
             type="button"

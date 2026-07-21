@@ -241,16 +241,55 @@ export function truncateCardText(text: string): string {
   return `${t.slice(0, MAX_CARD_FIELD_CHARS - 1)}…`;
 }
 
-/** カードに表示するテキスト行を組み立てる */
-export function getCardDisplayLines(ch: Character): string[] {
-  const lines: string[] = [];
+/** カード上でバッジ横並びしやすい短い項目キー（二つ名はアイコン下に専用配置） */
+export const COMPACT_CARD_FIELD_KEYS: DetailFieldKey[] = ["age", "gender"];
+
+/** カード上で必ずフル幅にする長文寄り項目 */
+export const BLOCK_CARD_FIELD_KEYS: DetailFieldKey[] = [
+  "note",
+  "appearance",
+  "goal",
+  "secret",
+  "relationMemo",
+  "backstory",
+];
+
+/** 短い項目とみなす文字数の目安（これ以下ならバッジ横並び） */
+export const COMPACT_CARD_CHAR_LIMIT = 10;
+
+export type CardDisplayItem = {
+  key: DetailFieldKey;
+  text: string;
+  /** true なら横並びバッジ、false ならフル幅 */
+  compact: boolean;
+};
+
+export function isCompactCardField(key: DetailFieldKey, value: string): boolean {
+  if (BLOCK_CARD_FIELD_KEYS.includes(key)) return false;
+  if (COMPACT_CARD_FIELD_KEYS.includes(key)) return true;
+  return value.length <= COMPACT_CARD_CHAR_LIMIT;
+}
+
+/** カードに表示する項目を組み立てる（短い項目は横並び用フラグ付き） */
+export function getCardDisplayItems(ch: Character): CardDisplayItem[] {
+  const items: CardDisplayItem[] = [];
   for (const key of ch.cardVisibleKeys) {
     const value = ch.details[key]?.trim();
     if (!value) continue;
-    lines.push(truncateCardText(value));
-    if (lines.length >= MAX_CARD_VISIBLE_FIELDS) break;
+    const text = truncateCardText(value);
+    items.push({
+      key,
+      text,
+      compact: isCompactCardField(key, value),
+    });
+    if (items.length >= MAX_CARD_VISIBLE_FIELDS) break;
   }
-  return lines;
+  return items;
+}
+
+/** @deprecated getCardDisplayItems を使用 */
+export function getCardDisplayLines(ch: Character): string[] {
+  return getCardDisplayItems(ch).map((i) => i.text);
 }
 
 export function normalizeDiagram(raw: unknown): DiagramData {

@@ -86,12 +86,20 @@ body {
 
   /* ヘッダー：開発者支援ボタン（ガラス調・グラデーションアクセント） */
   .btn-support {
-    @apply relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-zinc-200/90 px-3.5 py-2 text-sm font-medium text-zinc-600 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-4px_rgba(24,24,27,0.06)] backdrop-blur-md transition-[box-shadow,opacity] duration-300;
+    @apply relative inline-flex min-h-[2.5rem] items-center justify-center overflow-hidden rounded-full border border-zinc-200/90 px-3.5 py-2 text-sm font-medium text-zinc-600 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-4px_rgba(24,24,27,0.06)] backdrop-blur-md transition-[box-shadow,opacity] duration-300;
+    /* 日英切替で幅が変わらないよう、長い文言に合わせて固定 */
+    min-width: 6.875rem;
     background: linear-gradient(
       165deg,
       rgba(255, 255, 255, 0.96) 0%,
       rgba(250, 250, 250, 0.82) 100%
     );
+  }
+
+  @media (min-width: 640px) {
+    .btn-support {
+      min-width: 15.5rem;
+    }
   }
 
   .btn-support::before {
@@ -105,13 +113,23 @@ body {
     );
   }
 
-  .btn-support:disabled {
-    @apply cursor-not-allowed opacity-65;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  .btn-support:hover {
+    @apply border-zinc-300 text-zinc-800;
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.04),
+      0 12px 28px -6px rgba(24, 24, 27, 0.1);
+  }
+
+  .btn-support:active {
+    @apply opacity-90;
+  }
+
+  .btn-support__content {
+    @apply relative z-10 inline-flex items-center justify-center gap-2;
   }
 
   .btn-support__icon {
-    @apply relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full;
+    @apply flex size-6 shrink-0 items-center justify-center rounded-full;
     background: linear-gradient(
       135deg,
       rgba(254, 243, 199, 0.95) 0%,
@@ -124,11 +142,103 @@ body {
   }
 
   .btn-support__label {
-    @apply relative z-10 tracking-tight;
+    @apply whitespace-nowrap text-center leading-none tracking-tight;
+    animation: header-label-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
-  .btn-support__badge {
-    @apply relative z-10 rounded-full border border-zinc-200/80 bg-zinc-100/90 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-zinc-400;
+  .btn-support__label-slot {
+    @apply inline-flex items-center justify-center;
+  }
+
+  /* 言語トグル：スライドする選択インジケータ */
+  .lang-toggle {
+    @apply relative inline-grid grid-cols-2 p-0.5;
+  }
+
+  .lang-toggle__indicator {
+    @apply pointer-events-none absolute top-0.5 bottom-0.5 left-0.5 w-[calc(50%-2px)] rounded-full bg-zinc-900 shadow-sm;
+    transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .lang-toggle__indicator--en {
+    transform: translateX(calc(100% + 4px));
+  }
+
+  .lang-toggle__btn {
+    @apply relative z-10 rounded-full px-2.5 py-1 text-[11px] font-medium tracking-wide transition-colors duration-200 sm:px-3 sm:text-xs;
+  }
+
+  .lang-toggle__btn--active {
+    @apply text-zinc-50;
+  }
+
+  .lang-toggle__btn--inactive {
+    @apply text-zinc-500 hover:text-zinc-800;
+  }
+
+  /* ---------- ランチ貯金アプリ ---------- */
+  .lunch-confirm-btn {
+    @apply inline-flex items-center justify-center rounded-2xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-[background-color,transform,box-shadow] hover:bg-emerald-500 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-emerald-600;
+  }
+
+  .lunch-hero {
+    background: linear-gradient(
+      160deg,
+      rgba(209, 250, 229, 0.95) 0%,
+      rgba(236, 253, 245, 0.9) 45%,
+      rgba(255, 255, 255, 0.95) 100%
+    );
+  }
+
+  .lunch-hero--budget {
+    background: linear-gradient(
+      160deg,
+      rgba(224, 242, 254, 0.95) 0%,
+      rgba(240, 249, 255, 0.9) 45%,
+      rgba(255, 255, 255, 0.95) 100%
+    );
+  }
+
+  .lunch-hero--pop {
+    animation: lunch-pop 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .lunch-toast {
+    animation: lunch-toast-in 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+
+@keyframes header-label-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.35em);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes lunch-pop {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes lunch-toast-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -8px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
   }
 }
 
@@ -144,7 +254,20 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .btn-support__label {
+    animation: none;
+  }
+
+  .lang-toggle__indicator {
+    transition: none;
+  }
+
   .portal-fade-up {
+    animation: none;
+  }
+
+  .lunch-hero--pop,
+  .lunch-toast {
     animation: none;
   }
 }

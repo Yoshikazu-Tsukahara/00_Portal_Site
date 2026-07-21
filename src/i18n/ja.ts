@@ -16,9 +16,8 @@ export const ja: Dictionary = {
   header: {
     support: "開発者を応援する",
     supportShort: "応援する",
-    supportAria: "開発者を応援する（準備中）",
-    supportTitle: "準備中です",
-    preparing: "準備中",
+    supportAria: "開発者を応援する（Stripe決済ページを開く）",
+    supportTitle: "支援ページを開く",
     langToggleAria: "表示言語を切り替える",
   },
   home: {
@@ -50,7 +49,7 @@ export const ja: Dictionary = {
     "folder-generator": {
       title: "フォルダ自動生成アプリ",
       description:
-        "作りたいフォルダ名を一行ずつ入力するだけで、空フォルダ入りのZIPを一括生成。",
+        "命名規則を組み立て、日付・番号・リストで複数フォルダを一括生成。",
     },
     "pdf-editor": {
       title: "簡易PDF編集アプリ",
@@ -75,6 +74,11 @@ export const ja: Dictionary = {
       title: "小説相関図エディター",
       description:
         "登場人物カードを配置し、関係性の線とラベルで物語の相関図を視覚的に整理。",
+    },
+    "lunch-savings": {
+      title: "ランチ貯金",
+      description:
+        "予算との差額をタップで記録。浮いたお金をゲーム感覚で貯めるスマホ向けアプリ。",
     },
   },
   card: {

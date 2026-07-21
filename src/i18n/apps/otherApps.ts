@@ -75,36 +75,6 @@ export type TextCleanerDict = {
   };
 };
 
-export type FolderGeneratorDict = {
-  shell: AppShellCopy;
-  exporting: string;
-  exportZip: string;
-  preview: string;
-  previewHint: string;
-  addToRow: string;
-  toolboxHint: string;
-};
-
-export type ImageCompressorDict = {
-  shell: AppShellCopy;
-  zipping: string;
-  downloadZip: string;
-  addImages: string;
-  clearAll: string;
-  dropHint: string;
-  dropSub: string;
-};
-
-export type PdfEditorDict = {
-  shell: AppShellCopy;
-  exportPdf: string;
-  loading: string;
-  addPdf: string;
-  clearAll: string;
-  dropHint: string;
-  dropSub: string;
-};
-
 export const textCleanerJa: TextCleanerDict = {
   shell: {
     title: "テキスト・クレンジング",
@@ -253,82 +223,4 @@ export const textCleanerEn: TextCleanerDict = {
     deleteSet: "Delete this set?",
     deleteRule: "Delete this rule?",
   },
-};
-
-export const folderGeneratorJa: FolderGeneratorDict = {
-  shell: {
-    title: "フォルダ自動生成アプリ",
-    description: "命名規則を組み立て、複数フォルダを一括生成。",
-  },
-  exporting: "出力中…",
-  exportZip: "ZIPを出力",
-  preview: "プレビュー",
-  previewHint: "親の配置と子の命名で出力可",
-  addToRow: "選択行へ追加",
-  toolboxHint: "日付・番号・リスト",
-};
-
-export const folderGeneratorEn: FolderGeneratorDict = {
-  shell: {
-    title: "Folder Generator",
-    description: "Build naming rules and generate many folders at once.",
-  },
-  exporting: "Exporting…",
-  exportZip: "Export ZIP",
-  preview: "Preview",
-  previewHint: "Ready when parent layout and child names are set",
-  addToRow: "Add to selected row",
-  toolboxHint: "Date, number, list",
-};
-
-export const imageCompressorJa: ImageCompressorDict = {
-  shell: {
-    title: "画像一括軽量化",
-    description: "リサイズ・圧縮をブラウザ内で一括処理。ZIPで保存。",
-  },
-  zipping: "ZIP生成中…",
-  downloadZip: "一括ダウンロード（ZIP）",
-  addImages: "画像を追加",
-  clearAll: "すべてクリア",
-  dropHint: "画像をドロップ、または選択",
-  dropSub: "JPEG / PNG / WebP · 複数可 · ブラウザ内処理",
-};
-
-export const imageCompressorEn: ImageCompressorDict = {
-  shell: {
-    title: "Batch Image Compressor",
-    description: "Resize and compress in the browser. Save as a ZIP.",
-  },
-  zipping: "Creating ZIP…",
-  downloadZip: "Download all (ZIP)",
-  addImages: "Add images",
-  clearAll: "Clear all",
-  dropHint: "Drop images, or choose files",
-  dropSub: "JPEG / PNG / WebP · multiple · processed in-browser",
-};
-
-export const pdfEditorJa: PdfEditorDict = {
-  shell: {
-    title: "PDF編集",
-    description: "結合・並び替え・回転・白紙挿入。ブラウザ内で完結。",
-  },
-  exportPdf: "PDFを出力",
-  loading: "読込中…",
-  addPdf: "PDFを追加",
-  clearAll: "すべてクリア",
-  dropHint: "PDFをドロップ、または選択",
-  dropSub: "複数ファイル可 · ブラウザ内で処理",
-};
-
-export const pdfEditorEn: PdfEditorDict = {
-  shell: {
-    title: "PDF Editor",
-    description: "Merge, reorder, rotate, insert blanks—all in the browser.",
-  },
-  exportPdf: "Export PDF",
-  loading: "Loading…",
-  addPdf: "Add PDF",
-  clearAll: "Clear all",
-  dropHint: "Drop PDFs, or choose files",
-  dropSub: "Multiple files · processed in-browser",
 };

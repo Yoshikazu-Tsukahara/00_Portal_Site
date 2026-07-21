@@ -1,6 +1,48 @@
 /** メールテンプレアプリ用辞書 */
+export type MailTemplateDefaults = {
+  variables: { key: string; label: string }[];
+  tags: {
+    name: string;
+    color:
+      | "red"
+      | "orange"
+      | "amber"
+      | "green"
+      | "emerald"
+      | "cyan"
+      | "blue"
+      | "indigo"
+      | "purple"
+      | "pink";
+  }[];
+  templates: {
+    title: string;
+    subject: string;
+    body: string;
+    variableKeys: string[];
+    tagIndices: number[];
+  }[];
+};
+
 export type MailTemplateDict = {
   shell: { title: string; description: string };
+  defaults: MailTemplateDefaults;
+  combinedText: {
+    subjectOnly: string;
+    both: string;
+  };
+  colorLabels: {
+    red: string;
+    orange: string;
+    amber: string;
+    green: string;
+    emerald: string;
+    cyan: string;
+    blue: string;
+    indigo: string;
+    purple: string;
+    pink: string;
+  };
   actions: {
     tagMaster: string;
     variableMaster: string;
@@ -53,6 +95,7 @@ export type MailTemplateDict = {
     subjectHint: string;
     confirmEmpty: string;
     confirmMore: string;
+    listSeparator: string;
   };
   editor: {
     createTitle: string;
@@ -116,6 +159,155 @@ export const mailTemplateJa: MailTemplateDict = {
     title: "スマートメールテンプレ管理",
     description: "変数・ラベルで返信を即作成。データはブラウザ内に保存。",
   },
+  combinedText: {
+    subjectOnly: "件名：{subject}",
+    both: "件名：{subject}\n\n本文：\n{body}",
+  },
+  colorLabels: {
+    red: "レッド",
+    orange: "オレンジ",
+    amber: "アンバー",
+    green: "グリーン",
+    emerald: "エメラルド",
+    cyan: "シアン",
+    blue: "ブルー",
+    indigo: "インディゴ",
+    purple: "パープル",
+    pink: "ピンク",
+  },
+  defaults: {
+    variables: [
+      { key: "company", label: "会社名" },
+      { key: "name", label: "担当者名" },
+      { key: "ourCompany", label: "自社名" },
+      { key: "sender", label: "送信者名" },
+      { key: "slot1", label: "候補日時①" },
+      { key: "slot2", label: "候補日時②" },
+      { key: "slot3", label: "候補日時③" },
+      { key: "project", label: "案件名" },
+      { key: "deadline", label: "有効期限" },
+      { key: "product", label: "商品・サービス名" },
+      { key: "deliverable", label: "納品物" },
+      { key: "supportUntil", label: "サポート期限" },
+      { key: "subject_code", label: "受付番号" },
+      { key: "due_date", label: "担当日" },
+    ],
+    tags: [
+      { name: "重要", color: "red" },
+      { name: "サポート", color: "blue" },
+      { name: "営業", color: "emerald" },
+      { name: "社内", color: "indigo" },
+      { name: "フォロー", color: "amber" },
+    ],
+    templates: [
+      {
+        title: "お問い合わせへの初回返信",
+        subject: "【ご連絡】{{company}}様 お問い合わせの件",
+        body: `{{name}} 様
+
+お世話になっております。
+この度はお問い合わせいただき、誠にありがとうございます。
+
+ご質問の件、担当より改めてご連絡いたします。
+恐れ入りますが、今しばらくお待ちくださいませ。
+
+何かご不明点がございましたら、本メールへご返信ください。
+
+よろしくお願いいたします。`,
+        variableKeys: ["company", "name"],
+        tagIndices: [1],
+      },
+      {
+        title: "打ち合わせ日程調整",
+        subject: "【日程調整】{{company}}様 × {{ourCompany}}",
+        body: `{{name}} 様
+
+お世話になっております。{{ourCompany}}の{{sender}}です。
+
+先日はお打ち合わせの機会をいただきありがとうございました。
+下記候補日程にてご都合はいかがでしょうか。
+
+・候補①：{{slot1}}
+・候補②：{{slot2}}
+・候補③：{{slot3}}
+
+ご都合の良い日時をご返信いただけますと幸いです。
+
+何卒よろしくお願いいたします。`,
+        variableKeys: [
+          "company",
+          "ourCompany",
+          "name",
+          "sender",
+          "slot1",
+          "slot2",
+          "slot3",
+        ],
+        tagIndices: [2, 3],
+      },
+      {
+        title: "見積書送付のご案内",
+        subject: "【お見積】{{company}}様 {{project}}のご案内",
+        body: `{{name}} 様
+
+お世話になっております。{{ourCompany}}の{{sender}}です。
+
+ご依頼いただきました「{{project}}」の見積書を送付いたします。
+内容をご確認のうえ、ご不明点がございましたらお気軽にお申し付けください。
+
+有効期限：{{deadline}}
+
+ご検討のほど、よろしくお願いいたします。`,
+        variableKeys: [
+          "company",
+          "name",
+          "ourCompany",
+          "sender",
+          "project",
+          "deadline",
+        ],
+        tagIndices: [2, 0],
+      },
+      {
+        title: "フォローアップ（営業）",
+        subject: "【ご確認】{{company}}様 {{product}}のご提案について",
+        body: `{{name}} 様
+
+お世話になっております。{{ourCompany}}の{{sender}}です。
+
+先日ご提案いたしました「{{product}}」について、その後ご検討状況はいかがでしょうか。
+
+追加資料やデモのご案内も可能ですので、ご希望がございましたらお知らせください。
+
+お忙しいところ恐れ入りますが、ご確認のほどよろしくお願いいたします。`,
+        variableKeys: ["company", "name", "ourCompany", "sender", "product"],
+        tagIndices: [2, 4],
+      },
+      {
+        title: "納品完了のご連絡",
+        subject: "【納品完了】{{company}}様 {{deliverable}}",
+        body: `{{name}} 様
+
+お世話になっております。{{ourCompany}}の{{sender}}です。
+
+「{{deliverable}}」の納品が完了いたしましたのでご連絡いたします。
+
+納品内容に問題がございませんでしたら、ご確認の旨ご返信いただけますと幸いです。
+不具合や修正のご要望がございましたら、{{supportUntil}}までにお知らせください。
+
+引き続きよろしくお願いいたします。`,
+        variableKeys: [
+          "company",
+          "name",
+          "ourCompany",
+          "sender",
+          "deliverable",
+          "supportUntil",
+        ],
+        tagIndices: [1],
+      },
+    ],
+  },
   actions: {
     tagMaster: "ラベル管理",
     variableMaster: "変数マスタ",
@@ -177,6 +369,7 @@ export const mailTemplateJa: MailTemplateDict = {
     confirmEmpty:
       "未入力の変数がありますが、このままコピーしますか？\n（{names}{more}）",
     confirmMore: " ほか{count}件",
+    listSeparator: "、",
   },
   editor: {
     createTitle: "新規テンプレート",
@@ -241,6 +434,150 @@ export const mailTemplateEn: MailTemplateDict = {
     description:
       "Craft replies instantly with variables and labels. Data stays in your browser.",
   },
+  combinedText: {
+    subjectOnly: "Subject: {subject}",
+    both: "Subject: {subject}\n\nBody:\n{body}",
+  },
+  colorLabels: {
+    red: "Red",
+    orange: "Orange",
+    amber: "Amber",
+    green: "Green",
+    emerald: "Emerald",
+    cyan: "Cyan",
+    blue: "Blue",
+    indigo: "Indigo",
+    purple: "Purple",
+    pink: "Pink",
+  },
+  defaults: {
+    variables: [
+      { key: "company", label: "Company name" },
+      { key: "name", label: "Contact name" },
+      { key: "ourCompany", label: "Our company" },
+      { key: "sender", label: "Sender name" },
+      { key: "slot1", label: "Option 1 (date/time)" },
+      { key: "slot2", label: "Option 2 (date/time)" },
+      { key: "slot3", label: "Option 3 (date/time)" },
+      { key: "project", label: "Project name" },
+      { key: "deadline", label: "Valid until" },
+      { key: "product", label: "Product / service" },
+      { key: "deliverable", label: "Deliverable" },
+      { key: "supportUntil", label: "Support until" },
+      { key: "subject_code", label: "Ticket ID" },
+      { key: "due_date", label: "Due date" },
+    ],
+    tags: [
+      { name: "Important", color: "red" },
+      { name: "Support", color: "blue" },
+      { name: "Sales", color: "emerald" },
+      { name: "Internal", color: "indigo" },
+      { name: "Follow-up", color: "amber" },
+    ],
+    templates: [
+      {
+        title: "First reply to an inquiry",
+        subject: "Re: Your inquiry — {{company}}",
+        body: `Dear {{name}},
+
+Thank you for contacting us.
+
+We have received your message and will get back to you shortly.
+If you have any urgent questions, please reply to this email.
+
+Best regards,`,
+        variableKeys: ["company", "name"],
+        tagIndices: [1],
+      },
+      {
+        title: "Schedule a meeting",
+        subject: "Meeting times — {{company}} × {{ourCompany}}",
+        body: `Dear {{name}},
+
+This is {{sender}} from {{ourCompany}}. Thank you for your time recently.
+
+Would any of the following times work for you?
+
+· Option 1: {{slot1}}
+· Option 2: {{slot2}}
+· Option 3: {{slot3}}
+
+Please let us know your preference.
+
+Best regards,`,
+        variableKeys: [
+          "company",
+          "ourCompany",
+          "name",
+          "sender",
+          "slot1",
+          "slot2",
+          "slot3",
+        ],
+        tagIndices: [2, 3],
+      },
+      {
+        title: "Send a quote",
+        subject: "Quote for {{project}} — {{company}}",
+        body: `Dear {{name}},
+
+This is {{sender}} from {{ourCompany}}.
+
+Please find attached our quote for "{{project}}".
+If you have any questions, feel free to reach out.
+
+Valid until: {{deadline}}
+
+We look forward to hearing from you.`,
+        variableKeys: [
+          "company",
+          "name",
+          "ourCompany",
+          "sender",
+          "project",
+          "deadline",
+        ],
+        tagIndices: [2, 0],
+      },
+      {
+        title: "Sales follow-up",
+        subject: "Following up — {{product}} for {{company}}",
+        body: `Dear {{name}},
+
+This is {{sender}} from {{ourCompany}}.
+
+I wanted to follow up on our proposal for "{{product}}".
+Happy to share more materials or arrange a demo if helpful.
+
+Thank you for your time.`,
+        variableKeys: ["company", "name", "ourCompany", "sender", "product"],
+        tagIndices: [2, 4],
+      },
+      {
+        title: "Delivery complete",
+        subject: "Delivered: {{deliverable}} — {{company}}",
+        body: `Dear {{name}},
+
+This is {{sender}} from {{ourCompany}}.
+
+We have completed delivery of "{{deliverable}}".
+Please confirm receipt when convenient.
+
+If you notice any issues, let us know by {{supportUntil}}.
+
+Thank you,`,
+        variableKeys: [
+          "company",
+          "name",
+          "ourCompany",
+          "sender",
+          "deliverable",
+          "supportUntil",
+        ],
+        tagIndices: [1],
+      },
+    ],
+  },
   actions: {
     tagMaster: "Manage labels",
     variableMaster: "Variable master",
@@ -302,6 +639,7 @@ export const mailTemplateEn: MailTemplateDict = {
     confirmEmpty:
       "Some variables are empty. Copy anyway?\n({names}{more})",
     confirmMore: " +{count} more",
+    listSeparator: ", ",
   },
   editor: {
     createTitle: "New template",

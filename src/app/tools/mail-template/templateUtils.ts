@@ -1,3 +1,5 @@
+import { fmt } from "@/i18n/fmt";
+import type { MailTemplateDict } from "@/i18n/apps/mailTemplate";
 import type { MailTemplate, VariableMasterItem } from "./types";
 import { createId } from "./types";
 
@@ -53,12 +55,13 @@ export function buildFinalText(
   subject: string,
   body: string,
   values: Record<string, string>,
+  combined: MailTemplateDict["combinedText"],
 ): string {
   const s = applyVariables(subject, values).trim();
   const b = applyVariables(body, values).trim();
   if (!s) return b;
-  if (!b) return `件名：${s}`;
-  return `件名：${s}\n\n本文：\n${b}`;
+  if (!b) return fmt(combined.subjectOnly, { subject: s });
+  return fmt(combined.both, { subject: s, body: b });
 }
 
 /** 件名のみ（置換後） */
@@ -127,23 +130,9 @@ export function sortPinnedFirst(templates: MailTemplate[]): MailTemplate[] {
 }
 
 /** 初期変数マスタ */
-export function createDefaultVariableMaster(): VariableMasterItem[] {
-  const defs: { key: string; label: string }[] = [
-    { key: "company", label: "会社名" },
-    { key: "name", label: "担当者名" },
-    { key: "ourCompany", label: "自社名" },
-    { key: "sender", label: "送信者名" },
-    { key: "slot1", label: "候補日時①" },
-    { key: "slot2", label: "候補日時②" },
-    { key: "slot3", label: "候補日時③" },
-    { key: "project", label: "案件名" },
-    { key: "deadline", label: "有効期限" },
-    { key: "product", label: "商品・サービス名" },
-    { key: "deliverable", label: "納品物" },
-    { key: "supportUntil", label: "サポート期限" },
-    { key: "subject_code", label: "受付番号" },
-    { key: "due_date", label: "担当日" },
-  ];
+export function createDefaultVariableMaster(
+  defs: MailTemplateDict["defaults"]["variables"],
+): VariableMasterItem[] {
   return defs.map((d) => ({
     id: createId("var"),
     key: d.key,

@@ -1,50 +1,11 @@
 "use client";
 
+import { useI18n } from "@/i18n";
 import type {
   CompressPreset,
   CompressSettings,
   OutputFormat,
 } from "./imageUtils";
-
-const PRESETS: {
-  id: CompressPreset;
-  label: string;
-  hint: string;
-  pill: string;
-  activeText: string;
-  activeHint: string;
-}[] = [
-  {
-    id: "high",
-    label: "オリジナル重視",
-    hint: "品質90% · リサイズなし",
-    pill: "bg-sky-600",
-    activeText: "text-white",
-    activeHint: "text-sky-100",
-  },
-  {
-    id: "standard",
-    label: "標準バランス",
-    hint: "おすすめ · 品質70%",
-    pill: "bg-emerald-600",
-    activeText: "text-white",
-    activeHint: "text-emerald-100",
-  },
-  {
-    id: "light",
-    label: "最高圧縮",
-    hint: "ファイル最小化 · 品質40%",
-    pill: "bg-amber-600",
-    activeText: "text-white",
-    activeHint: "text-amber-100",
-  },
-];
-
-const FORMAT_OPTIONS: { value: OutputFormat; label: string }[] = [
-  { value: "original", label: "元形式を維持" },
-  { value: "webp", label: "WebPに変換" },
-  { value: "jpeg", label: "JPEGに変換" },
-];
 
 /** 3段階プリセット＋出力オプション */
 export default function SettingsPanel({
@@ -54,30 +15,72 @@ export default function SettingsPanel({
   settings: CompressSettings;
   onChange: (next: CompressSettings) => void;
 }) {
+  const { t } = useI18n();
+  const copy = t.apps.imageCompressor;
+  const presets: {
+    id: CompressPreset;
+    label: string;
+    hint: string;
+    pill: string;
+    activeText: string;
+    activeHint: string;
+  }[] = [
+    {
+      id: "high",
+      label: copy.presets.high.label,
+      hint: copy.presets.high.hint,
+      pill: "bg-sky-600",
+      activeText: "text-white",
+      activeHint: "text-sky-100",
+    },
+    {
+      id: "standard",
+      label: copy.presets.standard.label,
+      hint: copy.presets.standard.hint,
+      pill: "bg-emerald-600",
+      activeText: "text-white",
+      activeHint: "text-emerald-100",
+    },
+    {
+      id: "light",
+      label: copy.presets.light.label,
+      hint: copy.presets.light.hint,
+      pill: "bg-amber-600",
+      activeText: "text-white",
+      activeHint: "text-amber-100",
+    },
+  ];
+
+  const formatOptions: { value: OutputFormat; label: string }[] = [
+    { value: "original", label: copy.settings.formatOriginal },
+    { value: "webp", label: copy.settings.formatWebp },
+    { value: "jpeg", label: copy.settings.formatJpeg },
+  ];
+
   const activeIndex = Math.max(
     0,
-    PRESETS.findIndex((p) => p.id === settings.preset),
+    presets.findIndex((p) => p.id === settings.preset),
   );
-  const active = PRESETS[activeIndex] ?? PRESETS[1];
+  const active = presets[activeIndex] ?? presets[1];
 
   return (
     <div className="space-y-2">
       <div className="rounded-2xl border border-zinc-200/70 bg-zinc-100/90 p-1">
         <div
           role="radiogroup"
-          aria-label="圧縮プリセット"
+          aria-label={copy.presets.aria}
           className="relative grid grid-cols-1 gap-1 sm:grid-cols-3 sm:gap-0"
         >
           <div
             aria-hidden
             className={`pointer-events-none absolute inset-y-0 left-0 hidden rounded-xl shadow-sm transition-all duration-300 ease-out sm:block ${active.pill}`}
             style={{
-              width: `calc(100% / ${PRESETS.length})`,
+              width: `calc(100% / ${presets.length})`,
               transform: `translateX(${activeIndex * 100}%)`,
             }}
           />
 
-          {PRESETS.map((preset) => {
+          {presets.map((preset) => {
             const selected = settings.preset === preset.id;
             return (
               <button
@@ -119,8 +122,8 @@ export default function SettingsPanel({
             className="size-3.5 rounded border-zinc-300 text-zinc-900 accent-zinc-900"
           />
           <span>
-            ファイル名を連番にする
-            <span className="ml-1 text-zinc-400">photo_1, photo_2…</span>
+            {copy.settings.sequentialNames}
+            <span className="ml-1 text-zinc-400">{copy.settings.sequentialHint}</span>
           </span>
         </label>
 
@@ -129,7 +132,7 @@ export default function SettingsPanel({
             htmlFor="output-format"
             className="shrink-0 text-[11px] font-medium text-zinc-500"
           >
-            保存形式
+            {copy.settings.outputFormat}
           </label>
           <select
             id="output-format"
@@ -142,7 +145,7 @@ export default function SettingsPanel({
             }
             className="input-field !w-auto !min-w-[10.5rem] !py-1.5 !text-xs"
           >
-            {FORMAT_OPTIONS.map((opt) => (
+            {formatOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
               </option>

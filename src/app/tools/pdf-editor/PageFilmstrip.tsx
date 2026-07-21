@@ -2,6 +2,7 @@
 
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { SortableContext, rectSortingStrategy } from "@dnd-kit/sortable";
+import { fmt, useI18n } from "@/i18n";
 import PageCard from "./PageCard";
 import type { PdfPageItem } from "./types";
 
@@ -68,6 +69,7 @@ function InsertGap({
   orientation,
   pasteMode,
   pasteCount,
+  filmstrip,
 }: {
   insertIndex: number;
   onInsert: (index: number) => void;
@@ -76,6 +78,12 @@ function InsertGap({
   orientation: GapOrientation;
   pasteMode: boolean;
   pasteCount: number;
+  filmstrip: {
+    insertBlank: string;
+    insertBlankAria: string;
+    pastePages: string;
+    pasteAria: string;
+  };
 }) {
   const isVertical = orientation === "v";
 
@@ -85,14 +93,14 @@ function InsertGap({
         isVertical ? "h-8 w-5" : "h-5 w-8"
       }`}
       style={{ left: x, top: y }}
-      aria-label={pasteMode ? "コピーしたページを貼り付け" : "白紙を挿入"}
+      aria-label={pasteMode ? filmstrip.pasteAria : filmstrip.insertBlankAria}
     >
       <button
         type="button"
         title={
           pasteMode
-            ? `${pasteCount} ページを貼り付け`
-            : "白紙"
+            ? fmt(filmstrip.pastePages, { count: pasteCount })
+            : filmstrip.insertBlank
         }
         onClick={() => onInsert(insertIndex)}
         className={`pointer-events-none flex h-6 w-6 scale-90 items-center justify-center rounded-full border text-sm font-medium opacity-0 shadow-sm transition-all duration-150 group-hover/gap:pointer-events-auto group-hover/gap:scale-100 group-hover/gap:opacity-100 ${
@@ -200,6 +208,8 @@ export default function PageFilmstrip({
   clipboardCount: number;
   onPreviewPage: (index: number) => void;
 }) {
+  const { t } = useI18n();
+  const filmstrip = t.apps.pdfEditor.filmstrip;
   const scrollRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -272,7 +282,7 @@ export default function PageFilmstrip({
   if (pages.length === 0) {
     return (
       <div className="flex h-[60vh] max-h-[650px] items-center justify-center rounded-lg border border-dashed border-zinc-200 bg-zinc-50/30">
-        <p className="text-sm text-zinc-400">ページなし</p>
+        <p className="text-sm text-zinc-400">{filmstrip.noPages}</p>
       </div>
     );
   }
@@ -376,6 +386,7 @@ export default function PageFilmstrip({
             orientation={gap.orientation}
             pasteMode={hasClipboard}
             pasteCount={clipboardCount}
+            filmstrip={filmstrip}
             onInsert={onInsertAt}
           />
         ))}

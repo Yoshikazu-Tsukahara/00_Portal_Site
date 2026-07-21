@@ -1,5 +1,6 @@
 "use client";
 
+import { useI18n } from "@/i18n";
 import { formatBytes } from "./imageUtils";
 
 /** 全体の合計サイズ・総削減率 */
@@ -16,6 +17,9 @@ export default function TotalSummary({
   ready: boolean;
   count: number;
 }) {
+  const { t } = useI18n();
+  const copy = t.apps.imageCompressor.summary;
+
   if (count === 0) return null;
 
   return (
@@ -24,7 +28,7 @@ export default function TotalSummary({
       <span className="text-zinc-300">→</span>
       <span className="font-medium text-zinc-900">
         {!ready || compressedTotal === null
-          ? "算出中…"
+          ? copy.calculating
           : formatBytes(compressedTotal)}
       </span>
       {ready && offPercent !== null ? (

@@ -2,19 +2,26 @@
 
 import type { ReactNode } from "react";
 import { useCallback, useRef, useState } from "react";
-import {
-  VARIABLE_META,
-  type VariableToken,
-} from "./types";
+import { fmt, useI18n } from "@/i18n";
+import type { FolderGeneratorDict } from "@/i18n/apps/folderGenerator";
+import { type VariableToken } from "./types";
 import { extractColumnValuesFromFile } from "./parseSpreadsheet";
 import { countListItems } from "./listUtils";
+import { getVariableMeta } from "./variableMeta";
 
 const labelClass = "mb-1 block text-xs font-medium text-zinc-500";
 
+type SettingsCopy = FolderGeneratorDict["settings"];
+type DateFormatsCopy = FolderGeneratorDict["dateFormats"];
+type DateIncrementCopy = FolderGeneratorDict["dateIncrement"];
+type NumberStyleCopy = FolderGeneratorDict["numberStyle"];
+
 /** リスト用：Excel / CSV のドラッグ＆ドロップ取り込み */
 function ListFileImport({
+  copy,
   onImported,
 }: {
+  copy: SettingsCopy;
   onImported: (items: string) => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -31,7 +38,7 @@ function ListFileImport({
         lower.endsWith(".xls") ||
         lower.endsWith(".csv");
       if (!ok) {
-        setError(".xlsx / .csv のみ対応");
+        setError(copy.importInvalidType);
         setStatus(null);
         return;
       }
@@ -42,23 +49,23 @@ function ListFileImport({
       try {
         const values = await extractColumnValuesFromFile(file);
         if (values.length === 0) {
-          setError("データなし");
+          setError(copy.importNoData);
           return;
         }
         onImported(values.join(","));
-        setStatus(`${values.length} 件をインポート`);
+        setStatus(fmt(copy.importDone, { count: values.length }));
       } catch {
-        setError("読み込み失敗");
+        setError(copy.importFailed);
       } finally {
         setIsLoading(false);
       }
     },
-    [onImported],
+    [copy, onImported],
   );
 
   return (
     <div className="mt-2">
-      <p className={labelClass}>Excel / CSV インポート</p>
+      <p className={labelClass}>{copy.importHeading}</p>
       <div
         role="button"
         tabIndex={0}
@@ -98,11 +105,9 @@ function ListFileImport({
         }`}
       >
         <p className="text-xs font-medium text-zinc-700">
-          {isLoading ? "読み込み中…" : "ドロップまたは選択"}
+          {isLoading ? copy.importLoading : copy.importDrop}
         </p>
-        <p className="mt-0.5 text-[11px] text-zinc-400">
-          .xlsx / .csv · 1列目
-        </p>
+        <p className="mt-0.5 text-[11px] text-zinc-400">{copy.importSub}</p>
         <input
           ref={inputRef}
           type="file"
@@ -131,18 +136,29 @@ function ListFileImport({
 
 function VariableSettingsCard({
   token,
+  settingsCopy,
+  dateFormats,
+  dateIncrement,
+  numberStyle,
+  variableKinds,
   onChange,
 }: {
   token: VariableToken;
+  settingsCopy: SettingsCopy;
+  dateFormats: DateFormatsCopy;
+  dateIncrement: DateIncrementCopy;
+  numberStyle: NumberStyleCopy;
+  variableKinds: FolderGeneratorDict["variableKinds"];
   onChange: (id: string, patch: Partial<VariableToken>) => void;
 }) {
-  const meta = VARIABLE_META[token.type];
-  const title = `${meta.short}${token.index}`;
+  const meta = getVariableMeta(variableKinds);
+  const variableMeta = meta[token.type];
+  const title = `${variableMeta.short}${token.index}`;
 
   return (
     <div className="rounded-md border border-zinc-200/60 bg-zinc-50/50 p-2.5">
       <h3
-        className={`mb-1.5 inline-flex rounded border px-2 py-0.5 text-xs font-semibold ${meta.color}`}
+        className={`mb-1.5 inline-flex rounded border px-2 py-0.5 text-xs font-semibold ${variableMeta.color}`}
       >
         {title}
       </h3>
@@ -151,7 +167,7 @@ function VariableSettingsCard({
         <div className="grid gap-2 sm:grid-cols-2">
           <div>
             <label className={labelClass} htmlFor={`${token.id}-format`}>
-              フォーマット
+              {settingsCopy.format}
             </label>
             <select
               id={`${token.id}-format`}
@@ -166,15 +182,15 @@ function VariableSettingsCard({
                 })
               }
             >
-              <option value="yyyymmdd">yyyymmdd（例: 20240719）</option>
-              <option value="yyyy-mm-dd">yyyy-mm-dd（例: 2024-07-19）</option>
-              <option value="yyyy/mm/dd">yyyy/mm/dd（例: 2024/07/19）</option>
-              <option value="yyyy年mm月dd日">yyyy年mm月dd日</option>
+              <option value="yyyymmdd">{dateFormats.yyyymmdd}</option>
+              <option value="yyyy-mm-dd">{dateFormats.yyyymmddDash}</option>
+              <option value="yyyy/mm/dd">{dateFormats.yyyymmddSlash}</option>
+              <option value="yyyy年mm月dd日">{dateFormats.yyyymmddJa}</option>
             </select>
           </div>
           <div>
             <label className={labelClass} htmlFor={`${token.id}-increment`}>
-              増分
+              {settingsCopy.increment}
             </label>
             <select
               id={`${token.id}-increment`}
@@ -189,13 +205,13 @@ function VariableSettingsCard({
                 })
               }
             >
-              <option value="fixed">固定</option>
-              <option value="daily">1件ごと +1日</option>
+              <option value="fixed">{dateIncrement.fixed}</option>
+              <option value="daily">{dateIncrement.daily}</option>
             </select>
           </div>
           <div className="sm:col-span-2">
             <label className={labelClass} htmlFor={`${token.id}-base`}>
-              基準日
+              {settingsCopy.baseDate}
             </label>
             <input
               id={`${token.id}-base`}
@@ -216,7 +232,7 @@ function VariableSettingsCard({
         <div className="grid gap-2 sm:grid-cols-3">
           <div>
             <label className={labelClass} htmlFor={`${token.id}-style`}>
-              種類
+              {settingsCopy.numberStyle}
             </label>
             <select
               id={`${token.id}-style`}
@@ -231,13 +247,13 @@ function VariableSettingsCard({
                 })
               }
             >
-              <option value="numeric">数字</option>
-              <option value="alpha">アルファベット</option>
+              <option value="numeric">{numberStyle.numeric}</option>
+              <option value="alpha">{numberStyle.alpha}</option>
             </select>
           </div>
           <div>
             <label className={labelClass} htmlFor={`${token.id}-start`}>
-              開始番号
+              {settingsCopy.startNumber}
             </label>
             <input
               id={`${token.id}-start`}
@@ -257,7 +273,7 @@ function VariableSettingsCard({
           </div>
           <div>
             <label className={labelClass} htmlFor={`${token.id}-digits`}>
-              桁数
+              {settingsCopy.digits}
             </label>
             <input
               id={`${token.id}-digits`}
@@ -283,13 +299,13 @@ function VariableSettingsCard({
       {token.type === "list" && (
         <div>
           <label className={labelClass} htmlFor={`${token.id}-list`}>
-            手入力（カンマ区切り）
+            {settingsCopy.listManual}
           </label>
           <textarea
             id={`${token.id}-list`}
             rows={2}
             className="input-field w-full"
-            placeholder="例: 企画,デザイン,開発,テスト"
+            placeholder={settingsCopy.listPlaceholder}
             value={token.list.items}
             onChange={(e) =>
               onChange(token.id, {
@@ -298,9 +314,12 @@ function VariableSettingsCard({
             }
           />
           <p className="mt-1 text-[11px] text-zinc-400">
-            {countListItems(token.list.items)} 件
+            {fmt(settingsCopy.listCount, {
+              count: countListItems(token.list.items),
+            })}
           </p>
           <ListFileImport
+            copy={settingsCopy}
             onImported={(items) =>
               onChange(token.id, {
                 list: { items },
@@ -333,12 +352,20 @@ export default function SettingsPanel({
   onIncludeGitkeepChange: (v: boolean) => void;
   templateBar?: ReactNode;
 }) {
+  const { t } = useI18n();
+  const appCopy = t.apps.folderGenerator;
+  const settingsCopy = appCopy.settings;
+
   return (
     <section className="content-card !p-2.5 sm:!p-3">
       <div className="mb-2 flex items-baseline justify-between gap-2">
         <div>
-          <h2 className="text-sm font-semibold text-zinc-900">詳細設定</h2>
-          <p className="mt-0.5 text-[11px] text-zinc-500">全変数の一覧</p>
+          <h2 className="text-sm font-semibold text-zinc-900">
+            {settingsCopy.heading}
+          </h2>
+          <p className="mt-0.5 text-[11px] text-zinc-500">
+            {settingsCopy.subheading}
+          </p>
         </div>
       </div>
 
@@ -347,7 +374,7 @@ export default function SettingsPanel({
       <div className="mb-2 flex flex-wrap items-end gap-3">
         <div className="max-w-[7rem]">
           <label className={labelClass} htmlFor="total-count">
-            生成数
+            {settingsCopy.totalCount}
           </label>
           <input
             id="total-count"
@@ -364,7 +391,9 @@ export default function SettingsPanel({
             }
           />
           {totalCountLocked ? (
-            <p className="mt-0.5 text-[10px] text-zinc-400">リスト件数と連動</p>
+            <p className="mt-0.5 text-[10px] text-zinc-400">
+              {settingsCopy.totalCountLocked}
+            </p>
           ) : null}
         </div>
 
@@ -375,13 +404,13 @@ export default function SettingsPanel({
             onChange={(e) => onIncludeGitkeepChange(e.target.checked)}
             className="h-3.5 w-3.5 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-950"
           />
-          .gitkeep を同梱
+          {settingsCopy.includeGitkeep}
         </label>
       </div>
 
       {variables.length === 0 ? (
         <p className="rounded-md border border-dashed border-zinc-200 px-3 py-3 text-center text-sm text-zinc-400">
-          変数未配置
+          {settingsCopy.noVariables}
         </p>
       ) : (
         <div className="grid gap-2">
@@ -389,6 +418,11 @@ export default function SettingsPanel({
             <VariableSettingsCard
               key={token.id}
               token={token}
+              settingsCopy={settingsCopy}
+              dateFormats={appCopy.dateFormats}
+              dateIncrement={appCopy.dateIncrement}
+              numberStyle={appCopy.numberStyle}
+              variableKinds={appCopy.variableKinds}
               onChange={onUpdateVariable}
             />
           ))}

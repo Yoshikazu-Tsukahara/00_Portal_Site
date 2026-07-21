@@ -45,7 +45,6 @@ export type Dictionary = {
     supportShort: string;
     supportAria: string;
     supportTitle: string;
-    preparing: string;
     langToggleAria: string;
   };
   home: {

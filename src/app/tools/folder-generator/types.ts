@@ -1,4 +1,3 @@
-import { COLOR_PALETTE } from "@/lib/colorPalette";
 
 /** ツールボックスから置ける変数の種類 */
 export type VariableKind = "date" | "number" | "list";
@@ -75,6 +74,7 @@ export function createDefaultVariable(
   kind: VariableKind,
   id: string,
   index: number,
+  options?: { listItems?: string },
 ): VariableToken {
   return {
     id,
@@ -91,29 +91,7 @@ export function createDefaultVariable(
       digits: 2,
     },
     list: {
-      items: "企画,デザイン,開発",
+      items: options?.listItems ?? "Planning,Design,Development",
     },
   };
 }
-
-/** 変数ブロックの表示メタ（色は共通5色パレットに固定） */
-export const VARIABLE_META: Record<
-  VariableKind,
-  { label: string; short: string; color: string }
-> = {
-  date: {
-    label: "日付",
-    short: "日付",
-    color: COLOR_PALETTE.blue,
-  },
-  number: {
-    label: "番号",
-    short: "番号",
-    color: COLOR_PALETTE.green,
-  },
-  list: {
-    label: "リスト",
-    short: "リスト",
-    color: COLOR_PALETTE.purple,
-  },
-};

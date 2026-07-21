@@ -1,5 +1,7 @@
 "use client";
 
+import { useI18n } from "@/i18n";
+
 function UndoIcon() {
   return (
     <svg
@@ -50,16 +52,19 @@ export default function HistoryToolbar({
   onUndo: () => void;
   onRedo: () => void;
 }) {
+  const { t } = useI18n();
+  const copy = t.apps.pdfEditor.history;
+
   return (
     <div
       className="inline-flex items-center gap-0.5 rounded-md border border-zinc-200 bg-white p-0.5"
       role="group"
-      aria-label="履歴操作"
+      aria-label={copy.aria}
     >
       <button
         type="button"
-        title="元に戻す (Ctrl+Z)"
-        aria-label="元に戻す"
+        title={copy.undoTitle}
+        aria-label={copy.undo}
         disabled={!canUndo}
         onClick={onUndo}
         className="rounded p-1.5 text-zinc-700 transition-colors hover:bg-zinc-100 disabled:cursor-not-allowed disabled:text-zinc-300 disabled:hover:bg-transparent"
@@ -68,8 +73,8 @@ export default function HistoryToolbar({
       </button>
       <button
         type="button"
-        title="やり直す (Ctrl+Y)"
-        aria-label="やり直す"
+        title={copy.redoTitle}
+        aria-label={copy.redo}
         disabled={!canRedo}
         onClick={onRedo}
         className="rounded p-1.5 text-zinc-700 transition-colors hover:bg-zinc-100 disabled:cursor-not-allowed disabled:text-zinc-300 disabled:hover:bg-transparent"

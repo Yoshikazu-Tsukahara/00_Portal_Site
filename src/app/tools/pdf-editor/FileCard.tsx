@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { fmt, useI18n } from "@/i18n";
 import type { FileGroup } from "./fileGroups";
 
 function TrashIcon() {
@@ -58,6 +59,8 @@ export default function FileCard({
   onRemove: (sourceId: string) => void;
   onDuplicate: (sourceId: string) => void;
 }) {
+  const { t } = useI18n();
+  const copy = t.apps.pdfEditor.fileCard;
   const {
     attributes,
     listeners,
@@ -108,7 +111,7 @@ export default function FileCard({
       <button
         type="button"
         className="flex shrink-0 cursor-grab items-center gap-1.5 touch-none px-1 active:cursor-grabbing"
-        aria-label={`${group.name} を並べ替え`}
+        aria-label={fmt(copy.reorderAria, { name: group.name })}
         {...attributes}
         {...listeners}
       >
@@ -136,28 +139,28 @@ export default function FileCard({
               }
             }}
             className="input-field !w-full !px-1.5 !py-0.5 !text-xs"
-            aria-label="ファイル名を編集"
+            aria-label={copy.editName}
           />
         ) : (
           <button
             type="button"
             className="block w-full truncate text-left text-xs font-medium text-zinc-800 hover:underline"
-            title="クリックで名前を編集"
+            title={copy.editNameTitle}
             onClick={() => setEditing(true)}
           >
             {group.name}
           </button>
         )}
         <p className="mt-0.5 text-[11px] text-zinc-400">
-          {group.pageCount} ページ
+          {fmt(copy.pageCount, { count: group.pageCount })}
         </p>
       </div>
 
       <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
         <button
           type="button"
-          title="複製"
-          aria-label={`${group.name} を複製`}
+          title={copy.duplicate}
+          aria-label={fmt(copy.duplicateAria, { name: group.name })}
           onClick={() => onDuplicate(group.sourceId)}
           className="rounded p-1 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-800"
         >
@@ -165,8 +168,8 @@ export default function FileCard({
         </button>
         <button
           type="button"
-          title="削除"
-          aria-label={`${group.name} を削除`}
+          title={copy.delete}
+          aria-label={fmt(copy.deleteAria, { name: group.name })}
           onClick={() => onRemove(group.sourceId)}
           className="rounded p-1 text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-600"
         >

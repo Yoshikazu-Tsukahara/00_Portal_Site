@@ -17,7 +17,7 @@ import {
 import { arrayMove } from "@dnd-kit/sortable";
 
 import AppShell from "@/components/AppShell";
-import { useI18n } from "@/i18n";
+import { fmt, useI18n } from "@/i18n";
 import Toolbox from "./Toolbox";
 import FormatBuilder, { DragOverlayBadge } from "./FormatBuilder";
 import SettingsPanel from "./SettingsPanel";
@@ -145,13 +145,17 @@ export default function FolderGeneratorPage() {
 
   function addVariableToNode(nodeId: string, kind: VariableKind) {
     const index = nextIndexInTree(root, kind);
-    const token = createDefaultVariable(kind, createId(kind), index);
+    const token = createDefaultVariable(kind, createId(kind), index, {
+      listItems: copy.defaults.listItems,
+    });
     setRoot((prev) => {
       const next = updateNode(prev, nodeId, (node) => ({
         ...node,
         tokens: [
           ...node.tokens,
-          createDefaultVariable(kind, token.id, nextIndexInTree(prev, kind)),
+          createDefaultVariable(kind, token.id, nextIndexInTree(prev, kind), {
+            listItems: copy.defaults.listItems,
+          }),
         ],
       }));
       return next;
@@ -270,13 +274,16 @@ export default function FolderGeneratorPage() {
       const dropOnArea = overId.startsWith("format-area-");
       const insertBeforeTokenId = dropOnArea ? null : overId;
       const index = nextIndexInTree(root, kind);
-      const neu = createDefaultVariable(kind, createId(kind), index);
+      const neu = createDefaultVariable(kind, createId(kind), index, {
+        listItems: copy.defaults.listItems,
+      });
 
       setRoot((prev) => {
         const token = createDefaultVariable(
           kind,
           neu.id,
           nextIndexInTree(prev, kind),
+          { listItems: copy.defaults.listItems },
         );
         return updateNode(prev, targetNodeId!, (node) => {
           if (!insertBeforeTokenId) {
@@ -330,16 +337,14 @@ export default function FolderGeneratorPage() {
     setError(null);
 
     if (!canGenerateZip(root, totalCount)) {
-      setError("入力内容を確認");
+      setError(copy.errors.checkInput);
       return;
     }
 
     const tree = generateFolderTree(root, totalCount);
     const folderCount = countExpandedFolders(tree);
     if (folderCount === 0) {
-      setError(
-        "フォルダ名を生成できません",
-      );
+      setError(copy.errors.noFolders);
       return;
     }
 
@@ -358,9 +363,9 @@ export default function FolderGeneratorPage() {
       document.body.removeChild(anchor);
       URL.revokeObjectURL(url);
 
-      setMessage(`${folderCount} 件のフォルダを出力`);
+      setMessage(fmt(copy.messages.exported, { count: folderCount }));
     } catch {
-      setError("ZIP出力に失敗");
+      setError(copy.errors.zipFailed);
     } finally {
       setIsGenerating(false);
     }
@@ -423,9 +428,9 @@ export default function FolderGeneratorPage() {
               <div className="flex flex-wrap gap-1">
                 {(
                   [
-                    ["date", "日付"],
-                    ["number", "番号"],
-                    ["list", "リスト"],
+                    ["date", copy.variableKinds.date.label],
+                    ["number", copy.variableKinds.number.label],
+                    ["list", copy.variableKinds.list.label],
                   ] as const
                 ).map(([kind, label]) => (
                   <button

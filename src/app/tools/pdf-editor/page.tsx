@@ -14,7 +14,7 @@ import {
 import { arrayMove } from "@dnd-kit/sortable";
 
 import AppShell from "@/components/AppShell";
-import { useI18n } from "@/i18n";
+import { fmt, useI18n } from "@/i18n";
 import ExportDialog, {
   type ExportDialogMode,
   type ExportDialogValues,
@@ -174,7 +174,7 @@ export default function PdfEditorPage() {
     if (!prev) return;
     applySnapshot(prev);
     setHistoryTick((t) => t + 1);
-    setMessage("元に戻した");
+    setMessage(copy.messages.undone);
   }, [applySnapshot, takeSnapshot]);
 
   const handleRedo = useCallback(() => {
@@ -182,7 +182,7 @@ export default function PdfEditorPage() {
     if (!next) return;
     applySnapshot(next);
     setHistoryTick((t) => t + 1);
-    setMessage("やり直した");
+    setMessage(copy.messages.redone);
   }, [applySnapshot, takeSnapshot]);
 
   useEffect(() => {
@@ -211,7 +211,7 @@ export default function PdfEditorPage() {
     if (ids.length === 0) return;
     recordHistory();
     const count = copyToClipboard(pages, ids);
-    setMessage(`${count} ページをコピー`);
+    setMessage(fmt(copy.messages.copied, { count }));
   }, [copyToClipboard, pages, recordHistory, selectedIds]);
 
   useEffect(() => {
@@ -266,9 +266,9 @@ export default function PdfEditorPage() {
       recordHistory();
       setSources(nextSources);
       setPages((prev) => [...prev, ...added]);
-      setMessage(`${added.length} ページを追加`);
+      setMessage(fmt(copy.messages.pagesAdded, { count: added.length }));
     } catch {
-      setError("PDF読込に失敗");
+      setError(copy.errors.loadFailed);
     } finally {
       setIsLoading(false);
     }
@@ -297,7 +297,7 @@ export default function PdfEditorPage() {
       if (prev.length === 0) return prev;
       const refIndex = index === 0 ? 0 : index - 1;
       const ref = prev[refIndex];
-      const blank = createBlankPage(ref);
+      const blank = createBlankPage(ref, copy.blank);
       const next = [...prev];
       next.splice(index, 0, blank);
       return next;
@@ -315,7 +315,7 @@ export default function PdfEditorPage() {
     });
     if (inserted.length > 0) {
       setSelection(inserted.map((p) => p.id));
-      setMessage(`${inserted.length} ページを貼り付け`);
+      setMessage(fmt(copy.messages.pagesPasted, { count: inserted.length }));
     }
   }
 
@@ -334,14 +334,14 @@ export default function PdfEditorPage() {
     const idSet = new Set(ids);
     setPages((prev) => prev.filter((p) => !idSet.has(p.id)));
     clearSelection();
-    setMessage(`${ids.length} ページを削除`);
+    setMessage(fmt(copy.messages.pagesDeleted, { count: ids.length }));
   }
 
   function handleBulkRotate() {
     const ids = [...selectedIds];
     if (ids.length === 0) return;
     rotatePages(ids);
-    setMessage(`${ids.length} ページを回転`);
+    setMessage(fmt(copy.messages.pagesRotated, { count: ids.length }));
   }
 
   function handleRemoveFile(sourceId: string) {
@@ -355,7 +355,12 @@ export default function PdfEditorPage() {
     });
     clearSelection();
     setMessage(
-      group ? `${group.name} を削除（${group.pageCount} ページ）` : "ファイルを削除",
+      group
+        ? fmt(copy.messages.fileDeletedNamed, {
+            name: group.name,
+            count: group.pageCount,
+          })
+        : copy.messages.fileDeleted,
     );
   }
 
@@ -366,7 +371,7 @@ export default function PdfEditorPage() {
     const result = renameFile(pages, sources, sourceId, trimmed);
     setPages(result.pages);
     setSources(result.sources);
-    setMessage("ファイル名を更新");
+    setMessage(copy.messages.fileRenamed);
   }
 
   function handleDuplicateFile(sourceId: string) {
@@ -378,8 +383,11 @@ export default function PdfEditorPage() {
     const group = fileGroups.find((g) => g.sourceId === sourceId);
     setMessage(
       group
-        ? `${group.name} を複製（${group.pageCount} ページ）`
-        : "ファイルを複製",
+        ? fmt(copy.messages.fileDuplicatedNamed, {
+            name: group.name,
+            count: group.pageCount,
+          })
+        : copy.messages.fileDuplicated,
     );
   }
 
@@ -486,15 +494,15 @@ export default function PdfEditorPage() {
       downloadPdfBytes(bytes, filename);
       setMessage(
         exportMode === "extract"
-          ? `${targetPages.length} ページを抽出`
-          : `${targetPages.length} ページを出力`,
+          ? fmt(copy.messages.pagesExtracted, { count: targetPages.length })
+          : fmt(copy.messages.pagesExported, { count: targetPages.length }),
       );
       setExportOpen(false);
     } catch {
       setError(
         values.userPassword.trim()
-          ? "PDF出力または暗号化に失敗"
-          : "PDF出力に失敗",
+          ? copy.errors.exportEncryptFailed
+          : copy.errors.exportFailed,
       );
     } finally {
       setIsExporting(false);
@@ -540,16 +548,25 @@ export default function PdfEditorPage() {
     ? copy.loading
     : viewMode === "file"
       ? fileGroups.length > 0
-        ? `${fileGroups.length} ファイル · ${pages.length} ページ`
+        ? fmt(copy.status.filesAndPages, {
+            files: fileGroups.length,
+            pages: pages.length,
+          })
         : copy.addPdf
       : pages.length > 0
         ? selectedCount > 0
           ? selectedCount > 1
-            ? `${pages.length} ページ · ${selectedCount} 件選択`
-            : `${pages.length} ページ · 1 件選択`
+            ? fmt(copy.status.pagesSelected, {
+                pages: pages.length,
+                selected: selectedCount,
+              })
+            : fmt(copy.status.pagesSelectedOne, { pages: pages.length })
           : hasClipboard
-            ? `${pages.length} ページ · ${clipboardCount} 件コピー中`
-            : `${pages.length} ページ`
+            ? fmt(copy.status.pagesCopying, {
+                pages: pages.length,
+                copying: clipboardCount,
+              })
+            : fmt(copy.status.pagesOnly, { count: pages.length })
         : copy.addPdf;
 
   return (
@@ -688,7 +705,9 @@ export default function PdfEditorPage() {
                     {activeFileGroup.name}
                   </p>
                   <p className="text-[11px] text-zinc-400">
-                    {activeFileGroup.pageCount} ページ
+                    {fmt(copy.fileCard.pageCount, {
+                      count: activeFileGroup.pageCount,
+                    })}
                   </p>
                 </div>
               </div>

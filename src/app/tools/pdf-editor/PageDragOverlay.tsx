@@ -1,13 +1,16 @@
 "use client";
 
+import { fmt, useI18n } from "@/i18n";
 import type { PdfPageItem } from "./types";
 import { CARD_HEIGHT, CARD_WIDTH } from "./PageFilmstrip";
 
 function PageThumb({
   page,
+  blankLabel,
   className,
 }: {
   page: PdfPageItem;
+  blankLabel: string;
   className?: string;
 }) {
   if (page.kind === "blank") {
@@ -15,7 +18,7 @@ function PageThumb({
       <div
         className={`flex h-full w-full items-center justify-center bg-zinc-50 text-[11px] text-zinc-400 ${className ?? ""}`}
       >
-        白紙
+        {blankLabel}
       </div>
     );
   }
@@ -40,6 +43,8 @@ export default function PageDragOverlay({
   page: PdfPageItem;
   count: number;
 }) {
+  const { t } = useI18n();
+  const labels = t.apps.pdfEditor;
   const isStack = count > 1;
 
   if (!isStack) {
@@ -48,12 +53,11 @@ export default function PageDragOverlay({
         className="overflow-hidden rounded-lg border border-zinc-300 bg-white shadow-lg"
         style={{ width: CARD_WIDTH, height: CARD_HEIGHT }}
       >
-        <PageThumb page={page} />
+        <PageThumb page={page} blankLabel={labels.blank} />
       </div>
     );
   }
 
-  // 後ろに見せる枚数（最大2層）
   const backLayers = Math.min(count - 1, 2);
 
   return (
@@ -63,9 +67,8 @@ export default function PageDragOverlay({
         width: CARD_WIDTH + 14,
         height: CARD_HEIGHT + 14,
       }}
-      aria-label={`${count} ページを移動中`}
+      aria-label={fmt(labels.dragOverlay.moving, { count })}
     >
-      {/* 背面スタック（奥 → 手前） */}
       {backLayers >= 2 ? (
         <div
           aria-hidden
@@ -93,12 +96,11 @@ export default function PageDragOverlay({
         </div>
       ) : null}
 
-      {/* 前面：掴んでいるカード */}
       <div
         className="relative z-10 overflow-hidden rounded-lg border border-zinc-300 bg-white shadow-xl"
         style={{ width: CARD_WIDTH, height: CARD_HEIGHT }}
       >
-        <PageThumb page={page} />
+        <PageThumb page={page} blankLabel={labels.blank} />
         <span className="absolute right-1.5 top-1.5 flex h-6 min-w-6 items-center justify-center rounded-full bg-zinc-950 px-1.5 text-[11px] font-semibold tabular-nums text-white shadow-sm ring-2 ring-white">
           {count}
         </span>

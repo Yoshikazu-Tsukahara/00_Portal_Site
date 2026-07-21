@@ -10,7 +10,7 @@ const OPTIONS: { value: Locale; label: string }[] = [
 
 /**
  * JA / EN をワンクリックで切り替えるセグメントトグル。
- * zinc 基調のミニマルなピル型 UI。
+ * 選択ピルがスライドするアニメーション付き。
  */
 export default function LanguageToggle() {
   const { locale, setLocale, t } = useI18n();
@@ -19,8 +19,12 @@ export default function LanguageToggle() {
     <div
       role="group"
       aria-label={t.header.langToggleAria}
-      className="inline-flex items-center rounded-full border border-zinc-200/90 bg-white/80 p-0.5 shadow-[0_1px_2px_rgba(0,0,0,0.04)] backdrop-blur-sm"
+      className="lang-toggle items-center rounded-full border border-zinc-200/90 bg-white/80 shadow-[0_1px_2px_rgba(0,0,0,0.04)] backdrop-blur-sm"
     >
+      <span
+        aria-hidden
+        className={`lang-toggle__indicator ${locale === "en" ? "lang-toggle__indicator--en" : ""}`}
+      />
       {OPTIONS.map(({ value, label }) => {
         const active = locale === value;
         return (
@@ -29,10 +33,8 @@ export default function LanguageToggle() {
             type="button"
             onClick={() => setLocale(value)}
             aria-pressed={active}
-            className={`rounded-full px-2.5 py-1 text-[11px] font-medium tracking-wide transition-colors duration-200 sm:px-3 sm:text-xs ${
-              active
-                ? "bg-zinc-900 text-zinc-50 shadow-sm"
-                : "text-zinc-500 hover:text-zinc-800"
+            className={`lang-toggle__btn min-w-[2.25rem] sm:min-w-[2.5rem] ${
+              active ? "lang-toggle__btn--active" : "lang-toggle__btn--inactive"
             }`}
           >
             {label}

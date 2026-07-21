@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useI18n } from "@/i18n";
 import {
   listTemplates,
   saveTemplate,
@@ -23,6 +24,8 @@ export default function TemplateBar({
   onLoad: (template: SavedTemplate) => void;
   refreshToken?: number;
 }) {
+  const { t } = useI18n();
+  const copy = t.apps.folderGenerator.templates;
   const [templates, setTemplates] = useState<SavedTemplate[]>([]);
   const [selectedId, setSelectedId] = useState("");
   const [name, setName] = useState("");
@@ -41,19 +44,19 @@ export default function TemplateBar({
     try {
       saveTemplate(name, { root, totalCount, includeGitkeep });
       refresh();
-      setStatus("保存済");
+      setStatus(copy.saved);
       setTimeout(() => setStatus(null), 2000);
     } catch {
-      setStatus("名前未入力");
+      setStatus(copy.nameRequired);
     }
   }
 
   function handleLoad() {
     if (!selectedId) return;
-    const t = templates.find((x) => x.id === selectedId);
-    if (!t) return;
-    onLoad(t);
-    setStatus("読込済");
+    const template = templates.find((x) => x.id === selectedId);
+    if (!template) return;
+    onLoad(template);
+    setStatus(copy.loaded);
     setTimeout(() => setStatus(null), 2000);
   }
 
@@ -65,10 +68,10 @@ export default function TemplateBar({
         value={selectedId}
         onChange={(e) => setSelectedId(e.target.value)}
       >
-        <option value="">テンプレート</option>
-        {templates.map((t) => (
-          <option key={t.id} value={t.id}>
-            {t.name}
+        <option value="">{copy.select}</option>
+        {templates.map((template) => (
+          <option key={template.id} value={template.id}>
+            {template.name}
           </option>
         ))}
       </select>
@@ -78,22 +81,22 @@ export default function TemplateBar({
         disabled={!selectedId}
         className="btn-secondary !px-2 !py-1 text-[10px] disabled:opacity-40"
       >
-        読込
+        {copy.load}
       </button>
       <input
         type="text"
         value={name}
         onChange={(e) => setName(e.target.value)}
-        placeholder="名前"
+        placeholder={copy.namePlaceholder}
         className="input-field w-24 !py-1 text-xs"
-        aria-label="テンプレート名"
+        aria-label={copy.nameAria}
       />
       <button
         type="button"
         onClick={handleSave}
         className="btn-secondary !px-2 !py-1 text-[10px]"
       >
-        保存
+        {copy.save}
       </button>
       {status ? (
         <span className="text-[10px] text-zinc-400">{status}</span>
