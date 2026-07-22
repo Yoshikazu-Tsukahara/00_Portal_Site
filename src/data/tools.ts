@@ -89,4 +89,15 @@ export const genres: Genre[] = [
       },
     ],
   },
+  {
+    id: "minigames",
+    label: "Mini Games",
+    tools: [
+      {
+        id: "ultimate-probability-slot",
+        icon: "🎰",
+        href: "/ultimate-probability-slot",
+      },
+    ],
+  },
 ];

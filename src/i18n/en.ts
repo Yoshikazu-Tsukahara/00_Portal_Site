@@ -39,6 +39,10 @@ export const en: Dictionary = {
       name: "Everyday utilities",
       description: "General utilities for small everyday tasks",
     },
+    minigames: {
+      name: "Mini Games",
+      description: "A dash of madness and probability for your downtime",
+    },
   },
   tools: {
     "mail-template": {
@@ -79,6 +83,11 @@ export const en: Dictionary = {
       title: "Lunch Savings",
       description:
         "Tap to log lunch spend vs budget and watch your savings grow—built for phones.",
+    },
+    "ultimate-probability-slot": {
+      title: "Ultimate Probability Slot",
+      description:
+        "A cold computation engine for chasing—or dodging—your own astronomically low-odds jackpot.",
     },
   },
   card: {

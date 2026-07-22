@@ -39,6 +39,10 @@ export const ja: Dictionary = {
       name: "日常の便利ツール",
       description: "ちょっとした作業をサッと済ませる、汎用ユーティリティ",
     },
+    minigames: {
+      name: "ミニゲーム",
+      description: "作業の合間に、少しだけ狂気と確率を味わうための暇つぶし",
+    },
   },
   tools: {
     "mail-template": {
@@ -79,6 +83,11 @@ export const ja: Dictionary = {
       title: "ランチ貯金",
       description:
         "予算との差額をタップで記録。浮いたお金をゲーム感覚で貯めるスマホ向けアプリ。",
+    },
+    "ultimate-probability-slot": {
+      title: "究極確率スロット",
+      description:
+        "自作の天文学的低確率スロットで「当たるまで」／「外し続ける」に挑む、無機質な演算エンジン。",
     },
   },
   card: {

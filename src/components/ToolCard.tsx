@@ -4,12 +4,13 @@ import type { Tool } from "@/data/tools";
 import { useI18n } from "@/i18n";
 
 /** ジャンル ID → レアカード風アクセント */
-export type CardAccent = "blue" | "rose" | "emerald";
+export type CardAccent = "blue" | "rose" | "emerald" | "gold";
 
 const ACCENT_BY_GENRE: Record<string, CardAccent> = {
   business: "blue",
   creators: "rose",
   utilities: "emerald",
+  minigames: "gold",
 };
 
 /** カード共通：ベース構造（色味はアクセント側で付与） */
@@ -20,6 +21,7 @@ const ACCENT_CLASS: Record<CardAccent, string> = {
   blue: "portal-tool-card--blue",
   rose: "portal-tool-card--rose",
   emerald: "portal-tool-card--emerald",
+  gold: "portal-tool-card--gold",
 };
 
 /** Coming Soon 用：具体的内容を持たない汎用プレースホルダー */

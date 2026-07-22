@@ -26,6 +26,11 @@ import {
   textCleanerEn,
   textCleanerJa,
 } from "./otherApps";
+import type { UltimateProbabilitySlotDict } from "./ultimateProbabilitySlot";
+import {
+  ultimateProbabilitySlotEn,
+  ultimateProbabilitySlotJa,
+} from "./ultimateProbabilitySlot";
 
 export type AppsDictionary = {
   mailTemplate: MailTemplateDict;
@@ -36,6 +41,7 @@ export type AppsDictionary = {
   mediaMetadata: MediaMetadataDict;
   characterRelation: CharacterRelationDict;
   lunchSavings: LunchSavingsDict;
+  ultimateProbabilitySlot: UltimateProbabilitySlotDict;
 };
 
 export const appsJa: AppsDictionary = {
@@ -47,6 +53,7 @@ export const appsJa: AppsDictionary = {
   mediaMetadata: mediaMetadataJa,
   characterRelation: characterRelationJa,
   lunchSavings: lunchSavingsJa,
+  ultimateProbabilitySlot: ultimateProbabilitySlotJa,
 };
 
 export const appsEn: AppsDictionary = {
@@ -58,4 +65,5 @@ export const appsEn: AppsDictionary = {
   mediaMetadata: mediaMetadataEn,
   characterRelation: characterRelationEn,
   lunchSavings: lunchSavingsEn,
+  ultimateProbabilitySlot: ultimateProbabilitySlotEn,
 };
