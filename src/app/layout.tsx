@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import SiteChrome from "@/components/SiteChrome";
 import { I18nProvider } from "@/i18n";
 import "./globals.css";
 
@@ -26,9 +25,7 @@ export default function RootLayout({
     <html lang="ja" className={`${inter.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col bg-zinc-50 font-sans text-zinc-900">
         <I18nProvider>
-          <Header />
-          {children}
-          <Footer />
+          <SiteChrome>{children}</SiteChrome>
         </I18nProvider>
       </body>
     </html>

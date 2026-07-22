@@ -41,6 +41,7 @@ export default function GenreSection({
           <ToolCard
             key={tool.comingSoon ? `${genre.id}-coming-soon` : tool.id}
             tool={tool}
+            genreId={genre.id}
           />
         ))}
       </div>

@@ -3,24 +3,38 @@
 import type { Tool } from "@/data/tools";
 import { useI18n } from "@/i18n";
 
-/** カード共通：ベース＋ホバー時の質感 */
-const CARD_BASE =
-  "portal-tool-card group relative flex h-full min-h-[10.5rem] flex-col rounded-xl border border-zinc-200/80 bg-white/95 p-5 shadow-md backdrop-blur-[2px] transition-all duration-300 ease-out sm:min-h-[11rem] sm:p-6";
+/** ジャンル ID → レアカード風アクセント */
+export type CardAccent = "blue" | "rose" | "emerald";
 
-const CARD_HOVER =
-  "hover:-translate-y-1 hover:border-zinc-300/90 hover:bg-white hover:shadow-xl hover:shadow-zinc-900/5";
+const ACCENT_BY_GENRE: Record<string, CardAccent> = {
+  business: "blue",
+  creators: "rose",
+  utilities: "emerald",
+};
+
+/** カード共通：ベース構造（色味はアクセント側で付与） */
+const CARD_BASE =
+  "portal-tool-card group relative flex h-full min-h-[10.5rem] flex-col rounded-xl bg-white/95 p-5 shadow-md backdrop-blur-[2px] transition-all duration-300 ease-out sm:min-h-[11rem] sm:p-6";
+
+const ACCENT_CLASS: Record<CardAccent, string> = {
+  blue: "portal-tool-card--blue",
+  rose: "portal-tool-card--rose",
+  emerald: "portal-tool-card--emerald",
+};
 
 /** Coming Soon 用：具体的内容を持たない汎用プレースホルダー */
 function ComingSoonCard({
   label,
   hint,
+  accent,
 }: {
   label: string;
   hint: string;
+  accent: CardAccent;
 }) {
   return (
     <div
-      className={`${CARD_BASE} cursor-default border-dashed border-zinc-200/90 bg-zinc-50/40 opacity-70`}
+      className={`${CARD_BASE} ${ACCENT_CLASS[accent]} portal-tool-card--muted cursor-default border-dashed opacity-70`}
       aria-disabled="true"
     >
       <span className="absolute right-4 top-4 shrink-0 whitespace-nowrap rounded-full border border-zinc-200/80 bg-white px-2.5 py-0.5 text-[10px] font-medium tracking-wide text-zinc-500 sm:text-[11px]">
@@ -45,15 +59,24 @@ function ComingSoonCard({
   );
 }
 
-export default function ToolCard({ tool }: { tool: Tool }) {
+export default function ToolCard({
+  tool,
+  genreId,
+}: {
+  tool: Tool;
+  /** 所属カテゴリー（business / creators / utilities） */
+  genreId: string;
+}) {
   const { t } = useI18n();
   const { icon, href, comingSoon, id } = tool;
+  const accent = ACCENT_BY_GENRE[genreId] ?? "blue";
 
   if (comingSoon) {
     return (
       <ComingSoonCard
         label={t.card.comingSoon}
         hint={t.card.comingSoonHint}
+        accent={accent}
       />
     );
   }
@@ -95,7 +118,10 @@ export default function ToolCard({ tool }: { tool: Tool }) {
   );
 
   return (
-    <a href={href} className={`${CARD_BASE} ${CARD_HOVER}`}>
+    <a
+      href={href}
+      className={`${CARD_BASE} ${ACCENT_CLASS[accent]} portal-tool-card--live`}
+    >
       {content}
     </a>
   );

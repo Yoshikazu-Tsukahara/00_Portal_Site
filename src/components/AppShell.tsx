@@ -26,6 +26,14 @@ type AppShellProps = {
   fillViewport?: boolean;
   /** 相関図など広めのキャンバス向け */
   wide?: boolean;
+  /**
+   * タイトル／バックアップの直後に置くコンパクトな操作（PWA 追加など）
+   */
+  afterDataManager?: ReactNode;
+  /**
+   * true のとき「ポータルに戻る」リンクを隠す（独立 PWA 起動時など）
+   */
+  hidePortalLink?: boolean;
   children: ReactNode;
 };
 
@@ -38,8 +46,10 @@ export default function AppShell({
   description,
   actions,
   dataManager,
+  afterDataManager,
   fillViewport = false,
   wide = false,
+  hidePortalLink = false,
   children,
 }: AppShellProps) {
   const { t } = useI18n();
@@ -56,13 +66,17 @@ export default function AppShell({
         }`}
       >
         <div className="flex min-h-8 items-center gap-3">
-          <Link
-            href="/"
-            className="shrink-0 text-sm text-zinc-500 transition-colors hover:text-zinc-900"
-          >
-            {t.common.backToPortal}
-          </Link>
-          <span aria-hidden className="h-4 w-px shrink-0 bg-zinc-200" />
+          {!hidePortalLink ? (
+            <>
+              <Link
+                href="/"
+                className="shrink-0 text-sm text-zinc-500 transition-colors hover:text-zinc-900"
+              >
+                {t.common.backToPortal}
+              </Link>
+              <span aria-hidden className="h-4 w-px shrink-0 bg-zinc-200" />
+            </>
+          ) : null}
           <div className="flex min-w-0 flex-1 items-center gap-2">
             <h1 className="min-w-0 truncate text-base font-semibold tracking-tight text-zinc-900">
               {title}
@@ -71,6 +85,9 @@ export default function AppShell({
               <div className="shrink-0">
                 <DataManager {...dataManager} />
               </div>
+            ) : null}
+            {afterDataManager ? (
+              <div className="shrink-0">{afterDataManager}</div>
             ) : null}
           </div>
           {actions ? (

@@ -1,6 +1,6 @@
 "use client";
 
-import { fmt } from "@/i18n";
+import { useMemo } from "react";
 import type { LunchSavingsDict } from "@/i18n/apps/lunchSavings";
 import type { Locale } from "@/i18n/types";
 import {
@@ -9,6 +9,10 @@ import {
   type PeriodStats,
 } from "./calc";
 import { formatMoney, roundMoney } from "./currency";
+import {
+  pickProgressQuip,
+  pickTodayQuip,
+} from "./savingsQuips";
 import type { LunchEntry, LunchMode, LunchSettings } from "./types";
 
 /** メインのダッシュボード */
@@ -18,6 +22,7 @@ export default function Dashboard({
   todayEntry,
   recent,
   copy,
+  quips,
   locale,
   celebrate,
   onRecord,
@@ -31,6 +36,7 @@ export default function Dashboard({
   todayEntry: LunchEntry | null;
   recent: LunchEntry[];
   copy: LunchSavingsDict["dash"];
+  quips: LunchSavingsDict["quips"];
   locale: Locale;
   celebrate: boolean;
   onRecord: () => void;
@@ -42,11 +48,37 @@ export default function Dashboard({
   const currency = settings.currency;
   const money = (n: number) => formatMoney(n, currency, locale);
   const isBudget = settings.mode === "budget";
-  const goal = settings.goalLabel || "…";
   const progress = Math.min(100, stats.progressPercent);
   const overGoal =
     !isBudget && stats.progressPercent >= 100 && stats.totalSaved > 0;
   const overBudget = isBudget && stats.remainingBudget < 0;
+
+  const progressQuip = useMemo(
+    () =>
+      pickProgressQuip(
+        quips,
+        stats.totalSaved,
+        stats.progressPercent,
+        `${settings.startDate}:${settings.endDate}`,
+      ),
+    [
+      quips,
+      stats.totalSaved,
+      stats.progressPercent,
+      settings.startDate,
+      settings.endDate,
+    ],
+  );
+
+  const todayQuip = useMemo(() => {
+    if (!todayEntry) return null;
+    return pickTodayQuip(
+      quips,
+      settings.dailyBudget,
+      todayEntry.amount,
+      todayEntry.date,
+    );
+  }, [quips, settings.dailyBudget, todayEntry]);
 
   const heroValue = isBudget ? stats.remainingBudget : stats.totalSaved;
   const heroPositive = heroValue >= 0;
@@ -102,19 +134,21 @@ export default function Dashboard({
         >
           <span className="text-4xl sm:text-5xl">{money(heroValue)}</span>
         </p>
-        <p
-          className={`mt-3 text-sm ${
-            isBudget ? "text-sky-800/70" : "text-emerald-800/70"
-          }`}
-        >
-          {isBudget
-            ? overBudget
+        {isBudget ? (
+          <p
+            className={`mt-3 text-sm ${
+              overBudget ? "text-sky-800/70" : "text-sky-800/70"
+            }`}
+          >
+            {overBudget
               ? copy.budgetHint
-              : `${copy.spentLabel}: ${money(stats.totalSpent)}`
-            : stats.rewardTimes > 0
-              ? fmt(copy.rewardTimes, { goal, count: stats.rewardTimes })
-              : fmt(copy.rewardZero, { goal })}
-        </p>
+              : `${copy.spentLabel}: ${money(stats.totalSpent)}`}
+          </p>
+        ) : settings.goalLabel ? (
+          <p className="mt-3 text-sm text-emerald-800/70">
+            → {settings.goalLabel}
+          </p>
+        ) : null}
       </section>
 
       {/* 進捗ゲージ */}
@@ -165,6 +199,14 @@ export default function Dashboard({
             </>
           )}
         </p>
+        {!isBudget ? (
+          <p
+            key={progressQuip}
+            className="lunch-quip mt-2 text-xs italic leading-relaxed text-zinc-500"
+          >
+            {progressQuip}
+          </p>
+        ) : null}
       </section>
 
       {/* 残り日数・平均 */}
@@ -194,11 +236,21 @@ export default function Dashboard({
         </div>
       </section>
 
-      <p className="px-1 text-center text-xs text-zinc-400">
-        {copy.periodBudget}: {money(stats.periodBudget)} ·{" "}
-        {todayEntry ? copy.loggedToday : copy.notLoggedToday}
-        {todayEntry ? ` (${money(todayEntry.amount)})` : ""}
-      </p>
+      <div className="px-1 text-center">
+        <p className="text-xs text-zinc-400">
+          {copy.periodBudget}: {money(stats.periodBudget)} ·{" "}
+          {todayEntry ? copy.loggedToday : copy.notLoggedToday}
+          {todayEntry ? ` (${money(todayEntry.amount)})` : ""}
+        </p>
+        {!isBudget && todayEntry && todayQuip ? (
+          <p
+            key={todayQuip}
+            className="lunch-quip mt-1.5 text-xs italic leading-relaxed text-zinc-500"
+          >
+            {todayQuip}
+          </p>
+        ) : null}
+      </div>
 
       {/* 最近の記録 */}
       <section className="rounded-2xl border border-zinc-200/70 bg-white px-3 py-3 shadow-sm">

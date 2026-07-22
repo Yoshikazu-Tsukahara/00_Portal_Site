@@ -1,7 +1,20 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  async redirects() {
+    return [
+      {
+        source: "/tools/lunch-savings",
+        destination: "/lunch-savings",
+        permanent: true,
+      },
+      {
+        source: "/tools/lunch-savings/:path*",
+        destination: "/lunch-savings",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

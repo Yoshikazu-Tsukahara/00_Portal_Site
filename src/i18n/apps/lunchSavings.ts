@@ -1,7 +1,13 @@
 import type { AppShellCopy } from "./otherApps";
+import type { SavingsQuipsDict } from "../../app/lunch-savings/savingsQuips";
+import {
+  lunchSavingsQuipsEn,
+  lunchSavingsQuipsJa,
+} from "./lunchSavingsQuips";
 
 export type LunchSavingsDict = {
   shell: AppShellCopy;
+  quips: SavingsQuipsDict;
   modes: {
     savings: string;
     savingsHint: string;
@@ -87,6 +93,24 @@ export type LunchSavingsDict = {
     updated: string;
     deleted: string;
   };
+  install: {
+    button: string;
+    buttonShort: string;
+    buttonAria: string;
+    modalTitle: string;
+    modalLead: string;
+    step1Title: string;
+    step1Body: string;
+    step2Title: string;
+    step2Body: string;
+    desktopTitle: string;
+    desktopLead: string;
+    desktopStep1Title: string;
+    desktopStep1Body: string;
+    desktopStep2Title: string;
+    desktopStep2Body: string;
+    modalClose: string;
+  };
 };
 
 export const lunchSavingsJa: LunchSavingsDict = {
@@ -95,6 +119,7 @@ export const lunchSavingsJa: LunchSavingsDict = {
     description:
       "予算との差額をタップで記録。浮いたお金をゲーム感覚で貯めよう。",
   },
+  quips: lunchSavingsQuipsJa,
   modes: {
     savings: "コツコツ貯金",
     savingsHint: "1日の予算との差額を積み上げて、目標のご褒美を目指します",
@@ -179,6 +204,28 @@ export const lunchSavingsJa: LunchSavingsDict = {
     updated: "更新しました",
     deleted: "削除しました",
   },
+  install: {
+    button: "このアプリをホーム画面に追加",
+    buttonShort: "ホームに追加",
+    buttonAria: "ランチ貯金をホーム画面に追加してアプリとして使う",
+    modalTitle: "ホーム画面に追加",
+    modalLead:
+      "Safari からホーム画面に追加すると、ランチ貯金だけを独立アプリとしてすぐ開けます。",
+    step1Title: "共有をタップ",
+    step1Body: "画面下（または上）の共有アイコン［↑］をタップします。",
+    step2Title: "「ホーム画面に追加」",
+    step2Body: "メニューを下にスクロールし、「ホーム画面に追加」を選びます。",
+    desktopTitle: "アプリとしてインストール",
+    desktopLead:
+      "Chrome / Edge なら、アドレスバーやメニューからランチ貯金を独立アプリとして追加できます。",
+    desktopStep1Title: "ブラウザのメニューを開く",
+    desktopStep1Body:
+      "画面右上の「︙」またはアドレスバー横のインストールアイコンを探します。",
+    desktopStep2Title: "「アプリをインストール」",
+    desktopStep2Body:
+      "「ランチ貯金をインストール」や「アプリをインストール」を選ぶとホーム／デスクトップに追加されます。",
+    modalClose: "わかった",
+  },
 };
 
 export const lunchSavingsEn: LunchSavingsDict = {
@@ -187,6 +234,7 @@ export const lunchSavingsEn: LunchSavingsDict = {
     description:
       "Tap to log lunch spend vs budget. Watch your savings grow like a game.",
   },
+  quips: lunchSavingsQuipsEn,
   modes: {
     savings: "Target Savings",
     savingsHint: "Stack leftover daily budget toward a reward goal",
@@ -270,5 +318,27 @@ export const lunchSavingsEn: LunchSavingsDict = {
     saved: "Saved!",
     updated: "Updated",
     deleted: "Deleted",
+  },
+  install: {
+    button: "Add this app to Home Screen",
+    buttonShort: "Add to Home",
+    buttonAria: "Add Lunch Savings to your home screen as a standalone app",
+    modalTitle: "Add to Home Screen",
+    modalLead:
+      "Add Lunch Savings from Safari to open it as its own app — not the portal.",
+    step1Title: "Tap Share",
+    step1Body: "Tap the Share icon [↑] at the bottom (or top) of Safari.",
+    step2Title: "Add to Home Screen",
+    step2Body: "Scroll the menu and choose “Add to Home Screen”.",
+    desktopTitle: "Install as an app",
+    desktopLead:
+      "In Chrome or Edge, install Lunch Savings as its own app from the address bar or browser menu.",
+    desktopStep1Title: "Open the browser menu",
+    desktopStep1Body:
+      "Look for the ⋮ menu or the install icon near the address bar.",
+    desktopStep2Title: "Install app",
+    desktopStep2Body:
+      "Choose “Install Lunch Savings” / “Install app” to add it to your home screen or desktop.",
+    modalClose: "Got it",
   },
 };

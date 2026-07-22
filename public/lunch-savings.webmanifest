@@ -2,13 +2,16 @@
   "name": "ランチ貯金",
   "short_name": "ランチ貯金",
   "description": "毎日のランチ代の差額をタップで記録。浮いたお金をゲーム感覚で貯めるアプリ。",
-  "start_url": "/tools/lunch-savings",
-  "scope": "/",
+  "id": "/lunch-savings",
+  "start_url": "/lunch-savings",
+  "scope": "/lunch-savings/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#fafafa",
   "theme_color": "#10b981",
   "lang": "ja",
+  "dir": "ltr",
+  "categories": ["finance", "lifestyle", "utilities"],
   "icons": [
     {
       "src": "/icons/lunch-savings-192.png",
