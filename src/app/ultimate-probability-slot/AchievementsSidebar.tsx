@@ -27,7 +27,7 @@ export default function AchievementsSidebar({
 
   return (
     <aside
-      className="slot-achievements hidden lg:flex"
+      className="slot-achievements"
       aria-label={`${copy.title}（${modeLabel}）`}
     >
       <div className="slot-achievements__head">

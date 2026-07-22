@@ -201,7 +201,7 @@ export default function Dashboard({
             </button>
           </div>
 
-          <div className="slot-panel px-2 py-1 sm:px-2.5 sm:py-1.5">
+          <div className="slot-panel slot-console__lifetime px-2 py-1 sm:px-2.5 sm:py-1.5">
             <p className="slot-readout-label mb-0.5 sm:mb-1">
               {copy.lifetimeHeading}
             </p>

@@ -285,6 +285,7 @@ export default function UltimateProbabilitySlotPage() {
     <AppShell
       title={copy.shell.title}
       wide
+      fillViewport
       hidePortalLink={isStandalone}
       actions={isStandalone ? <LanguageToggle /> : undefined}
       afterDataManager={<InstallAppButton copy={copy.install} />}

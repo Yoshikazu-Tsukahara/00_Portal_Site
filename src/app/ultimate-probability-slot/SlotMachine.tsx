@@ -51,14 +51,16 @@ export default function SlotMachine({
         const isJackpotFace = !spinning && idx === JACKPOT_INDEX;
         return (
           <div key={i} className="slot-reel-col">
-            <div
-              className={`slot-reel ${spinning ? "slot-reel--spinning" : ""} ${
-                isJackpotFace ? "slot-reel--jackpot" : ""
-              }`}
-            >
-              <span className="slot-reel__glow" aria-hidden />
-              <div className="slot-reel__content">
-                <ItemView item={item} />
+            <div className="slot-reel-stage">
+              <div
+                className={`slot-reel ${spinning ? "slot-reel--spinning" : ""} ${
+                  isJackpotFace ? "slot-reel--jackpot" : ""
+                }`}
+              >
+                <span className="slot-reel__glow" aria-hidden />
+                <div className="slot-reel__content">
+                  <ItemView item={item} />
+                </div>
               </div>
             </div>
             {stopMode === "individual" ? (
