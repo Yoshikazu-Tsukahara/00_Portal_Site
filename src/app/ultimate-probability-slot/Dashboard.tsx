@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { UltimateProbabilitySlotDict } from "@/i18n/apps/ultimateProbabilitySlot";
+import AchievementsDrawer from "./AchievementsDrawer";
 import AchievementsSidebar from "./AchievementsSidebar";
 import ModeSegment from "./ModeSegment";
 import {
@@ -39,6 +40,7 @@ export default function Dashboard({
   modeCopy,
   stopModeCopy,
   fortuneCopy,
+  fortuneAntiCopy,
   achievementsCopy,
   badgeCopy,
   canSpin,
@@ -62,6 +64,7 @@ export default function Dashboard({
   modeCopy: UltimateProbabilitySlotDict["mode"];
   stopModeCopy: UltimateProbabilitySlotDict["stopMode"];
   fortuneCopy: UltimateProbabilitySlotDict["fortune"];
+  fortuneAntiCopy: UltimateProbabilitySlotDict["fortuneAntiBingo"];
   achievementsCopy: UltimateProbabilitySlotDict["achievements"];
   badgeCopy: UltimateProbabilitySlotDict["badges"];
   canSpin: boolean;
@@ -77,13 +80,18 @@ export default function Dashboard({
   onResetRun: () => void;
   onOpenSettings: () => void;
 }) {
+  const [achievementsOpen, setAchievementsOpen] = useState(false);
   const p = useMemo(() => singleSpinProbability(settings), [settings]);
   const cumulative = useMemo(
     () => displayCumulativeProbability(settings.mode, p, run.attempts),
     [settings.mode, p, run.attempts],
   );
-  const tier = getFortuneTier(fortuneCumulativeProbability(p, run.attempts));
-  const tierCopy = fortuneCopy[tier];
+  const tier = getFortuneTier(
+    fortuneCumulativeProbability(p, run.attempts),
+    settings.mode,
+  );
+  const tierCopy =
+    settings.mode === "antiBingo" ? fortuneAntiCopy[tier] : fortuneCopy[tier];
   const cumulativeLabel =
     settings.mode === "antiBingo"
       ? copy.cumulativeLabelAntiBingo
@@ -93,7 +101,7 @@ export default function Dashboard({
     <div className="slot-layout">
       <div className="slot-console">
         <div className="slot-console__main">
-          <div className="grid shrink-0 gap-1.5 sm:grid-cols-2 sm:gap-2">
+          <div className="grid shrink-0 gap-1 sm:grid-cols-2 sm:gap-2">
             <ModeSegment
               mode={settings.mode}
               copy={modeCopy}
@@ -107,7 +115,7 @@ export default function Dashboard({
             />
           </div>
 
-          <div className="grid shrink-0 grid-cols-3 gap-1.5">
+          <div className="grid shrink-0 grid-cols-3 gap-1 sm:gap-1.5">
             <Readout label={copy.attemptsLabel}>
               <span key={run.attempts} className="slot-tick">
                 {run.attempts.toLocaleString("en-US")}
@@ -133,7 +141,7 @@ export default function Dashboard({
             />
           </div>
 
-          <div className="flex shrink-0 flex-col gap-1">
+          <div className="flex shrink-0 flex-col gap-0.5 sm:gap-1">
             <div className="flex gap-2">
               <button
                 type="button"
@@ -161,21 +169,22 @@ export default function Dashboard({
         </div>
 
         <div className="slot-console__stats">
-          <div
-            className={`slot-panel flex items-baseline justify-between gap-2 px-2.5 py-1.5 ${TIER_STYLE[tier]}`}
-          >
-            <div className="min-w-0">
-              <p className="slot-readout-label opacity-80">{copy.fortuneLabel}</p>
-              <p className="truncate text-sm font-bold tracking-wide">
-                【{tierCopy.label}】
-              </p>
+          <div className={`slot-fortune-panel slot-panel ${TIER_STYLE[tier]}`}>
+            <p className="slot-readout-label opacity-80">{copy.fortuneLabel}</p>
+            <div className="slot-fortune-panel__body">
+              <p className="slot-fortune-panel__label">【{tierCopy.label}】</p>
+              <p className="slot-fortune-panel__desc">{tierCopy.description}</p>
             </div>
-            <p className="hidden max-w-[55%] truncate text-[10px] leading-snug opacity-75 sm:block">
-              {tierCopy.description}
-            </p>
           </div>
 
-          <div className="flex gap-1.5">
+          <div className="flex gap-1 sm:gap-1.5">
+            <button
+              type="button"
+              onClick={() => setAchievementsOpen(true)}
+              className="slot-ghost-btn flex-1 !py-1.5 lg:hidden"
+            >
+              {copy.achievementsButton}
+            </button>
             <button
               type="button"
               onClick={onOpenSettings}
@@ -192,9 +201,11 @@ export default function Dashboard({
             </button>
           </div>
 
-          <div className="slot-panel px-2.5 py-1.5">
-            <p className="slot-readout-label mb-1">{copy.lifetimeHeading}</p>
-            <div className="grid grid-cols-3 gap-x-2 gap-y-1 sm:grid-cols-6">
+          <div className="slot-panel px-2 py-1 sm:px-2.5 sm:py-1.5">
+            <p className="slot-readout-label mb-0.5 sm:mb-1">
+              {copy.lifetimeHeading}
+            </p>
+            <div className="grid grid-cols-3 gap-x-2 gap-y-0.5 sm:grid-cols-6 sm:gap-y-1">
               <Stat label={copy.lifetimeAttempts} value={stats.lifetimeAttempts} />
               <Stat label={copy.lifetimeWins} value={stats.lifetimeWins} />
               <Stat label={copy.lifetimeMisses} value={stats.lifetimeMisses} />
@@ -225,6 +236,15 @@ export default function Dashboard({
         badgeCopy={badgeCopy}
         copy={achievementsCopy}
       />
+
+      <AchievementsDrawer
+        open={achievementsOpen}
+        mode={settings.mode}
+        unlockedBadges={unlockedBadges}
+        badgeCopy={badgeCopy}
+        copy={achievementsCopy}
+        onClose={() => setAchievementsOpen(false)}
+      />
     </div>
   );
 }
@@ -237,9 +257,9 @@ function Readout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="slot-panel px-2 py-1 sm:px-2.5 sm:py-1.5">
+    <div className="slot-panel px-1.5 py-1 sm:px-2.5 sm:py-1.5">
       <p className="slot-readout-label mb-0.5 truncate">{label}</p>
-      <p className="slot-readout-value truncate text-sm sm:text-base">
+      <p className="slot-readout-value truncate text-xs sm:text-base">
         {children}
       </p>
     </div>
@@ -250,7 +270,7 @@ function Stat({ label, value }: { label: string; value: number | string }) {
   return (
     <div className="min-w-0">
       <p className="slot-readout-label truncate">{label}</p>
-      <p className="slot-readout-value truncate text-xs text-zinc-100 sm:text-sm">
+      <p className="slot-readout-value truncate text-[11px] text-zinc-100 sm:text-sm">
         {typeof value === "number" ? value.toLocaleString("en-US") : value}
       </p>
     </div>

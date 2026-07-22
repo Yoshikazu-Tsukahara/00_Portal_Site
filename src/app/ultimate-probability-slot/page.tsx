@@ -192,8 +192,14 @@ export default function UltimateProbabilitySlotPage() {
         return;
       }
 
-      // モーダル／フラッシュ表示中は操作しない
-      if (setupOpen || flash) return;
+      // モーダル／ドロワー／フラッシュ表示中は操作しない
+      if (
+        setupOpen ||
+        flash ||
+        document.body.classList.contains("slot-achievements-drawer-open")
+      ) {
+        return;
+      }
       if (!settings) return;
 
       e.preventDefault();
@@ -305,6 +311,7 @@ export default function UltimateProbabilitySlotPage() {
           modeCopy={copy.mode}
           stopModeCopy={copy.stopMode}
           fortuneCopy={copy.fortune}
+          fortuneAntiCopy={copy.fortuneAntiBingo}
           achievementsCopy={copy.achievements}
           badgeCopy={copy.badges}
           canSpin={canSpin}

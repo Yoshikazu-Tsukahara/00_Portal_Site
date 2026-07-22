@@ -68,6 +68,7 @@ export type UltimateProbabilitySlotDict = {
     resetRunButton: string;
     resetRunConfirm: string;
     settingsButton: string;
+    achievementsButton: string;
     lifetimeHeading: string;
     lifetimeAttempts: string;
     lifetimeWins: string;
@@ -83,6 +84,12 @@ export type UltimateProbabilitySlotDict = {
     spaceHint: string;
   };
   fortune: {
+    superRare: { label: string; description: string };
+    average: { label: string; description: string };
+    deepHooked: { label: string; description: string };
+    anomaly: { label: string; description: string };
+  };
+  fortuneAntiBingo: {
     superRare: { label: string; description: string };
     average: { label: string; description: string };
     deepHooked: { label: string; description: string };
@@ -113,6 +120,7 @@ export type UltimateProbabilitySlotDict = {
     modeLabelAntiBingo: string;
     unlockedCountTemplate: string;
     lockedLabel: string;
+    close: string;
   };
 };
 
@@ -189,6 +197,7 @@ export const ultimateProbabilitySlotJa: UltimateProbabilitySlotDict = {
     resetRunButton: "この試行をリセット",
     resetRunConfirm: "現在の試行回数をリセットしますか？（生涯統計・実績は保持されます）",
     settingsButton: "設定",
+    achievementsButton: "🏆 実績を見る",
     lifetimeHeading: "生涯統計",
     lifetimeAttempts: "生涯試行回数",
     lifetimeWins: "生涯的中回数",
@@ -221,6 +230,26 @@ export const ultimateProbabilitySlotJa: UltimateProbabilitySlotDict = {
       description: "数学的にはほぼ確定していたはずの事象が、いまだ観測されていません。",
     },
   },
+  fortuneAntiBingo: {
+    superRare: {
+      label: "超回避域",
+      description:
+        "累積外し確率は極小。統計上、そろそろ当たってもおかしくない回避限界です。",
+    },
+    average: {
+      label: "安定回避",
+      description: "累積外し確率は中程度。当たりと外しの境界線上にいます。",
+    },
+    deepHooked: {
+      label: "快適地帯",
+      description: "累積外し確率はまだ高水準。当たりを避け続けやすい領域です。",
+    },
+    anomaly: {
+      label: "鉄壁",
+      description:
+        "累積外し確率は最大付近。統計的にはまだ何も起きていない、理想的な回避領域です。",
+    },
+  },
   flash: {
     hitTitle: "SIGNAL DETECTED",
     hitBody: "全リール同期。ジャックポットに到達しました。",
@@ -248,6 +277,7 @@ export const ultimateProbabilitySlotJa: UltimateProbabilitySlotDict = {
     modeLabelAntiBingo: "外し続ける",
     unlockedCountTemplate: "{unlocked} / {total} 解放済み",
     lockedLabel: "未解放",
+    close: "閉じる",
   },
 };
 
@@ -326,6 +356,7 @@ export const ultimateProbabilitySlotEn: UltimateProbabilitySlotDict = {
     resetRunConfirm:
       "Reset the current attempt count? (Lifetime stats & achievements are kept.)",
     settingsButton: "Settings",
+    achievementsButton: "🏆 Achievements",
     lifetimeHeading: "Lifetime Stats",
     lifetimeAttempts: "Lifetime attempts",
     lifetimeWins: "Lifetime hits",
@@ -361,6 +392,26 @@ export const ultimateProbabilitySlotEn: UltimateProbabilitySlotDict = {
         "An event that was nearly certain by now has still not been observed.",
     },
   },
+  fortuneAntiBingo: {
+    superRare: {
+      label: "Critical Dodge",
+      description:
+        "Cumulative dodge probability is minimal. A hit is statistically overdue.",
+    },
+    average: {
+      label: "Balanced Dodge",
+      description: "Mid-range dodge probability — on the edge between hit and miss.",
+    },
+    deepHooked: {
+      label: "Comfort Zone",
+      description: "Dodge probability is still high. Avoidance remains comfortable.",
+    },
+    anomaly: {
+      label: "Iron Wall",
+      description:
+        "Near-maximum dodge probability. Statistically, nothing has happened yet — ideal avoidance.",
+    },
+  },
   flash: {
     hitTitle: "SIGNAL DETECTED",
     hitBody: "All reels synchronized. Jackpot reached.",
@@ -388,5 +439,6 @@ export const ultimateProbabilitySlotEn: UltimateProbabilitySlotDict = {
     modeLabelAntiBingo: "Keep Missing",
     unlockedCountTemplate: "{unlocked} / {total} unlocked",
     lockedLabel: "Locked",
+    close: "Close",
   },
 };

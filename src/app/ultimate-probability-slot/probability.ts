@@ -3,7 +3,7 @@
 // 「完全なシステムランダム」の数式のみを扱う。目押しや技術介入の余地はゼロ。
 // STOP ボタンは「いつ表示を確定させるか」だけを制御し、結果そのものは spin 開始時に確定する。
 
-import { JACKPOT_INDEX, type SlotSettings } from "./types";
+import { JACKPOT_INDEX, type PlayMode, type SlotSettings } from "./types";
 
 /** 1本のリールで JACKPOT_INDEX を引く確率（0〜1） */
 export function reelHitProbability(symbolCount: number): number {
@@ -84,10 +84,14 @@ const FORTUNE_TIER_ORDER: { id: FortuneTierId; min: number }[] = [
   { id: "superRare", min: 0 },
 ];
 
-/** 累積確率（0〜1）から現在の運勢ステータスを判定 */
-export function getFortuneTier(cumulative: number): FortuneTierId {
+/** 累積当たり確率（0〜1）から運勢ステータスを判定。外し続けるはレア度を反転 */
+export function getFortuneTier(
+  cumulativeHit: number,
+  mode: PlayMode = "hitUntilWin",
+): FortuneTierId {
+  const value = mode === "antiBingo" ? 1 - cumulativeHit : cumulativeHit;
   for (const tier of FORTUNE_TIER_ORDER) {
-    if (cumulative >= tier.min) return tier.id;
+    if (value >= tier.min) return tier.id;
   }
   return "superRare";
 }

@@ -1,9 +1,9 @@
-// 究極確率スロット: アップロード画像を小さな DataURL に変換
-// LocalStorage を圧迫しないよう、正方形サムネイル（最大 96px）に縮小する。
+// 究極確率スロット: アップロード画像を DataURL に変換
+// LocalStorage を圧迫しないよう、リール表示に足りる解像度（最大 320px）に縮小する。
 
 export function readImageAsDataUrl(
   file: File,
-  maxSize = 96,
+  maxSize = 320,
 ): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();

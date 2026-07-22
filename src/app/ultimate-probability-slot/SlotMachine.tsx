@@ -21,7 +21,7 @@ function ItemView({ item }: { item: SlotItem | undefined }) {
   );
 }
 
-/** リール本体：淡々としたフラッシュで演算の冷たさを表現。絵柄は枠いっぱいに大きく表示。 */
+/** リール本体：JACKPOT 停止時のみ端に静的な反射枠を付与 */
 export default function SlotMachine({
   symbols,
   reelCount,
@@ -57,15 +57,9 @@ export default function SlotMachine({
               }`}
             >
               <span className="slot-reel__glow" aria-hidden />
-              <ItemView item={item} />
-              {isJackpotFace ? (
-                <span
-                  aria-hidden
-                  className="absolute right-1.5 top-1.5 text-[10px] leading-none text-amber-400 sm:text-xs"
-                >
-                  ★
-                </span>
-              ) : null}
+              <div className="slot-reel__content">
+                <ItemView item={item} />
+              </div>
             </div>
             {stopMode === "individual" ? (
               <button
