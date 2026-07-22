@@ -13,8 +13,8 @@ function isLunchSavingsPath(pathname: string | null): boolean {
 
 /**
  * サイト共通ヘッダー／フッター。
- * ランチ貯金を PWA standalone で起動中のみポータル枠を完全非表示にする。
- * （通常ブラウザでの閲覧時は、どのページでもヘッダー配置を変えない）
+ * ランチ貯金を PWA standalone で起動中のみポータル枠を完全非表示。
+ * 通常ブラウザでは全ページ共通のヘッダー配置を維持する。
  */
 export default function SiteChrome({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -24,7 +24,7 @@ export default function SiteChrome({ children }: { children: ReactNode }) {
 
   if (isolatePwa) {
     return (
-      <div className="flex min-h-full flex-1 flex-col">{children}</div>
+      <div className="flex min-h-dvh flex-1 flex-col">{children}</div>
     );
   }
 

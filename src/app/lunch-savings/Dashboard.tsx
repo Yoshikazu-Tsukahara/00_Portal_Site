@@ -9,13 +9,14 @@ import {
   type PeriodStats,
 } from "./calc";
 import { formatMoney, roundMoney } from "./currency";
+import ModeSegment from "./ModeSegment";
 import {
   pickProgressQuip,
   pickTodayQuip,
 } from "./savingsQuips";
 import type { LunchEntry, LunchMode, LunchSettings } from "./types";
 
-/** メインのダッシュボード */
+/** メインのダッシュボード（ヘッダー固定＋中央スクロール＋下部CTA固定） */
 export default function Dashboard({
   settings,
   stats,
@@ -86,27 +87,18 @@ export default function Dashboard({
   return (
     <div className="mx-auto flex w-full max-w-lg flex-col gap-4 pb-28">
       {/* モード切替 */}
-      <div
-        className="grid grid-cols-2 gap-1 rounded-2xl border border-zinc-200/80 bg-zinc-100/80 p-1"
-        role="tablist"
-        aria-label="mode"
-      >
-        <ModeTab
-          active={!isBudget}
-          label={copy.modeSavings}
-          onClick={() => onChangeMode("savings")}
+      <div className="shrink-0">
+        <ModeSegment
+          mode={settings.mode}
+          savingsLabel={copy.modeSavings}
+          budgetLabel={copy.modeBudget}
+          onChange={onChangeMode}
         />
-        <ModeTab
-          active={isBudget}
-          label={copy.modeBudget}
-          onClick={() => onChangeMode("budget")}
-        />
+        <p className="mt-2 px-1 text-center text-[11px] text-zinc-400">
+          {copy.periodLabel}:{" "}
+          {formatPeriodRange(settings.startDate, settings.endDate, locale)}
+        </p>
       </div>
-
-      <p className="px-1 text-center text-[11px] text-zinc-400">
-        {copy.periodLabel}:{" "}
-        {formatPeriodRange(settings.startDate, settings.endDate, locale)}
-      </p>
 
       {/* メイン数値ハイライト */}
       <section
@@ -135,11 +127,7 @@ export default function Dashboard({
           <span className="text-4xl sm:text-5xl">{money(heroValue)}</span>
         </p>
         {isBudget ? (
-          <p
-            className={`mt-3 text-sm ${
-              overBudget ? "text-sky-800/70" : "text-sky-800/70"
-            }`}
-          >
+          <p className="mt-3 text-sm text-sky-800/70">
             {overBudget
               ? copy.budgetHint
               : `${copy.spentLabel}: ${money(stats.totalSpent)}`}
@@ -151,7 +139,6 @@ export default function Dashboard({
         ) : null}
       </section>
 
-      {/* 進捗ゲージ */}
       <section className="rounded-2xl border border-zinc-200/70 bg-white px-4 py-4 shadow-sm">
         <div className="mb-2 flex items-baseline justify-between gap-2">
           <h2 className="text-sm font-medium text-zinc-700">
@@ -194,7 +181,8 @@ export default function Dashboard({
             </>
           ) : (
             <>
-              {money(Math.max(0, stats.totalSaved))} / {money(settings.goalAmount)}
+              {money(Math.max(0, stats.totalSaved))} /{" "}
+              {money(settings.goalAmount)}
               {settings.goalLabel ? ` · ${settings.goalLabel}` : ""}
             </>
           )}
@@ -209,7 +197,6 @@ export default function Dashboard({
         ) : null}
       </section>
 
-      {/* 残り日数・平均 */}
       <section className="grid grid-cols-2 gap-3">
         <div className="rounded-2xl border border-zinc-200/70 bg-white px-4 py-4 shadow-sm">
           <p className="text-[11px] font-medium text-zinc-400">
@@ -223,7 +210,9 @@ export default function Dashboard({
           </p>
         </div>
         <div className="rounded-2xl border border-zinc-200/70 bg-white px-4 py-4 shadow-sm">
-          <p className="text-[11px] font-medium text-zinc-400">{copy.avgPerDay}</p>
+          <p className="text-[11px] font-medium text-zinc-400">
+            {copy.avgPerDay}
+          </p>
           <p className="mt-1 text-2xl font-semibold tabular-nums text-zinc-900">
             {stats.avgPerDay !== null ? (
               money(stats.avgPerDay)
@@ -252,7 +241,6 @@ export default function Dashboard({
         ) : null}
       </div>
 
-      {/* 最近の記録 */}
       <section className="rounded-2xl border border-zinc-200/70 bg-white px-3 py-3 shadow-sm">
         <h2 className="mb-2 px-1 text-sm font-medium text-zinc-700">
           {copy.recent}
@@ -301,7 +289,7 @@ export default function Dashboard({
                   <button
                     type="button"
                     onClick={() => onDelete(entry.id)}
-                    className="shrink-0 rounded-lg px-2 py-1.5 text-[11px] text-zinc-400 transition-colors hover:bg-rose-50 hover:text-rose-600"
+                    className="shrink-0 rounded-lg px-2 py-1.5 text-[11px] text-zinc-400 transition-transform active:scale-95 hover:bg-rose-50 hover:text-rose-600"
                   >
                     {copy.deleteEntry}
                   </button>
@@ -312,13 +300,13 @@ export default function Dashboard({
         )}
       </section>
 
-      {/* 親指ゾーン：固定CTA */}
+      {/* 親指ゾーン：画面下固定CTA */}
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-zinc-200/80 bg-zinc-50/95 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-md">
         <div className="mx-auto flex w-full max-w-lg gap-2">
           <button
             type="button"
             onClick={onOpenSettings}
-            className="btn-secondary shrink-0 !px-4 !py-3.5 !text-sm"
+            className="btn-secondary shrink-0 !px-4 !py-3.5 !text-sm active:scale-[0.97]"
           >
             {copy.openSettings}
           </button>
@@ -332,31 +320,5 @@ export default function Dashboard({
         </div>
       </div>
     </div>
-  );
-}
-
-function ModeTab({
-  active,
-  label,
-  onClick,
-}: {
-  active: boolean;
-  label: string;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      role="tab"
-      aria-selected={active}
-      onClick={onClick}
-      className={`rounded-xl px-2 py-2.5 text-center text-xs font-semibold transition-colors sm:text-sm ${
-        active
-          ? "bg-white text-zinc-900 shadow-sm"
-          : "text-zinc-500 hover:text-zinc-700"
-      }`}
-    >
-      {label}
-    </button>
   );
 }

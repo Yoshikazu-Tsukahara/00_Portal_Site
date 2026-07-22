@@ -175,16 +175,14 @@ export default function LunchSavingsPage() {
 
   if (!hydrated) {
     return (
-      <div className={isStandalone ? "lunch-pwa-root" : undefined}>
-        <AppShell
-          title={copy.shell.title}
-          description={copy.shell.description}
-          hidePortalLink={isStandalone}
-          actions={isStandalone ? <LanguageToggle /> : undefined}
-        >
-          <p className="text-sm text-zinc-400">{t.common.loading}</p>
-        </AppShell>
-      </div>
+      <AppShell
+        title={copy.shell.title}
+        description={copy.shell.description}
+        hidePortalLink={isStandalone}
+        actions={isStandalone ? <LanguageToggle /> : undefined}
+      >
+        <p className="text-sm text-zinc-400">{t.common.loading}</p>
+      </AppShell>
     );
   }
 
@@ -196,7 +194,6 @@ export default function LunchSavingsPage() {
   };
 
   return (
-    <div className={isStandalone ? "lunch-pwa-root" : undefined}>
     <AppShell
       title={copy.shell.title}
       description={copy.shell.description}
@@ -280,6 +277,5 @@ export default function LunchSavingsPage() {
         </div>
       ) : null}
     </AppShell>
-    </div>
   );
 }

@@ -141,7 +141,7 @@ export default function NumpadModal({
             value={note}
             onChange={(e) => setNote(e.target.value.slice(0, 80))}
             placeholder={copy.notePlaceholder}
-            className="input-field w-full !rounded-xl !border-zinc-200 !bg-zinc-50/80 !py-2.5 !text-sm placeholder:text-zinc-300"
+            className="input-field w-full !rounded-xl !border-zinc-200 !bg-zinc-50/80 !py-3 !text-base placeholder:text-zinc-300"
             autoComplete="off"
             enterKeyHint="done"
           />
@@ -153,10 +153,10 @@ export default function NumpadModal({
               key={key}
               type="button"
               onClick={() => pressDigit(key === "C" ? "C" : key)}
-              className={`flex h-14 items-center justify-center rounded-2xl text-xl font-medium transition-colors active:scale-[0.97] sm:h-16 ${
+              className={`flex h-14 items-center justify-center rounded-2xl text-xl font-medium transition-[transform,background-color] duration-150 active:scale-95 sm:h-16 ${
                 key === "C" || key === "⌫" || key === "."
-                  ? "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
-                  : "bg-zinc-50 text-zinc-900 hover:bg-zinc-100"
+                  ? "bg-zinc-100 text-zinc-600 hover:bg-zinc-200 active:bg-zinc-200"
+                  : "bg-zinc-50 text-zinc-900 hover:bg-zinc-100 active:bg-zinc-200"
               }`}
             >
               {key === "C" ? copy.clear : key === "⌫" ? copy.backspace : key}

@@ -276,7 +276,33 @@ body {
 
   /* ---------- ランチ貯金アプリ ---------- */
   .lunch-confirm-btn {
-    @apply inline-flex items-center justify-center rounded-2xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-[background-color,transform,box-shadow] hover:bg-emerald-500 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-emerald-600;
+    @apply inline-flex items-center justify-center rounded-2xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-[background-color,transform,box-shadow] hover:bg-emerald-500 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-emerald-600;
+  }
+
+  /* モード切替：iOS 風スライディング・セグメント */
+  .lunch-mode-segment {
+    @apply relative grid grid-cols-2 gap-0 rounded-2xl border border-zinc-200/80 bg-zinc-100/90 p-1;
+  }
+
+  .lunch-mode-segment__indicator {
+    @apply pointer-events-none absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] rounded-xl bg-white shadow-sm;
+    transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .lunch-mode-segment__indicator--budget {
+    transform: translateX(calc(100% + 4px));
+  }
+
+  .lunch-mode-segment__btn {
+    @apply relative z-10 rounded-xl px-2 py-2.5 text-center text-xs font-semibold transition-colors duration-200 active:scale-[0.98] sm:text-sm;
+  }
+
+  .lunch-mode-segment__btn--active {
+    @apply text-zinc-900;
+  }
+
+  .lunch-mode-segment__btn--inactive {
+    @apply text-zinc-500 hover:text-zinc-700;
   }
 
   .lunch-hero {
@@ -319,24 +345,17 @@ body {
   }
 }
 
-/* ランチ貯金 PWA standalone: スワイプバック／オーバースクロール抑制 */
-html.lunch-pwa-standalone,
-body.lunch-pwa-standalone {
-  overscroll-behavior: none;
-  overscroll-behavior-x: none;
-  overscroll-behavior-y: none;
-  touch-action: pan-y;
+/* ランチ貯金：過度なバウンスだけ抑え、通常スクロールは阻害しない */
+html.lunch-app-active,
+body.lunch-app-active {
+  overscroll-behavior-y: contain;
 }
 
-.lunch-pwa-root {
-  display: flex;
-  min-height: 100%;
-  flex: 1 1 auto;
-  flex-direction: column;
-  overscroll-behavior: none;
+/* ランチ貯金 PWA standalone: 端スワイプ戻り抑制 */
+html.lunch-pwa-standalone,
+body.lunch-pwa-standalone {
   overscroll-behavior-x: none;
   touch-action: pan-y;
-  overflow-x: hidden;
 }
 
 @keyframes header-label-in {
@@ -409,7 +428,8 @@ body.lunch-pwa-standalone {
     animation: none;
   }
 
-  .lang-toggle__indicator {
+  .lang-toggle__indicator,
+  .lunch-mode-segment__indicator {
     transition: none;
   }
 
