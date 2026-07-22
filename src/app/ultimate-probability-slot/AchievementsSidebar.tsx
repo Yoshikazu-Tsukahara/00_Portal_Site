@@ -36,12 +36,14 @@ export default function AchievementsSidebar({
         <p className="slot-achievements__count">{countLabel}</p>
       </div>
 
-      <AchievementsBadgeList
-        mode={mode}
-        unlockedBadges={unlockedBadges}
-        badgeCopy={badgeCopy}
-        copy={copy}
-      />
+      <div className="slot-achievements__body">
+        <AchievementsBadgeList
+          mode={mode}
+          unlockedBadges={unlockedBadges}
+          badgeCopy={badgeCopy}
+          copy={copy}
+        />
+      </div>
     </aside>
   );
 }

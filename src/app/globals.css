@@ -380,7 +380,7 @@ body {
    * スマホでもスクロールなしで収める（実績はドロワーへ退避）。
    */
   .slot-layout {
-    @apply flex min-h-0 w-full flex-1 flex-col gap-1.5 sm:gap-2 lg:flex-row lg:items-stretch lg:gap-3;
+    @apply flex min-h-0 w-full flex-1 flex-col overflow-hidden;
     /* AppShell(fillViewport) の残り高さいっぱい。dvh は親が伸びない時の下限 */
     height: 100%;
     max-height: 100%;
@@ -392,24 +392,52 @@ body {
   }
 
   .slot-console {
-    @apply flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-zinc-800 bg-[radial-gradient(ellipse_at_top,rgb(39,39,42,0.55),rgba(9,9,11,0.98))] font-mono text-zinc-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_20px_60px_-24px_rgba(0,0,0,0.9)] sm:rounded-2xl;
+    @apply flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden font-mono text-zinc-100;
     height: 100%;
     max-height: 100%;
+  }
+
+  .slot-console__columns {
+    @apply flex min-h-0 flex-1 flex-col;
+  }
+
+  .slot-console__inner {
+    @apply flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-zinc-800 bg-[radial-gradient(ellipse_at_top,rgb(39,39,42,0.55),rgba(9,9,11,0.98))] shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_20px_60px_-24px_rgba(0,0,0,0.9)] sm:rounded-2xl;
+  }
+
+  @media (min-width: 1024px) {
+    .slot-console__columns {
+      @apply relative flex min-h-0 flex-1 flex-col;
+    }
+
+    .slot-console__inner {
+      /* 実績欄分の余白を確保し、高さはこのパネルだけが決める */
+      margin-right: calc(17.5rem + 0.75rem);
+    }
   }
 
   .slot-achievements {
     /* スマホでは必ず非表示（ドロワーへ）。PCのみ右サイドバー */
     display: none;
-    @apply shrink-0 flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-[radial-gradient(ellipse_at_top,rgba(39,39,42,0.45),rgba(9,9,11,0.96))] font-mono text-zinc-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)];
+    @apply min-h-0 shrink-0 flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-[radial-gradient(ellipse_at_top,rgba(39,39,42,0.45),rgba(9,9,11,0.96))] font-mono text-zinc-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)];
   }
 
   @media (min-width: 1024px) {
     .slot-achievements {
       display: flex;
+      /* スロット本体の高さに合わせる（実績リストは内部スクロール） */
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
       width: 17.5rem;
-      height: 100%;
-      max-height: 100%;
+      min-height: 0;
+      max-height: none;
     }
+  }
+
+  .slot-achievements__body {
+    @apply flex min-h-0 flex-1 flex-col overflow-hidden;
   }
 
   .slot-achievements__head {

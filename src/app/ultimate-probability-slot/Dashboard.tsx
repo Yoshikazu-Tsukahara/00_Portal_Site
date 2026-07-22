@@ -100,7 +100,9 @@ export default function Dashboard({
   return (
     <div className="slot-layout">
       <div className="slot-console">
-        <div className="slot-console__main">
+        <div className="slot-console__columns">
+          <div className="slot-console__inner">
+            <div className="slot-console__main">
           <div className="grid shrink-0 gap-1 sm:grid-cols-2 sm:gap-2">
             <ModeSegment
               mode={settings.mode}
@@ -227,15 +229,17 @@ export default function Dashboard({
               />
             </div>
           </div>
+            </div>
+          </div>
+
+          <AchievementsSidebar
+            mode={settings.mode}
+            unlockedBadges={unlockedBadges}
+            badgeCopy={badgeCopy}
+            copy={achievementsCopy}
+          />
         </div>
       </div>
-
-      <AchievementsSidebar
-        mode={settings.mode}
-        unlockedBadges={unlockedBadges}
-        badgeCopy={badgeCopy}
-        copy={achievementsCopy}
-      />
 
       <AchievementsDrawer
         open={achievementsOpen}
