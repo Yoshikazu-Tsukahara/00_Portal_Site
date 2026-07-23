@@ -76,6 +76,8 @@ export type UltimateProbabilitySlotDict = {
     reachPinchWarning: string;
     manualStopButton: string;
     reachSpaceHint: string;
+    antiCheatWarning: string;
+    antiCheatLockdown: string;
   };
   fortune: {
     p0: { label: string; description: string };
@@ -113,34 +115,12 @@ export type UltimateProbabilitySlotDict = {
     cumulativeLabel: string;
     singleProbLabel: string;
     evaluationLabel: string;
-    downloadPdf: string;
-    generatingPdf: string;
+    downloadPng: string;
+    generatingPng: string;
     oddsPrefix: string;
-  };
-  /** PDF 観測レポート文言 */
-  report: {
-    reportTitle: string;
-    reportSubtitle: string;
-    sectionSummary: string;
-    sectionMoment: string;
-    sectionGraph: string;
-    fieldMode: string;
-    fieldSingleProb: string;
-    fieldAttempts: string;
-    fieldCumulative: string;
-    fieldEndedAt: string;
-    fieldEvaluation: string;
-    modeHitUntilWin: string;
-    modeAntiBingo: string;
-    outcomeClear: string;
-    outcomeGameover: string;
-    graphXLabel: string;
-    graphYLabelHit: string;
-    graphYLabelMiss: string;
-    oddsPrefix: string;
-    noScreenshot: string;
-    noHistory: string;
-    filenamePrefix: string;
+    langPickerTitle: string;
+    langJa: string;
+    langEn: string;
   };
   toast: {
     settingsSaved: string;
@@ -188,11 +168,11 @@ export const ultimateProbabilitySlotJa: UltimateProbabilitySlotDict = {
     modalClose: "閉じる",
   },
   mode: {
-    heading: "モード",
-    hitUntilWin: "当たるまで回す",
-    hitUntilWinHint: "ジャックポットを目指す",
-    antiBingo: "外し続ける",
-    antiBingoHint: "当たりを避ける",
+    heading: "TARGET",
+    hitUntilWin: "[ TARGET: HIT ]",
+    hitUntilWinHint: "当たるまで",
+    antiBingo: "[ TARGET: AVOID ]",
+    antiBingoHint: "外し続ける",
     switchConfirm: "モードを切り替えると回転数がリセットされます。よろしいですか？",
   },
   setup: {
@@ -242,6 +222,9 @@ export const ultimateProbabilitySlotJa: UltimateProbabilitySlotDict = {
     reachPinchWarning: "[ PINCH: CRITICAL REACH ]",
     manualStopButton: "MANUAL STOP",
     reachSpaceHint: "クリック／タップで MANUAL STOP",
+    antiCheatWarning: "[ WARNING: AUTOMATED INPUT DETECTED ]",
+    antiCheatLockdown:
+      "[ ANTI-CHEAT SYSTEM ACTIVATED: LOCKDOWN FOR {sec} SEC ]",
   },
   fortune: {
     p0: {
@@ -326,33 +309,12 @@ export const ultimateProbabilitySlotJa: UltimateProbabilitySlotDict = {
     cumulativeLabel: "到達した累積確率",
     singleProbLabel: "1回の確率",
     evaluationLabel: "最終評価",
-    downloadPdf: "📄 実験レポートをPDFでダウンロード",
-    generatingPdf: "GENERATING REPORT...",
+    downloadPng: "📄 実験レポートをPNGでダウンロード",
+    generatingPng: "GENERATING REPORT...",
     oddsPrefix: "1 /",
-  },
-  report: {
-    reportTitle: "PROBABILITY EXPERIMENT REPORT",
-    reportSubtitle: "確率観測レポート / LOCAL OBSERVATION LOG",
-    sectionSummary: "01  PLAY SUMMARY",
-    sectionMoment: "02  CRITICAL MOMENT",
-    sectionGraph: "03  CUMULATIVE PROBABILITY TRACE",
-    fieldMode: "MODE",
-    fieldSingleProb: "P(HIT)",
-    fieldAttempts: "SPINS",
-    fieldCumulative: "CUMULATIVE",
-    fieldEndedAt: "TIMESTAMP",
-    fieldEvaluation: "EVAL",
-    modeHitUntilWin: "HIT UNTIL WIN",
-    modeAntiBingo: "KEEP MISSING",
-    outcomeClear: "CLEAR",
-    outcomeGameover: "GAME OVER",
-    graphXLabel: "SPINS (n)",
-    graphYLabelHit: "CUMULATIVE HIT %",
-    graphYLabelMiss: "CUMULATIVE MISS %",
-    oddsPrefix: "1 /",
-    noScreenshot: "[ NO CAPTURE AVAILABLE ]",
-    noHistory: "[ NO TRACE DATA ]",
-    filenamePrefix: "probability-experiment-report",
+    langPickerTitle: "REPORT LANGUAGE",
+    langJa: "日本語 (JP)",
+    langEn: "English (EN)",
   },
   toast: {
     settingsSaved: "設定を保存しました。",
@@ -400,11 +362,11 @@ export const ultimateProbabilitySlotEn: UltimateProbabilitySlotDict = {
     modalClose: "Close",
   },
   mode: {
-    heading: "Mode",
-    hitUntilWin: "Hit Until Win",
-    hitUntilWinHint: "Chase the jackpot",
-    antiBingo: "Keep Missing",
-    antiBingoHint: "Avoid the jackpot",
+    heading: "TARGET",
+    hitUntilWin: "[ TARGET: HIT ]",
+    hitUntilWinHint: "Hit until win",
+    antiBingo: "[ TARGET: AVOID ]",
+    antiBingoHint: "Keep missing",
     switchConfirm: "Switching modes resets your spin count. Continue?",
   },
   setup: {
@@ -455,6 +417,9 @@ export const ultimateProbabilitySlotEn: UltimateProbabilitySlotDict = {
     reachPinchWarning: "[ PINCH: CRITICAL REACH ]",
     manualStopButton: "MANUAL STOP",
     reachSpaceHint: "Click or tap to MANUAL STOP",
+    antiCheatWarning: "[ WARNING: AUTOMATED INPUT DETECTED ]",
+    antiCheatLockdown:
+      "[ ANTI-CHEAT SYSTEM ACTIVATED: LOCKDOWN FOR {sec} SEC ]",
   },
   fortune: {
     p0: {
@@ -539,33 +504,12 @@ export const ultimateProbabilitySlotEn: UltimateProbabilitySlotDict = {
     cumulativeLabel: "Final cumulative probability",
     singleProbLabel: "Per-spin probability",
     evaluationLabel: "Final evaluation",
-    downloadPdf: "📄 Download experiment report (PDF)",
-    generatingPdf: "GENERATING REPORT...",
+    downloadPng: "📄 Download experiment report (PNG)",
+    generatingPng: "GENERATING REPORT...",
     oddsPrefix: "1 /",
-  },
-  report: {
-    reportTitle: "PROBABILITY EXPERIMENT REPORT",
-    reportSubtitle: "LOCAL OBSERVATION LOG",
-    sectionSummary: "01  PLAY SUMMARY",
-    sectionMoment: "02  CRITICAL MOMENT",
-    sectionGraph: "03  CUMULATIVE PROBABILITY TRACE",
-    fieldMode: "MODE",
-    fieldSingleProb: "P(HIT)",
-    fieldAttempts: "SPINS",
-    fieldCumulative: "CUMULATIVE",
-    fieldEndedAt: "TIMESTAMP",
-    fieldEvaluation: "EVAL",
-    modeHitUntilWin: "HIT UNTIL WIN",
-    modeAntiBingo: "KEEP MISSING",
-    outcomeClear: "CLEAR",
-    outcomeGameover: "GAME OVER",
-    graphXLabel: "SPINS (n)",
-    graphYLabelHit: "CUMULATIVE HIT %",
-    graphYLabelMiss: "CUMULATIVE MISS %",
-    oddsPrefix: "1 /",
-    noScreenshot: "[ NO CAPTURE AVAILABLE ]",
-    noHistory: "[ NO TRACE DATA ]",
-    filenamePrefix: "probability-experiment-report",
+    langPickerTitle: "REPORT LANGUAGE",
+    langJa: "日本語 (JP)",
+    langEn: "English (EN)",
   },
   toast: {
     settingsSaved: "Settings saved.",

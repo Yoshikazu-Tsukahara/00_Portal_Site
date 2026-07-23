@@ -1,8 +1,7 @@
-// 確率観測レポート（PDF）のクライアントサイド生成
-// サーバー通信なし。jspdf + Canvas 描画のみ。
+// 確率観測レポート：型・統計ヘルパー・文言パック・PNG生成
+// サーバー通信なし。html2canvas で隠しDOMを画像化する。
 
-import { jsPDF } from "jspdf";
-import type { PlayMode } from "./types";
+import { JACKPOT_INDEX, type PlayMode } from "./types";
 
 /** 1回転ごとの累積確率サンプル（表示用 %） */
 export type ProbHistoryPoint = {
@@ -12,48 +11,286 @@ export type ProbHistoryPoint = {
 };
 
 export type ExperimentResultKind = "clear" | "gameover";
+export type ReportLang = "ja" | "en";
+
+/** 1ラン中に蓄積する観測統計 */
+export type RunSessionStats = {
+  /** リーチ発生回数（最終リール以外が全ジャックポット） */
+  reachCount: number;
+  /** 左からの最高連続一致リール数 */
+  maxLeftMatch: number;
+};
+
+export const EMPTY_RUN_SESSION_STATS: RunSessionStats = {
+  reachCount: 0,
+  maxLeftMatch: 0,
+};
 
 /** ゲーム終了時に凍結するリザルト一式 */
 export type ExperimentResult = {
   kind: ExperimentResultKind;
   mode: PlayMode;
   endedAt: Date;
+  experimentId: string;
   attempts: number;
+  reelCount: number;
   /** 単発確率 0〜1 */
   singleProbability: number;
   /** 最終累積確率（表示用）0〜1 */
   cumulativeProbability: number;
+  /** 理論期待値（平均で何回で1回当たるか = 1/p） */
+  expectedValue: number;
+  /** 理論値乖離率（総回転数 ÷ 期待値） */
+  deviationRatio: number;
+  reachCount: number;
+  maxLeftMatch: number;
   fortuneLabel: string;
   fortuneDescription: string;
+  /** 統計偏差ランク（言語非依存コード） */
+  anomalyRank: AnomalyRankId;
   /** スロット画面キャプチャ（data URL）。失敗時は null */
   screenshotDataUrl: string | null;
   history: ProbHistoryPoint[];
 };
 
+export type AnomalyRankId =
+  | "cursed"
+  | "deep_hook"
+  | "average"
+  | "fast"
+  | "anomaly"
+  | "singular";
+
 export type ExperimentReportCopy = {
   reportTitle: string;
   reportSubtitle: string;
-  sectionSummary: string;
-  sectionMoment: string;
-  sectionGraph: string;
+  fieldExperimentId: string;
+  fieldEndedAt: string;
   fieldMode: string;
+  fieldOutcome: string;
+  sectionParams: string;
+  sectionVisual: string;
+  sectionEval: string;
   fieldSingleProb: string;
+  fieldExpected: string;
   fieldAttempts: string;
   fieldCumulative: string;
-  fieldEndedAt: string;
-  fieldEvaluation: string;
+  fieldDeviation: string;
+  fieldReachCount: string;
+  fieldMaxMatch: string;
+  visualShot: string;
+  fieldRank: string;
+  fieldAnalysis: string;
   modeHitUntilWin: string;
   modeAntiBingo: string;
   outcomeClear: string;
   outcomeGameover: string;
-  graphXLabel: string;
-  graphYLabelHit: string;
-  graphYLabelMiss: string;
   oddsPrefix: string;
   noScreenshot: string;
-  noHistory: string;
   filenamePrefix: string;
+  deviationSuffix: string;
+  maxMatchOf: string;
+  ranks: Record<AnomalyRankId, string>;
+  analyses: Record<AnomalyRankId, { hit: string; avoid: string }>;
 };
+
+/** 画像レポートの二言語パック（UI言語とは独立） */
+export const REPORT_COPY: Record<ReportLang, ExperimentReportCopy> = {
+  ja: {
+    reportTitle: "PROBABILITY EXPERIMENT REPORT",
+    reportSubtitle: "確率観測報告書  /  LOCAL OBSERVATION LOG",
+    fieldExperimentId: "EXP-ID",
+    fieldEndedAt: "TIMESTAMP",
+    fieldMode: "MODE",
+    fieldOutcome: "OUTCOME",
+    sectionParams: "01  PARAMETERS & STATISTICS",
+    sectionVisual: "02  VISUAL EVIDENCE",
+    sectionEval: "03  SYSTEM EVALUATION",
+    fieldSingleProb: "P(HIT)",
+    fieldExpected: "E[N]  理論期待値",
+    fieldAttempts: "SPINS  総回転数",
+    fieldCumulative: "CUMULATIVE  到達累積確率",
+    fieldDeviation: "DEVIATION  理論値乖離率",
+    fieldReachCount: "REACH  リーチ発生回数",
+    fieldMaxMatch: "MAX-MATCH  最高連続一致",
+    visualShot: "CRITICAL FRAME",
+    fieldRank: "RANK",
+    fieldAnalysis: "ANALYSIS",
+    modeHitUntilWin: "[ TARGET: HIT ]",
+    modeAntiBingo: "[ TARGET: AVOID ]",
+    outcomeClear: "CLEAR",
+    outcomeGameover: "GAME OVER",
+    oddsPrefix: "1 /",
+    noScreenshot: "[ NO CAPTURE ]",
+    filenamePrefix: "experiment-report",
+    deviationSuffix: "× expected",
+    maxMatchOf: "/",
+    ranks: {
+      cursed: "CURSED",
+      deep_hook: "DEEP HOOK",
+      average: "AVERAGE",
+      fast: "FAST HIT",
+      anomaly: "STATISTICAL ANOMALY",
+      singular: "SINGULARITY",
+    },
+    analyses: {
+      cursed: {
+        hit: "理論期待値の数倍を空回り。乱数はあなたを嫌っているように見える。",
+        avoid: "期待より早く罠に落ちた。回避プロトコルは破綻した。",
+      },
+      deep_hook: {
+        hit: "期待値を大きく超えてハマった。観測ログは「不運」と記録する。",
+        avoid: "期待より早く同期した。生存ラインを下回った。",
+      },
+      average: {
+        hit: "理論付近での決着。確率の教科書どおりの平凡な結果。",
+        avoid: "平均的なタイミングで同期失敗。特異点ではない。",
+      },
+      fast: {
+        hit: "期待より早く当たった。幸運、あるいは単なる短いサンプル。",
+        avoid: "早すぎる同期。回避側としては苦い速攻敗北。",
+      },
+      anomaly: {
+        hit: "統計的に稀な速攻。報告書に残す価値のある逸脱。",
+        avoid: "異常に早いゲームオーバー。システムは記録を残す。",
+      },
+      singular: {
+        hit: "特異点級の即決。ほぼ奇跡。再現を期待してはいけない。",
+        avoid: "特異点級の即死。確率の罠が最初から口を開けていた。",
+      },
+    },
+  },
+  en: {
+    reportTitle: "PROBABILITY EXPERIMENT REPORT",
+    reportSubtitle: "OFFICIAL OBSERVATION LOG  /  LOCAL GENERATION",
+    fieldExperimentId: "EXP-ID",
+    fieldEndedAt: "TIMESTAMP",
+    fieldMode: "MODE",
+    fieldOutcome: "OUTCOME",
+    sectionParams: "01  PARAMETERS & STATISTICS",
+    sectionVisual: "02  VISUAL EVIDENCE",
+    sectionEval: "03  SYSTEM EVALUATION",
+    fieldSingleProb: "P(HIT)",
+    fieldExpected: "E[N]  Expected spins",
+    fieldAttempts: "SPINS  Total",
+    fieldCumulative: "CUMULATIVE  Final",
+    fieldDeviation: "DEVIATION  vs expected",
+    fieldReachCount: "REACH  Count",
+    fieldMaxMatch: "MAX-MATCH  Left streak",
+    visualShot: "CRITICAL FRAME",
+    fieldRank: "RANK",
+    fieldAnalysis: "ANALYSIS",
+    modeHitUntilWin: "[ TARGET: HIT ]",
+    modeAntiBingo: "[ TARGET: AVOID ]",
+    outcomeClear: "CLEAR",
+    outcomeGameover: "GAME OVER",
+    oddsPrefix: "1 /",
+    noScreenshot: "[ NO CAPTURE ]",
+    filenamePrefix: "experiment-report",
+    deviationSuffix: "× expected",
+    maxMatchOf: "/",
+    ranks: {
+      cursed: "CURSED",
+      deep_hook: "DEEP HOOK",
+      average: "AVERAGE",
+      fast: "FAST HIT",
+      anomaly: "STATISTICAL ANOMALY",
+      singular: "SINGULARITY",
+    },
+    analyses: {
+      cursed: {
+        hit: "Spun multiple expected values with no hit. RNG appears hostile.",
+        avoid: "Fell into the trap earlier than expected. Dodge protocol failed.",
+      },
+      deep_hook: {
+        hit: "Well past expectation. Log classifies this as deep unlucky.",
+        avoid: "Synced earlier than expected. Survival line breached.",
+      },
+      average: {
+        hit: "Resolved near theory. Textbook-ordinary outcome.",
+        avoid: "Average-timing sync failure. Not a singularity.",
+      },
+      fast: {
+        hit: "Hit sooner than expected. Luck, or a short sample.",
+        avoid: "Too-early sync. A bitter fast loss for the dodge side.",
+      },
+      anomaly: {
+        hit: "Statistically rare early hit. Worth filing in the report.",
+        avoid: "Abnormally early game over. System retains the record.",
+      },
+      singular: {
+        hit: "Near-miracle instant resolution. Do not expect a replay.",
+        avoid: "Singularity-class instant death. The trap was open from spin one.",
+      },
+    },
+  },
+};
+
+/** 観測実験ID（例: OBS-A7F3C2） */
+export function createExperimentId(): string {
+  const hex = Math.random().toString(16).slice(2, 8).toUpperCase();
+  return `OBS-${hex}`;
+}
+
+/** 左からジャックポットが何本連続しているか */
+export function leftJackpotMatchCount(indices: number[]): number {
+  let n = 0;
+  for (const idx of indices) {
+    if (idx === JACKPOT_INDEX) n += 1;
+    else break;
+  }
+  return n;
+}
+
+/** 最終リール以外がすべてジャックポット＝リーチ発生 */
+export function isReachSpin(indices: number[], reelCount: number): boolean {
+  if (reelCount < 2) return false;
+  return indices.slice(0, reelCount - 1).every((i) => i === JACKPOT_INDEX);
+}
+
+/** 理論期待値（幾何分布の平均 = 1/p） */
+export function theoreticalExpectedSpins(p: number): number {
+  if (!(p > 0) || !Number.isFinite(p)) return Number.POSITIVE_INFINITY;
+  if (p >= 1) return 1;
+  return 1 / p;
+}
+
+/** 理論値乖離率（attempts / E[N]）。小さいほど速攻、大きいほどハマり */
+export function deviationRatio(attempts: number, expected: number): number {
+  if (!(expected > 0) || !Number.isFinite(expected)) {
+    return Number.POSITIVE_INFINITY;
+  }
+  if (!(attempts > 0)) return 0;
+  return attempts / expected;
+}
+
+/**
+ * 乖離率から統計偏差ランクを判定。
+ * hit モード：大きい＝ハマり、小さい＝速攻。
+ */
+export function getAnomalyRank(ratio: number): AnomalyRankId {
+  if (!Number.isFinite(ratio)) return "cursed";
+  if (ratio >= 3) return "cursed";
+  if (ratio >= 1.5) return "deep_hook";
+  if (ratio >= 0.7) return "average";
+  if (ratio >= 0.35) return "fast";
+  if (ratio >= 0.15) return "anomaly";
+  return "singular";
+}
+
+/** 1スピン結果をセッション統計へ反映 */
+export function accumulateRunSessionStats(
+  prev: RunSessionStats,
+  indices: number[],
+  reelCount: number,
+): RunSessionStats {
+  const left = leftJackpotMatchCount(indices);
+  const reach = isReachSpin(indices, reelCount) ? 1 : 0;
+  return {
+    reachCount: prev.reachCount + reach,
+    maxLeftMatch: Math.max(prev.maxLeftMatch, left),
+  };
+}
 
 function pad2(n: number): string {
   return String(n).padStart(2, "0");
@@ -67,320 +304,11 @@ export function formatReportDateTime(date: Date): string {
   );
 }
 
-/** 点が多すぎる場合は間引いて描画負荷を抑える */
-function downsampleHistory(
-  history: ProbHistoryPoint[],
-  maxPoints = 800,
-): ProbHistoryPoint[] {
-  if (history.length <= maxPoints) return history;
-  const out: ProbHistoryPoint[] = [];
-  const last = history.length - 1;
-  for (let i = 0; i < maxPoints - 1; i++) {
-    const idx = Math.round((i * last) / (maxPoints - 1));
-    out.push(history[idx]);
-  }
-  out.push(history[last]);
-  return out;
-}
-
-/** 累積確率の折れ線グラフを Canvas に描画し PNG data URL を返す */
-export function renderProbabilityChart(
-  history: ProbHistoryPoint[],
-  options: {
-    yLabel: string;
-    xLabel: string;
-    width?: number;
-    height?: number;
-  },
-): string {
-  const width = options.width ?? 900;
-  const height = options.height ?? 360;
-  const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return "";
-
-  const samples = downsampleHistory(history);
-
-  // 白黒の観測シート風
-  ctx.fillStyle = "#ffffff";
-  ctx.fillRect(0, 0, width, height);
-
-  const padL = 64;
-  const padR = 24;
-  const padT = 28;
-  const padB = 48;
-  const plotW = width - padL - padR;
-  const plotH = height - padT - padB;
-
-  ctx.strokeStyle = "#111111";
-  ctx.fillStyle = "#111111";
-  ctx.lineWidth = 1.5;
-  ctx.font = '12px "Courier New", Courier, monospace';
-
-  // 枠
-  ctx.strokeRect(padL, padT, plotW, plotH);
-
-  // グリッド（横 0/25/50/75/100%）
-  ctx.strokeStyle = "#cccccc";
-  ctx.lineWidth = 1;
-  for (let i = 0; i <= 4; i++) {
-    const y = padT + (plotH * i) / 4;
-    ctx.beginPath();
-    ctx.moveTo(padL, y);
-    ctx.lineTo(padL + plotW, y);
-    ctx.stroke();
-    const pct = 100 - i * 25;
-    ctx.fillStyle = "#333333";
-    ctx.textAlign = "right";
-    ctx.textBaseline = "middle";
-    ctx.fillText(`${pct}`, padL - 8, y);
-  }
-
-  // 軸ラベル
-  ctx.fillStyle = "#111111";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "top";
-  ctx.fillText(options.xLabel, padL + plotW / 2, height - 28);
-
-  ctx.save();
-  ctx.translate(18, padT + plotH / 2);
-  ctx.rotate(-Math.PI / 2);
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText(options.yLabel, 0, 0);
-  ctx.restore();
-
-  if (samples.length === 0) {
-    ctx.fillStyle = "#666666";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText("(NO DATA)", padL + plotW / 2, padT + plotH / 2);
-    return canvas.toDataURL("image/png");
-  }
-
-  const maxAttempts = Math.max(
-    1,
-    ...samples.map((h) => h.attempts),
-    samples[samples.length - 1]?.attempts ?? 1,
-  );
-
-  // 原点（回転0, 累積0%）を含めて描く
-  const points: ProbHistoryPoint[] = [
-    { attempts: 0, cumulativePercent: 0 },
-    ...samples,
-  ];
-
-  const toX = (attempts: number) =>
-    padL + (Math.min(attempts, maxAttempts) / maxAttempts) * plotW;
-  const toY = (pct: number) =>
-    padT + plotH - (Math.min(100, Math.max(0, pct)) / 100) * plotH;
-
-  // 折れ線
-  ctx.strokeStyle = "#111111";
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  points.forEach((pt, i) => {
-    const x = toX(pt.attempts);
-    const y = toY(pt.cumulativePercent);
-    if (i === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-  });
-  ctx.stroke();
-
-  // 端点マーカー
-  const last = points[points.length - 1];
-  ctx.fillStyle = "#111111";
-  ctx.beginPath();
-  ctx.arc(toX(last.attempts), toY(last.cumulativePercent), 4, 0, Math.PI * 2);
-  ctx.fill();
-
-  // X 軸の目盛り（最大回転）
-  ctx.fillStyle = "#333333";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "top";
-  ctx.fillText("0", padL, padT + plotH + 6);
-  ctx.fillText(String(maxAttempts), padL + plotW, padT + plotH + 6);
-
-  return canvas.toDataURL("image/png");
-}
-
-function dataUrlToImage(dataUrl: string): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = () => reject(new Error("image-load-failed"));
-    img.src = dataUrl;
-  });
-}
-
-/**
- * A4縦の観測レポート PDF を生成してダウンロードする。
- * すべてブラウザ内で完結する。
- */
-export async function downloadExperimentReportPdf(
-  result: ExperimentResult,
-  copy: ExperimentReportCopy,
-  formatters: {
-    formatOdds: (p: number) => string;
-    formatPercent: (p: number) => string;
-  },
-): Promise<void> {
-  const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-  const pageW = doc.internal.pageSize.getWidth();
-  const pageH = doc.internal.pageSize.getHeight();
-  const margin = 14;
-  const contentW = pageW - margin * 2;
-  let y = margin;
-
-  const ink = "#111111";
-  const mute = "#555555";
-
-  doc.setTextColor(ink);
-  doc.setDrawColor(ink);
-  doc.setLineWidth(0.4);
-
-  // ─ ヘッダー ─
-  doc.setFont("courier", "bold");
-  doc.setFontSize(14);
-  doc.text(copy.reportTitle, margin, y + 4);
-  y += 9;
-  doc.setFont("courier", "normal");
-  doc.setFontSize(8);
-  doc.setTextColor(mute);
-  doc.text(copy.reportSubtitle, margin, y);
-  y += 5;
-  doc.setTextColor(ink);
-  doc.line(margin, y, pageW - margin, y);
-  y += 7;
-
-  const ended = formatReportDateTime(result.endedAt);
-  const modeLabel =
-    result.mode === "antiBingo" ? copy.modeAntiBingo : copy.modeHitUntilWin;
-  const outcomeLabel =
-    result.kind === "clear" ? copy.outcomeClear : copy.outcomeGameover;
-  const cumPct = `${formatters.formatPercent(result.cumulativeProbability)}%`;
-  const odds = `${copy.oddsPrefix} ${formatters.formatOdds(result.singleProbability)}`;
-
-  // ─ サマリー ─
-  doc.setFont("courier", "bold");
-  doc.setFontSize(10);
-  doc.text(copy.sectionSummary, margin, y);
-  y += 6;
-  doc.setFont("courier", "normal");
-  doc.setFontSize(9);
-
-  const summaryRows: [string, string][] = [
-    [copy.fieldEndedAt, ended],
-    [copy.fieldMode, `${modeLabel}  /  ${outcomeLabel}`],
-    [copy.fieldSingleProb, odds],
-    [copy.fieldAttempts, result.attempts.toLocaleString("en-US")],
-    [copy.fieldCumulative, cumPct],
-    [
-      copy.fieldEvaluation,
-      `【${result.fortuneLabel}】 ${result.fortuneDescription}`,
-    ],
-  ];
-
-  for (const [label, value] of summaryRows) {
-    doc.setFont("courier", "bold");
-    doc.text(label, margin, y);
-    doc.setFont("courier", "normal");
-    const wrapped = doc.splitTextToSize(value, contentW - 48);
-    doc.text(wrapped, margin + 48, y);
-    y += Math.max(5.5, wrapped.length * 4.2 + 1.5);
-  }
-
-  y += 2;
-  doc.line(margin, y, pageW - margin, y);
-  y += 7;
-
-  // ─ 決定的瞬間 ─
-  doc.setFont("courier", "bold");
-  doc.setFontSize(10);
-  doc.text(copy.sectionMoment, margin, y);
-  y += 4;
-
-  const shotMaxH = 62;
-  if (result.screenshotDataUrl) {
-    try {
-      const img = await dataUrlToImage(result.screenshotDataUrl);
-      const ratio = img.width / Math.max(1, img.height);
-      let drawW = contentW;
-      let drawH = drawW / ratio;
-      if (drawH > shotMaxH) {
-        drawH = shotMaxH;
-        drawW = drawH * ratio;
-      }
-      const x = margin + (contentW - drawW) / 2;
-      doc.setDrawColor("#aaaaaa");
-      doc.rect(x - 1, y - 1, drawW + 2, drawH + 2);
-      doc.setDrawColor(ink);
-      doc.addImage(result.screenshotDataUrl, "PNG", x, y, drawW, drawH);
-      y += drawH + 6;
-    } catch {
-      doc.setFont("courier", "normal");
-      doc.setFontSize(8);
-      doc.setTextColor(mute);
-      doc.text(copy.noScreenshot, margin, y + 4);
-      doc.setTextColor(ink);
-      y += 10;
-    }
-  } else {
-    doc.setFont("courier", "normal");
-    doc.setFontSize(8);
-    doc.setTextColor(mute);
-    doc.text(copy.noScreenshot, margin, y + 4);
-    doc.setTextColor(ink);
-    y += 10;
-  }
-
-  doc.line(margin, y, pageW - margin, y);
-  y += 7;
-
-  // ─ 確率推移グラフ ─
-  doc.setFont("courier", "bold");
-  doc.setFontSize(10);
-  doc.text(copy.sectionGraph, margin, y);
-  y += 4;
-
-  const yLabel =
-    result.mode === "antiBingo" ? copy.graphYLabelMiss : copy.graphYLabelHit;
-  const chartDataUrl = renderProbabilityChart(result.history, {
-    xLabel: copy.graphXLabel,
-    yLabel,
-  });
-
-  if (chartDataUrl && result.history.length > 0) {
-    const chartH = Math.min(78, pageH - y - margin - 8);
-    const chartW = contentW;
-    if (y + chartH > pageH - margin) {
-      doc.addPage();
-      y = margin;
-    }
-    doc.addImage(chartDataUrl, "PNG", margin, y, chartW, chartH);
-    y += chartH + 4;
-  } else {
-    doc.setFont("courier", "normal");
-    doc.setFontSize(8);
-    doc.setTextColor(mute);
-    doc.text(copy.noHistory, margin, y + 4);
-    doc.setTextColor(ink);
-  }
-
-  // フッタ
-  doc.setFont("courier", "normal");
-  doc.setFontSize(7);
-  doc.setTextColor(mute);
-  doc.text(
-    `OBS-LOG // ${ended} // LOCAL GENERATION`,
-    margin,
-    pageH - 8,
-  );
-
-  const stamp = formatReportDateTime(result.endedAt).replace(/[: ]/g, "-");
-  doc.save(`${copy.filenamePrefix}-${stamp}.pdf`);
+export function formatDeviation(ratio: number): string {
+  if (!Number.isFinite(ratio)) return "∞";
+  if (ratio >= 100) return `${Math.round(ratio).toLocaleString("en-US")}`;
+  if (ratio >= 10) return ratio.toFixed(1);
+  return ratio.toFixed(2);
 }
 
 /** 指定 DOM をキャプチャして PNG data URL を返す（失敗時 null） */
@@ -401,4 +329,41 @@ export async function captureElementAsPng(
   } catch {
     return null;
   }
+}
+
+/**
+ * 隠しレポート DOM を高画質 PNG としてダウンロードする。
+ * SNS シェア向け。サーバー通信なし。
+ */
+export async function downloadExperimentReportPng(
+  element: HTMLElement | null,
+  filename = "experiment-report.png",
+): Promise<void> {
+  if (!element) throw new Error("report-element-missing");
+
+  // レイアウト確定後にキャプチャ（言語切替直後のフォント計測待ち）
+  await new Promise<void>((resolve) => {
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+  });
+
+  const html2canvas = (await import("html2canvas")).default;
+  const canvas = await html2canvas(element, {
+    backgroundColor: "#09090b",
+    scale: 2,
+    useCORS: true,
+    allowTaint: false,
+    logging: false,
+    width: element.offsetWidth,
+    height: element.offsetHeight,
+    windowWidth: element.offsetWidth,
+    windowHeight: element.offsetHeight,
+  });
+
+  const dataUrl = canvas.toDataURL("image/png");
+  const link = document.createElement("a");
+  link.href = dataUrl;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
 }

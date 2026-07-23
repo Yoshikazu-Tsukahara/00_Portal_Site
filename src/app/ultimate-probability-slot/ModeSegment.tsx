@@ -3,7 +3,7 @@
 import type { UltimateProbabilitySlotDict } from "@/i18n/apps/ultimateProbabilitySlot";
 import type { PlayMode } from "./types";
 
-/** 「当たるまで回す」／「外し続ける」のスライディング・セグメント */
+/** 「TARGET: HIT」／「TARGET: AVOID」のスライディング・セグメント */
 export default function ModeSegment({
   mode,
   copy,
@@ -34,7 +34,8 @@ export default function ModeSegment({
               : "slot-mode-segment__btn--inactive"
           }`}
         >
-          {copy.hitUntilWin}
+          <span className="slot-mode-segment__label">{copy.hitUntilWin}</span>
+          <span className="slot-mode-segment__hint">{copy.hitUntilWinHint}</span>
         </button>
         <button
           type="button"
@@ -45,7 +46,8 @@ export default function ModeSegment({
               : "slot-mode-segment__btn--inactive"
           }`}
         >
-          {copy.antiBingo}
+          <span className="slot-mode-segment__label">{copy.antiBingo}</span>
+          <span className="slot-mode-segment__hint">{copy.antiBingoHint}</span>
         </button>
       </div>
     </div>

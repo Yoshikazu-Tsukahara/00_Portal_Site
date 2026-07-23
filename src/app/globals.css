@@ -380,7 +380,7 @@ body {
    * スマホでもスクロールなしで収める（実績はドロワーへ退避）。
    */
   .slot-layout {
-    @apply flex min-h-0 w-full flex-1 flex-col overflow-hidden;
+    @apply relative flex min-h-0 w-full flex-1 flex-col overflow-hidden;
     --slot-achievements-width: 21rem;
     /* AppShell(fillViewport) の残り高さいっぱい。dvh は親が伸びない時の下限 */
     height: 100%;
@@ -570,7 +570,44 @@ body {
   }
 
   .slot-mode-segment__btn {
-    @apply relative z-10 rounded-lg px-1 py-1 text-center text-[10px] font-semibold tracking-wide transition-colors duration-200 active:scale-95 sm:px-1.5 sm:py-2 sm:text-xs;
+    @apply relative z-10 flex flex-col items-center justify-center gap-0 rounded-lg px-0.5 py-1 text-center transition-colors duration-200 active:scale-95 sm:px-1 sm:py-1.5;
+  }
+
+  .slot-mode-segment__label {
+    @apply font-mono text-[9px] font-bold leading-tight tracking-[0.08em] sm:text-[10px] sm:tracking-[0.12em];
+  }
+
+  .slot-mode-segment__hint {
+    @apply mt-0.5 font-mono text-[7px] font-normal leading-none tracking-wide opacity-75 sm:text-[8px];
+  }
+
+  .slot-mode-segment__btn--active .slot-mode-segment__hint {
+    @apply opacity-80;
+  }
+
+  .slot-mode-segment__btn--inactive .slot-mode-segment__hint {
+    @apply opacity-60;
+  }
+
+  /* 1回の確率：分数 / % のレスポンシブ2段レイアウト */
+  .slot-single-prob {
+    @apply flex min-w-0 max-w-full flex-row flex-wrap items-baseline gap-x-2 gap-y-0.5 font-mono font-semibold leading-tight tracking-tight text-zinc-50;
+    overflow: hidden;
+  }
+
+  .slot-single-prob--stack {
+    @apply flex-col items-start gap-y-0.5;
+  }
+
+  .slot-single-prob__odds,
+  .slot-single-prob__pct {
+    @apply min-w-0 max-w-full;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .slot-single-prob__pct {
+    @apply text-zinc-300;
   }
 
   .slot-mode-segment__btn--active {
@@ -979,6 +1016,126 @@ body {
     animation: slot-flash-flicker 0.9s ease-in-out infinite;
   }
 
+  /* アンチチート・ロックダウン警告 */
+  .slot-anticheat-banner {
+    @apply pointer-events-none absolute inset-x-0 top-2 z-[90] mx-auto flex w-[min(100%-1rem,28rem)] flex-col items-center gap-1 border border-rose-500/70 bg-zinc-950/95 px-3 py-2.5 text-center font-mono shadow-[0_0_24px_-4px_rgba(244,63,94,0.55)];
+  }
+
+  .slot-anticheat-banner__warn {
+    @apply text-[10px] font-bold tracking-[0.14em] text-rose-400 sm:text-xs;
+    animation: slot-reach-text-blink 0.7s steps(1, end) infinite;
+    text-shadow: 0 0 12px rgba(244, 63, 94, 0.65);
+  }
+
+  .slot-anticheat-banner__lock {
+    @apply text-[9px] font-semibold tracking-[0.1em] text-rose-300/90 sm:text-[10px];
+    animation: slot-reach-text-blink 1s steps(1, end) infinite;
+  }
+
+  .slot-layout--lockdown .slot-console__inner {
+    border-color: rgb(244 63 94 / 0.45);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.03),
+      0 0 0 1px rgb(244 63 94 / 0.25),
+      0 0 36px -10px rgb(244 63 94 / 0.4);
+  }
+
+  /* PNG 言語トグル */
+  .slot-report-lang-toggle {
+    @apply grid grid-cols-2 gap-1 border border-zinc-700 bg-zinc-950/80 p-1;
+  }
+
+  .slot-report-lang-toggle__btn {
+    @apply px-2 py-1.5 font-mono text-[10px] font-semibold tracking-wide text-zinc-400 transition hover:text-zinc-200 disabled:opacity-50;
+  }
+
+  .slot-report-lang-toggle__btn--active {
+    @apply bg-zinc-100 text-zinc-950;
+  }
+
+  /* 画面外・固定サイズの観測シート（PNG 元データ） */
+  .slot-report-template {
+    @apply box-border flex flex-col gap-3 overflow-hidden bg-zinc-950 p-6 font-mono text-zinc-100;
+    border: 1px solid #3f3f46;
+  }
+
+  .slot-report-template__header {
+    @apply border border-zinc-600 bg-zinc-900/80 px-4 py-3;
+  }
+
+  .slot-report-template__brand {
+    @apply text-[18px] font-bold tracking-[0.12em] text-zinc-50;
+  }
+
+  .slot-report-template__sub {
+    @apply mt-1 text-[11px] tracking-wide text-zinc-400;
+  }
+
+  .slot-report-template__meta {
+    @apply mt-3 flex flex-wrap justify-between gap-2 border-t border-zinc-700 pt-2 text-[11px] text-zinc-300;
+  }
+
+  .slot-report-template__section {
+    @apply flex min-h-0 flex-col gap-2;
+  }
+
+  .slot-report-template__section-title {
+    @apply bg-zinc-100 px-2 py-1.5 text-[11px] font-bold tracking-[0.14em] text-zinc-950;
+  }
+
+  .slot-report-template__table {
+    @apply border border-zinc-600;
+  }
+
+  .slot-report-template__row {
+    @apply grid grid-cols-[240px_1fr] border-b border-zinc-700 last:border-b-0;
+  }
+
+  .slot-report-template__key {
+    @apply border-r border-zinc-700 bg-zinc-900/70 px-3 py-2 text-[11px] font-bold tracking-wide text-zinc-400;
+  }
+
+  .slot-report-template__val {
+    @apply px-3 py-2 text-[12px] font-semibold tracking-tight text-zinc-50;
+    word-break: break-word;
+  }
+
+  .slot-report-template__caption {
+    @apply text-[10px] tracking-[0.16em] text-zinc-500;
+  }
+
+  .slot-report-template__shot {
+    @apply flex h-[280px] items-center justify-center overflow-hidden border border-zinc-600 bg-black;
+  }
+
+  .slot-report-template__shot-img {
+    @apply max-h-full max-w-full object-contain;
+  }
+
+  .slot-report-template__empty {
+    @apply text-[12px] tracking-wide text-zinc-500;
+  }
+
+  .slot-report-template__eval {
+    @apply border border-zinc-600 bg-zinc-900/50 px-4 py-3;
+  }
+
+  .slot-report-template__eval-label {
+    @apply text-[10px] tracking-[0.18em] text-zinc-500;
+  }
+
+  .slot-report-template__eval-rank {
+    @apply mt-1 text-[22px] font-bold tracking-[0.08em] text-amber-200;
+  }
+
+  .slot-report-template__eval-body {
+    @apply mt-2 text-[13px] leading-relaxed text-zinc-300;
+  }
+
+  .slot-report-template__footer {
+    @apply mt-auto border-t border-zinc-700 pt-2 text-[10px] tracking-wide text-zinc-500;
+  }
+
   .slot-badge-card {
     @apply relative flex w-full min-w-0 shrink-0 flex-col gap-1 overflow-clip rounded-lg px-2.5 py-2;
   }
@@ -1350,7 +1507,9 @@ body.slot-pwa-standalone {
   .slot-manual-stop-btn--chance,
   .slot-manual-stop-btn--pinch,
   .slot-reach-banner__text,
-  .slot-reach-banner__pulse {
+  .slot-reach-banner__pulse,
+  .slot-anticheat-banner__warn,
+  .slot-anticheat-banner__lock {
     animation: none;
   }
 }

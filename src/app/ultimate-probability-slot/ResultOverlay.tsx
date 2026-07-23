@@ -1,32 +1,35 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { UltimateProbabilitySlotDict } from "@/i18n/apps/ultimateProbabilitySlot";
 import {
-  downloadExperimentReportPdf,
+  downloadExperimentReportPng,
   type ExperimentResult,
+  type ReportLang,
 } from "./experimentReport";
 import {
   formatCumulativePercent,
   formatOdds,
   formatSinglePercent,
 } from "./probability";
+import ReportImageTemplate from "./ReportImageTemplate";
 
 /** ゲーム終了時のリザルト画面（クリア／ゲームオーバー） */
 export default function ResultOverlay({
   result,
   copy,
   flashCopy,
-  reportCopy,
   onDismiss,
 }: {
   result: ExperimentResult;
   copy: UltimateProbabilitySlotDict["result"];
   flashCopy: UltimateProbabilitySlotDict["flash"];
-  reportCopy: UltimateProbabilitySlotDict["report"];
   onDismiss: () => void;
 }) {
   const [generating, setGenerating] = useState(false);
+  const [reportLang, setReportLang] = useState<ReportLang>("ja");
+  const reportRef = useRef<HTMLDivElement | null>(null);
+
   const isClear = result.kind === "clear";
   const title = isClear ? flashCopy.hitTitle : flashCopy.failTitle;
   const lead = isClear ? flashCopy.hitBody : flashCopy.failBody;
@@ -37,16 +40,16 @@ export default function ResultOverlay({
   const cumPct = `${formatCumulativePercent(result.cumulativeProbability)}%`;
   const odds = `${copy.oddsPrefix} ${formatOdds(result.singleProbability)} (${formatSinglePercent(result.singleProbability)}%)`;
 
-  async function handleDownloadPdf() {
+  async function handleDownloadPng() {
     if (generating) return;
     setGenerating(true);
     try {
-      await downloadExperimentReportPdf(result, reportCopy, {
-        formatOdds,
-        formatPercent: formatCumulativePercent,
-      });
+      await downloadExperimentReportPng(
+        reportRef.current,
+        "experiment-report.png",
+      );
     } catch {
-      // 生成失敗時もローディングを解除するだけ（アラートは出さない）
+      // 生成失敗時もローディングを解除するだけ
     } finally {
       setGenerating(false);
     }
@@ -88,13 +91,36 @@ export default function ResultOverlay({
         </div>
 
         <div className="slot-result-actions">
+          <div className="slot-report-lang-toggle" role="group" aria-label={copy.langPickerTitle}>
+            <button
+              type="button"
+              className={`slot-report-lang-toggle__btn ${
+                reportLang === "ja" ? "slot-report-lang-toggle__btn--active" : ""
+              }`}
+              disabled={generating}
+              onClick={() => setReportLang("ja")}
+            >
+              {copy.langJa}
+            </button>
+            <button
+              type="button"
+              className={`slot-report-lang-toggle__btn ${
+                reportLang === "en" ? "slot-report-lang-toggle__btn--active" : ""
+              }`}
+              disabled={generating}
+              onClick={() => setReportLang("en")}
+            >
+              {copy.langEn}
+            </button>
+          </div>
+
           <button
             type="button"
-            onClick={handleDownloadPdf}
+            onClick={() => void handleDownloadPng()}
             disabled={generating}
             className="slot-result-pdf-btn"
           >
-            {generating ? copy.generatingPdf : copy.downloadPdf}
+            {generating ? copy.generatingPng : copy.downloadPng}
           </button>
           <button
             type="button"
@@ -112,9 +138,18 @@ export default function ResultOverlay({
           <span className="slot-result-generating__pulse" aria-hidden>
             ■
           </span>
-          <span>{copy.generatingPdf}</span>
+          <span>{copy.generatingPng}</span>
         </div>
       ) : null}
+
+      {/* 画面外の固定サイズ・観測シート（PNG 元データ） */}
+      <div className="pointer-events-none absolute -left-[9999px] top-0 overflow-hidden">
+        <ReportImageTemplate
+          ref={reportRef}
+          result={result}
+          lang={reportLang}
+        />
+      </div>
     </div>
   );
 }

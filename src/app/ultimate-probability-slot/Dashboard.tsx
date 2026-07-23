@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
+import { useEffect, useMemo, useRef, useState, type MouseEvent, type RefObject } from "react";
 import type { UltimateProbabilitySlotDict } from "@/i18n/apps/ultimateProbabilitySlot";
 import AchievementsDrawer from "./AchievementsDrawer";
 import AchievementsSidebar from "./AchievementsSidebar";
@@ -72,6 +72,9 @@ export default function Dashboard({
   onResetRun,
   onOpenSettings,
   captureTargetRef,
+  cheatLocked = false,
+  cheatRemainingSec = 0,
+  guardClick,
 }: {
   settings: SlotSettings;
   run: RunState;
@@ -97,6 +100,11 @@ export default function Dashboard({
   onResetRun: () => void;
   onOpenSettings: () => void;
   captureTargetRef?: RefObject<HTMLDivElement | null>;
+  /** アンチチート・ロックダウン中 */
+  cheatLocked?: boolean;
+  cheatRemainingSec?: number;
+  /** SPIN / MANUAL STOP 用のクリック検査ラッパー */
+  guardClick?: (handler: () => void) => (e: MouseEvent) => void;
 }) {
   const [achievementsOpen, setAchievementsOpen] = useState(false);
   const [statusFlash, setStatusFlash] = useState(false);
@@ -142,13 +150,24 @@ export default function Dashboard({
   const reachTone = settings.mode === "antiBingo" ? "pinch" : "chance";
   const reachWarning =
     reachTone === "pinch" ? copy.reachPinchWarning : copy.reachChanceWarning;
+  const wrapClick = guardClick ?? ((handler: () => void) => () => handler());
+  const lockdownLabel = copy.antiCheatLockdown.replace(
+    "{sec}",
+    String(Math.max(1, cheatRemainingSec)),
+  );
 
   return (
     <div
       className={`slot-layout ${
         isReach ? `slot-layout--reach slot-layout--reach-${reachTone}` : ""
-      }`}
+      } ${cheatLocked ? "slot-layout--lockdown" : ""}`}
     >
+      {cheatLocked ? (
+        <div className="slot-anticheat-banner" role="alert" aria-live="assertive">
+          <p className="slot-anticheat-banner__warn">{copy.antiCheatWarning}</p>
+          <p className="slot-anticheat-banner__lock">{lockdownLabel}</p>
+        </div>
+      ) : null}
       <div className="slot-console">
         <div className="slot-console__columns">
           <div
@@ -192,8 +211,10 @@ export default function Dashboard({
                   </span>
                 </Readout>
                 <Readout label={copy.singleProbLabel}>
-                  <AutoFitText
-                    text={`${copy.oddsPrefix} ${formatOdds(p)} (${formatSinglePercent(p)}%)`}
+                  <SingleProbDisplay
+                    oddsPrefix={copy.oddsPrefix}
+                    odds={formatOdds(p)}
+                    percent={formatSinglePercent(p)}
                   />
                 </Readout>
                 <Readout label={cumulativeLabel}>
@@ -227,8 +248,8 @@ export default function Dashboard({
                 {isReach ? (
                   <button
                     type="button"
-                    onClick={onManualStop}
-                    disabled={!canManualStop}
+                    onClick={wrapClick(onManualStop)}
+                    disabled={!canManualStop || cheatLocked}
                     className={`slot-manual-stop-btn slot-manual-stop-btn--${reachTone}`}
                     // Space / Enter では発火させず、クリック／タップのみ許可
                     onKeyDown={(e) => {
@@ -250,8 +271,8 @@ export default function Dashboard({
                   <div className="flex gap-2">
                     <button
                       type="button"
-                      onClick={onSpin}
-                      disabled={!canSpin}
+                      onClick={wrapClick(onSpin)}
+                      disabled={!canSpin || cheatLocked}
                       className="slot-spin-btn flex-1"
                     >
                       {anySpinning ? copy.spinningLabel : copy.spinButton}
@@ -259,7 +280,7 @@ export default function Dashboard({
                     <button
                       type="button"
                       onClick={onStopAll}
-                      disabled={!canStop}
+                      disabled={!canStop || cheatLocked}
                       className="slot-stop-all-btn flex-1"
                     >
                       {copy.stopButton}
@@ -373,6 +394,48 @@ function Readout({
     <div className="slot-panel min-w-0 px-1.5 py-1 sm:px-2.5 sm:py-1.5">
       <p className="slot-readout-label mb-0.5 truncate">{label}</p>
       <div className="slot-readout-value min-w-0">{children}</div>
+    </div>
+  );
+}
+
+/**
+ * 1回の確率：分数表記と % を横並び／桁数に応じて2段折り返し。
+ * 枠内に収まるようフォントサイズも段階的に縮小する。
+ */
+function SingleProbDisplay({
+  oddsPrefix,
+  odds,
+  percent,
+}: {
+  oddsPrefix: string;
+  odds: string;
+  percent: string;
+}) {
+  const oddsText = `${oddsPrefix} ${odds}`.trim();
+  const pctText = `${percent}%`;
+  const maxLen = Math.max(oddsText.length, pctText.length);
+  const stack = oddsText.length > 13 || pctText.length > 11 || maxLen > 18;
+
+  const sizeClass =
+    maxLen > 32
+      ? "text-[8px] sm:text-[9px]"
+      : maxLen > 26
+        ? "text-[9px] sm:text-[10px]"
+        : maxLen > 20
+          ? "text-[10px] sm:text-xs"
+          : maxLen > 14
+            ? "text-xs sm:text-sm"
+            : "text-sm sm:text-base";
+
+  return (
+    <div
+      className={`slot-single-prob ${stack ? "slot-single-prob--stack" : ""} ${sizeClass}`}
+      title={`${oddsText} / ${pctText}`}
+    >
+      <span className="slot-single-prob__odds">{oddsText}</span>
+      <span className="slot-single-prob__pct">
+        {stack ? pctText : `(${pctText})`}
+      </span>
     </div>
   );
 }

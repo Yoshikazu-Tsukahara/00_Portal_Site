@@ -15,9 +15,16 @@ import {
 } from "./achievements";
 import Dashboard from "./Dashboard";
 import {
+  accumulateRunSessionStats,
   captureElementAsPng,
+  createExperimentId,
+  deviationRatio,
+  EMPTY_RUN_SESSION_STATS,
+  getAnomalyRank,
+  theoreticalExpectedSpins,
   type ExperimentResult,
   type ProbHistoryPoint,
+  type RunSessionStats,
 } from "./experimentReport";
 import InstallAppButton from "./InstallAppButton";
 import {
@@ -43,6 +50,7 @@ import {
   type SlotStats,
 } from "./types";
 import { usePwaInstall } from "./usePwaInstall";
+import { useAntiCheat } from "./useAntiCheat";
 import { useSlotEngine } from "./useSlotEngine";
 
 /** 次の描画フレームまで待つ（リール確定後のキャプチャ用） */
@@ -58,6 +66,11 @@ export default function UltimateProbabilitySlotPage() {
   const { t } = useI18n();
   const copy = t.apps.ultimateProbabilitySlot;
   const { isStandalone } = usePwaInstall();
+  const {
+    locked: cheatLocked,
+    remainingSec: cheatRemainingSec,
+    guardClick,
+  } = useAntiCheat();
   const [data, setData, { hydrated }] = useLocalStorageState<SlotAppData>(
     STORAGE_KEY,
     buildEmptyAppData(),
@@ -69,6 +82,10 @@ export default function UltimateProbabilitySlotPage() {
   const [resultLock, setResultLock] = useState(false);
   /** 今ラン中の累積確率推移（PDF グラフ用。永続化しない） */
   const [probHistory, setProbHistory] = useState<ProbHistoryPoint[]>([]);
+  /** 今ラン中の拡張統計（リーチ回数・最大一致。永続化しない） */
+  const [sessionStats, setSessionStats] = useState<RunSessionStats>(
+    EMPTY_RUN_SESSION_STATS,
+  );
   const captureTargetRef = useRef<HTMLDivElement | null>(null);
   const settlingRef = useRef(false);
 
@@ -114,6 +131,13 @@ export default function UltimateProbabilitySlotPage() {
         cumulativePercent: displayCum * 100,
       };
       const nextHistory = [...probHistory, historyPoint];
+      const nextSession = accumulateRunSessionStats(
+        sessionStats,
+        spinResult.indices,
+        settings.reelCount,
+      );
+      const expected = theoreticalExpectedSpins(p);
+      const deviation = deviationRatio(attemptsNow, expected);
 
       let stats: SlotStats = {
         ...data.stats,
@@ -189,15 +213,23 @@ export default function UltimateProbabilitySlotPage() {
           unlockedBadges,
         });
         setProbHistory([]);
+        setSessionStats(EMPTY_RUN_SESSION_STATS);
         setResult({
           kind: mode === "hitUntilWin" ? "clear" : "gameover",
           mode,
           endedAt: new Date(),
+          experimentId: createExperimentId(),
           attempts: attemptsNow,
+          reelCount: settings.reelCount,
           singleProbability: p,
           cumulativeProbability: displayCum,
+          expectedValue: expected,
+          deviationRatio: deviation,
+          reachCount: nextSession.reachCount,
+          maxLeftMatch: nextSession.maxLeftMatch,
           fortuneLabel: tierCopy.label,
           fortuneDescription: tierCopy.description,
+          anomalyRank: getAnomalyRank(deviation),
           screenshotDataUrl,
           history: nextHistory,
         });
@@ -210,6 +242,7 @@ export default function UltimateProbabilitySlotPage() {
           unlockedBadges,
         });
         setProbHistory(nextHistory);
+        setSessionStats(nextSession);
       }
 
       if (newlyUnlocked.length > 0) {
@@ -282,6 +315,7 @@ export default function UltimateProbabilitySlotPage() {
         setupOpen ||
         result ||
         resultLock ||
+        cheatLocked ||
         document.body.classList.contains("slot-achievements-drawer-open")
       ) {
         return;
@@ -307,6 +341,7 @@ export default function UltimateProbabilitySlotPage() {
     setupOpen,
     result,
     resultLock,
+    cheatLocked,
     isReach,
     canSpin,
     canStop,
@@ -317,6 +352,7 @@ export default function UltimateProbabilitySlotPage() {
   function saveSettings(next: SlotAppData["settings"]) {
     if (!next) return;
     setProbHistory([]);
+    setSessionStats(EMPTY_RUN_SESSION_STATS);
     setData((prev) => ({ ...prev, settings: next, run: buildInitialRun() }));
     setSetupOpen(false);
     setToast(copy.toast.settingsSaved);
@@ -329,6 +365,7 @@ export default function UltimateProbabilitySlotPage() {
       if (!confirmed) return;
     }
     setProbHistory([]);
+    setSessionStats(EMPTY_RUN_SESSION_STATS);
     setData((prev) => ({
       ...prev,
       settings: { ...settings, mode },
@@ -340,6 +377,7 @@ export default function UltimateProbabilitySlotPage() {
     const confirmed = window.confirm(copy.dash.resetRunConfirm);
     if (!confirmed) return;
     setProbHistory([]);
+    setSessionStats(EMPTY_RUN_SESSION_STATS);
     setData((prev) => ({ ...prev, run: buildInitialRun() }));
     setToast(copy.toast.runReset);
   }
@@ -373,6 +411,7 @@ export default function UltimateProbabilitySlotPage() {
           const parsed = normalizeAppData(raw);
           if (!parsed) return false;
           setProbHistory([]);
+          setSessionStats(EMPTY_RUN_SESSION_STATS);
           setData(parsed);
           if (!parsed.settings) setSetupOpen(true);
           return true;
@@ -391,9 +430,9 @@ export default function UltimateProbabilitySlotPage() {
           fortuneAntiCopy={copy.fortuneAntiBingo}
           achievementsCopy={copy.achievements}
           badgeCopy={copy.badges}
-          canSpin={canSpin && !resultLock}
-          canStop={canStop && !resultLock}
-          canManualStop={canManualStop && !resultLock}
+          canSpin={canSpin && !resultLock && !cheatLocked}
+          canStop={canStop && !resultLock && !cheatLocked}
+          canManualStop={canManualStop && !resultLock && !cheatLocked}
           isReach={isReach}
           anySpinning={anySpinning}
           displayIndices={displayIndices}
@@ -405,6 +444,9 @@ export default function UltimateProbabilitySlotPage() {
           onResetRun={resetRun}
           onOpenSettings={() => setSetupOpen(true)}
           captureTargetRef={captureTargetRef}
+          cheatLocked={cheatLocked}
+          cheatRemainingSec={cheatRemainingSec}
+          guardClick={guardClick}
         />
       ) : (
         <div className="slot-console flex min-h-[40vh] flex-col items-center justify-center gap-3 px-4 py-10 text-center">
@@ -442,7 +484,6 @@ export default function UltimateProbabilitySlotPage() {
           result={result}
           copy={copy.result}
           flashCopy={copy.flash}
-          reportCopy={copy.report}
           onDismiss={() => {
             setResult(null);
             setResultLock(false);
