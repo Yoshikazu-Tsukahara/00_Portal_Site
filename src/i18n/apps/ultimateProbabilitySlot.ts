@@ -70,7 +70,10 @@ export type UltimateProbabilitySlotDict = {
     emptyButton: string;
     oddsPrefix: string;
     spaceHint: string;
-    reachWarning: string;
+    /** 当たるまで回す：チャンスのリーチ文言 */
+    reachChanceWarning: string;
+    /** 外し続ける：ピンチのリーチ文言 */
+    reachPinchWarning: string;
     manualStopButton: string;
     reachSpaceHint: string;
   };
@@ -235,7 +238,8 @@ export const ultimateProbabilitySlotJa: UltimateProbabilitySlotDict = {
     emptyButton: "スロットを設定",
     oddsPrefix: "1 /",
     spaceHint: "Space で SPIN / STOP",
-    reachWarning: "[ WARNING: REACH DETECTED ]",
+    reachChanceWarning: "[ CHANCE: REACH DETECTED ]",
+    reachPinchWarning: "[ PINCH: CRITICAL REACH ]",
     manualStopButton: "MANUAL STOP",
     reachSpaceHint: "クリック／タップで MANUAL STOP",
   },
@@ -447,7 +451,8 @@ export const ultimateProbabilitySlotEn: UltimateProbabilitySlotDict = {
     emptyButton: "Set up slot",
     oddsPrefix: "1 /",
     spaceHint: "Space for SPIN / STOP",
-    reachWarning: "[ WARNING: REACH DETECTED ]",
+    reachChanceWarning: "[ CHANCE: REACH DETECTED ]",
+    reachPinchWarning: "[ PINCH: CRITICAL REACH ]",
     manualStopButton: "MANUAL STOP",
     reachSpaceHint: "Click or tap to MANUAL STOP",
   },

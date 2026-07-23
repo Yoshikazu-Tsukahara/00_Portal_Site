@@ -138,14 +138,24 @@ export default function Dashboard({
 
   const gaugePct = Math.min(100, Math.max(0, cumulative * 100));
   const gaugeCritical = gaugePct >= 99;
+  /** 当たるまで＝チャンス、外し続ける＝ピンチ */
+  const reachTone = settings.mode === "antiBingo" ? "pinch" : "chance";
+  const reachWarning =
+    reachTone === "pinch" ? copy.reachPinchWarning : copy.reachChanceWarning;
 
   return (
-    <div className={`slot-layout ${isReach ? "slot-layout--reach" : ""}`}>
+    <div
+      className={`slot-layout ${
+        isReach ? `slot-layout--reach slot-layout--reach-${reachTone}` : ""
+      }`}
+    >
       <div className="slot-console">
         <div className="slot-console__columns">
           <div
             className={`slot-console__inner ${
-              isReach ? "slot-console__inner--reach" : ""
+              isReach
+                ? `slot-console__inner--reach slot-console__inner--reach-${reachTone}`
+                : ""
             }`}
           >
             <div className="slot-console__main">
@@ -158,12 +168,16 @@ export default function Dashboard({
               </div>
 
               {isReach ? (
-                <div className="slot-reach-banner" role="status" aria-live="assertive">
+                <div
+                  className={`slot-reach-banner slot-reach-banner--${reachTone}`}
+                  role="status"
+                  aria-live="assertive"
+                >
                   <span className="slot-reach-banner__pulse" aria-hidden>
                     ■
                   </span>
                   <span className="slot-reach-banner__text">
-                    {copy.reachWarning}
+                    {reachWarning}
                   </span>
                   <span className="slot-reach-banner__pulse" aria-hidden>
                     ■
@@ -205,6 +219,7 @@ export default function Dashboard({
                   displayIndices={displayIndices}
                   reelSpinning={reelSpinning}
                   isReach={isReach}
+                  reachTone={reachTone}
                 />
               </div>
 
@@ -214,7 +229,7 @@ export default function Dashboard({
                     type="button"
                     onClick={onManualStop}
                     disabled={!canManualStop}
-                    className="slot-manual-stop-btn"
+                    className={`slot-manual-stop-btn slot-manual-stop-btn--${reachTone}`}
                     // Space / Enter では発火させず、クリック／タップのみ許可
                     onKeyDown={(e) => {
                       if (

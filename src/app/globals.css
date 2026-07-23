@@ -614,13 +614,21 @@ body {
     @apply border-amber-400/45;
   }
 
-  /* リーチ中の最終リール：冷たい赤の緊張感（点滅は控えめ） */
-  .slot-reel--reach {
+  /* リーチ中の最終リール：モードで色味を分ける */
+  .slot-reel--reach-chance {
+    border-color: rgb(251 191 36 / 0.8);
+    box-shadow:
+      0 0 0 1px rgb(245 158 11 / 0.5),
+      0 0 24px -4px rgb(251 191 36 / 0.6);
+    animation: slot-reach-reel-pulse-chance 0.85s ease-in-out infinite;
+  }
+
+  .slot-reel--reach-pinch {
     border-color: rgb(248 113 113 / 0.75);
     box-shadow:
       0 0 0 1px rgb(244 63 94 / 0.45),
       0 0 22px -4px rgb(244 63 94 / 0.55);
-    animation: slot-reach-reel-pulse 0.85s ease-in-out infinite;
+    animation: slot-reach-reel-pulse-pinch 0.85s ease-in-out infinite;
   }
 
   .slot-reel--jackpot {
@@ -784,10 +792,19 @@ body {
     @apply relative inline-flex w-full items-center justify-center gap-2 rounded-xl border border-zinc-500/50 bg-gradient-to-b from-zinc-200 to-zinc-400 px-3 py-2 font-mono text-sm font-bold uppercase tracking-[0.2em] text-zinc-950 shadow-[0_0_20px_-6px_rgba(228,228,231,0.35)] transition-transform duration-100 hover:brightness-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:brightness-100 disabled:active:scale-100 sm:px-4 sm:py-3;
   }
 
-  /* リーチ時の手動停止：コンソール警告色のソリッドボタン */
+  /* リーチ時の手動停止：チャンス＝琥珀、ピンチ＝警報赤 */
   .slot-manual-stop-btn {
-    @apply relative inline-flex w-full items-center justify-center gap-2 rounded-xl border border-rose-500/60 bg-gradient-to-b from-rose-500 to-rose-700 px-3 py-2.5 font-mono text-sm font-bold uppercase tracking-[0.22em] text-zinc-50 shadow-[0_0_28px_-4px_rgba(244,63,94,0.65)] transition-transform duration-100 hover:brightness-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 sm:px-4 sm:py-3.5 sm:text-base sm:tracking-[0.28em];
-    animation: slot-reach-btn-pulse 1.1s ease-in-out infinite;
+    @apply relative inline-flex w-full items-center justify-center gap-2 rounded-xl px-3 py-2.5 font-mono text-sm font-bold uppercase tracking-[0.22em] transition-transform duration-100 hover:brightness-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 sm:px-4 sm:py-3.5 sm:text-base sm:tracking-[0.28em];
+  }
+
+  .slot-manual-stop-btn--chance {
+    @apply border border-amber-400/70 bg-gradient-to-b from-amber-300 to-amber-500 text-zinc-950 shadow-[0_0_28px_-4px_rgba(251,191,36,0.7)];
+    animation: slot-reach-btn-pulse-chance 1.1s ease-in-out infinite;
+  }
+
+  .slot-manual-stop-btn--pinch {
+    @apply border border-rose-500/60 bg-gradient-to-b from-rose-500 to-rose-700 text-zinc-50 shadow-[0_0_28px_-4px_rgba(244,63,94,0.65)];
+    animation: slot-reach-btn-pulse-pinch 1.1s ease-in-out infinite;
   }
 
   .slot-ghost-btn {
@@ -809,18 +826,35 @@ body {
     box-shadow: 0 0 8px rgb(244 63 94 / 0.55);
   }
 
-  /* リーチ演出：枠の警告点滅＋バナー */
-  .slot-console__inner--reach {
+  /* リーチ演出：枠・バナー（チャンス＝琥珀、ピンチ＝赤） */
+  .slot-console__inner--reach-chance {
+    border-color: rgb(251 191 36 / 0.55);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.04),
+      0 0 0 1px rgb(245 158 11 / 0.35),
+      0 0 42px -12px rgb(251 191 36 / 0.5);
+    animation: slot-reach-frame-chance 0.7s ease-in-out infinite;
+  }
+
+  .slot-console__inner--reach-pinch {
     border-color: rgb(244 63 94 / 0.55);
     box-shadow:
       inset 0 1px 0 rgb(255 255 255 / 0.04),
       0 0 0 1px rgb(244 63 94 / 0.35),
       0 0 40px -12px rgb(244 63 94 / 0.45);
-    animation: slot-reach-frame 0.7s ease-in-out infinite;
+    animation: slot-reach-frame-pinch 0.7s ease-in-out infinite;
   }
 
   .slot-reach-banner {
-    @apply flex shrink-0 items-center justify-center gap-2 rounded-md border border-rose-500/50 bg-rose-950/50 px-2 py-1.5 font-mono text-[10px] font-semibold tracking-[0.18em] text-rose-300 sm:gap-3 sm:px-3 sm:text-xs sm:tracking-[0.28em];
+    @apply flex shrink-0 items-center justify-center gap-2 rounded-md px-2 py-1.5 font-mono text-[10px] font-semibold tracking-[0.18em] sm:gap-3 sm:px-3 sm:text-xs sm:tracking-[0.28em];
+  }
+
+  .slot-reach-banner--chance {
+    @apply border border-amber-400/55 bg-amber-950/45 text-amber-200;
+  }
+
+  .slot-reach-banner--pinch {
+    @apply border border-rose-500/50 bg-rose-950/50 text-rose-300;
   }
 
   .slot-reach-banner__text {
@@ -829,8 +863,16 @@ body {
   }
 
   .slot-reach-banner__pulse {
-    @apply text-[8px] text-rose-500;
+    @apply text-[8px];
     animation: slot-reach-text-blink 0.6s steps(1, end) infinite;
+  }
+
+  .slot-reach-banner--chance .slot-reach-banner__pulse {
+    @apply text-amber-400;
+  }
+
+  .slot-reach-banner--pinch .slot-reach-banner__pulse {
+    @apply text-rose-500;
   }
 
   .slot-flash-overlay {
@@ -1129,7 +1171,17 @@ body.slot-pwa-standalone {
   }
 }
 
-@keyframes slot-reach-frame {
+@keyframes slot-reach-frame-chance {
+  0%,
+  100% {
+    border-color: rgb(245 158 11 / 0.35);
+  }
+  50% {
+    border-color: rgb(251 191 36 / 0.9);
+  }
+}
+
+@keyframes slot-reach-frame-pinch {
   0%,
   100% {
     border-color: rgb(244 63 94 / 0.35);
@@ -1154,7 +1206,21 @@ body.slot-pwa-standalone {
   }
 }
 
-@keyframes slot-reach-reel-pulse {
+@keyframes slot-reach-reel-pulse-chance {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1px rgb(245 158 11 / 0.4),
+      0 0 16px -4px rgb(251 191 36 / 0.4);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgb(251 191 36 / 0.75),
+      0 0 28px -2px rgb(251 191 36 / 0.75);
+  }
+}
+
+@keyframes slot-reach-reel-pulse-pinch {
   0%,
   100% {
     box-shadow:
@@ -1179,7 +1245,17 @@ body.slot-pwa-standalone {
   }
 }
 
-@keyframes slot-reach-btn-pulse {
+@keyframes slot-reach-btn-pulse-chance {
+  0%,
+  100% {
+    box-shadow: 0 0 22px -4px rgb(251 191 36 / 0.5);
+  }
+  50% {
+    box-shadow: 0 0 36px -2px rgb(251 191 36 / 0.85);
+  }
+}
+
+@keyframes slot-reach-btn-pulse-pinch {
   0%,
   100% {
     box-shadow: 0 0 22px -4px rgb(244 63 94 / 0.45);
@@ -1265,7 +1341,15 @@ body.slot-pwa-standalone {
   .slot-flash-title,
   .slot-tick,
   .slot-achievements-drawer__backdrop,
-  .slot-achievements-drawer__sheet {
+  .slot-achievements-drawer__sheet,
+  .slot-console__inner--reach-chance,
+  .slot-console__inner--reach-pinch,
+  .slot-reel--reach-chance,
+  .slot-reel--reach-pinch,
+  .slot-manual-stop-btn--chance,
+  .slot-manual-stop-btn--pinch,
+  .slot-reach-banner__text,
+  .slot-reach-banner__pulse {
     animation: none;
   }
 }

@@ -33,6 +33,7 @@ function ReelCell({
   displayIndices,
   reelSpinning,
   isReach,
+  reachTone,
   reelCount,
 }: {
   index: number;
@@ -40,6 +41,7 @@ function ReelCell({
   displayIndices: number[];
   reelSpinning: boolean[];
   isReach: boolean;
+  reachTone: "chance" | "pinch";
   reelCount: number;
 }) {
   const idx = displayIndices[index] ?? 0;
@@ -55,7 +57,11 @@ function ReelCell({
         <div
           className={`slot-reel ${spinning ? "slot-reel--spinning" : ""} ${
             isJackpotFace ? "slot-reel--jackpot" : ""
-          } ${isReachReel ? "slot-reel--reach" : ""}`}
+          } ${
+            isReachReel
+              ? `slot-reel--reach slot-reel--reach-${reachTone}`
+              : ""
+          }`}
         >
           <span className="slot-reel__glow" aria-hidden />
           <div className="slot-reel__content">
@@ -86,12 +92,15 @@ export default function SlotMachine({
   displayIndices,
   reelSpinning,
   isReach = false,
+  reachTone = "chance",
 }: {
   symbols: SlotItem[];
   reelCount: number;
   displayIndices: number[];
   reelSpinning: boolean[];
   isReach?: boolean;
+  /** 当たるまで＝chance、外し続ける＝pinch */
+  reachTone?: "chance" | "pinch";
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [layout, setLayout] = useState<ReelLayoutPlan>(() => ({
@@ -155,6 +164,7 @@ export default function SlotMachine({
             displayIndices={displayIndices}
             reelSpinning={reelSpinning}
             isReach={isReach}
+            reachTone={reachTone}
             reelCount={reelCount}
           />
         ))}
@@ -169,6 +179,7 @@ export default function SlotMachine({
               displayIndices={displayIndices}
               reelSpinning={reelSpinning}
               isReach={isReach}
+              reachTone={reachTone}
               reelCount={reelCount}
             />
           ))}
