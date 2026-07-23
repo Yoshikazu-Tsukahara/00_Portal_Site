@@ -62,7 +62,7 @@ export function AchievementsBadgeList({
                 : "slot-badge-card--locked"
             }`}
           >
-            <div className="flex items-start justify-between gap-2">
+            <div className="slot-badge-card__head">
               <p
                 className={`slot-badge-card__title ${
                   unlocked
@@ -72,8 +72,15 @@ export function AchievementsBadgeList({
               >
                 {title}
               </p>
-              <span aria-hidden className="shrink-0 text-sm leading-none">
-                {unlocked ? "🏅" : "🔒"}
+              <span
+                className={`slot-badge-card__status ${
+                  unlocked
+                    ? "slot-badge-card__status--unlocked"
+                    : "slot-badge-card__status--locked"
+                }`}
+                aria-hidden
+              >
+                {unlocked ? "◆" : "▣"}
               </span>
             </div>
             <p
@@ -85,9 +92,15 @@ export function AchievementsBadgeList({
             >
               {description}
             </p>
-            {!unlocked ? (
-              <p className="slot-badge-card__locked-label">{copy.lockedLabel}</p>
-            ) : null}
+            <p
+              className={`slot-badge-card__stamp ${
+                unlocked
+                  ? "slot-badge-card__stamp--unlocked"
+                  : "slot-badge-card__stamp--locked"
+              }`}
+            >
+              {unlocked ? copy.unlockedLabel : copy.lockedLabel}
+            </p>
           </div>
         );
       })}

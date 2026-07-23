@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import AppShell from "@/components/AppShell";
 import { LanguageToggle, useI18n } from "@/i18n";
 import { useLocalStorageState } from "@/lib/localData";
@@ -14,13 +14,21 @@ import {
   formatOddsTierLabel,
 } from "./achievements";
 import Dashboard from "./Dashboard";
-import FlashOverlay from "./FlashOverlay";
+import {
+  captureElementAsPng,
+  type ExperimentResult,
+  type ProbHistoryPoint,
+} from "./experimentReport";
 import InstallAppButton from "./InstallAppButton";
 import {
-  cumulativeMissProbability,
+  displayCumulativeProbability,
+  fortuneCumulativeProbability,
+  getFortuneTier,
   singleSpinProbability,
+  cumulativeMissProbability,
   type SpinResult,
 } from "./probability";
+import ResultOverlay from "./ResultOverlay";
 import SetupModal from "./SetupModal";
 import {
   buildEmptyAppData,
@@ -37,6 +45,15 @@ import {
 import { usePwaInstall } from "./usePwaInstall";
 import { useSlotEngine } from "./useSlotEngine";
 
+/** 次の描画フレームまで待つ（リール確定後のキャプチャ用） */
+function waitNextPaint(): Promise<void> {
+  return new Promise((resolve) => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => resolve());
+    });
+  });
+}
+
 export default function UltimateProbabilitySlotPage() {
   const { t } = useI18n();
   const copy = t.apps.ultimateProbabilitySlot;
@@ -47,7 +64,13 @@ export default function UltimateProbabilitySlotPage() {
   );
   const [setupOpen, setSetupOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
-  const [flash, setFlash] = useState<"hit" | "fail" | null>(null);
+  const [result, setResult] = useState<ExperimentResult | null>(null);
+  /** キャプチャ〜リザルト表示中は再スピンさせない */
+  const [resultLock, setResultLock] = useState(false);
+  /** 今ラン中の累積確率推移（PDF グラフ用。永続化しない） */
+  const [probHistory, setProbHistory] = useState<ProbHistoryPoint[]>([]);
+  const captureTargetRef = useRef<HTMLDivElement | null>(null);
+  const settlingRef = useRef(false);
 
   // 起動時に旧・不正データを安全な形へ正規化して LocalStorage も更新
   useEffect(() => {
@@ -77,89 +100,138 @@ export default function UltimateProbabilitySlotPage() {
     return () => window.clearTimeout(timer);
   }, [toast]);
 
-  function handleSettled(result: SpinResult) {
-    if (!settings) return;
-    const attemptsNow = data.run.attempts + 1;
-    const p = singleSpinProbability(settings);
-    const mode = settings.mode;
+  async function handleSettled(spinResult: SpinResult) {
+    if (!settings || settlingRef.current) return;
+    settlingRef.current = true;
 
-    let stats: SlotStats = {
-      ...data.stats,
-      lifetimeAttempts: data.stats.lifetimeAttempts + 1,
-    };
-    let nextRun: RunState;
+    try {
+      const attemptsNow = data.run.attempts + 1;
+      const p = singleSpinProbability(settings);
+      const mode = settings.mode;
+      const displayCum = displayCumulativeProbability(mode, p, attemptsNow);
+      const historyPoint: ProbHistoryPoint = {
+        attempts: attemptsNow,
+        cumulativePercent: displayCum * 100,
+      };
+      const nextHistory = [...probHistory, historyPoint];
 
-    if (result.hit) {
-      if (mode === "hitUntilWin") {
-        stats = {
-          ...stats,
-          lifetimeWins: stats.lifetimeWins + 1,
-          bestWinAttempts:
-            stats.bestWinAttempts === null
-              ? attemptsNow
-              : Math.min(stats.bestWinAttempts, attemptsNow),
-        };
+      let stats: SlotStats = {
+        ...data.stats,
+        lifetimeAttempts: data.stats.lifetimeAttempts + 1,
+      };
+      let nextRun: RunState;
+
+      if (spinResult.hit) {
+        if (mode === "hitUntilWin") {
+          stats = {
+            ...stats,
+            lifetimeWins: stats.lifetimeWins + 1,
+            bestWinAttempts:
+              stats.bestWinAttempts === null
+                ? attemptsNow
+                : Math.min(stats.bestWinAttempts, attemptsNow),
+          };
+        } else {
+          stats = {
+            ...stats,
+            antiBingoFailCount: stats.antiBingoFailCount + 1,
+            longestMissStreak: Math.max(
+              stats.longestMissStreak,
+              attemptsNow - 1,
+            ),
+          };
+        }
+        nextRun = buildInitialRun();
       } else {
         stats = {
           ...stats,
-          antiBingoFailCount: stats.antiBingoFailCount + 1,
-          longestMissStreak: Math.max(stats.longestMissStreak, attemptsNow - 1),
+          lifetimeMisses: stats.lifetimeMisses + 1,
+          longestMissStreak: Math.max(stats.longestMissStreak, attemptsNow),
         };
+        nextRun = { attempts: attemptsNow, startedAt: data.run.startedAt };
       }
-      nextRun = buildInitialRun();
-    } else {
-      stats = {
-        ...stats,
-        lifetimeMisses: stats.lifetimeMisses + 1,
-        longestMissStreak: Math.max(stats.longestMissStreak, attemptsNow),
-      };
-      nextRun = { attempts: attemptsNow, startedAt: data.run.startedAt };
-    }
 
-    let unlockedBadges = data.unlockedBadges;
-    let newlyUnlocked: string[] = [];
+      let unlockedBadges = data.unlockedBadges;
+      let newlyUnlocked: string[] = [];
 
-    if (mode === "hitUntilWin" && result.hit) {
-      // 的中時：単発オッズ以下の全ティアを解放
-      const nextIds = evaluateHitUntilWinBadges(p);
-      const merged = mergeModeBadges(data.unlockedBadges, mode, nextIds);
-      unlockedBadges = merged.unlockedBadges;
-      newlyUnlocked = merged.newlyUnlocked;
-    } else if (mode === "antiBingo" && !result.hit) {
-      // 外し成功時：累積外し確率が tier% 以下まで下がったら解放
-      const cumulativeMiss = cumulativeMissProbability(p, attemptsNow);
-      const nextIds = evaluateAntiBingoBadges(cumulativeMiss);
-      const merged = mergeModeBadges(data.unlockedBadges, mode, nextIds);
-      unlockedBadges = merged.unlockedBadges;
-      newlyUnlocked = merged.newlyUnlocked;
-    }
+      if (mode === "hitUntilWin" && spinResult.hit) {
+        const nextIds = evaluateHitUntilWinBadges(p);
+        const merged = mergeModeBadges(data.unlockedBadges, mode, nextIds);
+        unlockedBadges = merged.unlockedBadges;
+        newlyUnlocked = merged.newlyUnlocked;
+      } else if (mode === "antiBingo" && !spinResult.hit) {
+        const cumulativeMiss = cumulativeMissProbability(p, attemptsNow);
+        const nextIds = evaluateAntiBingoBadges(cumulativeMiss);
+        const merged = mergeModeBadges(data.unlockedBadges, mode, nextIds);
+        unlockedBadges = merged.unlockedBadges;
+        newlyUnlocked = merged.newlyUnlocked;
+      }
 
-    setData({
-      ...data,
-      settings,
-      run: nextRun,
-      stats,
-      unlockedBadges,
-    });
+      if (spinResult.hit) {
+        // キャプチャ完了まで操作をロック（リザルト表示中も継続）
+        setResultLock(true);
+        // ラン状態をリセットする前に、揃った絵柄をキャプチャ
+        await waitNextPaint();
+        const screenshotDataUrl = await captureElementAsPng(
+          captureTargetRef.current,
+        );
 
-    if (result.hit) {
-      setFlash(mode === "hitUntilWin" ? "hit" : "fail");
-    }
+        const cumulativeHit = fortuneCumulativeProbability(p, attemptsNow);
+        const tier = getFortuneTier(cumulativeHit);
+        const tierCopy =
+          mode === "antiBingo" ? copy.fortuneAntiBingo[tier] : copy.fortune[tier];
 
-    if (newlyUnlocked.length > 0) {
-      const hardest = newlyUnlocked[newlyUnlocked.length - 1];
-      const titleTemplate =
-        mode === "antiBingo"
-          ? copy.badges.titleTemplateAntiBingo
-          : copy.badges.titleTemplateHitUntilWin;
-      const label =
-        mode === "antiBingo"
-          ? formatMissPercentLabel(badgeIdToMissPercent(hardest) ?? 0)
-          : formatOddsTierLabel(badgeIdToOddsTier(hardest) ?? 0);
-      const title = titleTemplate
-        .replace("{percent}", label)
-        .replace("{odds}", label);
-      setToast(`${copy.toast.badgeUnlockedPrefix}${title}`);
+        setData({
+          ...data,
+          settings,
+          run: nextRun,
+          stats,
+          unlockedBadges,
+        });
+        setProbHistory([]);
+        setResult({
+          kind: mode === "hitUntilWin" ? "clear" : "gameover",
+          mode,
+          endedAt: new Date(),
+          attempts: attemptsNow,
+          singleProbability: p,
+          cumulativeProbability: displayCum,
+          fortuneLabel: tierCopy.label,
+          fortuneDescription: tierCopy.description,
+          screenshotDataUrl,
+          history: nextHistory,
+        });
+      } else {
+        setData({
+          ...data,
+          settings,
+          run: nextRun,
+          stats,
+          unlockedBadges,
+        });
+        setProbHistory(nextHistory);
+      }
+
+      if (newlyUnlocked.length > 0) {
+        const hardest = newlyUnlocked[newlyUnlocked.length - 1];
+        const titleTemplate =
+          mode === "antiBingo"
+            ? copy.badges.titleTemplateAntiBingo
+            : copy.badges.titleTemplateHitUntilWin;
+        const label =
+          mode === "antiBingo"
+            ? formatMissPercentLabel(badgeIdToMissPercent(hardest) ?? 0)
+            : formatOddsTierLabel(badgeIdToOddsTier(hardest) ?? 0);
+        const title = titleTemplate
+          .replace("{percent}", label)
+          .replace("{odds}", label);
+        setToast(`${copy.toast.badgeUnlockedPrefix}${title}`);
+      }
+    } catch {
+      // キャプチャ失敗などでロックが残らないようにする
+      setResultLock(false);
+    } finally {
+      settlingRef.current = false;
     }
   }
 
@@ -179,7 +251,6 @@ export default function UltimateProbabilitySlotPage() {
   // PC: スペースキーで SPIN → STOP（リーチ時の MANUAL STOP はキーボード不可）
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
-      // リーチ中は Space / Enter による停止を一切受け付けない（クリック／タップのみ）
       if (isReach) {
         if (
           e.code === "Space" ||
@@ -207,10 +278,10 @@ export default function UltimateProbabilitySlotPage() {
         return;
       }
 
-      // モーダル／ドロワー／フラッシュ表示中は操作しない
       if (
         setupOpen ||
-        flash ||
+        result ||
+        resultLock ||
         document.body.classList.contains("slot-achievements-drawer-open")
       ) {
         return;
@@ -234,7 +305,8 @@ export default function UltimateProbabilitySlotPage() {
   }, [
     settings,
     setupOpen,
-    flash,
+    result,
+    resultLock,
     isReach,
     canSpin,
     canStop,
@@ -244,6 +316,7 @@ export default function UltimateProbabilitySlotPage() {
 
   function saveSettings(next: SlotAppData["settings"]) {
     if (!next) return;
+    setProbHistory([]);
     setData((prev) => ({ ...prev, settings: next, run: buildInitialRun() }));
     setSetupOpen(false);
     setToast(copy.toast.settingsSaved);
@@ -255,6 +328,7 @@ export default function UltimateProbabilitySlotPage() {
       const confirmed = window.confirm(copy.mode.switchConfirm);
       if (!confirmed) return;
     }
+    setProbHistory([]);
     setData((prev) => ({
       ...prev,
       settings: { ...settings, mode },
@@ -265,6 +339,7 @@ export default function UltimateProbabilitySlotPage() {
   function resetRun() {
     const confirmed = window.confirm(copy.dash.resetRunConfirm);
     if (!confirmed) return;
+    setProbHistory([]);
     setData((prev) => ({ ...prev, run: buildInitialRun() }));
     setToast(copy.toast.runReset);
   }
@@ -297,6 +372,7 @@ export default function UltimateProbabilitySlotPage() {
         onImport: (raw) => {
           const parsed = normalizeAppData(raw);
           if (!parsed) return false;
+          setProbHistory([]);
           setData(parsed);
           if (!parsed.settings) setSetupOpen(true);
           return true;
@@ -315,9 +391,9 @@ export default function UltimateProbabilitySlotPage() {
           fortuneAntiCopy={copy.fortuneAntiBingo}
           achievementsCopy={copy.achievements}
           badgeCopy={copy.badges}
-          canSpin={canSpin}
-          canStop={canStop}
-          canManualStop={canManualStop}
+          canSpin={canSpin && !resultLock}
+          canStop={canStop && !resultLock}
+          canManualStop={canManualStop && !resultLock}
           isReach={isReach}
           anySpinning={anySpinning}
           displayIndices={displayIndices}
@@ -328,6 +404,7 @@ export default function UltimateProbabilitySlotPage() {
           onChangeMode={changeMode}
           onResetRun={resetRun}
           onOpenSettings={() => setSetupOpen(true)}
+          captureTargetRef={captureTargetRef}
         />
       ) : (
         <div className="slot-console flex min-h-[40vh] flex-col items-center justify-center gap-3 px-4 py-10 text-center">
@@ -360,11 +437,16 @@ export default function UltimateProbabilitySlotPage() {
         onSave={saveSettings}
       />
 
-      {flash ? (
-        <FlashOverlay
-          kind={flash}
-          copy={copy.flash}
-          onDismiss={() => setFlash(null)}
+      {result ? (
+        <ResultOverlay
+          result={result}
+          copy={copy.result}
+          flashCopy={copy.flash}
+          reportCopy={copy.report}
+          onDismiss={() => {
+            setResult(null);
+            setResultLock(false);
+          }}
         />
       ) : null}
 

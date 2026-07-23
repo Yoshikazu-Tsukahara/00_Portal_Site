@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import type { UltimateProbabilitySlotDict } from "@/i18n/apps/ultimateProbabilitySlot";
 import AchievementsDrawer from "./AchievementsDrawer";
 import AchievementsSidebar from "./AchievementsSidebar";
@@ -71,6 +71,7 @@ export default function Dashboard({
   onChangeMode,
   onResetRun,
   onOpenSettings,
+  captureTargetRef,
 }: {
   settings: SlotSettings;
   run: RunState;
@@ -95,6 +96,7 @@ export default function Dashboard({
   onChangeMode: (mode: PlayMode) => void;
   onResetRun: () => void;
   onOpenSettings: () => void;
+  captureTargetRef?: RefObject<HTMLDivElement | null>;
 }) {
   const [achievementsOpen, setAchievementsOpen] = useState(false);
   const [statusFlash, setStatusFlash] = useState(false);
@@ -196,7 +198,7 @@ export default function Dashboard({
                 </Readout>
               </div>
 
-              <div className="slot-console__reels">
+              <div ref={captureTargetRef} className="slot-console__reels">
                 <SlotMachine
                   symbols={settings.symbols}
                   reelCount={settings.reelCount}
@@ -362,20 +364,18 @@ function Readout({
 
 /**
  * 桁数が長い確率テキストでも枠内1行に収める。
- * 文字数に応じてフォントサイズを段階的に縮小する。
+ * 通常は回転数と同じサイズ感。桁が増えたときだけ段階的に縮小する。
  */
 function AutoFitText({ text }: { text: string }) {
   const len = text.length;
   const sizeClass =
-    len > 22
-      ? "text-[8px] sm:text-[9px]"
-      : len > 16
-        ? "text-[9px] sm:text-[10px]"
-        : len > 12
-          ? "text-[10px] sm:text-xs"
-          : len > 8
-            ? "text-xs sm:text-sm"
-            : "text-xs sm:text-base";
+    len > 32
+      ? "text-[10px] sm:text-xs"
+      : len > 26
+        ? "text-xs sm:text-sm"
+        : len > 20
+          ? "text-sm sm:text-[15px]"
+          : "text-sm sm:text-base";
 
   return (
     <span

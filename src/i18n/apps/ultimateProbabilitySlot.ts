@@ -102,6 +102,43 @@ export type UltimateProbabilitySlotDict = {
     failBody: string;
     failContinue: string;
   };
+  /** ゲーム終了リザルト画面 */
+  result: {
+    outcomeClear: string;
+    outcomeGameover: string;
+    attemptsLabel: string;
+    cumulativeLabel: string;
+    singleProbLabel: string;
+    evaluationLabel: string;
+    downloadPdf: string;
+    generatingPdf: string;
+    oddsPrefix: string;
+  };
+  /** PDF 観測レポート文言 */
+  report: {
+    reportTitle: string;
+    reportSubtitle: string;
+    sectionSummary: string;
+    sectionMoment: string;
+    sectionGraph: string;
+    fieldMode: string;
+    fieldSingleProb: string;
+    fieldAttempts: string;
+    fieldCumulative: string;
+    fieldEndedAt: string;
+    fieldEvaluation: string;
+    modeHitUntilWin: string;
+    modeAntiBingo: string;
+    outcomeClear: string;
+    outcomeGameover: string;
+    graphXLabel: string;
+    graphYLabelHit: string;
+    graphYLabelMiss: string;
+    oddsPrefix: string;
+    noScreenshot: string;
+    noHistory: string;
+    filenamePrefix: string;
+  };
   toast: {
     settingsSaved: string;
     runReset: string;
@@ -119,6 +156,7 @@ export type UltimateProbabilitySlotDict = {
     modeLabelAntiBingo: string;
     unlockedCountTemplate: string;
     lockedLabel: string;
+    unlockedLabel: string;
     close: string;
   };
 };
@@ -277,6 +315,41 @@ export const ultimateProbabilitySlotJa: UltimateProbabilitySlotDict = {
     failBody: "回避失敗。当たってしまいました。",
     failContinue: "次の試行へ",
   },
+  result: {
+    outcomeClear: "CLEAR — 観測成功",
+    outcomeGameover: "GAME OVER — 回避失敗",
+    attemptsLabel: "回した回数",
+    cumulativeLabel: "到達した累積確率",
+    singleProbLabel: "1回の確率",
+    evaluationLabel: "最終評価",
+    downloadPdf: "📄 実験レポートをPDFでダウンロード",
+    generatingPdf: "GENERATING REPORT...",
+    oddsPrefix: "1 /",
+  },
+  report: {
+    reportTitle: "PROBABILITY EXPERIMENT REPORT",
+    reportSubtitle: "確率観測レポート / LOCAL OBSERVATION LOG",
+    sectionSummary: "01  PLAY SUMMARY",
+    sectionMoment: "02  CRITICAL MOMENT",
+    sectionGraph: "03  CUMULATIVE PROBABILITY TRACE",
+    fieldMode: "MODE",
+    fieldSingleProb: "P(HIT)",
+    fieldAttempts: "SPINS",
+    fieldCumulative: "CUMULATIVE",
+    fieldEndedAt: "TIMESTAMP",
+    fieldEvaluation: "EVAL",
+    modeHitUntilWin: "HIT UNTIL WIN",
+    modeAntiBingo: "KEEP MISSING",
+    outcomeClear: "CLEAR",
+    outcomeGameover: "GAME OVER",
+    graphXLabel: "SPINS (n)",
+    graphYLabelHit: "CUMULATIVE HIT %",
+    graphYLabelMiss: "CUMULATIVE MISS %",
+    oddsPrefix: "1 /",
+    noScreenshot: "[ NO CAPTURE AVAILABLE ]",
+    noHistory: "[ NO TRACE DATA ]",
+    filenamePrefix: "probability-experiment-report",
+  },
   toast: {
     settingsSaved: "設定を保存しました。",
     runReset: "回転数をリセットしました。",
@@ -285,17 +358,16 @@ export const ultimateProbabilitySlotJa: UltimateProbabilitySlotDict = {
   badges: {
     titleTemplateHitUntilWin: "1/{odds} を当てた",
     titleTemplateAntiBingo: "外し確率 {percent}% 到達",
-    descriptionHitUntilWin:
-      "1回の確率 1/{odds} 以下で的中。易しい実績もまとめて解放。",
-    descriptionAntiBingo:
-      "外し確率が {percent}% まで下がるまで継続。易しい実績もまとめて解放。",
+    descriptionHitUntilWin: "1回の確率 1/{odds} 以下で的中。",
+    descriptionAntiBingo: "外し確率が {percent}% まで下がるまで継続。",
   },
   achievements: {
     title: "実績",
     modeLabelHitUntilWin: "当たるまで回す",
     modeLabelAntiBingo: "外し続ける",
     unlockedCountTemplate: "{unlocked} / {total} 解放",
-    lockedLabel: "未解放",
+    lockedLabel: "LOCK",
+    unlockedLabel: "UNLOCKED",
     close: "閉じる",
   },
 };
@@ -455,6 +527,41 @@ export const ultimateProbabilitySlotEn: UltimateProbabilitySlotDict = {
     failBody: "Dodge failed. You hit.",
     failContinue: "Next run",
   },
+  result: {
+    outcomeClear: "CLEAR — Observation success",
+    outcomeGameover: "GAME OVER — Dodge failed",
+    attemptsLabel: "Spins",
+    cumulativeLabel: "Final cumulative probability",
+    singleProbLabel: "Per-spin probability",
+    evaluationLabel: "Final evaluation",
+    downloadPdf: "📄 Download experiment report (PDF)",
+    generatingPdf: "GENERATING REPORT...",
+    oddsPrefix: "1 /",
+  },
+  report: {
+    reportTitle: "PROBABILITY EXPERIMENT REPORT",
+    reportSubtitle: "LOCAL OBSERVATION LOG",
+    sectionSummary: "01  PLAY SUMMARY",
+    sectionMoment: "02  CRITICAL MOMENT",
+    sectionGraph: "03  CUMULATIVE PROBABILITY TRACE",
+    fieldMode: "MODE",
+    fieldSingleProb: "P(HIT)",
+    fieldAttempts: "SPINS",
+    fieldCumulative: "CUMULATIVE",
+    fieldEndedAt: "TIMESTAMP",
+    fieldEvaluation: "EVAL",
+    modeHitUntilWin: "HIT UNTIL WIN",
+    modeAntiBingo: "KEEP MISSING",
+    outcomeClear: "CLEAR",
+    outcomeGameover: "GAME OVER",
+    graphXLabel: "SPINS (n)",
+    graphYLabelHit: "CUMULATIVE HIT %",
+    graphYLabelMiss: "CUMULATIVE MISS %",
+    oddsPrefix: "1 /",
+    noScreenshot: "[ NO CAPTURE AVAILABLE ]",
+    noHistory: "[ NO TRACE DATA ]",
+    filenamePrefix: "probability-experiment-report",
+  },
   toast: {
     settingsSaved: "Settings saved.",
     runReset: "Spin count reset.",
@@ -463,17 +570,16 @@ export const ultimateProbabilitySlotEn: UltimateProbabilitySlotDict = {
   badges: {
     titleTemplateHitUntilWin: "Hit 1/{odds}",
     titleTemplateAntiBingo: "Miss rate {percent}%",
-    descriptionHitUntilWin:
-      "Hit at 1/{odds} or rarer. Easier badges unlock too.",
-    descriptionAntiBingo:
-      "Kept missing until miss rate hit {percent}%. Easier badges unlock too.",
+    descriptionHitUntilWin: "Hit at 1/{odds} or rarer.",
+    descriptionAntiBingo: "Kept missing until miss rate hit {percent}%.",
   },
   achievements: {
     title: "Achievements",
     modeLabelHitUntilWin: "Hit Until Win",
     modeLabelAntiBingo: "Keep Missing",
     unlockedCountTemplate: "{unlocked} / {total} unlocked",
-    lockedLabel: "Locked",
+    lockedLabel: "LOCK",
+    unlockedLabel: "UNLOCKED",
     close: "Close",
   },
 };

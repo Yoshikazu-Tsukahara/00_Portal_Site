@@ -51,7 +51,7 @@ export function stopDelayBeforeReel(
  */
 export function useSlotEngine(
   settings: SlotSettings | null,
-  onSettled: (result: SpinResult) => void,
+  onSettled: (result: SpinResult) => void | Promise<void>,
 ) {
   const [phase, setPhase] = useState<SlotPhase>("idle");
   const [displayIndices, setDisplayIndices] = useState<number[]>([]);
