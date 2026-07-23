@@ -381,6 +381,7 @@ body {
    */
   .slot-layout {
     @apply flex min-h-0 w-full flex-1 flex-col overflow-hidden;
+    --slot-achievements-width: 21rem;
     /* AppShell(fillViewport) の残り高さいっぱい。dvh は親が伸びない時の下限 */
     height: 100%;
     max-height: 100%;
@@ -412,7 +413,7 @@ body {
 
     .slot-console__inner {
       /* 実績欄分の余白を確保し、高さはこのパネルだけが決める */
-      margin-right: calc(17.5rem + 0.75rem);
+      margin-right: calc(var(--slot-achievements-width) + 0.75rem);
     }
   }
 
@@ -430,7 +431,8 @@ body {
       top: 0;
       right: 0;
       bottom: 0;
-      width: 17.5rem;
+      width: var(--slot-achievements-width);
+      min-width: var(--slot-achievements-width);
       min-height: 0;
       max-height: none;
     }
@@ -457,7 +459,7 @@ body {
   }
 
   .slot-achievements__list {
-    @apply flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto overscroll-contain p-2.5;
+    @apply flex min-h-0 min-w-0 flex-1 flex-col gap-1.5 overflow-y-auto overscroll-contain p-2.5;
   }
 
   /* スマホ実績ドロワー（下からスライドイン） */
@@ -471,7 +473,7 @@ body {
   }
 
   .slot-achievements-drawer__sheet {
-    @apply relative z-10 flex max-h-[min(78dvh,36rem)] flex-col overflow-hidden rounded-t-2xl border border-zinc-700/80 border-b-0 bg-[radial-gradient(ellipse_at_top,rgba(39,39,42,0.7),rgba(9,9,11,0.98))] font-mono text-zinc-100 shadow-[0_-16px_48px_-16px_rgba(0,0,0,0.85)];
+    @apply relative z-10 flex max-h-[min(78dvh,36rem)] w-full flex-col overflow-hidden rounded-t-2xl border border-zinc-700/80 border-b-0 bg-[radial-gradient(ellipse_at_top,rgba(39,39,42,0.7),rgba(9,9,11,0.98))] font-mono text-zinc-100 shadow-[0_-16px_48px_-16px_rgba(0,0,0,0.85)];
     padding-bottom: env(safe-area-inset-bottom, 0px);
     animation: slot-drawer-slide-up 0.28s cubic-bezier(0.22, 1, 0.36, 1);
   }
@@ -481,7 +483,7 @@ body {
   }
 
   .slot-achievements-drawer .slot-achievements__list {
-    @apply min-h-0 flex-1 pb-4;
+    @apply min-h-0 min-w-0 flex-1 px-3 pb-4;
   }
 
   body.slot-achievements-drawer-open {
@@ -936,15 +938,16 @@ body {
   }
 
   .slot-badge-card {
-    @apply relative flex flex-col gap-1 overflow-hidden rounded-lg px-2.5 py-2;
+    @apply relative flex w-full min-w-0 shrink-0 flex-col gap-1 overflow-clip rounded-lg px-2.5 py-2;
   }
 
   .slot-badge-card__head {
-    @apply flex items-start justify-between gap-2;
+    @apply flex min-w-0 items-start justify-between gap-2;
   }
 
   .slot-badge-card__title {
-    @apply text-xs font-semibold leading-snug;
+    @apply min-w-0 flex-1 text-xs font-semibold leading-snug break-words;
+    overflow-wrap: anywhere;
   }
 
   .slot-badge-card__title--unlocked {
@@ -956,7 +959,8 @@ body {
   }
 
   .slot-badge-card__desc {
-    @apply text-[10px] leading-relaxed;
+    @apply text-[10px] leading-relaxed break-words;
+    overflow-wrap: anywhere;
   }
 
   .slot-badge-card__desc--unlocked {
