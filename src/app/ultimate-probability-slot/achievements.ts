@@ -107,29 +107,26 @@ export function mergeModeBadges(
   };
 }
 
-/** 分母 N を表示用に整形（1,000 / 10^12 など） */
+/** 分母 N を表示用に整形（指数なしの生表記） */
 export function formatOddsTierLabel(tier: number): string {
   if (!Number.isFinite(tier) || tier <= 0) return "?";
-  if (tier < 100_000) {
-    return Math.round(tier).toLocaleString("en-US");
-  }
-  const exp = Math.floor(Math.log10(tier));
-  const mantissa = tier / Math.pow(10, exp);
-  if (Math.abs(mantissa - 1) < 1e-9) return `10^${exp}`;
-  return `${mantissa.toFixed(2)}\u00d710^${exp}`;
+  return Math.round(tier).toLocaleString("en-US", { useGrouping: true });
 }
 
-/** 累積外し確率（%）を表示用に整形 */
+/** 累積外し確率（%）を表示用に整形（指数なし） */
 export function formatMissPercentLabel(percent: number): string {
   if (!Number.isFinite(percent)) return "?";
   if (percent >= 1) {
     return percent.toLocaleString("en-US", { maximumFractionDigits: 2 });
   }
   if (percent >= 0.01) {
-    return parseFloat(percent.toFixed(4)).toString();
+    return percent.toFixed(4).replace(/0+$/, "").replace(/\.$/, "");
   }
-  const exp = Math.floor(Math.log10(percent));
-  const mantissa = percent / Math.pow(10, exp);
-  if (Math.abs(mantissa - 1) < 1e-9) return `10^${exp}`;
-  return `${mantissa.toFixed(2)}\u00d710^${exp}`;
+  // 極小値もゼロ並びの生小数
+  const needed = Math.ceil(-Math.log10(percent)) + 1;
+  const decimals = Math.min(24, Math.max(4, needed));
+  return percent
+    .toFixed(decimals)
+    .replace(/0+$/, "")
+    .replace(/\.$/, "");
 }

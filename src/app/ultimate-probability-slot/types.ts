@@ -13,7 +13,10 @@ export type SlotItemType = "text" | "number" | "emoji" | "image";
 export type SlotItem = {
   id: string;
   type: SlotItemType;
-  /** text/number/emoji はそのままの文字列、image は DataURL */
+  /**
+   * text/number/emoji はそのままの文字列。
+   * image は DataURL、または public パス（デフォルト JP）。
+   */
   value: string;
 };
 
@@ -21,11 +24,10 @@ export type SlotItem = {
 export type PlayMode = "hitUntilWin" | "antiBingo";
 
 /**
- * 停止操作モード
- * - individual: 各リールに STOP
- * - batch: 1つの STOP で左から順次停止
+ * 停止操作モード（互換のため残す。常に一括順次として扱う）
+ * @deprecated 個別 STOP は廃止。正規化時は常に "batch"
  */
-export type StopMode = "individual" | "batch";
+export type StopMode = "batch";
 
 /** スロットのカスタマイズ設定 */
 export type SlotSettings = {
@@ -34,6 +36,7 @@ export type SlotSettings = {
   /** 全リール共通の絵柄リスト（先頭が JACKPOT） */
   symbols: SlotItem[];
   mode: PlayMode;
+  /** 互換フィールド。常に "batch"（一括順次） */
   stopMode: StopMode;
 };
 
@@ -75,53 +78,99 @@ export const STORAGE_KEY = "ultimate-probability-slot-data";
 /** ジャックポット（当たり）と判定するインデックス。常に絵柄リストの先頭。 */
 export const JACKPOT_INDEX = 0;
 
-export const MIN_REELS = 2;
-export const MAX_REELS = 8;
-export const MIN_ITEMS_PER_REEL = 2;
-export const MAX_ITEMS_PER_REEL = 24;
+/** デフォルトの JP 画像（public 配下） */
+export const DEFAULT_JP_IMAGE_PATH =
+  "/ultimate-probability-slot/default-jp.png";
 
-/** 一括順次ストップ時のリール間ディレイ（ms） */
+/** ハズレ用 BAR 画像（7️⃣ の代わり） */
+export const DEFAULT_BAR_IMAGE_PATH =
+  "/ultimate-probability-slot/bar-symbol.png";
+
+export const MIN_REELS = 3;
+export const MAX_REELS = 10;
+export const MIN_ITEMS_PER_REEL = 5;
+export const MAX_ITEMS_PER_REEL = 10;
+
+/** 一括順次ストップ時の基本ディレイ（ms） */
 export const BATCH_STOP_DELAY_MS = 280;
+/** ジャックポット継続時、停止間隔を伸ばす量（ms / 連続本数） */
+export const BATCH_STOP_TEASE_STEP_MS = 140;
 
 export function createId(): string {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
-/** 先頭（index 0）ほどレアな絵柄になるよう並べたデフォルト絵文字プール */
-const DEFAULT_EMOJI_POOL = [
-  "⭐",
-  "7️⃣",
-  "💎",
-  "🔔",
-  "👑",
-  "🍇",
-  "🍋",
-  "🍒",
-  "🍀",
-  "🎯",
-  "⚡",
-  "🔥",
-  "🌙",
-  "☄️",
-  "🪙",
-  "🎲",
-  "🧿",
-  "🔮",
-  "🛰️",
-  "🧬",
-  "⚛️",
-  "🌀",
-  "🔷",
-  "🔺",
+/**
+ * ハズレ絵柄の王道スロットプリセット。
+ * 種類数に応じて先頭から順番に割り当てる（JP は別途 index 0）。
+ */
+const MISS_SYMBOL_POOL: Array<Pick<SlotItem, "type" | "value">> = [
+  { type: "emoji", value: "🍒" }, // チェリー
+  { type: "emoji", value: "🔔" }, // ベル
+  { type: "emoji", value: "🍉" }, // スイカ
+  { type: "emoji", value: "🍋" }, // レモン
+  { type: "emoji", value: "🍇" }, // プラム／ブドウ
+  { type: "emoji", value: "💎" }, // ダイヤモンド
+  { type: "emoji", value: "⭐" }, // スター
+  { type: "emoji", value: "👑" }, // クラウン
+  { type: "image", value: DEFAULT_BAR_IMAGE_PATH }, // BAR（旧 7️⃣）
+  { type: "emoji", value: "⬛" }, // BAR タグ
 ];
 
+/** デフォルトのジャックポット絵柄（画像） */
+export function buildDefaultJackpot(): SlotItem {
+  return {
+    id: createId(),
+    type: "image",
+    value: DEFAULT_JP_IMAGE_PATH,
+  };
+}
+
+/** ハズレ1マス（王道スロット絵柄を順番に割り当て） */
+export function buildMissItem(index: number): SlotItem {
+  // index は 1 始まり想定（0 は JP）。プールは 0 始まりで順番に取る
+  const poolIndex = Math.max(0, index - 1) % MISS_SYMBOL_POOL.length;
+  const preset = MISS_SYMBOL_POOL[poolIndex];
+  return {
+    id: createId(),
+    type: preset.type,
+    value: preset.value,
+  };
+}
+
+/**
+ * 絵柄セットを構築。
+ * 先頭は JP 画像、残りはシステム自動のハズレ記号。
+ */
+export function buildSymbols(
+  count: number,
+  jackpot: SlotItem = buildDefaultJackpot(),
+): SlotItem[] {
+  const n = Math.min(
+    Math.max(Math.floor(count), MIN_ITEMS_PER_REEL),
+    MAX_ITEMS_PER_REEL,
+  );
+  const jp: SlotItem = {
+    id: jackpot.id || createId(),
+    type: "image",
+    value:
+      typeof jackpot.value === "string" && jackpot.value.length > 0
+        ? jackpot.value
+        : DEFAULT_JP_IMAGE_PATH,
+  };
+  return Array.from({ length: n }, (_, i) =>
+    i === JACKPOT_INDEX ? jp : buildMissItem(i),
+  );
+}
+
+/** @deprecated buildSymbols を使う */
 export function buildDefaultItem(index: number): SlotItem {
-  const value = DEFAULT_EMOJI_POOL[index % DEFAULT_EMOJI_POOL.length];
-  return { id: createId(), type: "emoji", value };
+  if (index === JACKPOT_INDEX) return buildDefaultJackpot();
+  return buildMissItem(index);
 }
 
 export function buildDefaultSymbols(count: number): SlotItem[] {
-  return Array.from({ length: count }, (_, i) => buildDefaultItem(i));
+  return buildSymbols(count);
 }
 
 export function buildDefaultSettings(): SlotSettings {
@@ -165,26 +214,25 @@ function isSlotItemType(v: unknown): v is SlotItemType {
   return v === "text" || v === "number" || v === "emoji" || v === "image";
 }
 
-function normalizeItem(raw: unknown, fallbackIndex: number): SlotItem {
+/** 旧データから JP 画像を抽出。画像以外／空ならデフォルトへ */
+function extractJackpot(raw: unknown): SlotItem {
   if (raw && typeof raw === "object") {
     const obj = raw as Record<string, unknown>;
-    const type = isSlotItemType(obj.type) ? obj.type : "emoji";
-    const value =
-      typeof obj.value === "string" && obj.value.length > 0
-        ? obj.value
-        : buildDefaultItem(fallbackIndex).value;
-    const id = typeof obj.id === "string" ? obj.id : createId();
-    return { id, type, value };
+    const type = isSlotItemType(obj.type) ? obj.type : null;
+    const value = typeof obj.value === "string" ? obj.value : "";
+    // 画像として保存されている場合のみ引き継ぐ（DataURL または public パス）
+    if (type === "image" && value.length > 0) {
+      return {
+        id: typeof obj.id === "string" ? obj.id : createId(),
+        type: "image",
+        value,
+      };
+    }
   }
-  return buildDefaultItem(fallbackIndex);
+  return buildDefaultJackpot();
 }
 
-function normalizeSymbols(raw: unknown, count: number): SlotItem[] {
-  const list = Array.isArray(raw) ? raw : [];
-  return Array.from({ length: count }, (_, i) => normalizeItem(list[i], i));
-}
-
-/** 読み込んだ設定を安全な形に正規化（旧 reels 構造からの移行含む） */
+/** 読み込んだ設定を安全な形に正規化（旧 reels 構造・旧絵柄設定からの移行含む） */
 export function normalizeSettings(raw: unknown): SlotSettings | null {
   if (!raw || typeof raw !== "object") return null;
   const obj = raw as Record<string, unknown>;
@@ -197,7 +245,10 @@ export function normalizeSettings(raw: unknown): SlotSettings | null {
       : 0;
 
   // 旧形式: reels[] から移行（先頭リールの絵柄を共通セットとして採用）
-  if ((!Array.isArray(symbolsRaw) || symbolsRaw.length === 0) && Array.isArray(obj.reels)) {
+  if (
+    (!Array.isArray(symbolsRaw) || symbolsRaw.length === 0) &&
+    Array.isArray(obj.reels)
+  ) {
     const rawReels = obj.reels;
     if (rawReels.length === 0) return null;
     reelCount = rawReels.length;
@@ -214,9 +265,12 @@ export function normalizeSettings(raw: unknown): SlotSettings | null {
     Math.max(symbolsRaw.length, MIN_ITEMS_PER_REEL),
     MAX_ITEMS_PER_REEL,
   );
-  const symbols = normalizeSymbols(symbolsRaw, itemsPerReel);
+  // ハズレは常に自動生成。JP 画像だけ旧データを引き継ぐ
+  const jackpot = extractJackpot(symbolsRaw[0]);
+  const symbols = buildSymbols(itemsPerReel, jackpot);
   const mode: PlayMode = obj.mode === "antiBingo" ? "antiBingo" : "hitUntilWin";
-  const stopMode: StopMode = obj.stopMode === "individual" ? "individual" : "batch";
+  // 個別 STOP は廃止。旧データも一括順次へ寄せる
+  const stopMode: StopMode = "batch";
 
   return { reelCount, symbols, mode, stopMode };
 }

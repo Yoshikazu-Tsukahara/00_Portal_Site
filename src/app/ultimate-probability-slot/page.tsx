@@ -33,7 +33,6 @@ import {
   type SlotAppData,
   type SlotSettings,
   type SlotStats,
-  type StopMode,
 } from "./types";
 import { usePwaInstall } from "./usePwaInstall";
 import { useSlotEngine } from "./useSlotEngine";
@@ -170,15 +169,31 @@ export default function UltimateProbabilitySlotPage() {
     anySpinning,
     canSpin,
     canStop,
+    canManualStop,
+    isReach,
     spin,
-    stopReel,
     stopAllSequential,
+    manualStopLast,
   } = useSlotEngine(settings, handleSettled);
 
-  // PC: スペースキーで SPIN → STOP → SPIN を一連操作
+  // PC: スペースキーで SPIN → STOP（リーチ時の MANUAL STOP はキーボード不可）
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
-      if (e.code !== "Space" && e.key !== " ") return;
+      // リーチ中は Space / Enter による停止を一切受け付けない（クリック／タップのみ）
+      if (isReach) {
+        if (
+          e.code === "Space" ||
+          e.key === " " ||
+          e.code === "Enter" ||
+          e.key === "Enter"
+        ) {
+          e.preventDefault();
+        }
+        return;
+      }
+
+      const isSpace = e.code === "Space" || e.key === " ";
+      if (!isSpace) return;
       if (e.repeat) return;
 
       const target = e.target as HTMLElement | null;
@@ -209,14 +224,9 @@ export default function UltimateProbabilitySlotPage() {
         return;
       }
 
-      if (settings.stopMode === "batch") {
-        if (canStop) stopAllSequential();
-        return;
+      if (canStop) {
+        stopAllSequential();
       }
-
-      // 個別 STOP: 左から順に、まだ回っているリールを1本止める
-      const next = reelSpinning.findIndex(Boolean);
-      if (next >= 0) stopReel(next);
     }
 
     window.addEventListener("keydown", onKeyDown);
@@ -225,11 +235,10 @@ export default function UltimateProbabilitySlotPage() {
     settings,
     setupOpen,
     flash,
+    isReach,
     canSpin,
     canStop,
-    reelSpinning,
     spin,
-    stopReel,
     stopAllSequential,
   ]);
 
@@ -250,14 +259,6 @@ export default function UltimateProbabilitySlotPage() {
       ...prev,
       settings: { ...settings, mode },
       run: buildInitialRun(),
-    }));
-  }
-
-  function changeStopMode(stopMode: StopMode) {
-    if (!settings || anySpinning) return;
-    setData((prev) => ({
-      ...prev,
-      settings: { ...settings, stopMode },
     }));
   }
 
@@ -310,21 +311,21 @@ export default function UltimateProbabilitySlotPage() {
           unlockedBadges={data.unlockedBadges[settings.mode] ?? []}
           copy={copy.dash}
           modeCopy={copy.mode}
-          stopModeCopy={copy.stopMode}
           fortuneCopy={copy.fortune}
           fortuneAntiCopy={copy.fortuneAntiBingo}
           achievementsCopy={copy.achievements}
           badgeCopy={copy.badges}
           canSpin={canSpin}
           canStop={canStop}
+          canManualStop={canManualStop}
+          isReach={isReach}
           anySpinning={anySpinning}
           displayIndices={displayIndices}
           reelSpinning={reelSpinning}
           onSpin={spin}
-          onStopReel={stopReel}
           onStopAll={stopAllSequential}
+          onManualStop={manualStopLast}
           onChangeMode={changeMode}
-          onChangeStopMode={changeStopMode}
           onResetRun={resetRun}
           onOpenSettings={() => setSetupOpen(true)}
         />

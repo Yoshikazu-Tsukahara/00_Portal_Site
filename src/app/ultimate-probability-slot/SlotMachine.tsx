@@ -1,5 +1,11 @@
 "use client";
 
+import { useEffect, useRef, useState, type CSSProperties } from "react";
+import {
+  computeOptimalReelLayout,
+  REEL_LAYOUT_GAP_PX,
+  type ReelLayoutPlan,
+} from "./reelLayout";
 import { JACKPOT_INDEX, type SlotItem } from "./types";
 
 function ItemView({ item }: { item: SlotItem | undefined }) {
@@ -21,61 +27,153 @@ function ItemView({ item }: { item: SlotItem | undefined }) {
   );
 }
 
-/** リール本体：JACKPOT 停止時のみ端に静的な反射枠を付与 */
+function ReelCell({
+  index,
+  symbols,
+  displayIndices,
+  reelSpinning,
+  isReach,
+  reelCount,
+}: {
+  index: number;
+  symbols: SlotItem[];
+  displayIndices: number[];
+  reelSpinning: boolean[];
+  isReach: boolean;
+  reelCount: number;
+}) {
+  const idx = displayIndices[index] ?? 0;
+  const item = symbols[idx];
+  const spinning = Boolean(reelSpinning[index]);
+  const isJackpotFace = !spinning && idx === JACKPOT_INDEX;
+  const isLastReel = index === reelCount - 1;
+  const isReachReel = isReach && isLastReel && spinning;
+
+  return (
+    <div className="slot-reel-col">
+      <div className="slot-reel-stage">
+        <div
+          className={`slot-reel ${spinning ? "slot-reel--spinning" : ""} ${
+            isJackpotFace ? "slot-reel--jackpot" : ""
+          } ${isReachReel ? "slot-reel--reach" : ""}`}
+        >
+          <span className="slot-reel__glow" aria-hidden />
+          <div className="slot-reel__content">
+            <ItemView item={item} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const FALLBACK_LAYOUT: ReelLayoutPlan = {
+  rows: 1,
+  topCount: 3,
+  bottomCount: 0,
+  reelSize: 96,
+};
+
+/**
+ * リール本体。
+ * コンテナサイズを ResizeObserver で監視し、1行/2行のうち
+ * リール面積が最大になる配置を自動選択する。
+ * 停止順（Z順）は index 0 から左上→右下で固定。
+ */
 export default function SlotMachine({
   symbols,
   reelCount,
   displayIndices,
   reelSpinning,
-  stopMode,
-  stopLabel,
-  onStopReel,
+  isReach = false,
 }: {
   symbols: SlotItem[];
   reelCount: number;
   displayIndices: number[];
   reelSpinning: boolean[];
-  stopMode: "individual" | "batch";
-  stopLabel: string;
-  onStopReel: (index: number) => void;
+  isReach?: boolean;
 }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [layout, setLayout] = useState<ReelLayoutPlan>(() => ({
+    ...FALLBACK_LAYOUT,
+    topCount: reelCount,
+  }));
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const update = () => {
+      const rect = el.getBoundingClientRect();
+      setLayout(
+        computeOptimalReelLayout(
+          rect.width,
+          rect.height,
+          reelCount,
+          REEL_LAYOUT_GAP_PX,
+        ),
+      );
+    };
+
+    update();
+    const observer = new ResizeObserver(() => {
+      update();
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [reelCount]);
+
+  const size = Math.max(0, Math.floor(layout.reelSize * 100) / 100);
+  const gridStyle: CSSProperties = {
+    ["--reel-size" as string]: `${size}px`,
+    ["--reel-gap" as string]: `${REEL_LAYOUT_GAP_PX}px`,
+  };
+
+  const topIndices = Array.from({ length: layout.topCount }, (_, i) => i);
+  const bottomIndices =
+    layout.rows === 2
+      ? Array.from(
+          { length: layout.bottomCount },
+          (_, i) => layout.topCount + i,
+        )
+      : [];
+
   return (
     <div
-      className="slot-machine-grid grid min-h-0 flex-1 gap-2 sm:gap-3"
-      style={{ gridTemplateColumns: `repeat(${reelCount}, minmax(0, 1fr))` }}
+      ref={containerRef}
+      className={`slot-machine-grid ${
+        layout.rows === 2 ? "slot-machine-grid--rows-2" : "slot-machine-grid--rows-1"
+      }`}
+      style={gridStyle}
     >
-      {Array.from({ length: reelCount }, (_, i) => {
-        const idx = displayIndices[i] ?? 0;
-        const item = symbols[idx];
-        const spinning = Boolean(reelSpinning[i]);
-        const isJackpotFace = !spinning && idx === JACKPOT_INDEX;
-        return (
-          <div key={i} className="slot-reel-col">
-            <div className="slot-reel-stage">
-              <div
-                className={`slot-reel ${spinning ? "slot-reel--spinning" : ""} ${
-                  isJackpotFace ? "slot-reel--jackpot" : ""
-                }`}
-              >
-                <span className="slot-reel__glow" aria-hidden />
-                <div className="slot-reel__content">
-                  <ItemView item={item} />
-                </div>
-              </div>
-            </div>
-            {stopMode === "individual" ? (
-              <button
-                type="button"
-                onClick={() => onStopReel(i)}
-                disabled={!spinning}
-                className="slot-stop-btn"
-              >
-                {stopLabel}
-              </button>
-            ) : null}
-          </div>
-        );
-      })}
+      <div className="slot-machine-row">
+        {topIndices.map((i) => (
+          <ReelCell
+            key={i}
+            index={i}
+            symbols={symbols}
+            displayIndices={displayIndices}
+            reelSpinning={reelSpinning}
+            isReach={isReach}
+            reelCount={reelCount}
+          />
+        ))}
+      </div>
+      {layout.rows === 2 ? (
+        <div className="slot-machine-row">
+          {bottomIndices.map((i) => (
+            <ReelCell
+              key={i}
+              index={i}
+              symbols={symbols}
+              displayIndices={displayIndices}
+              reelSpinning={reelSpinning}
+              isReach={isReach}
+              reelCount={reelCount}
+            />
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }

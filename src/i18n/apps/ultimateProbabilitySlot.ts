@@ -28,29 +28,17 @@ export type UltimateProbabilitySlotDict = {
     antiBingoHint: string;
     switchConfirm: string;
   };
-  stopMode: {
-    heading: string;
-    individual: string;
-    batch: string;
-  };
   setup: {
     title: string;
     subtitle: string;
     reelsLabel: string;
     itemsLabel: string;
-    sharedSymbolsHint: string;
+    autoMissHint: string;
     jackpotTag: string;
-    typeLabel: string;
-    typeText: string;
-    typeNumber: string;
-    typeEmoji: string;
-    typeImage: string;
-    valuePlaceholderText: string;
-    valuePlaceholderEmoji: string;
-    valuePlaceholderNumber: string;
+    jackpotImageOnly: string;
     uploadButton: string;
     uploadHint: string;
-    removeImage: string;
+    resetJackpot: string;
     save: string;
     cancel: string;
     startButton: string;
@@ -82,18 +70,29 @@ export type UltimateProbabilitySlotDict = {
     emptyButton: string;
     oddsPrefix: string;
     spaceHint: string;
+    reachWarning: string;
+    manualStopButton: string;
+    reachSpaceHint: string;
   };
   fortune: {
-    superRare: { label: string; description: string };
-    average: { label: string; description: string };
-    deepHooked: { label: string; description: string };
-    anomaly: { label: string; description: string };
+    p0: { label: string; description: string };
+    p20: { label: string; description: string };
+    p50: { label: string; description: string };
+    p80: { label: string; description: string };
+    p90: { label: string; description: string };
+    p95: { label: string; description: string };
+    p99: { label: string; description: string };
+    p999: { label: string; description: string };
   };
   fortuneAntiBingo: {
-    superRare: { label: string; description: string };
-    average: { label: string; description: string };
-    deepHooked: { label: string; description: string };
-    anomaly: { label: string; description: string };
+    p0: { label: string; description: string };
+    p20: { label: string; description: string };
+    p50: { label: string; description: string };
+    p80: { label: string; description: string };
+    p90: { label: string; description: string };
+    p95: { label: string; description: string };
+    p99: { label: string; description: string };
+    p999: { label: string; description: string };
   };
   flash: {
     hitTitle: string;
@@ -127,155 +126,175 @@ export type UltimateProbabilitySlotDict = {
 export const ultimateProbabilitySlotJa: UltimateProbabilitySlotDict = {
   shell: {
     title: "究極確率スロット",
-    description:
-      "自作の天文学的低確率スロットで、確率の哲学と狂気を味わう演算エンジン。",
+    description: "自分だけの低確率スロットで、確率を体感する。",
   },
   install: {
     button: "アプリとして保存",
     buttonShort: "保存",
     buttonAria: "ホーム画面にアプリを追加",
     modalTitle: "ホーム画面に追加",
-    modalLead: "共有ボタンから、この演算装置を端末にインストールできます。",
-    step1Title: "共有ボタンをタップ",
-    step1Body: "画面下部（または上部）の共有アイコン［↑］をタップしてください。",
-    step2Title: "ホーム画面に追加を選択",
-    step2Body: "メニューから「ホーム画面に追加」を選ぶとアイコンが作成されます。",
+    modalLead: "共有メニューからホーム画面に追加できます。",
+    step1Title: "共有をタップ",
+    step1Body: "画面の共有アイコン［↑］をタップ。",
+    step2Title: "ホーム画面に追加",
+    step2Body: "メニューから「ホーム画面に追加」を選ぶ。",
     desktopTitle: "アプリとしてインストール",
-    desktopLead: "ブラウザのインストール機能で、単体アプリとして利用できます。",
+    desktopLead: "ブラウザから単体アプリとして使えます。",
     desktopStep1Title: "アドレスバーを確認",
-    desktopStep1Body: "アドレスバー付近のインストールアイコンをクリックしてください。",
-    desktopStep2Title: "インストールを選択",
-    desktopStep2Body: "表示されたダイアログで「インストール」を選ぶと完了します。",
+    desktopStep1Body: "インストールアイコンをクリック。",
+    desktopStep2Title: "インストール",
+    desktopStep2Body: "ダイアログで「インストール」を選ぶ。",
     modalClose: "閉じる",
   },
   mode: {
-    heading: "プレイモード",
+    heading: "モード",
     hitUntilWin: "当たるまで回す",
     hitUntilWinHint: "ジャックポットを目指す",
     antiBingo: "外し続ける",
-    antiBingoHint: "的中を回避し続ける",
-    switchConfirm: "モードを切り替えると現在の試行回数がリセットされます。よろしいですか？",
-  },
-  stopMode: {
-    heading: "停止操作",
-    individual: "個別 STOP",
-    batch: "一括順次",
+    antiBingoHint: "当たりを避ける",
+    switchConfirm: "モードを切り替えると回転数がリセットされます。よろしいですか？",
   },
   setup: {
     title: "スロット設定",
-    subtitle: "共通の絵柄セットとリール本数で、確率そのものをデザインする。",
+    subtitle: "リール数と絵柄数で確率を決め、当たり画像だけ差し替え。",
     reelsLabel: "リール数",
-    itemsLabel: "絵柄の種類数",
-    sharedSymbolsHint:
-      "絵柄は全リール共通です。ここで設定した1セットが、すべてのリールで同じように使われます。",
+    itemsLabel: "絵柄の種類",
+    autoMissHint:
+      "ハズレは王道絵柄が自動配置。変えられるのはジャックポット画像だけです。",
     jackpotTag: "★ JACKPOT",
-    typeLabel: "種類",
-    typeText: "文字",
-    typeNumber: "数字",
-    typeEmoji: "絵文字",
-    typeImage: "画像",
-    valuePlaceholderText: "文字を入力",
-    valuePlaceholderEmoji: "絵文字を入力",
-    valuePlaceholderNumber: "数字を入力",
-    uploadButton: "画像を選択",
-    uploadHint: "端末内で自動縮小され、LocalStorageに保存されます。",
-    removeImage: "削除",
+    jackpotImageOnly: "IMAGE ONLY",
+    uploadButton: "画像をアップロード",
+    uploadHint: "JPEG / PNG など。端末内で縮小して保存します。",
+    resetJackpot: "デフォルトに戻す",
     save: "この設定で開始",
     cancel: "キャンセル",
-    startButton: "設定を保存して始める",
-    oddsPreviewLabel: "この設定での単発オッズ",
+    startButton: "保存して始める",
+    oddsPreviewLabel: "1回の確率（オッズ）",
   },
   dash: {
-    attemptsLabel: "試行回数",
-    singleProbLabel: "単発確率",
-    cumulativeLabel: "累積確率",
-    cumulativeLabelAntiBingo: "累積外し確率",
-    fortuneLabel: "現在の運勢ステータス",
+    attemptsLabel: "回転数",
+    singleProbLabel: "1回の確率",
+    cumulativeLabel: "当たった確率",
+    cumulativeLabelAntiBingo: "外し続けた確率",
+    fortuneLabel: "いまの状態",
     spinButton: "SPIN",
     stopButton: "STOP",
-    spinningLabel: "演算中…",
-    resetRunButton: "この試行をリセット",
-    resetRunConfirm: "現在の試行回数をリセットしますか？（生涯統計・実績は保持されます）",
+    spinningLabel: "回転中…",
+    resetRunButton: "回転数をリセット",
+    resetRunConfirm: "回転数をリセットしますか？（生涯統計・実績は残ります）",
     settingsButton: "設定",
-    achievementsButton: "🏆 実績を見る",
+    achievementsButton: "🏆 実績",
     lifetimeHeading: "生涯統計",
-    lifetimeAttempts: "生涯試行回数",
-    lifetimeWins: "生涯的中回数",
-    lifetimeMisses: "生涯ミス回数",
-    bestWinAttempts: "最速的中",
+    lifetimeAttempts: "総回転数",
+    lifetimeWins: "当たり回数",
+    lifetimeMisses: "ハズレ回数",
+    bestWinAttempts: "最速当たり",
     bestWinAttemptsEmpty: "—",
-    longestMissStreak: "最長回避記録",
-    antiBingoFailCount: "回避失敗回数",
-    emptyTitle: "演算装置は未初期化です",
-    emptyLead: "リールと絵柄を設定して、確率の実験を開始してください。",
-    emptyButton: "スロットを設定する",
+    longestMissStreak: "最長外し",
+    antiBingoFailCount: "外し失敗",
+    emptyTitle: "まだ設定がありません",
+    emptyLead: "リールと絵柄を設定して始めましょう。",
+    emptyButton: "スロットを設定",
     oddsPrefix: "1 /",
-    spaceHint: "Space キーで SPIN / STOP",
+    spaceHint: "Space で SPIN / STOP",
+    reachWarning: "[ WARNING: REACH DETECTED ]",
+    manualStopButton: "MANUAL STOP",
+    reachSpaceHint: "クリック／タップで MANUAL STOP",
   },
   fortune: {
-    superRare: {
-      label: "激レア",
-      description: "統計的にはまだ何も起きていない領域。今当たれば奇跡です。",
+    p0: {
+      label: "観測開始",
+      description: "まだ序盤。誤差の範囲です。",
     },
-    average: {
-      label: "平均的",
-      description: "統計上、ごく普通に当たってもおかしくないタイミングです。",
+    p20: {
+      label: "平均的領域",
+      description: "そろそろ当たりがチラつく頃。",
     },
-    deepHooked: {
-      label: "大ハマり中",
-      description: "累積確率はすでに高水準。そろそろ収束してもいい頃合いです。",
+    p50: {
+      label: "折り返し通過",
+      description: "半数超え。ハマり領域に突入。",
     },
-    anomaly: {
-      label: "異常事態",
-      description: "数学的にはほぼ確定していたはずの事象が、いまだ観測されていません。",
+    p80: {
+      label: "大ハマり予兆",
+      description: "80%をスルー。運気低下を検知。",
+    },
+    p90: {
+      label: "警戒レベル高",
+      description: "90%の壁。そろそろ当てたい。",
+    },
+    p95: {
+      label: "天文学的ハマり",
+      description: "95%超え。バグを疑いたくなる領域。",
+    },
+    p99: {
+      label: "確率の奴隷",
+      description: "99%超え。100人に1人の不運。",
+    },
+    p999: {
+      label: "確率の特異点",
+      description: "99.9%超。当たらない方が奇跡。",
     },
   },
   fortuneAntiBingo: {
-    superRare: {
-      label: "超回避域",
-      description:
-        "累積外し確率は極小。統計上、そろそろ当たってもおかしくない回避限界です。",
+    p0: {
+      label: "生存確認",
+      description: "まだ序盤。罠はあちこちに。",
     },
-    average: {
-      label: "安定回避",
-      description: "累積外し確率は中程度。当たりと外しの境界線上にいます。",
+    p20: {
+      label: "順調",
+      description: "確率の網をうまくすり抜け中。",
     },
-    deepHooked: {
-      label: "快適地帯",
-      description: "累積外し確率はまだ高水準。当たりを避け続けやすい領域です。",
+    p50: {
+      label: "卓越した回避",
+      description: "50%を回避。生存率が上昇。",
     },
-    anomaly: {
+    p80: {
+      label: "神回避の兆候",
+      description: "80%の当たりを無効化。見事。",
+    },
+    p90: {
       label: "鉄壁",
-      description:
-        "累積外し確率は最大付近。統計的にはまだ何も起きていない、理想的な回避領域です。",
+      description: "90%の壁をすり抜けた回避力。",
+    },
+    p95: {
+      label: "絶対防御",
+      description: "95%を拒否。プロ級の回避力。",
+    },
+    p99: {
+      label: "バグ級の生存",
+      description: "99%を回避。システム困惑中。",
+    },
+    p999: {
+      label: "アンチビンゴ神",
+      description: "99.9%をすり抜けた伝説の回避。",
     },
   },
   flash: {
     hitTitle: "SIGNAL DETECTED",
-    hitBody: "全リール同期。ジャックポットに到達しました。",
-    hitContinue: "新しい試行を開始",
+    hitBody: "ジャックポット達成！",
+    hitContinue: "次の試行へ",
     failTitle: "SYNC FAILURE",
-    failBody: "回避に失敗。的中を検出しました。",
-    failContinue: "新しい試行を開始",
+    failBody: "回避失敗。当たってしまいました。",
+    failContinue: "次の試行へ",
   },
   toast: {
     settingsSaved: "設定を保存しました。",
-    runReset: "試行回数をリセットしました。",
+    runReset: "回転数をリセットしました。",
     badgeUnlockedPrefix: "実績解放：",
   },
   badges: {
     titleTemplateHitUntilWin: "1/{odds} を当てた",
-    titleTemplateAntiBingo: "累積外し確率 {percent}% 到達",
+    titleTemplateAntiBingo: "外し確率 {percent}% 到達",
     descriptionHitUntilWin:
-      "単発確率 1/{odds} 以下の的中を達成した。これより当たりやすい実績もまとめて解放。",
+      "1回の確率 1/{odds} 以下で的中。易しい実績もまとめて解放。",
     descriptionAntiBingo:
-      "累積外し確率が {percent}% まで下がるまで外し続けた。これより高い（易しい）実績もまとめて解放。",
+      "外し確率が {percent}% まで下がるまで継続。易しい実績もまとめて解放。",
   },
   achievements: {
     title: "実績",
     modeLabelHitUntilWin: "当たるまで回す",
     modeLabelAntiBingo: "外し続ける",
-    unlockedCountTemplate: "{unlocked} / {total} 解放済み",
+    unlockedCountTemplate: "{unlocked} / {total} 解放",
     lockedLabel: "未解放",
     close: "閉じる",
   },
@@ -284,154 +303,170 @@ export const ultimateProbabilitySlotJa: UltimateProbabilitySlotDict = {
 export const ultimateProbabilitySlotEn: UltimateProbabilitySlotDict = {
   shell: {
     title: "Ultimate Probability Slot",
-    description:
-      "A computation engine for tasting the philosophy and madness of probability.",
+    description: "Feel probability with your own ultra-rare slot.",
   },
   install: {
     button: "Add to Home Screen",
     buttonShort: "Install",
     buttonAria: "Add this app to your home screen",
     modalTitle: "Add to Home Screen",
-    modalLead: "Install this engine on your device via the share menu.",
-    step1Title: "Tap the share button",
-    step1Body: "Tap the share icon [↑] at the bottom (or top) of the screen.",
-    step2Title: "Choose Add to Home Screen",
-    step2Body: "Select \"Add to Home Screen\" from the menu to create the icon.",
+    modalLead: "Add this app from the share menu.",
+    step1Title: "Tap Share",
+    step1Body: "Tap the share icon [↑].",
+    step2Title: "Add to Home Screen",
+    step2Body: "Choose \"Add to Home Screen\".",
     desktopTitle: "Install as an App",
-    desktopLead: "Use your browser's install feature to run this as a standalone app.",
+    desktopLead: "Run it as a standalone app from your browser.",
     desktopStep1Title: "Check the address bar",
-    desktopStep1Body: "Click the install icon near the address bar.",
-    desktopStep2Title: "Confirm install",
-    desktopStep2Body: "Choose \"Install\" in the dialog that appears.",
+    desktopStep1Body: "Click the install icon.",
+    desktopStep2Title: "Install",
+    desktopStep2Body: "Confirm Install in the dialog.",
     modalClose: "Close",
   },
   mode: {
-    heading: "Play Mode",
+    heading: "Mode",
     hitUntilWin: "Hit Until Win",
     hitUntilWinHint: "Chase the jackpot",
     antiBingo: "Keep Missing",
-    antiBingoHint: "Dodge the jackpot forever",
-    switchConfirm:
-      "Switching modes will reset the current attempt streak. Continue?",
-  },
-  stopMode: {
-    heading: "Stop Control",
-    individual: "Per-reel STOP",
-    batch: "Sequential",
+    antiBingoHint: "Avoid the jackpot",
+    switchConfirm: "Switching modes resets your spin count. Continue?",
   },
   setup: {
-    title: "Slot Configuration",
-    subtitle: "Design the odds with one shared symbol set and a reel count.",
-    reelsLabel: "Number of reels",
-    itemsLabel: "Symbol count",
-    sharedSymbolsHint:
-      "Symbols are shared across every reel. The set you configure here is used identically on all reels.",
+    title: "Slot Settings",
+    subtitle: "Set reels and symbol count. Only the jackpot image is custom.",
+    reelsLabel: "Reels",
+    itemsLabel: "Symbols",
+    autoMissHint:
+      "Miss icons are classic slot symbols. Only the jackpot image is editable.",
     jackpotTag: "★ JACKPOT",
-    typeLabel: "Type",
-    typeText: "Text",
-    typeNumber: "Number",
-    typeEmoji: "Emoji",
-    typeImage: "Image",
-    valuePlaceholderText: "Enter text",
-    valuePlaceholderEmoji: "Enter an emoji",
-    valuePlaceholderNumber: "Enter a number",
-    uploadButton: "Choose image",
-    uploadHint: "Automatically downsized on-device and stored in LocalStorage.",
-    removeImage: "Remove",
+    jackpotImageOnly: "IMAGE ONLY",
+    uploadButton: "Upload image",
+    uploadHint: "JPEG / PNG etc. Downsized and saved locally.",
+    resetJackpot: "Reset to default",
     save: "Start with this setup",
     cancel: "Cancel",
     startButton: "Save & Start",
-    oddsPreviewLabel: "Single-spin odds with this setup",
+    oddsPreviewLabel: "Odds per spin",
   },
   dash: {
-    attemptsLabel: "Attempts",
-    singleProbLabel: "Single odds",
-    cumulativeLabel: "Cumulative",
-    cumulativeLabelAntiBingo: "Cumulative dodge",
-    fortuneLabel: "Current fortune status",
+    attemptsLabel: "Spins",
+    singleProbLabel: "Per spin",
+    cumulativeLabel: "Hit chance",
+    cumulativeLabelAntiBingo: "Miss streak",
+    fortuneLabel: "Status",
     spinButton: "SPIN",
     stopButton: "STOP",
-    spinningLabel: "Computing…",
-    resetRunButton: "Reset this run",
+    spinningLabel: "Spinning…",
+    resetRunButton: "Reset spins",
     resetRunConfirm:
-      "Reset the current attempt count? (Lifetime stats & achievements are kept.)",
+      "Reset spin count? (Lifetime stats & achievements are kept.)",
     settingsButton: "Settings",
     achievementsButton: "🏆 Achievements",
-    lifetimeHeading: "Lifetime Stats",
-    lifetimeAttempts: "Lifetime attempts",
-    lifetimeWins: "Lifetime hits",
-    lifetimeMisses: "Lifetime misses",
+    lifetimeHeading: "Lifetime",
+    lifetimeAttempts: "Total spins",
+    lifetimeWins: "Hits",
+    lifetimeMisses: "Misses",
     bestWinAttempts: "Fastest hit",
     bestWinAttemptsEmpty: "—",
-    longestMissStreak: "Longest dodge streak",
-    antiBingoFailCount: "Dodge failures",
-    emptyTitle: "Engine not initialized",
-    emptyLead: "Configure your reels and symbols to begin the probability experiment.",
-    emptyButton: "Configure slot",
+    longestMissStreak: "Longest miss",
+    antiBingoFailCount: "Miss fails",
+    emptyTitle: "Not set up yet",
+    emptyLead: "Configure reels and symbols to start.",
+    emptyButton: "Set up slot",
     oddsPrefix: "1 /",
-    spaceHint: "Press Space to SPIN / STOP",
+    spaceHint: "Space for SPIN / STOP",
+    reachWarning: "[ WARNING: REACH DETECTED ]",
+    manualStopButton: "MANUAL STOP",
+    reachSpaceHint: "Click or tap to MANUAL STOP",
   },
   fortune: {
-    superRare: {
-      label: "Super Rare",
-      description:
-        "Statistically, nothing should have happened yet. A hit now would be a miracle.",
+    p0: {
+      label: "JUST STARTED",
+      description: "Still early. Within noise range.",
     },
-    average: {
-      label: "Average",
-      description:
-        "Right in the expected zone — a hit now would be perfectly ordinary.",
+    p20: {
+      label: "AVERAGE ZONE",
+      description: "A hit should start to feel close.",
     },
-    deepHooked: {
-      label: "Deeply Hooked",
-      description: "Cumulative probability is already high. Convergence is overdue.",
+    p50: {
+      label: "MIDPOINT",
+      description: "Past 50%. Entering deep-hook zone.",
     },
-    anomaly: {
-      label: "Critical Anomaly",
-      description:
-        "An event that was nearly certain by now has still not been observed.",
+    p80: {
+      label: "DEEP HOOK SIGN",
+      description: "Skipped 80%. Luck dropping.",
+    },
+    p90: {
+      label: "HIGH ALERT",
+      description: "90% wall. Time for a hit.",
+    },
+    p95: {
+      label: "WILD HOOK",
+      description: "Over 95%. Almost looks broken.",
+    },
+    p99: {
+      label: "ODDS SLAVE",
+      description: "Past 99%. One-in-a-hundred unlucky.",
+    },
+    p999: {
+      label: "SINGULARITY",
+      description: "Past 99.9%. Missing is the miracle.",
     },
   },
   fortuneAntiBingo: {
-    superRare: {
-      label: "Critical Dodge",
-      description:
-        "Cumulative dodge probability is minimal. A hit is statistically overdue.",
+    p0: {
+      label: "ALIVE",
+      description: "Early phase. Traps everywhere.",
     },
-    average: {
-      label: "Balanced Dodge",
-      description: "Mid-range dodge probability — on the edge between hit and miss.",
+    p20: {
+      label: "STEADY",
+      description: "Slipping through the odds mesh.",
     },
-    deepHooked: {
-      label: "Comfort Zone",
-      description: "Dodge probability is still high. Avoidance remains comfortable.",
+    p50: {
+      label: "GREAT DODGE",
+      description: "Dodged 50%. Survival rising.",
     },
-    anomaly: {
-      label: "Iron Wall",
-      description:
-        "Near-maximum dodge probability. Statistically, nothing has happened yet — ideal avoidance.",
+    p80: {
+      label: "DIVINE DODGE",
+      description: "Nullified an 80% hit. Nice.",
+    },
+    p90: {
+      label: "IRON WALL",
+      description: "Slipped past the 90% wall.",
+    },
+    p95: {
+      label: "ABSOLUTE DEFENSE",
+      description: "Rejected 95%. Pro-level dodge.",
+    },
+    p99: {
+      label: "BUG-TIER SURVIVAL",
+      description: "Dodged 99%. System confused.",
+    },
+    p999: {
+      label: "ANTI-BINGO GOD",
+      description: "Legendary dodge past 99.9%.",
     },
   },
   flash: {
     hitTitle: "SIGNAL DETECTED",
-    hitBody: "All reels synchronized. Jackpot reached.",
-    hitContinue: "Start a new run",
+    hitBody: "Jackpot!",
+    hitContinue: "Next run",
     failTitle: "SYNC FAILURE",
-    failBody: "Avoidance failed. A hit was detected.",
-    failContinue: "Start a new run",
+    failBody: "Dodge failed. You hit.",
+    failContinue: "Next run",
   },
   toast: {
     settingsSaved: "Settings saved.",
-    runReset: "Attempt count reset.",
-    badgeUnlockedPrefix: "Achievement unlocked: ",
+    runReset: "Spin count reset.",
+    badgeUnlockedPrefix: "Unlocked: ",
   },
   badges: {
     titleTemplateHitUntilWin: "Hit 1/{odds}",
-    titleTemplateAntiBingo: "Dodge rate reached {percent}%",
+    titleTemplateAntiBingo: "Miss rate {percent}%",
     descriptionHitUntilWin:
-      "Landed a hit at single-spin odds of 1/{odds} or rarer. Easier tiers unlock together.",
+      "Hit at 1/{odds} or rarer. Easier badges unlock too.",
     descriptionAntiBingo:
-      "Kept missing until cumulative dodge probability fell to {percent}%. Easier (higher %) tiers unlock together.",
+      "Kept missing until miss rate hit {percent}%. Easier badges unlock too.",
   },
   achievements: {
     title: "Achievements",
