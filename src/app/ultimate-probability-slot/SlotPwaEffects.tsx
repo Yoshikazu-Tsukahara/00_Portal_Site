@@ -7,6 +7,7 @@ import { useStandaloneDisplay } from "@/lib/useStandaloneDisplay";
  * 究極確率スロット共通:
  * - body にネイティブ操作向けクラスを付与（バウンス抑制）
  * - PWA standalone 時は履歴バックでポータルへ戻るのを抑止
+ * - SiteChrome 側で共通ヘッダー／フッターも完全非表示
  */
 export default function SlotPwaEffects() {
   const { isStandalone } = useStandaloneDisplay();

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import RegisterSW from "./RegisterSW";
 import SlotPwaEffects from "./SlotPwaEffects";
+import { SLOT_PWA_MANIFEST_PATH } from "./manifest";
 
 export const metadata: Metadata = {
   title: "究極確率スロット",
@@ -15,8 +16,8 @@ export const metadata: Metadata = {
   formatDetection: {
     telephone: false,
   },
-  /** start_url / scope ともに /ultimate-probability-slot に限定した独立 PWA */
-  manifest: "/ultimate-probability-slot.webmanifest",
+  /** 共通ポータル manifest ではなく、スロット専用を明示参照 */
+  manifest: SLOT_PWA_MANIFEST_PATH,
   icons: {
     icon: [
       {
@@ -38,7 +39,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#09090b",
+  /** アクセントのゴールド（マニフェスト theme_color と一致） */
+  themeColor: "#eab308",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,

@@ -56,7 +56,8 @@ export default function InstallAppButton({
         <span aria-hidden className="text-[12px] leading-none sm:text-[13px]">
           📱
         </span>
-        <span>{copy.buttonShort}</span>
+        <span className="sm:hidden">{copy.buttonShort}</span>
+        <span className="hidden sm:inline">{copy.button.replace(/^📱\s*/, "")}</span>
       </button>
 
       <InstallGuideModal

@@ -1,8 +1,8 @@
 /* 究極確率スロット専用 Service Worker（scope: /ultimate-probability-slot） */
-const CACHE_NAME = "ultimate-probability-slot-v1";
+const CACHE_NAME = "ultimate-probability-slot-v2";
 const PRECACHE = [
   "/ultimate-probability-slot",
-  "/ultimate-probability-slot.webmanifest",
+  "/ultimate-probability-slot/manifest.webmanifest",
   "/icons/ultimate-probability-slot-192.png",
   "/icons/ultimate-probability-slot-512.png",
 ];
@@ -42,7 +42,6 @@ self.addEventListener("fetch", (event) => {
   const inScope =
     path === "/ultimate-probability-slot" ||
     path.startsWith("/ultimate-probability-slot/") ||
-    path === "/ultimate-probability-slot.webmanifest" ||
     path.startsWith("/icons/ultimate-probability-slot");
   if (!inScope) return;
 

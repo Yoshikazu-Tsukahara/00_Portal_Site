@@ -1104,7 +1104,8 @@ body.slot-app-active {
 /* 究極確率スロット PWA standalone: 端スワイプ戻り抑制 */
 html.slot-pwa-standalone,
 body.slot-pwa-standalone {
-  overscroll-behavior: none;
+  overscroll-behavior-y: none;
+  overscroll-behavior-x: none;
   touch-action: pan-y;
 }
 
