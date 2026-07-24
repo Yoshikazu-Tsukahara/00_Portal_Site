@@ -9,7 +9,7 @@ import {
   type RefObject,
 } from "react";
 import type { PixelDropPuzzleDict } from "@/i18n/apps/pixelDropPuzzle";
-import { LIFE_MAX_PT, stageThemeStyle } from "./types";
+import { lifeMaxForStage, stageThemeStyle } from "./types";
 
 type RailLayout = {
   /** 黒いステージのビューポート上の左端 */
@@ -127,7 +127,8 @@ export default function RecordsSideRails({
     return stageThemeStyle(records.highestClearedStage);
   }, [records.highestClearedStage]);
 
-  const lifePct = Math.max(0, Math.min(100, (lifePt / LIFE_MAX_PT) * 100));
+  const lifeMaxPt = lifeMaxForStage(stage);
+  const lifePct = Math.max(0, Math.min(100, (lifePt / lifeMaxPt) * 100));
   const lifeTone =
     lifePct > 50 ? "ok" : lifePct > 25 ? "warn" : "danger";
   const lifeDisplay = Number.isInteger(lifePt)
@@ -168,7 +169,7 @@ export default function RecordsSideRails({
                 <span className="pxd-mobile-hud__value">
                   {lifeDisplay}
                   <span className="pxd-mobile-hud__unit">
-                    /{LIFE_MAX_PT}
+                    /{lifeMaxPt}
                   </span>
                 </span>
               </div>
@@ -176,8 +177,8 @@ export default function RecordsSideRails({
                 className={`pxd-life-bar pxd-life-bar--compact pxd-life-bar--${lifeTone}`}
                 role="meter"
                 aria-valuemin={0}
-                aria-valuemax={LIFE_MAX_PT}
-                aria-valuenow={Math.max(0, Math.min(LIFE_MAX_PT, lifePt))}
+                aria-valuemax={lifeMaxPt}
+                aria-valuenow={Math.max(0, Math.min(lifeMaxPt, lifePt))}
                 aria-label={copy.hud.lifeLabel}
               >
                 <div
@@ -280,15 +281,15 @@ export default function RecordsSideRails({
               <span className="pxd-records-rail__value pxd-life-value">
                 {lifeDisplay}
                 <span className="pxd-records-rail__unit">
-                  / {LIFE_MAX_PT} {copy.hud.lifeUnit}
+                  / {lifeMaxPt} {copy.hud.lifeUnit}
                 </span>
               </span>
               <div
                 className={`pxd-life-bar pxd-life-bar--${lifeTone}`}
                 role="meter"
                 aria-valuemin={0}
-                aria-valuemax={LIFE_MAX_PT}
-                aria-valuenow={Math.max(0, Math.min(LIFE_MAX_PT, lifePt))}
+                aria-valuemax={lifeMaxPt}
+                aria-valuenow={Math.max(0, Math.min(lifeMaxPt, lifePt))}
                 aria-label={copy.hud.lifeLabel}
               >
                 <div

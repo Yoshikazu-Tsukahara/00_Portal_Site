@@ -12,8 +12,8 @@ import PlayField from "./PlayField";
 import RulesIntroModal from "./RulesIntroModal";
 import {
   buildEmptyAppData,
-  LIFE_MAX_PT,
   lifeAfterDamage,
+  lifeMaxForStage,
   normalizeAppData,
   stageAccentHex,
   stageThemeStyle,
@@ -147,10 +147,11 @@ export default function PixelDropPuzzlePage() {
       if (judge.lifeDepleted) {
         archive.totalAttempts += 1;
         archive.totalFails += 1;
+        const downStage = Math.max(1, prev.stage - 1);
         return {
           ...prev,
-          stage: Math.max(1, prev.stage - 1),
-          lifePt: LIFE_MAX_PT,
+          stage: downStage,
+          lifePt: lifeMaxForStage(downStage),
           archive,
         };
       }
@@ -190,11 +191,14 @@ export default function PixelDropPuzzlePage() {
 
   function handleNext() {
     setFailScrollY(null);
-    setData((prev) => ({
-      ...prev,
-      stage: prev.stage + 1,
-      lifePt: LIFE_MAX_PT,
-    }));
+    setData((prev) => {
+      const nextStage = prev.stage + 1;
+      return {
+        ...prev,
+        stage: nextStage,
+        lifePt: lifeMaxForStage(nextStage),
+      };
+    });
     setRoundId((r) => r + 1);
   }
 
@@ -203,7 +207,7 @@ export default function PixelDropPuzzlePage() {
     if (!confirmed) return;
     setData((prev) => ({
       stage: 1,
-      lifePt: LIFE_MAX_PT,
+      lifePt: lifeMaxForStage(1),
       lastImage: prev.lastImage,
       archive: prev.archive,
     }));

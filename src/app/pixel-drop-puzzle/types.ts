@@ -7,8 +7,18 @@ import type { CSSProperties } from "react";
 
 export const STORAGE_KEY = "pixel-drop-puzzle-data";
 
-/** ステージ開始時のライフ上限（pt） */
+/** ステージ 1〜9 のライフ上限（pt） */
 export const LIFE_MAX_PT = 1000;
+/** ステージ 10 以降のライフ上限（pt） */
+export const LIFE_MAX_PT_HIGH = 1500;
+/** ライフ上限が 1500 になる最初のステージ */
+export const LIFE_HIGH_STAGE_FROM = 10;
+
+/** ステージ開始時・全回復時のライフ上限（pt） */
+export function lifeMaxForStage(stage: number): number {
+  const s = Math.max(1, Math.floor(stage));
+  return s >= LIFE_HIGH_STAGE_FROM ? LIFE_MAX_PT_HIGH : LIFE_MAX_PT;
+}
 
 /**
  * ARCHIVE：アプリ全体の生涯記録。
@@ -53,7 +63,7 @@ export function buildEmptyAppData(): PixelDropAppData {
   return {
     stage: 1,
     lastImage: null,
-    lifePt: LIFE_MAX_PT,
+    lifePt: lifeMaxForStage(1),
     archive: buildEmptyArchive(),
   };
 }
@@ -108,13 +118,15 @@ export const FAIL_PARTICLE_BEFORE_RESULT_MS = 760;
 
 /**
  * 着地時に溜め演出を入れるか。
- * 成功（許容内）は常に対象。失敗は許容の約2.25倍以内の惜しいミスのみ。
+ * 絶対誤差 ±1px 以内は無条件。成功（許容内）も常に対象。
+ * 失敗は許容の約2.25倍以内の惜しいミスのみ。
  */
 export function shouldHoldAtImpact(
   absErrorPx: number,
   tolerancePx: number,
   success: boolean,
 ): boolean {
+  if (absErrorPx <= 1 + 1e-12) return true;
   if (success) return true;
   if (tolerancePx <= 0) return absErrorPx <= 1e-9;
   return absErrorPx <= tolerancePx * 2.25 + 1e-12;
@@ -295,8 +307,8 @@ export function normalizeAppData(raw: unknown): PixelDropAppData | null {
       : null;
   const lifePt =
     isFiniteNumber(obj.lifePt) && obj.lifePt >= 0
-      ? Math.min(LIFE_MAX_PT, obj.lifePt)
-      : empty.lifePt;
+      ? Math.min(lifeMaxForStage(stage), obj.lifePt)
+      : lifeMaxForStage(stage);
 
   const archive = normalizeArchive(obj.archive, obj);
 
