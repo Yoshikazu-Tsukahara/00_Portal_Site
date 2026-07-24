@@ -65,8 +65,10 @@ export default function PixelDropPuzzlePage() {
   }
 
   // カスタム画像 or 同梱デフォルトを復元
+  // ※ imageLoading を依存に入れると setImageLoading(true) で cleanup が走り、
+  //   読み込みがキャンセルされたまま固まるため、意図的に依存から外す
   useEffect(() => {
-    if (!hydrated || image || imageLoading) return;
+    if (!hydrated || image) return;
 
     let cancelled = false;
     setImageLoading(true);
@@ -85,9 +87,11 @@ export default function PixelDropPuzzlePage() {
       } catch {
         if (cancelled) return;
         if (data.lastImage) {
+          // 壊れたカスタム画像を捨てて、次の効果でデフォルトへフォールバック
           setData((prev) => ({ ...prev, lastImage: null }));
+        } else {
+          setImage(null);
         }
-        setImage(null);
       } finally {
         if (!cancelled) setImageLoading(false);
       }
@@ -97,7 +101,7 @@ export default function PixelDropPuzzlePage() {
     return () => {
       cancelled = true;
     };
-  }, [hydrated, data.lastImage, image, imageLoading]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [hydrated, data.lastImage, image]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!toast) return;
