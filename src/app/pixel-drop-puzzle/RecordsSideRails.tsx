@@ -41,11 +41,26 @@ const COMPACT_HUD_MAX_VIEW_W = 640;
 /** ライフ回復フラッシュの表示時間（ms） */
 const RECOVER_FLASH_MS = 1600;
 
-/** コンボの [■][■][ ][ ][ ] 型インジケーター文字列 */
-function buildStreakCells(streak: number): string {
-  return Array.from({ length: NEAR_HIT_STREAK_TARGET }, (_, i) =>
-    i < streak ? "[■]" : "[ ]",
-  ).join("");
+/** 斜めセグメント式の5段コンボゲージ */
+function StreakGauge({ streak }: { streak: number }) {
+  return (
+    <span
+      className="pxd-streak-gauge"
+      role="meter"
+      aria-valuemin={0}
+      aria-valuemax={NEAR_HIT_STREAK_TARGET}
+      aria-valuenow={Math.max(0, Math.min(NEAR_HIT_STREAK_TARGET, streak))}
+    >
+      {Array.from({ length: NEAR_HIT_STREAK_TARGET }, (_, i) => (
+        <span
+          key={i}
+          className={`pxd-streak-gauge__cell ${
+            i < streak ? "pxd-streak-gauge__cell--on" : ""
+          }`}
+        />
+      ))}
+    </span>
+  );
 }
 
 export default function RecordsSideRails({
@@ -168,7 +183,6 @@ export default function RecordsSideRails({
     ? String(lifePt)
     : lifePt.toFixed(1);
   const streakUnlocked = stage >= NEAR_HIT_STAGE_FROM;
-  const streakCells = buildStreakCells(nearHitStreak);
 
   if (!layout) return null;
 
@@ -205,9 +219,7 @@ export default function RecordsSideRails({
             <div className="pxd-mobile-hud__row pxd-mobile-hud__row--sub">
               <span className="pxd-mobile-hud__label">{copy.hud.streakLabel}</span>
               {streakUnlocked ? (
-                <span className="pxd-mobile-hud__value pxd-streak-cells">
-                  {streakCells}
-                </span>
+                <StreakGauge streak={nearHitStreak} />
               ) : (
                 <span className="pxd-mobile-hud__value pxd-streak-locked">
                   {copy.hud.streakLocked}
@@ -340,9 +352,7 @@ export default function RecordsSideRails({
             <div className="pxd-records-rail__block">
               <span className="pxd-records-rail__label">{copy.hud.streakLabel}</span>
               {streakUnlocked ? (
-                <span className="pxd-records-rail__value pxd-streak-cells">
-                  {streakCells}
-                </span>
+                <StreakGauge streak={nearHitStreak} />
               ) : (
                 <span className="pxd-records-rail__value pxd-streak-locked">
                   {copy.hud.streakLocked}
