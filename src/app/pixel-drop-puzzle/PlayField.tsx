@@ -460,7 +460,8 @@ export default function PlayField({
         impactTopY,
       );
 
-      onRememberFailScroll(window.scrollY);
+      // リトライ時はDROPした瞬間の画面位置に戻す（落下追従後の位置ではない）
+      onRememberFailScroll(cameraFollowRef.current.scrollAtDrop);
 
       setImpactY(impactTopY);
       setLockedX(x);
@@ -507,7 +508,8 @@ export default function PlayField({
         lifeDepleted: true,
       });
 
-      onRememberFailScroll(window.scrollY);
+      // リトライ時はDROPした瞬間の画面位置に戻す（落下追従後の位置ではない）
+      onRememberFailScroll(cameraFollowRef.current.scrollAtDrop);
       setDepleteFromStage(stage);
       setImpactY(impactTopY);
       setLockedX(x);
