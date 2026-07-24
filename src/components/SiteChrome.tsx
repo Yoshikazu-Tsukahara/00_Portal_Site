@@ -7,7 +7,11 @@ import Header from "@/components/Header";
 import { useStandaloneDisplay } from "@/lib/useStandaloneDisplay";
 
 /** 単体 PWA として独立させているアプリのルートパス一覧 */
-const STANDALONE_APP_PATHS = ["/lunch-savings", "/ultimate-probability-slot"];
+const STANDALONE_APP_PATHS = [
+  "/lunch-savings",
+  "/ultimate-probability-slot",
+  "/pixel-drop-puzzle",
+];
 
 function isStandaloneAppPath(pathname: string | null): boolean {
   if (!pathname) return false;

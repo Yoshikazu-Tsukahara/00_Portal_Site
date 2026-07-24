@@ -21,6 +21,8 @@ import type { MediaMetadataDict } from "./mediaMetadata";
 import { mediaMetadataEn, mediaMetadataJa } from "./mediaMetadata";
 import type { PdfEditorDict } from "./pdfEditor";
 import { pdfEditorEn, pdfEditorJa } from "./pdfEditor";
+import type { PixelDropPuzzleDict } from "./pixelDropPuzzle";
+import { pixelDropPuzzleEn, pixelDropPuzzleJa } from "./pixelDropPuzzle";
 import type { TextCleanerDict } from "./otherApps";
 import {
   textCleanerEn,
@@ -42,6 +44,7 @@ export type AppsDictionary = {
   characterRelation: CharacterRelationDict;
   lunchSavings: LunchSavingsDict;
   ultimateProbabilitySlot: UltimateProbabilitySlotDict;
+  pixelDropPuzzle: PixelDropPuzzleDict;
 };
 
 export const appsJa: AppsDictionary = {
@@ -54,6 +57,7 @@ export const appsJa: AppsDictionary = {
   characterRelation: characterRelationJa,
   lunchSavings: lunchSavingsJa,
   ultimateProbabilitySlot: ultimateProbabilitySlotJa,
+  pixelDropPuzzle: pixelDropPuzzleJa,
 };
 
 export const appsEn: AppsDictionary = {
@@ -66,4 +70,5 @@ export const appsEn: AppsDictionary = {
   characterRelation: characterRelationEn,
   lunchSavings: lunchSavingsEn,
   ultimateProbabilitySlot: ultimateProbabilitySlotEn,
+  pixelDropPuzzle: pixelDropPuzzleEn,
 };

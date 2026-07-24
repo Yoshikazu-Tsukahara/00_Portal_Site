@@ -89,6 +89,11 @@ export const ja: Dictionary = {
       description:
         "自作の天文学的低確率スロットで「当たるまで」／「外し続ける」に挑む、無機質な演算エンジン。",
     },
+    "pixel-drop-puzzle": {
+      title: "極小ピクセル隙間落としパズル",
+      description:
+        "写真を隙間に落とすだけ。ただし判定は小数点以下のピクセル単位という、鬼畜な精度パズル。",
+    },
   },
   card: {
     open: "開く",

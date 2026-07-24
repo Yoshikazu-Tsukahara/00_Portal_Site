@@ -1,0 +1,71 @@
+"use client";
+
+import { useState } from "react";
+import type { PixelDropPuzzleDict } from "@/i18n/apps/pixelDropPuzzle";
+import InstallGuideModal from "./InstallGuideModal";
+import { usePwaInstall } from "./usePwaInstall";
+
+/** バックアップ横に置くコンパクトな「ホームに追加」ボタン */
+export default function InstallAppButton({
+  copy,
+}: {
+  copy: PixelDropPuzzleDict["install"];
+}) {
+  const { canShow, isIos, canPrompt, promptInstall } = usePwaInstall();
+  const [guideOpen, setGuideOpen] = useState(false);
+  const [guideVariant, setGuideVariant] = useState<"ios" | "desktop">("desktop");
+  const [busy, setBusy] = useState(false);
+
+  if (!canShow) return null;
+
+  async function handleClick() {
+    if (isIos) {
+      setGuideVariant("ios");
+      setGuideOpen(true);
+      return;
+    }
+
+    if (canPrompt) {
+      setBusy(true);
+      try {
+        const result = await promptInstall();
+        if (result === "unavailable") {
+          setGuideVariant("desktop");
+          setGuideOpen(true);
+        }
+      } finally {
+        setBusy(false);
+      }
+      return;
+    }
+
+    setGuideVariant("desktop");
+    setGuideOpen(true);
+  }
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => void handleClick()}
+        disabled={busy}
+        className="inline-flex items-center gap-1 rounded-full border border-zinc-300 px-2.5 py-1 text-[11px] font-medium text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-800 disabled:opacity-50"
+        aria-label={copy.buttonAria}
+        title={copy.button}
+      >
+        <span aria-hidden className="text-[12px] leading-none sm:text-[13px]">
+          📱
+        </span>
+        <span className="sm:hidden">{copy.buttonShort}</span>
+        <span className="hidden sm:inline">{copy.button.replace(/^📱\s*/, "")}</span>
+      </button>
+
+      <InstallGuideModal
+        open={guideOpen}
+        variant={guideVariant}
+        copy={copy}
+        onClose={() => setGuideOpen(false)}
+      />
+    </>
+  );
+}

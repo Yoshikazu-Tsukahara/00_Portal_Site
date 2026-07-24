@@ -98,6 +98,11 @@ export const genres: Genre[] = [
         icon: "🎰",
         href: "/ultimate-probability-slot",
       },
+      {
+        id: "pixel-drop-puzzle",
+        icon: "🧩",
+        href: "/pixel-drop-puzzle",
+      },
     ],
   },
 ];

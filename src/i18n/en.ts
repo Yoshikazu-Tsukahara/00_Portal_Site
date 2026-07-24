@@ -89,6 +89,11 @@ export const en: Dictionary = {
       description:
         "A cold computation engine for chasing—or dodging—your own astronomically low-odds jackpot.",
     },
+    "pixel-drop-puzzle": {
+      title: "Tiny Pixel Gap Drop Puzzle",
+      description:
+        "Just drop a photo into the gap. Judged to a fraction of a pixel — an unforgiving precision puzzle.",
+    },
   },
   card: {
     open: "Open",
