@@ -11,7 +11,7 @@ import {
   formatSignedPx,
   generateSampleId,
 } from "./format";
-import { classifyErrorTier, pickIronicQuip } from "./ironicQuips";
+import { formatIronyQuip, resolveIronyScale } from "./ironicQuips";
 import { decimalsForTolerance, toleranceForStage, type JudgeResult } from "./types";
 
 export default function ResultOverlay({
@@ -32,8 +32,14 @@ export default function ResultOverlay({
 }) {
   const { locale } = useI18n();
   const decimals = decimalsForTolerance(judge.tolerancePx);
-  const tier = classifyErrorTier(judge.absErrorPx);
-  const quip = useMemo(() => pickIronicQuip(tier, copy.fail.quips), [tier, copy.fail.quips]);
+  const ironyScale = useMemo(
+    () => resolveIronyScale(judge.absErrorPx),
+    [judge.absErrorPx],
+  );
+  const quip = useMemo(
+    () => formatIronyQuip(judge.absErrorPx, locale),
+    [judge.absErrorPx, locale],
+  );
   const sampleId = useMemo(() => generateSampleId(), []);
   const observedAt = useMemo(() => formatObservedAt(new Date()), []);
   /** 全面タップとボタンの二重発火を防ぐ */
@@ -78,11 +84,15 @@ export default function ResultOverlay({
               label={copy.fail.toleranceLabel}
               value={`\u00b1${judge.tolerancePx.toFixed(decimals)} px`}
             />
-            <Row label={copy.fail.tierLabel} value={copy.fail.tierLabels[tier]} accent="text-red-300" />
+            <Row
+              label={copy.fail.tierLabel}
+              value={locale === "ja" ? ironyScale.itemJa : ironyScale.itemEn}
+              accent="text-red-300"
+            />
           </div>
 
-          <p className="px-2 text-[12px] italic leading-relaxed text-zinc-400">
-            &ldquo;{quip}&rdquo;
+          <p className="pxd-fail-irony px-2 text-left font-mono text-[11px] leading-relaxed tracking-wide text-red-400/90 sm:text-xs">
+            {quip}
           </p>
 
           {/* 視覚ガイド用。実際の再開は画面どこでも可 */}

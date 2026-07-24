@@ -1,11 +1,5 @@
 // 極小ピクセル隙間落としパズル: アプリ内 UI 辞書（JA / EN）
 
-import type { ErrorTier } from "../../app/pixel-drop-puzzle/ironicQuips";
-import {
-  pixelDropPuzzleFailQuipsEn,
-  pixelDropPuzzleFailQuipsJa,
-} from "./pixelDropPuzzleQuips";
-
 export type PixelDropPuzzleDict = {
   shell: { title: string; description: string };
   install: {
@@ -97,10 +91,9 @@ export type PixelDropPuzzleDict = {
     errorLabel: string;
     timeDeltaLabel: string;
     toleranceLabel: string;
+    /** 皮肉スケールの物質名を表示する欄のラベル */
     tierLabel: string;
     retryButton: string;
-    tierLabels: Record<ErrorTier, string>;
-    quips: Record<ErrorTier, string[]>;
   };
   success: {
     title: string;
@@ -218,9 +211,8 @@ export const pixelDropPuzzleJa: PixelDropPuzzleDict = {
     errorLabel: "誤差",
     timeDeltaLabel: "時間差",
     toleranceLabel: "許容誤差",
-    tierLabel: "誤差分類",
+    tierLabel: "スケール参照",
     retryButton: "もう一度挑戦する",
-    ...pixelDropPuzzleFailQuipsJa,
   },
   success: {
     title: "PERFECT ALIGNMENT ACHIEVED",
@@ -337,9 +329,8 @@ export const pixelDropPuzzleEn: PixelDropPuzzleDict = {
     errorLabel: "ERROR",
     timeDeltaLabel: "TIME_DELTA",
     toleranceLabel: "TOLERANCE",
-    tierLabel: "CLASSIFICATION",
+    tierLabel: "SCALE_REF",
     retryButton: "Try again",
-    ...pixelDropPuzzleFailQuipsEn,
   },
   success: {
     title: "PERFECT ALIGNMENT ACHIEVED",

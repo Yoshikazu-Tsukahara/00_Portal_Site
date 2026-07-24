@@ -1867,6 +1867,15 @@ html.pxd-pwa-standalone .pxd-block-guide {
   background: linear-gradient(to bottom, rgba(9, 9, 11, 0.92), transparent);
 }
 
+/* 失敗リザルトの皮肉ログ（等幅・無機質） */
+.pxd-fail-irony {
+  border-left: 2px solid rgba(248, 113, 113, 0.35);
+  padding: 0.55rem 0.65rem;
+  background: rgba(0, 0, 0, 0.55);
+  box-shadow: inset 0 0 0 1px rgba(127, 29, 29, 0.35);
+  word-break: break-word;
+}
+
 /* スマホ：NOW / ARCHIVE を画面下のコンパクトフッターに表示 */
 .pxd-mobile-hud--footer {
   right: 0;
