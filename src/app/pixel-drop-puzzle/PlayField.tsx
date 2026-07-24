@@ -84,7 +84,7 @@ function isPlaySurfaceInteractiveTarget(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false;
   return Boolean(
     target.closest(
-      "button, a, input, label, textarea, select, [role='dialog']",
+      "button, a, input, label, textarea, select, [role='dialog'], [data-pxd-no-drop]",
     ),
   );
 }

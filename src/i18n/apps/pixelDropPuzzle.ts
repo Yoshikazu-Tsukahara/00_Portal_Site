@@ -56,6 +56,10 @@ export type PixelDropPuzzleDict = {
     attemptsLabel: string;
     resetButton: string;
     resetConfirm: string;
+    resetConfirmEyebrow: string;
+    resetConfirmTitle: string;
+    resetConfirmCancel: string;
+    resetConfirmOk: string;
     /** 左サイドレール見出し（現在の状況） */
     statusEyebrow: string;
     /** 右サイドレール見出し（記録・アーカイブ） */
@@ -184,7 +188,11 @@ export const pixelDropPuzzleJa: PixelDropPuzzleDict = {
     attemptsLabel: "生涯試行回数",
     resetButton: "進行状況をリセット",
     resetConfirm:
-      "現在の進行（ステージ・ライフ）をリセットしますか？ ARCHIVEの記録は残り、画像も保持されます。",
+      "現在の進行（ステージ・ライフ・コンボ）をステージ1へ戻します。ARCHIVEの記録と画像は保持されます。この操作は取り消せません。",
+    resetConfirmEyebrow: "WARNING",
+    resetConfirmTitle: "進行状況をリセットしますか？",
+    resetConfirmCancel: "キャンセル",
+    resetConfirmOk: "リセットする",
     statusEyebrow: "NOW",
     archiveEyebrow: "ARCHIVE",
     lifeLabel: "LIFE",
@@ -305,7 +313,11 @@ export const pixelDropPuzzleEn: PixelDropPuzzleDict = {
     attemptsLabel: "Lifetime attempts",
     resetButton: "Reset progress",
     resetConfirm:
-      "Reset current progress (stage and life)? ARCHIVE records are kept; your image is kept too.",
+      "Reset current progress (stage, life, and combo) to stage 1. ARCHIVE records and your image are kept. This cannot be undone.",
+    resetConfirmEyebrow: "WARNING",
+    resetConfirmTitle: "Reset progress?",
+    resetConfirmCancel: "Cancel",
+    resetConfirmOk: "Reset",
     statusEyebrow: "NOW",
     archiveEyebrow: "ARCHIVE",
     lifeLabel: "LIFE",

@@ -9,6 +9,7 @@ import { readImageSize, type LoadedGameImage } from "./imageUtil";
 import { loadDefaultGameImage } from "./defaultImage";
 import InstallAppButton from "./InstallAppButton";
 import PlayField from "./PlayField";
+import ResetConfirmModal from "./ResetConfirmModal";
 import RulesIntroModal from "./RulesIntroModal";
 import {
   advanceNearHitStreak,
@@ -48,6 +49,8 @@ export default function PixelDropPuzzlePage() {
   /** 起動時ルール。START までプレイ不可 */
   const [rulesOpen, setRulesOpen] = useState(false);
   const [experimentStarted, setExperimentStarted] = useState(false);
+  /** 進行リセット確認モーダル */
+  const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
 
   // 起動時に旧・不正データを安全な形へ正規化
   useEffect(() => {
@@ -230,9 +233,12 @@ export default function PixelDropPuzzlePage() {
     setRoundId((r) => r + 1);
   }
 
-  function handleResetProgress() {
-    const confirmed = window.confirm(copy.hud.resetConfirm);
-    if (!confirmed) return;
+  function handleRequestResetProgress() {
+    setResetConfirmOpen(true);
+  }
+
+  function handleConfirmResetProgress() {
+    setResetConfirmOpen(false);
     setData((prev) => ({
       stage: 1,
       lifePt: lifeMaxForStage(1),
@@ -243,6 +249,10 @@ export default function PixelDropPuzzlePage() {
     setFailScrollY(null);
     setRoundId((r) => r + 1);
     setToast(copy.toast.runReset);
+  }
+
+  function handleCancelResetProgress() {
+    setResetConfirmOpen(false);
   }
 
   return (
@@ -304,7 +314,7 @@ export default function PixelDropPuzzlePage() {
               totalAttempts: data.archive.totalAttempts,
             }}
               onImageChange={handleSelectImage}
-              onResetProgress={handleResetProgress}
+              onResetProgress={handleRequestResetProgress}
               onRememberFailScroll={setFailScrollY}
               onSettled={handleSettled}
               onRetry={handleRetry}
@@ -317,6 +327,12 @@ export default function PixelDropPuzzlePage() {
           open={rulesOpen}
           copy={copy.rules}
           onStart={startExperiment}
+        />
+        <ResetConfirmModal
+          open={resetConfirmOpen}
+          copy={copy.hud}
+          onCancel={handleCancelResetProgress}
+          onConfirm={handleConfirmResetProgress}
         />
       </div>
 

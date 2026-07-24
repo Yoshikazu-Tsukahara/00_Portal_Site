@@ -260,8 +260,10 @@ export default function RecordsSideRails({
           <div className="pxd-mobile-hud__divider" aria-hidden />
 
           <div
-            className="pxd-mobile-hud__col pxd-mobile-hud__col--archive"
+            className="pxd-mobile-hud__col pxd-mobile-hud__col--archive pointer-events-auto"
             style={highestClearedTheme}
+            data-pxd-no-drop
+            onPointerDown={(e) => e.stopPropagation()}
           >
             <p className="pxd-mobile-hud__eyebrow">{copy.hud.archiveEyebrow}</p>
             <div className="pxd-mobile-hud__row">
@@ -398,7 +400,12 @@ export default function RecordsSideRails({
           className="pxd-records-rail pxd-records-rail--right"
           style={panelStyle}
         >
-          <div className="pxd-records-rail__panel" style={panelStyle}>
+          <div
+            className="pxd-records-rail__panel pointer-events-auto"
+            style={panelStyle}
+            data-pxd-no-drop
+            onPointerDown={(e) => e.stopPropagation()}
+          >
             <p className="pxd-records-rail__eyebrow">{copy.hud.archiveEyebrow}</p>
             <div
               className="pxd-records-rail__block pxd-records-rail__block--archive-stage"
@@ -429,7 +436,7 @@ export default function RecordsSideRails({
               </span>
             </div>
             <div className="pxd-records-rail__divider" aria-hidden />
-            <div className="pxd-records-rail__actions pointer-events-auto">
+            <div className="pxd-records-rail__actions">
               {changeImageControl}
               {!usingDefaultImage ? (
                 <button
