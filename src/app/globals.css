@@ -2446,7 +2446,7 @@ html.pxd-pwa-standalone .pxd-block-guide {
   }
 }
 
-/* 一周後の成功フラッシュ：柔らかいブルーム＋斜めのシャインスイープ */
+/* 一周後の成功演出：斜めのシャインスイープのみ（全面フラッシュなし） */
 .pxd-success-flash {
   position: absolute;
   inset: 0;
@@ -2456,24 +2456,7 @@ html.pxd-pwa-standalone .pxd-block-guide {
   border-radius: 1px;
 }
 
-/* 層1：中心からふわっと広がるブルーム（ステージ色を含む） */
-.pxd-success-flash::before {
-  content: "";
-  position: absolute;
-  inset: -12%;
-  background: radial-gradient(
-    ellipse at 50% 42%,
-    rgba(255, 255, 255, 0.8) 0%,
-    rgb(var(--pxd-accent-rgb) / 0.42) 28%,
-    rgb(var(--pxd-accent-rgb) / 0.14) 55%,
-    transparent 76%
-  );
-  filter: blur(8px);
-  mix-blend-mode: screen;
-  opacity: 0;
-}
-
-/* 層2：左から右へ走る細い光帯（モダンなハイライト） */
+/* 左から右へ走る細い光帯（モダンなハイライト） */
 .pxd-success-flash::after {
   content: "";
   position: absolute;
@@ -2495,30 +2478,8 @@ html.pxd-pwa-standalone .pxd-block-guide {
   opacity: 0;
 }
 
-.pxd-success-flash--active::before {
-  animation: pxd-success-bloom 0.72s cubic-bezier(0.22, 0.61, 0.36, 1) both;
-}
-
 .pxd-success-flash--active::after {
   animation: pxd-success-shine 0.72s cubic-bezier(0.4, 0, 0.2, 1) both;
-}
-
-@keyframes pxd-success-bloom {
-  0% {
-    opacity: 0;
-    transform: scale(0.985);
-  }
-  24% {
-    opacity: 0.92;
-    transform: scale(1.002);
-  }
-  58% {
-    opacity: 0.4;
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1.02);
-  }
 }
 
 @keyframes pxd-success-shine {
@@ -2897,7 +2858,6 @@ html.pxd-pwa-standalone .pxd-block-guide {
   .pxd-success-ring__spin,
   .pxd-success-flash,
   .pxd-success-flash--active,
-  .pxd-success-flash--active::before,
   .pxd-success-flash--active::after,
   .pxd-overlay--success .pxd-result-title,
   .pxd-overlay--success .pxd-result-frame,
@@ -2909,7 +2869,6 @@ html.pxd-pwa-standalone .pxd-block-guide {
 
   .pxd-success-ring--active,
   .pxd-success-flash--active,
-  .pxd-success-flash--active::before,
   .pxd-success-flash--active::after {
     opacity: 0;
   }
