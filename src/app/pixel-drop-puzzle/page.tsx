@@ -51,6 +51,10 @@ export default function PixelDropPuzzlePage() {
   const [experimentStarted, setExperimentStarted] = useState(false);
   /** 進行リセット確認モーダル */
   const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
+  /** 失敗リザルトに載せる 5px-COMBO ボーナス（pt）。null なら非表示 */
+  const [failLifeBonusPt, setFailLifeBonusPt] = useState<number | null>(null);
+  /** ステージクリア時に次ステージへ持ち越すコンボボーナス（pt） */
+  const pendingNextStageBonusRef = useRef(0);
 
   // 起動時に旧・不正データを安全な形へ正規化
   useEffect(() => {
@@ -152,6 +156,7 @@ export default function PixelDropPuzzlePage() {
 
   function handleSettled(judge: JudgeResult) {
     let recoveredNow = false;
+    let showFailBonus = false;
 
     setData((prev) => {
       const nextLife = lifeAfterDamage(prev.lifePt, judge.absErrorPx);
@@ -161,6 +166,7 @@ export default function PixelDropPuzzlePage() {
         archive.totalAttempts += 1;
         archive.totalFails += 1;
         const downStage = Math.max(1, prev.stage - 1);
+        pendingNextStageBonusRef.current = 0;
         return {
           ...prev,
           stage: downStage,
@@ -177,9 +183,6 @@ export default function PixelDropPuzzlePage() {
         judge.absErrorPx,
       );
       recoveredNow = nearHit.recovered;
-      const lifeWithRecovery = nearHit.recovered
-        ? Math.min(lifeMaxForStage(prev.stage), nextLife + NEAR_HIT_RECOVER_PT)
-        : nextLife;
 
       if (judge.success) {
         archive.totalAttempts += 1;
@@ -192,12 +195,28 @@ export default function PixelDropPuzzlePage() {
           archive.bestAbsErrorPx === null
             ? judge.absErrorPx
             : Math.min(archive.bestAbsErrorPx, judge.absErrorPx);
+
+        // 5連続目がステージクリアなら、現ライフには足さず次ステージへ持ち越し
+        if (nearHit.recovered) {
+          pendingNextStageBonusRef.current = NEAR_HIT_RECOVER_PT;
+        }
+
         return {
           ...prev,
-          lifePt: lifeWithRecovery,
+          lifePt: nextLife,
           nearHitStreak: nearHit.streak,
           archive,
         };
+      }
+
+      // 失敗：5連続達成なら即時 +100（上限内）し、リザルトに表示
+      let lifeWithRecovery = nextLife;
+      if (nearHit.recovered) {
+        lifeWithRecovery = Math.min(
+          lifeMaxForStage(prev.stage),
+          nextLife + NEAR_HIT_RECOVER_PT,
+        );
+        showFailBonus = true;
       }
 
       archive.totalAttempts += 1;
@@ -210,26 +229,40 @@ export default function PixelDropPuzzlePage() {
       };
     });
 
-    if (recoveredNow) {
+    if (showFailBonus) {
+      setFailLifeBonusPt(NEAR_HIT_RECOVER_PT);
       setLifeRecoveredAtMs(Date.now());
+    } else if (recoveredNow && !showFailBonus) {
+      // クリア時の持ち越し：NOW フラッシュは次ステージ入場時に出す
+      setFailLifeBonusPt(null);
+    } else {
+      setFailLifeBonusPt(null);
     }
   }
 
   function handleRetry() {
     // failScrollY は保持したまま remount → PlayField がカメラを復元
+    setFailLifeBonusPt(null);
     setRoundId((r) => r + 1);
   }
 
   function handleNext() {
     setFailScrollY(null);
+    setFailLifeBonusPt(null);
+    const carryBonus = pendingNextStageBonusRef.current;
+    pendingNextStageBonusRef.current = 0;
     setData((prev) => {
       const nextStage = prev.stage + 1;
       return {
         ...prev,
         stage: nextStage,
-        lifePt: lifeMaxForStage(nextStage),
+        lifePt: lifeMaxForStage(nextStage) + carryBonus,
+        nearHitStreak: prev.nearHitStreak,
       };
     });
+    if (carryBonus > 0) {
+      setLifeRecoveredAtMs(Date.now());
+    }
     setRoundId((r) => r + 1);
   }
 
@@ -239,6 +272,8 @@ export default function PixelDropPuzzlePage() {
 
   function handleConfirmResetProgress() {
     setResetConfirmOpen(false);
+    pendingNextStageBonusRef.current = 0;
+    setFailLifeBonusPt(null);
     setData((prev) => ({
       stage: 1,
       lifePt: lifeMaxForStage(1),
@@ -303,6 +338,7 @@ export default function PixelDropPuzzlePage() {
               lifePt={data.lifePt}
               nearHitStreak={data.nearHitStreak}
               lifeRecoveredAtMs={lifeRecoveredAtMs}
+              failLifeBonusPt={failLifeBonusPt}
               playActive={experimentStarted && !rulesOpen}
               copy={copy}
               restoreScrollY={failScrollY}

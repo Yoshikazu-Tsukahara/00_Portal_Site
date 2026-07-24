@@ -102,6 +102,10 @@ export type PixelDropPuzzleDict = {
     /** 皮肉スケールの物質名を表示する欄のラベル */
     tierLabel: string;
     retryButton: string;
+    /** 5px-COMBO ボーナス表示 */
+    bonusEyebrow: string;
+    bonusLabel: string;
+    bonusSub: string;
   };
   success: {
     title: string;
@@ -228,6 +232,9 @@ export const pixelDropPuzzleJa: PixelDropPuzzleDict = {
     toleranceLabel: "許容誤差",
     tierLabel: "スケール参照",
     retryButton: "もう一度挑戦する",
+    bonusEyebrow: "5px-COMBO CLEAR",
+    bonusLabel: "LIFE RECOVERED",
+    bonusSub: "連続ニアピン×5 — ライフボーナス取得",
   },
   success: {
     title: "PERFECT ALIGNMENT ACHIEVED",
@@ -353,6 +360,9 @@ export const pixelDropPuzzleEn: PixelDropPuzzleDict = {
     toleranceLabel: "TOLERANCE",
     tierLabel: "SCALE_REF",
     retryButton: "Try again",
+    bonusEyebrow: "5px-COMBO CLEAR",
+    bonusLabel: "LIFE RECOVERED",
+    bonusSub: "5 near-hits in a row — life bonus acquired",
   },
   success: {
     title: "PERFECT ALIGNMENT ACHIEVED",

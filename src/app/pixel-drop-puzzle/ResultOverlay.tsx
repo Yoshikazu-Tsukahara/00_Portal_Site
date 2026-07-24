@@ -19,6 +19,7 @@ export default function ResultOverlay({
   stage,
   copy,
   imageDataUrl,
+  lifeBonusPt,
   onRetry,
   onNext,
 }: {
@@ -27,6 +28,8 @@ export default function ResultOverlay({
   copy: PixelDropPuzzleDict;
   /** 成功時に表示する完成画像 */
   imageDataUrl?: string;
+  /** 5px-COMBO 達成で得たライフボーナス（失敗リザルト用） */
+  lifeBonusPt?: number | null;
   onRetry: () => void;
   onNext: () => void;
 }) {
@@ -94,6 +97,19 @@ export default function ResultOverlay({
           <p className="pxd-fail-irony px-2 text-left font-mono text-[11px] leading-relaxed tracking-wide text-red-400/90 sm:text-xs">
             {quip}
           </p>
+
+          {lifeBonusPt != null && lifeBonusPt > 0 ? (
+            <div className="pxd-fail-bonus" role="status">
+              <div className="pxd-fail-bonus__glow" aria-hidden />
+              <p className="pxd-fail-bonus__eyebrow">{copy.fail.bonusEyebrow}</p>
+              <p className="pxd-fail-bonus__value">
+                +{lifeBonusPt}
+                <span className="pxd-fail-bonus__unit">pt</span>
+              </p>
+              <p className="pxd-fail-bonus__label">{copy.fail.bonusLabel}</p>
+              <p className="pxd-fail-bonus__sub">{copy.fail.bonusSub}</p>
+            </div>
+          ) : null}
 
           {/* 視覚ガイド用。実際の再開は画面どこでも可 */}
           <div className="w-full rounded-md border border-red-700/70 bg-red-950/40 py-2.5 text-sm font-semibold tracking-wide text-red-200">
