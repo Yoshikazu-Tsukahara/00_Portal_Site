@@ -2,13 +2,14 @@
 
 import {
   useLayoutEffect,
+  useMemo,
   useState,
   type CSSProperties,
   type ReactNode,
   type RefObject,
 } from "react";
 import type { PixelDropPuzzleDict } from "@/i18n/apps/pixelDropPuzzle";
-import { LIFE_MAX_PT } from "./types";
+import { LIFE_MAX_PT, stageThemeStyle } from "./types";
 
 type RailLayout = {
   /** 黒いステージのビューポート上の左端 */
@@ -47,7 +48,8 @@ export default function RecordsSideRails({
   /** 現在ステージの残りライフ（pt） */
   lifePt: number;
   records: {
-    clearedStage: number;
+    /** クリアした最高ステージ（0 = 未クリア） */
+    highestClearedStage: number;
     bestAbsErrorPx: number | null;
     totalAttempts: number;
   };
@@ -107,6 +109,12 @@ export default function RecordsSideRails({
     records.bestAbsErrorPx === null
       ? copy.stage.bestErrorEmpty
       : `${records.bestAbsErrorPx.toFixed(6)}`;
+
+  /** ARCHIVE：表示中の最高クリアステージに対応するアクセント（未クリア時は継承しない） */
+  const highestClearedTheme = useMemo(() => {
+    if (records.highestClearedStage <= 0) return undefined;
+    return stageThemeStyle(records.highestClearedStage);
+  }, [records.highestClearedStage]);
 
   const lifePct = Math.max(0, Math.min(100, (lifePt / LIFE_MAX_PT) * 100));
   const lifeTone =
@@ -208,10 +216,19 @@ export default function RecordsSideRails({
         >
           <div className="pxd-records-rail__panel" style={panelStyle}>
             <p className="pxd-records-rail__eyebrow">{copy.hud.archiveEyebrow}</p>
-            <div className="pxd-records-rail__block">
-              <span className="pxd-records-rail__label">{copy.stage.bestStageLabel}</span>
-              <span className="pxd-records-rail__value">
-                {records.clearedStage || "--"}
+            <div
+              className="pxd-records-rail__block pxd-records-rail__block--archive-stage"
+              style={highestClearedTheme}
+            >
+              <span className="pxd-records-rail__label">{copy.stage.highestClearedStageLabel}</span>
+              <span
+                className={`pxd-records-rail__value ${
+                  records.highestClearedStage > 0
+                    ? "pxd-records-rail__value--hero"
+                    : "pxd-records-rail__value--archive-empty"
+                }`}
+              >
+                {records.highestClearedStage || "--"}
               </span>
             </div>
             <div className="pxd-records-rail__block">

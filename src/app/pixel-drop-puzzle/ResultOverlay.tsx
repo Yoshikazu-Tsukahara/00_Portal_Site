@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import { useI18n } from "@/i18n";
 import type { PixelDropPuzzleDict } from "@/i18n/apps/pixelDropPuzzle";
 import {
@@ -36,11 +36,30 @@ export default function ResultOverlay({
   const quip = useMemo(() => pickIronicQuip(tier, copy.fail.quips), [tier, copy.fail.quips]);
   const sampleId = useMemo(() => generateSampleId(), []);
   const observedAt = useMemo(() => formatObservedAt(new Date()), []);
+  /** 全面タップとボタンの二重発火を防ぐ */
+  const continuedRef = useRef(false);
+
+  function continuePlay() {
+    if (continuedRef.current) return;
+    continuedRef.current = true;
+    if (judge.success) onNext();
+    else onRetry();
+  }
 
   if (!judge.success) {
     return (
-      <div className="pxd-overlay pxd-overlay--fail fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="w-full max-w-sm space-y-4 text-center font-mono">
+      <div
+        className="pxd-overlay pxd-overlay--fail fixed inset-0 z-50 flex cursor-pointer items-center justify-center p-4"
+        onPointerDown={(e) => {
+          e.preventDefault();
+          continuePlay();
+        }}
+        role="presentation"
+      >
+        <div
+          className="pointer-events-none w-full max-w-sm space-y-4 text-center font-mono"
+          aria-hidden={false}
+        >
           <p className="pxd-glitch text-lg font-bold tracking-[0.14em] text-red-500 sm:text-xl">
             {copy.fail.title}
           </p>
@@ -66,13 +85,10 @@ export default function ResultOverlay({
             &ldquo;{quip}&rdquo;
           </p>
 
-          <button
-            type="button"
-            onClick={onRetry}
-            className="w-full rounded-md border border-red-700/70 bg-red-950/40 py-2.5 text-sm font-semibold tracking-wide text-red-200 transition-colors hover:bg-red-900/50"
-          >
+          {/* 視覚ガイド用。実際の再開は画面どこでも可 */}
+          <div className="w-full rounded-md border border-red-700/70 bg-red-950/40 py-2.5 text-sm font-semibold tracking-wide text-red-200">
             {copy.fail.retryButton}
-          </button>
+          </div>
         </div>
       </div>
     );
@@ -81,8 +97,15 @@ export default function ResultOverlay({
   const nextTolerance = toleranceForStage(stage + 1);
 
   return (
-    <div className="pxd-overlay pxd-overlay--success fixed inset-0 z-50 flex items-end justify-center p-4 pb-6 sm:items-center">
-      <div className="w-full max-w-md space-y-3 text-center font-mono">
+    <div
+      className="pxd-overlay pxd-overlay--success fixed inset-0 z-50 flex cursor-pointer items-end justify-center p-4 pb-6 sm:items-center"
+      onPointerDown={(e) => {
+        e.preventDefault();
+        continuePlay();
+      }}
+      role="presentation"
+    >
+      <div className="pointer-events-none w-full max-w-md space-y-3 text-center font-mono">
         <p className="pxd-result-title text-lg font-bold tracking-[0.12em] sm:text-xl">
           {copy.success.title}
         </p>
@@ -137,13 +160,9 @@ export default function ResultOverlay({
           />
         </div>
 
-        <button
-          type="button"
-          onClick={onNext}
-          className="pxd-result-next w-full rounded-md py-2.5 text-sm font-semibold tracking-wide"
-        >
+        <div className="pxd-result-next w-full rounded-md py-2.5 text-sm font-semibold tracking-wide">
           {copy.success.nextButton}
-        </button>
+        </div>
       </div>
     </div>
   );

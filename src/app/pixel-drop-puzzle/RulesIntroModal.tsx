@@ -16,7 +16,7 @@ export default function RulesIntroModal({
   const titleId = useId();
   if (!open) return null;
 
-  const steps = [copy.step1, copy.step2, copy.step3, copy.step4];
+  const steps = [copy.step1, copy.step2, copy.step3, copy.step4, copy.step5];
 
   return (
     <div

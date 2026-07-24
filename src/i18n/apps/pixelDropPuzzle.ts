@@ -48,7 +48,8 @@ export type PixelDropPuzzleDict = {
   stage: {
     stageLabel: string;
     toleranceLabel: string;
-    bestStageLabel: string;
+    /** 右サイドレール（ARCHIVE）用：クリアした最高ステージ */
+    highestClearedStageLabel: string;
     bestErrorLabel: string;
     bestErrorEmpty: string;
   };
@@ -74,6 +75,8 @@ export type PixelDropPuzzleDict = {
     step2: string;
     step3: string;
     step4: string;
+    /** スマホのタッチ操作 */
+    step5: string;
     close: string;
   };
   /** ライフ枯渇による降格警告 */
@@ -114,6 +117,9 @@ export type PixelDropPuzzleDict = {
   toast: {
     settingsSaved: string;
     runReset: string;
+  };
+  anticheat: {
+    warning: string;
   };
 };
 
@@ -163,7 +169,7 @@ export const pixelDropPuzzleJa: PixelDropPuzzleDict = {
   stage: {
     stageLabel: "STAGE",
     toleranceLabel: "許容誤差",
-    bestStageLabel: "最高到達ステージ",
+    highestClearedStageLabel: "最高クリアステージ",
     bestErrorLabel: "自己ベスト誤差",
     bestErrorEmpty: "記録なし",
   },
@@ -171,7 +177,8 @@ export const pixelDropPuzzleJa: PixelDropPuzzleDict = {
     stopButton: "DROP",
     attemptsLabel: "生涯試行回数",
     resetButton: "進行状況をリセット",
-    resetConfirm: "ステージ進行と記録をすべてリセットしますか？（画像は保持されます）",
+    resetConfirm:
+      "現在の進行（ステージ・ライフ）をリセットしますか？ ARCHIVEの記録は残り、画像も保持されます。",
     statusEyebrow: "NOW",
     archiveEyebrow: "ARCHIVE",
     lifeLabel: "LIFE",
@@ -185,6 +192,8 @@ export const pixelDropPuzzleJa: PixelDropPuzzleDict = {
     step2: "落下のたびに、隙間とのX誤差（px）の絶対値だけライフが減る。",
     step3: "ライフが残ったまま許容誤差内にハメればクリア（ライフは全回復）。",
     step4: "クリア前にライフが尽きると、1つ前のステージへ強制降格する。",
+    step5:
+      "スマホでは1本指タップで落下の合図。画面を動かすときは2本指でタップまたはスライドしてください。",
     close: "START EXPERIMENT",
   },
   deplete: {
@@ -222,6 +231,9 @@ export const pixelDropPuzzleJa: PixelDropPuzzleDict = {
   toast: {
     settingsSaved: "画像を設定しました",
     runReset: "進行状況をリセットしました",
+  },
+  anticheat: {
+    warning: "[ WARNING: AUTOMATED INPUT DETECTED. LOCKDOWN INITIATED. ]",
   },
 };
 
@@ -271,7 +283,7 @@ export const pixelDropPuzzleEn: PixelDropPuzzleDict = {
   stage: {
     stageLabel: "STAGE",
     toleranceLabel: "TOLERANCE",
-    bestStageLabel: "Best stage reached",
+    highestClearedStageLabel: "Highest stage cleared",
     bestErrorLabel: "Personal best error",
     bestErrorEmpty: "No record yet",
   },
@@ -279,7 +291,8 @@ export const pixelDropPuzzleEn: PixelDropPuzzleDict = {
     stopButton: "DROP",
     attemptsLabel: "Lifetime attempts",
     resetButton: "Reset progress",
-    resetConfirm: "Reset all stage progress and records? (Your image is kept.)",
+    resetConfirm:
+      "Reset current progress (stage and life)? ARCHIVE records are kept; your image is kept too.",
     statusEyebrow: "NOW",
     archiveEyebrow: "ARCHIVE",
     lifeLabel: "LIFE",
@@ -293,6 +306,8 @@ export const pixelDropPuzzleEn: PixelDropPuzzleDict = {
     step2: "Each drop subtracts the absolute X error (px) from your life.",
     step3: "Clear within tolerance while life remains (life fully restores).",
     step4: "If life hits zero before a clear, you are forced one stage down.",
+    step5:
+      "On phones: one-finger tap signals a drop. Scroll the page with two fingers (tap or drag).",
     close: "START EXPERIMENT",
   },
   deplete: {
@@ -330,5 +345,8 @@ export const pixelDropPuzzleEn: PixelDropPuzzleDict = {
   toast: {
     settingsSaved: "Image set",
     runReset: "Progress has been reset",
+  },
+  anticheat: {
+    warning: "[ WARNING: AUTOMATED INPUT DETECTED. LOCKDOWN INITIATED. ]",
   },
 };

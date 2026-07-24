@@ -10,13 +10,14 @@ export const STORAGE_KEY = "pixel-drop-puzzle-data";
 /** ステージ開始時のライフ上限（pt） */
 export const LIFE_MAX_PT = 1000;
 
-/** LocalStorage に保存する全データ */
-export type PixelDropAppData = {
-  /** 現在挑戦中のステージ（1始まり） */
-  stage: number;
-  /** これまでにクリアした最高ステージ（0 = 未クリア） */
-  clearedStage: number;
-  /** 生涯の停止（STOP）試行回数 */
+/**
+ * ARCHIVE：アプリ全体の生涯記録。
+ * 進行状況リセットでは消えない。
+ */
+export type PixelDropArchive = {
+  /** クリアした最高ステージ（0 = 未クリア） */
+  highestClearedStage: number;
+  /** 生涯の停止（DROP）試行回数 */
   totalAttempts: number;
   /** 生涯クリア回数 */
   totalClears: number;
@@ -24,22 +25,36 @@ export type PixelDropAppData = {
   totalFails: number;
   /** 過去最小の絶対誤差（成功時のみ更新。px） */
   bestAbsErrorPx: number | null;
+};
+
+/** LocalStorage に保存する全データ */
+export type PixelDropAppData = {
+  /** 現在挑戦中のステージ（1始まり） */
+  stage: number;
   /** 直近アップロードした画像（DataURL）。再訪時に自動復元するため保持 */
   lastImage: string | null;
   /** 現在ステージの残りライフ（pt）。誤差の絶対値（px）だけ減る */
   lifePt: number;
+  /** 生涯記録（リセット対象外） */
+  archive: PixelDropArchive;
 };
 
-export function buildEmptyAppData(): PixelDropAppData {
+export function buildEmptyArchive(): PixelDropArchive {
   return {
-    stage: 1,
-    clearedStage: 0,
+    highestClearedStage: 0,
     totalAttempts: 0,
     totalClears: 0,
     totalFails: 0,
     bestAbsErrorPx: null,
+  };
+}
+
+export function buildEmptyAppData(): PixelDropAppData {
+  return {
+    stage: 1,
     lastImage: null,
     lifePt: LIFE_MAX_PT,
+    archive: buildEmptyArchive(),
   };
 }
 
@@ -201,6 +216,71 @@ function isFiniteNumber(v: unknown): v is number {
   return typeof v === "number" && Number.isFinite(v);
 }
 
+function normalizeArchive(raw: unknown, legacy: Record<string, unknown>): PixelDropArchive {
+  const empty = buildEmptyArchive();
+
+  if (raw && typeof raw === "object") {
+    const a = raw as Record<string, unknown>;
+    const highestClearedStage =
+      isFiniteNumber(a.highestClearedStage) && a.highestClearedStage >= 0
+        ? Math.floor(a.highestClearedStage)
+        : empty.highestClearedStage;
+    const totalAttempts =
+      isFiniteNumber(a.totalAttempts) && a.totalAttempts >= 0
+        ? Math.floor(a.totalAttempts)
+        : empty.totalAttempts;
+    const totalClears =
+      isFiniteNumber(a.totalClears) && a.totalClears >= 0
+        ? Math.floor(a.totalClears)
+        : empty.totalClears;
+    const totalFails =
+      isFiniteNumber(a.totalFails) && a.totalFails >= 0
+        ? Math.floor(a.totalFails)
+        : empty.totalFails;
+    const bestAbsErrorPx =
+      isFiniteNumber(a.bestAbsErrorPx) && a.bestAbsErrorPx >= 0
+        ? a.bestAbsErrorPx
+        : null;
+    return {
+      highestClearedStage,
+      totalAttempts,
+      totalClears,
+      totalFails,
+      bestAbsErrorPx,
+    };
+  }
+
+  // 旧形式（フラット）から移行
+  const highestClearedStage =
+    isFiniteNumber(legacy.clearedStage) && legacy.clearedStage >= 0
+      ? Math.floor(legacy.clearedStage)
+      : empty.highestClearedStage;
+  const totalAttempts =
+    isFiniteNumber(legacy.totalAttempts) && legacy.totalAttempts >= 0
+      ? Math.floor(legacy.totalAttempts)
+      : empty.totalAttempts;
+  const totalClears =
+    isFiniteNumber(legacy.totalClears) && legacy.totalClears >= 0
+      ? Math.floor(legacy.totalClears)
+      : empty.totalClears;
+  const totalFails =
+    isFiniteNumber(legacy.totalFails) && legacy.totalFails >= 0
+      ? Math.floor(legacy.totalFails)
+      : empty.totalFails;
+  const bestAbsErrorPx =
+    isFiniteNumber(legacy.bestAbsErrorPx) && legacy.bestAbsErrorPx >= 0
+      ? legacy.bestAbsErrorPx
+      : null;
+
+  return {
+    highestClearedStage,
+    totalAttempts,
+    totalClears,
+    totalFails,
+    bestAbsErrorPx,
+  };
+}
+
 /** バックアップ／LocalStorage から読み込んだ生データを安全な形へ正規化 */
 export function normalizeAppData(raw: unknown): PixelDropAppData | null {
   if (!raw || typeof raw !== "object") return null;
@@ -209,26 +289,6 @@ export function normalizeAppData(raw: unknown): PixelDropAppData | null {
 
   const stage =
     isFiniteNumber(obj.stage) && obj.stage >= 1 ? Math.floor(obj.stage) : empty.stage;
-  const clearedStage =
-    isFiniteNumber(obj.clearedStage) && obj.clearedStage >= 0
-      ? Math.floor(obj.clearedStage)
-      : empty.clearedStage;
-  const totalAttempts =
-    isFiniteNumber(obj.totalAttempts) && obj.totalAttempts >= 0
-      ? Math.floor(obj.totalAttempts)
-      : empty.totalAttempts;
-  const totalClears =
-    isFiniteNumber(obj.totalClears) && obj.totalClears >= 0
-      ? Math.floor(obj.totalClears)
-      : empty.totalClears;
-  const totalFails =
-    isFiniteNumber(obj.totalFails) && obj.totalFails >= 0
-      ? Math.floor(obj.totalFails)
-      : empty.totalFails;
-  const bestAbsErrorPx =
-    isFiniteNumber(obj.bestAbsErrorPx) && obj.bestAbsErrorPx >= 0
-      ? obj.bestAbsErrorPx
-      : null;
   const lastImage =
     typeof obj.lastImage === "string" && obj.lastImage.startsWith("data:")
       ? obj.lastImage
@@ -238,15 +298,13 @@ export function normalizeAppData(raw: unknown): PixelDropAppData | null {
       ? Math.min(LIFE_MAX_PT, obj.lifePt)
       : empty.lifePt;
 
+  const archive = normalizeArchive(obj.archive, obj);
+
   return {
     stage,
-    clearedStage,
-    totalAttempts,
-    totalClears,
-    totalFails,
-    bestAbsErrorPx,
     lastImage,
     lifePt,
+    archive,
   };
 }
 

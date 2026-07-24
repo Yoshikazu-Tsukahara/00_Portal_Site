@@ -18,6 +18,7 @@ import {
   idealStopTimeDeltaMs,
   MAX_BOARD_WIDTH,
   periodMsForPatrolSpeedLevel,
+  randomPatrolPhaseMs,
   triangleWave,
   type PatrolSpeedState,
   type PlayGeometry,
@@ -29,6 +30,13 @@ import ParticleBurst from "./ParticleBurst";
 import RecordsSideRails from "./RecordsSideRails";
 import ResultOverlay from "./ResultOverlay";
 import UploadGate from "./UploadGate";
+import {
+  ANTI_CHEAT_LOCKDOWN_MS,
+  evaluateKeyAntiCheat,
+  evaluatePointerAntiCheat,
+  pushPointerSample,
+  type PointerSample,
+} from "./antiCheat";
 import {
   FAIL_PARTICLE_BEFORE_RESULT_MS,
   IMPACT_HOLD_MS,
@@ -66,6 +74,29 @@ const SUCCESS_FLASH_MS = 450;
 
 /** 互換：溶解トランジションに使う */
 const MERGE_DURATION_MS = SUCCESS_MERGE_MS;
+
+/** スマホ：1本指タップとスクロールを区別する移動上限（px） */
+const TOUCH_DROP_MAX_MOVE_PX = 28;
+/** スマホ：タップとして DROP する最大時間（ms） */
+const TOUCH_DROP_MAX_MS = 450;
+
+function isPlaySurfaceInteractiveTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  return Boolean(
+    target.closest(
+      "button, a, input, label, textarea, select, [role='dialog']",
+    ),
+  );
+}
+
+function pointerCentroidY(
+  positions: Map<number, { x: number; y: number }>,
+): number | null {
+  if (positions.size < 2) return null;
+  let sum = 0;
+  for (const p of positions.values()) sum += p.y;
+  return sum / positions.size;
+}
 
 type SuccessFx = "idle" | "merge" | "sweep" | "flash" | "done";
 
@@ -109,7 +140,7 @@ export default function PlayField({
   restoreScrollY: number | null;
   /** 盤面グリッド上に薄く表示する記録 */
   records: {
-    clearedStage: number;
+    highestClearedStage: number;
     bestAbsErrorPx: number | null;
     totalAttempts: number;
   };
@@ -151,12 +182,45 @@ export default function PlayField({
   const [imageChangeOpen, setImageChangeOpen] = useState(false);
   /** 降格前ステージ（警告 UI 用） */
   const [depleteFromStage, setDepleteFromStage] = useState(stage);
+  /** 不正検知ロックダウン中 */
+  const [lockdown, setLockdown] = useState(false);
+  const lockdownTimerRef = useRef<number | null>(null);
+  const pointerHistoryRef = useRef<PointerSample[]>([]);
+  const lastKeyDropMsRef = useRef<number | null>(null);
+  const playSurfaceRef = useRef<HTMLDivElement | null>(null);
+  /** アクティブなタッチ／ポインタ位置（2本指スクロール用） */
+  const activePointersRef = useRef(
+    new Map<number, { x: number; y: number }>(),
+  );
+  const lastTwoFingerCentroidYRef = useRef<number | null>(null);
+  /** 現在のタッチジェスチャ（1本指 DROP 判定用） */
+  const touchGestureRef = useRef<{
+    startX: number;
+    startY: number;
+    startT: number;
+    /** 2本指以上が一度でも使われた */
+    multiTouch: boolean;
+  } | null>(null);
 
-  const playBlocked = !playActive || imageChangeOpen;
+  const playBlocked = !playActive || imageChangeOpen || lockdown;
   const playBlockedRef = useRef(playBlocked);
   useEffect(() => {
     playBlockedRef.current = playBlocked;
   }, [playBlocked]);
+
+  const triggerLockdown = useCallback(() => {
+    setLockdown(true);
+    if (lockdownTimerRef.current !== null) {
+      window.clearTimeout(lockdownTimerRef.current);
+    }
+    lockdownTimerRef.current = window.setTimeout(() => {
+      lockdownTimerRef.current = null;
+      setLockdown(false);
+      // ロック解除後は履歴を捨て、誤検知の連鎖を防ぐ
+      pointerHistoryRef.current = [];
+      lastKeyDropMsRef.current = null;
+    }, ANTI_CHEAT_LOCKDOWN_MS);
+  }, []);
 
   const changeImageControl = useMemo(
     () => (
@@ -554,10 +618,15 @@ export default function PlayField({
   useLayoutEffect(() => {
     if (phase !== "patrolling" || playBlocked) return;
     const now = performance.now();
-    // 試行開始時は必ず最速（第1段階）へリセット
+    const periodMs = periodMsForPatrolSpeedLevel(basePeriodMsRef.current, 1);
+    const g = geometryRef.current;
+    // 初期X・進行方向を毎回ランダム化（タイミング予測マクロ対策）
+    const phaseMs = g
+      ? randomPatrolPhaseMs(periodMs, g.maxX)
+      : Math.random() * periodMs;
     patrolClockRef.current = {
-      periodMs: periodMsForPatrolSpeedLevel(basePeriodMsRef.current, 1),
-      phaseMs: 0,
+      periodMs,
+      phaseMs,
       completedTrips: 0,
       speedLevel: 1,
       lastNow: now,
@@ -793,11 +862,150 @@ export default function PlayField({
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
       if (phaseRef.current !== "patrolling" || playBlockedRef.current) return;
       e.preventDefault();
+
+      const now = performance.now();
+      const verdict = evaluateKeyAntiCheat(
+        now,
+        lastKeyDropMsRef.current,
+        e.isTrusted,
+      );
+      if (!verdict.ok) {
+        triggerLockdown();
+        return;
+      }
+      lastKeyDropMsRef.current = now;
       startFall();
     }
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [startFall]);
+  }, [startFall, triggerLockdown]);
+
+  /** スマホ：1本指＝DROP、2本指＝縦スクロール。マウスは従来どおり押下で DROP */
+  useEffect(() => {
+    const el = playSurfaceRef.current;
+    if (!el) return;
+
+    function tryDropFromPointer(clientX: number, clientY: number, isTrusted: boolean) {
+      if (phaseRef.current !== "patrolling" || playBlockedRef.current) return;
+      const sample = {
+        x: clientX,
+        y: clientY,
+        t: performance.now(),
+      };
+      const verdict = evaluatePointerAntiCheat(
+        sample,
+        pointerHistoryRef.current,
+        isTrusted,
+      );
+      if (!verdict.ok) {
+        triggerLockdown();
+        return;
+      }
+      pushPointerSample(pointerHistoryRef.current, sample);
+      startFall();
+    }
+
+    function onPointerDown(e: PointerEvent) {
+      if (isPlaySurfaceInteractiveTarget(e.target)) return;
+
+      const map = activePointersRef.current;
+      map.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+      if (e.pointerType === "touch") {
+        if (map.size === 1) {
+          touchGestureRef.current = {
+            startX: e.clientX,
+            startY: e.clientY,
+            startT: performance.now(),
+            multiTouch: false,
+          };
+        } else if (map.size >= 2) {
+          if (touchGestureRef.current) {
+            touchGestureRef.current.multiTouch = true;
+          }
+          lastTwoFingerCentroidYRef.current = pointerCentroidY(map);
+        }
+        e.preventDefault();
+        return;
+      }
+
+      if (phaseRef.current !== "patrolling" || playBlockedRef.current) return;
+      e.preventDefault();
+      tryDropFromPointer(e.clientX, e.clientY, e.isTrusted);
+    }
+
+    function onPointerMove(e: PointerEvent) {
+      const map = activePointersRef.current;
+      const prev = map.get(e.pointerId);
+      if (!prev) return;
+      map.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+      if (e.pointerType !== "touch") return;
+
+      if (map.size >= 2) {
+        e.preventDefault();
+        const cy = pointerCentroidY(map);
+        const lastY = lastTwoFingerCentroidYRef.current;
+        if (cy !== null && lastY !== null) {
+          window.scrollBy({ top: lastY - cy, left: 0, behavior: "auto" });
+        }
+        lastTwoFingerCentroidYRef.current = cy;
+        return;
+      }
+
+      if (map.size === 1) {
+        e.preventDefault();
+      }
+    }
+
+    function releasePointer(e: PointerEvent) {
+      const map = activePointersRef.current;
+      map.delete(e.pointerId);
+
+      if (e.pointerType === "touch") {
+        if (map.size >= 2) {
+          lastTwoFingerCentroidYRef.current = pointerCentroidY(map);
+        } else {
+          lastTwoFingerCentroidYRef.current = null;
+        }
+
+        if (map.size === 0) {
+          const g = touchGestureRef.current;
+          touchGestureRef.current = null;
+          if (
+            g &&
+            !g.multiTouch &&
+            phaseRef.current === "patrolling" &&
+            !playBlockedRef.current
+          ) {
+            const dx = e.clientX - g.startX;
+            const dy = e.clientY - g.startY;
+            const dist = Math.hypot(dx, dy);
+            const dt = performance.now() - g.startT;
+            if (dist <= TOUCH_DROP_MAX_MOVE_PX && dt <= TOUCH_DROP_MAX_MS) {
+              tryDropFromPointer(e.clientX, e.clientY, e.isTrusted);
+            }
+          }
+        }
+        return;
+      }
+
+      if (map.size === 0) {
+        lastTwoFingerCentroidYRef.current = null;
+      }
+    }
+
+    el.addEventListener("pointerdown", onPointerDown);
+    el.addEventListener("pointermove", onPointerMove, { passive: false });
+    el.addEventListener("pointerup", releasePointer);
+    el.addEventListener("pointercancel", releasePointer);
+    return () => {
+      el.removeEventListener("pointerdown", onPointerDown);
+      el.removeEventListener("pointermove", onPointerMove);
+      el.removeEventListener("pointerup", releasePointer);
+      el.removeEventListener("pointercancel", releasePointer);
+    };
+  }, [startFall, triggerLockdown]);
 
   useEffect(() => {
     return () => {
@@ -806,6 +1014,10 @@ export default function PlayField({
       if (failResultTimerRef.current !== null) {
         window.clearTimeout(failResultTimerRef.current);
         failResultTimerRef.current = null;
+      }
+      if (lockdownTimerRef.current !== null) {
+        window.clearTimeout(lockdownTimerRef.current);
+        lockdownTimerRef.current = null;
       }
     };
   }, []);
@@ -822,23 +1034,21 @@ export default function PlayField({
 
   return (
     <div
-      className="relative w-full"
+      ref={playSurfaceRef}
+      className="pxd-play-surface relative w-full"
       style={stageTheme}
-      onPointerDown={(e) => {
-        // ゲーム画面内のボタン等以外ならどこでも DROP（ヘッダー操作は対象外）
-        if (phaseRef.current !== "patrolling" || playBlockedRef.current) return;
-        const target = e.target as HTMLElement;
-        if (
-          target.closest(
-            "button, a, input, label, textarea, select, [role='dialog']",
-          )
-        ) {
-          return;
-        }
-        e.preventDefault();
-        startFall();
-      }}
     >
+      {lockdown ? (
+        <div
+          className="pxd-anticheat-lock fixed inset-0 z-[90] flex items-center justify-center p-4"
+          role="alert"
+          aria-live="assertive"
+        >
+          <p className="pxd-anticheat-lock__text max-w-xl text-center font-mono text-[11px] font-bold tracking-[0.08em] text-red-500 sm:text-sm">
+            {copy.anticheat.warning}
+          </p>
+        </div>
+      ) : null}
       {/* 画面外上方の棒X位置ガイド（ヘッダー下に表示・文字なし） */}
       <div
         ref={guideRef}
@@ -876,10 +1086,10 @@ export default function PlayField({
         />
       ) : null}
 
-      {/* 縦長ステージ本体（専用DROPボタンなし：タップ／クリック／Space） */}
+      {/* 縦長ステージ本体（DROP：1本指タップ／クリック／Space・スクロール：2本指） */}
       <div
         ref={stageRef}
-        className="pxd-stage relative w-full touch-none select-none"
+        className="pxd-stage relative w-full select-none"
         style={{ height: g?.stageHeight ?? "260vh", minHeight: "260vh" }}
         role="presentation"
       >

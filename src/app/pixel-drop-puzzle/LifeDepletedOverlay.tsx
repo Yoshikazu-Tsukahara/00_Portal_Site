@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import type { PixelDropPuzzleDict } from "@/i18n/apps/pixelDropPuzzle";
 
 /** ライフ枯渇時の冷徹な降格警告 */
@@ -14,9 +15,24 @@ export default function LifeDepletedOverlay({
   toStage: number;
   onContinue: () => void;
 }) {
+  const continuedRef = useRef(false);
+
+  function continuePlay() {
+    if (continuedRef.current) return;
+    continuedRef.current = true;
+    onContinue();
+  }
+
   return (
-    <div className="pxd-overlay pxd-overlay--deplete fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md space-y-5 text-center font-mono">
+    <div
+      className="pxd-overlay pxd-overlay--deplete fixed inset-0 z-50 flex cursor-pointer items-center justify-center p-4"
+      onPointerDown={(e) => {
+        e.preventDefault();
+        continuePlay();
+      }}
+      role="presentation"
+    >
+      <div className="pointer-events-none w-full max-w-md space-y-5 text-center font-mono">
         <p className="pxd-deplete-title text-sm font-bold tracking-[0.12em] text-red-400 sm:text-base">
           {copy.title}
         </p>
@@ -31,13 +47,9 @@ export default function LifeDepletedOverlay({
             </span>
           </div>
         </div>
-        <button
-          type="button"
-          onClick={onContinue}
-          className="w-full rounded-md border border-red-700/70 bg-red-950/40 py-2.5 text-sm font-semibold tracking-[0.18em] text-red-200 transition-colors hover:bg-red-900/50"
-        >
+        <div className="w-full rounded-md border border-red-700/70 bg-red-950/40 py-2.5 text-sm font-semibold tracking-[0.18em] text-red-200">
           {copy.continueButton}
-        </button>
+        </div>
       </div>
     </div>
   );

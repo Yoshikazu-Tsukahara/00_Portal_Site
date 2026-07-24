@@ -1510,6 +1510,11 @@ body.pxd-pwa-standalone {
   background-color: #09090b;
 }
 
+/* プレイ面：1本指は JS で DROP、2本指で手動スクロール */
+.pxd-play-surface {
+  touch-action: none;
+}
+
 .pxd-grid {
   /* 1px単位の極薄線 ＋ 16px間隔のやや濃い補助線（NASAコンソール風メモリ） */
   background-image:
@@ -1698,6 +1703,11 @@ html.pxd-pwa-standalone .pxd-block-guide {
   font-weight: 700;
   line-height: 1;
   color: rgb(var(--pxd-accent-rgb) / 0.88);
+}
+
+.pxd-records-rail__value--archive-empty {
+  color: rgba(113, 113, 122, 0.85);
+  text-shadow: none;
 }
 
 .pxd-records-rail__value--mono {
@@ -2296,6 +2306,23 @@ html.pxd-pwa-standalone .pxd-block-guide {
     -1px 0 #fca5a5;
 }
 
+/* 不正入力検知ロックダウン */
+.pxd-anticheat-lock {
+  background: rgba(9, 9, 11, 0.92);
+  backdrop-filter: blur(2px);
+  animation: pxd-overlay-in 0.2s ease-out both;
+  pointer-events: auto;
+  cursor: not-allowed;
+}
+
+.pxd-anticheat-lock__text {
+  animation: pxd-glitch 0.45s steps(2, end) infinite;
+  text-shadow:
+    1px 0 #ef4444,
+    -1px 0 #fca5a5,
+    0 0 18px rgba(239, 68, 68, 0.45);
+}
+
 .pxd-overlay--success .pxd-result-title {
   animation: pxd-success-title-in 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
   letter-spacing: 0.16em;
@@ -2458,7 +2485,8 @@ html.pxd-pwa-standalone .pxd-block-guide {
   .pxd-overlay--success .pxd-result-title,
   .pxd-overlay--success .pxd-result-frame,
   .pxd-overlay--success .pxd-result-panel,
-  .pxd-overlay--success .pxd-result-next {
+  .pxd-overlay--success .pxd-result-next,
+  .pxd-anticheat-lock__text {
     animation: none;
   }
 

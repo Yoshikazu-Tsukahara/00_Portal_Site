@@ -103,36 +103,43 @@ export default function PixelDropPuzzlePage() {
   function handleSettled(judge: JudgeResult) {
     setData((prev) => {
       const nextLife = lifeAfterDamage(prev.lifePt, judge.absErrorPx);
+      const archive = { ...prev.archive };
 
       if (judge.lifeDepleted) {
+        archive.totalAttempts += 1;
+        archive.totalFails += 1;
         return {
           ...prev,
-          totalAttempts: prev.totalAttempts + 1,
-          totalFails: prev.totalFails + 1,
           stage: Math.max(1, prev.stage - 1),
           lifePt: LIFE_MAX_PT,
+          archive,
         };
       }
 
       if (judge.success) {
+        archive.totalAttempts += 1;
+        archive.totalClears += 1;
+        archive.highestClearedStage = Math.max(
+          archive.highestClearedStage,
+          prev.stage,
+        );
+        archive.bestAbsErrorPx =
+          archive.bestAbsErrorPx === null
+            ? judge.absErrorPx
+            : Math.min(archive.bestAbsErrorPx, judge.absErrorPx);
         return {
           ...prev,
-          totalAttempts: prev.totalAttempts + 1,
-          totalClears: prev.totalClears + 1,
-          clearedStage: Math.max(prev.clearedStage, prev.stage),
-          bestAbsErrorPx:
-            prev.bestAbsErrorPx === null
-              ? judge.absErrorPx
-              : Math.min(prev.bestAbsErrorPx, judge.absErrorPx),
           lifePt: nextLife,
+          archive,
         };
       }
 
+      archive.totalAttempts += 1;
+      archive.totalFails += 1;
       return {
         ...prev,
-        totalAttempts: prev.totalAttempts + 1,
-        totalFails: prev.totalFails + 1,
         lifePt: nextLife,
+        archive,
       };
     });
   }
@@ -156,8 +163,10 @@ export default function PixelDropPuzzlePage() {
     const confirmed = window.confirm(copy.hud.resetConfirm);
     if (!confirmed) return;
     setData((prev) => ({
-      ...buildEmptyAppData(),
+      stage: 1,
+      lifePt: LIFE_MAX_PT,
       lastImage: prev.lastImage,
+      archive: prev.archive,
     }));
     setFailScrollY(null);
     setRoundId((r) => r + 1);
@@ -213,11 +222,11 @@ export default function PixelDropPuzzlePage() {
               playActive={experimentStarted && !rulesOpen}
               copy={copy}
               restoreScrollY={failScrollY}
-              records={{
-                clearedStage: data.clearedStage,
-                bestAbsErrorPx: data.bestAbsErrorPx,
-                totalAttempts: data.totalAttempts,
-              }}
+            records={{
+              highestClearedStage: data.archive.highestClearedStage,
+              bestAbsErrorPx: data.archive.bestAbsErrorPx,
+              totalAttempts: data.archive.totalAttempts,
+            }}
               onImageChange={handleSelectImage}
               onResetProgress={handleResetProgress}
               onRememberFailScroll={setFailScrollY}

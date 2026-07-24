@@ -210,6 +210,29 @@ export function triangleWave(elapsedMs: number, periodMs: number, maxX: number):
   return t < half ? (t / half) * maxX : maxX - ((t - half) / half) * maxX;
 }
 
+/**
+ * パトロール開始時の位相（ms）をランダム生成する。
+ * - 初期X位置をランダム
+ * - 進行方向（右行き／左行き）もランダム
+ * これにより「開始から○秒後」の固定タイミング狙いを無効化する。
+ */
+export function randomPatrolPhaseMs(periodMs: number, maxX: number): number {
+  if (periodMs <= 0) return 0;
+  if (maxX <= 0) return Math.random() * periodMs;
+
+  const half = periodMs / 2;
+  const startX = Math.random() * maxX;
+  const goingRight = Math.random() < 0.5;
+  const ratio = startX / maxX;
+
+  if (goingRight) {
+    // 上昇辺：0 → maxX
+    return ratio * half;
+  }
+  // 下降辺：maxX → 0
+  return half + (1 - ratio) * half;
+}
+
 /** 周期 periodMs の円環上での符号付き最短距離 */
 function circularDelta(a: number, b: number, periodMs: number): number {
   let d = (a - b) % periodMs;
