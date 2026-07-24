@@ -1515,6 +1515,14 @@ body.pxd-pwa-standalone {
   touch-action: none;
 }
 
+/* スマホフッター分、ステージ最下部に余白（盤面と HUD が重ならない） */
+@media (max-width: 639px) {
+  .pxd-play-surface .pxd-stage {
+    box-sizing: border-box;
+    padding-bottom: calc(7.75rem + env(safe-area-inset-bottom, 0px));
+  }
+}
+
 .pxd-grid {
   /* 1px単位の極薄線 ＋ 16px間隔のやや濃い補助線（NASAコンソール風メモリ） */
   background-image:
@@ -1848,6 +1856,243 @@ html.pxd-pwa-standalone .pxd-block-guide {
 
 .pxd-side-rails-fallback {
   background: linear-gradient(to bottom, rgba(9, 9, 11, 0.92), transparent);
+}
+
+/* スマホ：NOW / ARCHIVE を画面下のコンパクトフッターに表示 */
+.pxd-mobile-hud--footer {
+  right: 0;
+  bottom: 0;
+  left: 0;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  padding: 0.35rem 0.65rem max(0.5rem, env(safe-area-inset-bottom, 0px));
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    rgba(9, 9, 11, 0.97) 0%,
+    rgba(9, 9, 11, 0.82) 42%,
+    rgba(9, 9, 11, 0) 100%
+  );
+}
+
+.pxd-mobile-hud__dock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  width: min(19.5rem, 100%);
+  max-width: 100%;
+}
+
+.pxd-mobile-hud {
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+.pxd-mobile-hud__shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr);
+  gap: 0 0.3rem;
+  align-items: stretch;
+  padding: 0.35rem 0.45rem 0.4rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  background: linear-gradient(
+    155deg,
+    rgba(9, 9, 11, 0.94) 0%,
+    rgba(24, 24, 27, 0.72) 100%
+  );
+  border: 1px solid rgba(63, 63, 70, 0.55);
+  border-radius: 0.4rem;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 4px 16px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(10px);
+}
+
+.pxd-mobile-hud__shell::before,
+.pxd-mobile-hud__shell::after {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-color: rgb(var(--pxd-accent-rgb) / 0.28);
+  content: "";
+  pointer-events: none;
+}
+
+.pxd-mobile-hud__shell {
+  position: relative;
+}
+
+.pxd-mobile-hud__shell::before {
+  top: 3px;
+  left: 3px;
+  border-top: 1px solid;
+  border-left: 1px solid;
+}
+
+.pxd-mobile-hud__shell::after {
+  right: 3px;
+  bottom: 3px;
+  border-right: 1px solid;
+  border-bottom: 1px solid;
+}
+
+.pxd-mobile-hud__divider {
+  align-self: stretch;
+  width: 1px;
+  margin: 0.15rem 0;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(113, 113, 122, 0.45) 35%,
+    rgba(113, 113, 122, 0.45) 65%,
+    transparent
+  );
+}
+
+.pxd-mobile-hud__col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.pxd-mobile-hud__col--now {
+  padding-right: 0.15rem;
+  text-align: left;
+  border-left: 2px solid rgb(var(--pxd-accent-rgb) / 0.4);
+  padding-left: 0.35rem;
+}
+
+.pxd-mobile-hud__col--archive {
+  padding-left: 0.15rem;
+  text-align: right;
+  align-items: flex-end;
+  border-right: 2px solid rgb(var(--pxd-accent-rgb) / 0.35);
+  padding-right: 0.35rem;
+}
+
+.pxd-mobile-hud__eyebrow {
+  margin: 0;
+  font-size: 7px;
+  letter-spacing: 0.26em;
+  color: rgba(113, 113, 122, 0.88);
+}
+
+.pxd-mobile-hud__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.35rem;
+  width: 100%;
+}
+
+.pxd-mobile-hud__col--archive .pxd-mobile-hud__row {
+  justify-content: flex-end;
+}
+
+.pxd-mobile-hud__row--sub {
+  gap: 0.2rem 0.3rem;
+}
+
+.pxd-mobile-hud__label {
+  font-size: 7px;
+  line-height: 1.25;
+  letter-spacing: 0.06em;
+  color: rgba(113, 113, 122, 0.95);
+}
+
+.pxd-mobile-hud__hero {
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  color: rgb(var(--pxd-accent-rgb) / 0.9);
+  text-shadow: 0 0 12px rgb(var(--pxd-accent-rgb) / 0.2);
+}
+
+.pxd-mobile-hud__value--empty {
+  color: rgba(113, 113, 122, 0.85);
+  text-shadow: none;
+}
+
+.pxd-mobile-hud__value {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: rgb(var(--pxd-accent-rgb) / 0.78);
+}
+
+.pxd-mobile-hud__value--mono {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 8px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pxd-mobile-hud__unit {
+  margin-left: 0.1rem;
+  font-size: 7px;
+  font-weight: 500;
+  color: rgba(113, 113, 122, 0.9);
+}
+
+.pxd-mobile-hud__life {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  width: 100%;
+}
+
+.pxd-life-bar--compact {
+  height: 3px;
+  margin-top: 0;
+}
+
+.pxd-mobile-hud__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem 0.4rem;
+  margin-top: 0;
+}
+
+.pxd-mobile-hud__reset {
+  padding: 0.28rem 0.55rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  color: rgba(161, 161, 170, 0.95);
+  background: rgba(9, 9, 11, 0.75);
+  border: 1px solid rgba(63, 63, 70, 0.65);
+  border-radius: 9999px;
+  backdrop-filter: blur(6px);
+}
+
+.pxd-mobile-hud__reset:hover {
+  color: rgb(var(--pxd-accent-rgb) / 0.95);
+  border-color: rgb(var(--pxd-accent-rgb) / 0.35);
+}
+
+.pxd-mobile-hud__actions .pxd-records-rail__action {
+  padding: 0.28rem 0.55rem;
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  text-transform: none;
+  color: rgba(161, 161, 170, 0.95);
+  background: rgba(9, 9, 11, 0.75);
+  border: 1px solid rgba(63, 63, 70, 0.65);
+  border-radius: 9999px;
+  backdrop-filter: blur(6px);
+}
+
+.pxd-mobile-hud__actions .pxd-records-rail__action:hover {
+  color: rgb(var(--pxd-accent-rgb) / 0.95);
+  border-color: rgb(var(--pxd-accent-rgb) / 0.35);
+  text-shadow: none;
 }
 
 /* ルール説明ポップアップ（サイドレールと同系統） */

@@ -20,12 +20,18 @@ type RailLayout = {
   boardWidth: number;
   /** 左右余白の小さい方（px） */
   gutter: number;
-  /** 縦位置（ビューポート上端からの px） */
+  /** 縦位置（ビューポート上端からの px）— サイドレール中央用 */
   top: number;
+  /** 計測時のビューポート幅 */
+  viewWidth: number;
 };
 
 const PANEL_IDEAL_W = 184; // 11.5rem
 const GUTTER_PAD = 12;
+/** 左右レールを出す最小余白（px） */
+const SIDE_RAIL_MIN_PANEL_W = 96;
+/** コンパクト HUD に切り替えるビューポート幅（px） */
+const COMPACT_HUD_MAX_VIEW_W = 640;
 
 export default function RecordsSideRails({
   copy,
@@ -89,6 +95,7 @@ export default function RecordsSideRails({
         boardWidth: cRect.width,
         gutter: Math.min(gutterLeft, gutterRight),
         top: (visibleTop + visibleBottom) / 2,
+        viewWidth: window.innerWidth,
       });
     }
 
@@ -126,7 +133,9 @@ export default function RecordsSideRails({
   if (!layout) return null;
 
   const panelW = Math.min(PANEL_IDEAL_W, Math.max(0, layout.gutter - GUTTER_PAD));
-  const showSideRails = panelW >= 96;
+  const useCompactHud =
+    layout.viewWidth < COMPACT_HUD_MAX_VIEW_W ||
+    panelW < SIDE_RAIL_MIN_PANEL_W;
 
   const wrapStyle: CSSProperties = {
     left: layout.boundsLeft,
@@ -134,22 +143,94 @@ export default function RecordsSideRails({
     top: layout.top,
   };
 
-  if (!showSideRails) {
+  if (useCompactHud) {
     return (
-      <div
-        className="pxd-side-rails-fallback pointer-events-none fixed z-[5] px-2 pt-2"
-        style={{
-          left: layout.boundsLeft,
-          width: layout.boundsWidth,
-          top: Math.max(8, 0),
-        }}
-      >
-        <div className="pointer-events-auto mx-auto flex max-w-lg flex-wrap items-center justify-between gap-2 font-mono text-[10px] text-zinc-500">
-          <span>
-            {copy.stage.stageLabel} {stage} · {copy.hud.lifeLabel} {lifeDisplay}/
-            {LIFE_MAX_PT}
-          </span>
-          <div className="flex items-center gap-2">{changeImageControl}</div>
+      <div className="pxd-mobile-hud pxd-mobile-hud--footer fixed z-[30]">
+        <div className="pxd-mobile-hud__dock">
+          <div className="pxd-mobile-hud__shell pointer-events-none">
+          <div className="pxd-mobile-hud__col pxd-mobile-hud__col--now">
+            <p className="pxd-mobile-hud__eyebrow">{copy.hud.statusEyebrow}</p>
+            <div className="pxd-mobile-hud__row">
+              <span className="pxd-mobile-hud__label">{copy.stage.stageLabel}</span>
+              <span className="pxd-mobile-hud__hero">{stage}</span>
+            </div>
+            <div className="pxd-mobile-hud__row pxd-mobile-hud__row--sub">
+              <span className="pxd-mobile-hud__label">{copy.stage.toleranceLabel}</span>
+              <span className="pxd-mobile-hud__value">±{tolerancePx}px</span>
+            </div>
+            <div className="pxd-mobile-hud__life">
+              <div className="pxd-mobile-hud__row pxd-mobile-hud__row--sub">
+                <span className="pxd-mobile-hud__label">{copy.hud.lifeLabel}</span>
+                <span className="pxd-mobile-hud__value">
+                  {lifeDisplay}
+                  <span className="pxd-mobile-hud__unit">
+                    /{LIFE_MAX_PT}
+                  </span>
+                </span>
+              </div>
+              <div
+                className={`pxd-life-bar pxd-life-bar--compact pxd-life-bar--${lifeTone}`}
+                role="meter"
+                aria-valuemin={0}
+                aria-valuemax={LIFE_MAX_PT}
+                aria-valuenow={Math.max(0, Math.min(LIFE_MAX_PT, lifePt))}
+                aria-label={copy.hud.lifeLabel}
+              >
+                <div
+                  className="pxd-life-bar__fill"
+                  style={{ width: `${lifePct}%` }}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="pxd-mobile-hud__divider" aria-hidden />
+
+          <div
+            className="pxd-mobile-hud__col pxd-mobile-hud__col--archive"
+            style={highestClearedTheme}
+          >
+            <p className="pxd-mobile-hud__eyebrow">{copy.hud.archiveEyebrow}</p>
+            <div className="pxd-mobile-hud__row">
+              <span className="pxd-mobile-hud__label">
+                {copy.stage.highestClearedStageLabel}
+              </span>
+              <span
+                className={`pxd-mobile-hud__value ${
+                  records.highestClearedStage <= 0
+                    ? "pxd-mobile-hud__value--empty"
+                    : ""
+                }`}
+              >
+                {records.highestClearedStage || "--"}
+              </span>
+            </div>
+            <div className="pxd-mobile-hud__row pxd-mobile-hud__row--sub">
+              <span className="pxd-mobile-hud__label">{copy.hud.attemptsLabel}</span>
+              <span className="pxd-mobile-hud__value">{records.totalAttempts}</span>
+            </div>
+            <div className="pxd-mobile-hud__row pxd-mobile-hud__row--sub">
+              <span className="pxd-mobile-hud__label">{copy.stage.bestErrorLabel}</span>
+              <span className="pxd-mobile-hud__value pxd-mobile-hud__value--mono">
+                {bestError}
+                {records.bestAbsErrorPx !== null ? (
+                  <span className="pxd-mobile-hud__unit">px</span>
+                ) : null}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="pxd-mobile-hud__actions pointer-events-auto">
+          {changeImageControl}
+          <button
+            type="button"
+            onClick={onResetProgress}
+            className="pxd-mobile-hud__reset"
+          >
+            {copy.hud.resetButton}
+          </button>
+        </div>
         </div>
       </div>
     );
@@ -223,9 +304,9 @@ export default function RecordsSideRails({
               <span className="pxd-records-rail__label">{copy.stage.highestClearedStageLabel}</span>
               <span
                 className={`pxd-records-rail__value ${
-                  records.highestClearedStage > 0
-                    ? "pxd-records-rail__value--hero"
-                    : "pxd-records-rail__value--archive-empty"
+                  records.highestClearedStage <= 0
+                    ? "pxd-records-rail__value--archive-empty"
+                    : ""
                 }`}
               >
                 {records.highestClearedStage || "--"}
