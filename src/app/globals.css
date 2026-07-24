@@ -1515,11 +1515,20 @@ body.pxd-pwa-standalone {
   touch-action: none;
 }
 
-/* スマホフッター分、ステージ最下部に余白（盤面と HUD が重ならない） */
+/* スマホフッター分の高さ（ステージ余白・アシスト位置で共通） */
 @media (max-width: 639px) {
+  .pxd-play-surface {
+    --pxd-mobile-footer-reserve: calc(7.75rem + env(safe-area-inset-bottom, 0px));
+  }
+
   .pxd-play-surface .pxd-stage {
     box-sizing: border-box;
-    padding-bottom: calc(7.75rem + env(safe-area-inset-bottom, 0px));
+    padding-bottom: var(--pxd-mobile-footer-reserve);
+  }
+
+  /* 盤面アシスト：NOW/ARCHIVE フッターの直上 */
+  .pxd-play-surface .pxd-ground-guide {
+    bottom: var(--pxd-mobile-footer-reserve);
   }
 }
 

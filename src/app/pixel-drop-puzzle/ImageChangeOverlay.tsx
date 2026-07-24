@@ -17,12 +17,16 @@ export default function ImageChangeOverlay({
   themeStyle,
   onClose,
   onConfirm,
+  onRestoreDefault,
+  usingDefaultImage,
 }: {
   open: boolean;
   copy: PixelDropPuzzleDict["upload"];
   themeStyle: CSSProperties;
   onClose: () => void;
   onConfirm: (image: LoadedGameImage) => void;
+  onRestoreDefault: () => void;
+  usingDefaultImage: boolean;
 }) {
   const titleId = useId();
   const [mounted, setMounted] = useState(false);
@@ -137,6 +141,16 @@ export default function ImageChangeOverlay({
             }}
           />
         </label>
+
+        {!usingDefaultImage ? (
+          <button
+            type="button"
+            onClick={onRestoreDefault}
+            className="mt-3 w-full rounded-lg border border-zinc-700 py-2.5 text-sm text-zinc-300 transition-colors hover:border-zinc-500 hover:text-zinc-100"
+          >
+            {copy.restoreDefaultButton}
+          </button>
+        ) : null}
 
         {error ? <p className="mt-3 text-center text-xs text-red-400">{error}</p> : null}
         <p className="mt-4 text-center text-[10px] leading-relaxed text-zinc-500">

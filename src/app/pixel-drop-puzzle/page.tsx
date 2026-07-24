@@ -6,6 +6,7 @@ import { LanguageToggle, useI18n } from "@/i18n";
 import { useLocalStorageState } from "@/lib/localData";
 import { useStandaloneDisplay } from "@/lib/useStandaloneDisplay";
 import { readImageSize, type LoadedGameImage } from "./imageUtil";
+import { loadDefaultGameImage } from "./defaultImage";
 import InstallAppButton from "./InstallAppButton";
 import PlayField from "./PlayField";
 import RulesIntroModal from "./RulesIntroModal";
@@ -63,19 +64,39 @@ export default function PixelDropPuzzlePage() {
     setExperimentStarted(true);
   }
 
-  // 直近アップロード画像があれば自動復元（サイズ再取得のみ、通信は発生しない）
+  // カスタム画像 or 同梱デフォルトを復元
   useEffect(() => {
     if (!hydrated || image || imageLoading) return;
-    if (!data.lastImage) return;
+
+    let cancelled = false;
     setImageLoading(true);
-    readImageSize(data.lastImage)
-      .then(({ width, height }) => {
-        setImage({ dataUrl: data.lastImage as string, width, height });
-      })
-      .catch(() => {
-        setData((prev) => ({ ...prev, lastImage: null }));
-      })
-      .finally(() => setImageLoading(false));
+
+    async function loadStoredOrDefault() {
+      try {
+        if (data.lastImage) {
+          const { width, height } = await readImageSize(data.lastImage);
+          if (cancelled) return;
+          setImage({ dataUrl: data.lastImage, width, height });
+          return;
+        }
+        const next = await loadDefaultGameImage();
+        if (cancelled) return;
+        setImage(next);
+      } catch {
+        if (cancelled) return;
+        if (data.lastImage) {
+          setData((prev) => ({ ...prev, lastImage: null }));
+        }
+        setImage(null);
+      } finally {
+        if (!cancelled) setImageLoading(false);
+      }
+    }
+
+    void loadStoredOrDefault();
+    return () => {
+      cancelled = true;
+    };
   }, [hydrated, data.lastImage, image, imageLoading]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
@@ -98,6 +119,24 @@ export default function PixelDropPuzzlePage() {
     setFailScrollY(null);
     setRoundId((r) => r + 1);
     setToast(copy.toast.settingsSaved);
+  }
+
+  async function handleRestoreDefaultImage() {
+    const confirmed = window.confirm(copy.upload.restoreDefaultConfirm);
+    if (!confirmed) return;
+    setImageLoading(true);
+    try {
+      const next = await loadDefaultGameImage();
+      setImage(next);
+      setData((prev) => ({ ...prev, lastImage: null }));
+      setFailScrollY(null);
+      setRoundId((r) => r + 1);
+      setToast(copy.toast.restoreDefault);
+    } catch {
+      setToast(copy.upload.errorDefaultLoad);
+    } finally {
+      setImageLoading(false);
+    }
   }
 
   function handleSettled(judge: JudgeResult) {
@@ -222,6 +261,8 @@ export default function PixelDropPuzzlePage() {
               playActive={experimentStarted && !rulesOpen}
               copy={copy}
               restoreScrollY={failScrollY}
+              usingDefaultImage={data.lastImage === null}
+              onRestoreDefaultImage={handleRestoreDefaultImage}
             records={{
               highestClearedStage: data.archive.highestClearedStage,
               bestAbsErrorPx: data.archive.bestAbsErrorPx,

@@ -106,3 +106,13 @@ export function readImageSize(
     img.src = dataUrl;
   });
 }
+
+/** 公開アセット（/public）の画像 URL を読み込む */
+export function loadImageFromUrl(url: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onerror = () => reject(new Error("load-failed"));
+    img.onload = () => resolve(img);
+    img.src = url;
+  });
+}

@@ -43,6 +43,8 @@ export default function RecordsSideRails({
   records,
   changeImageControl,
   onResetProgress,
+  usingDefaultImage,
+  onRestoreDefaultImage,
 }: {
   copy: PixelDropPuzzleDict;
   /** 黒いステージ（レールがはみ出さない枠） */
@@ -61,6 +63,8 @@ export default function RecordsSideRails({
   };
   changeImageControl: ReactNode;
   onResetProgress: () => void;
+  usingDefaultImage: boolean;
+  onRestoreDefaultImage: () => void;
 }) {
   const [layout, setLayout] = useState<RailLayout | null>(null);
 
@@ -223,6 +227,15 @@ export default function RecordsSideRails({
 
         <div className="pxd-mobile-hud__actions pointer-events-auto">
           {changeImageControl}
+          {!usingDefaultImage ? (
+            <button
+              type="button"
+              onClick={onRestoreDefaultImage}
+              className="pxd-mobile-hud__reset"
+            >
+              {copy.upload.restoreDefaultButton}
+            </button>
+          ) : null}
           <button
             type="button"
             onClick={onResetProgress}
@@ -328,6 +341,15 @@ export default function RecordsSideRails({
             <div className="pxd-records-rail__divider" aria-hidden />
             <div className="pxd-records-rail__actions pointer-events-auto">
               {changeImageControl}
+              {!usingDefaultImage ? (
+                <button
+                  type="button"
+                  onClick={onRestoreDefaultImage}
+                  className="pxd-records-rail__action"
+                >
+                  {copy.upload.restoreDefaultButton}
+                </button>
+              ) : null}
               <button
                 type="button"
                 onClick={onResetProgress}

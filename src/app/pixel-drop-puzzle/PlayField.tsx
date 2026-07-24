@@ -120,7 +120,9 @@ export default function PlayField({
   copy,
   restoreScrollY,
   records,
+  usingDefaultImage,
   onImageChange,
+  onRestoreDefaultImage,
   onResetProgress,
   onSettled,
   onRememberFailScroll,
@@ -145,8 +147,12 @@ export default function PlayField({
     totalAttempts: number;
   };
   onResetProgress: () => void;
+  /** 同梱デフォルト画像を使用中 */
+  usingDefaultImage: boolean;
   /** 画像変更確定時（全面オーバーレイから） */
   onImageChange: (image: LoadedGameImage) => void;
+  /** デフォルト画像へ戻す */
+  onRestoreDefaultImage: () => void;
   onSettled: (judge: JudgeResult) => void;
   /** 失敗確定時のカメラ位置を親へ渡す */
   onRememberFailScroll: (scrollY: number) => void;
@@ -1083,6 +1089,8 @@ export default function PlayField({
           records={records}
           changeImageControl={changeImageControl}
           onResetProgress={onResetProgress}
+          usingDefaultImage={usingDefaultImage}
+          onRestoreDefaultImage={onRestoreDefaultImage}
         />
       ) : null}
 
@@ -1279,10 +1287,15 @@ export default function PlayField({
         open={imageChangeOpen}
         copy={copy.upload}
         themeStyle={stageTheme}
+        usingDefaultImage={usingDefaultImage}
         onClose={() => setImageChangeOpen(false)}
         onConfirm={(image) => {
           setImageChangeOpen(false);
           onImageChange(image);
+        }}
+        onRestoreDefault={() => {
+          setImageChangeOpen(false);
+          onRestoreDefaultImage();
         }}
       />
     </div>

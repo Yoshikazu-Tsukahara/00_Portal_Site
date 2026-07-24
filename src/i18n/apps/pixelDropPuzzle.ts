@@ -44,6 +44,10 @@ export type PixelDropPuzzleDict = {
     changeOverlayTitle: string;
     changeOverlayLead: string;
     changeOverlayResume: string;
+    /** 同梱デフォルト画像へ戻す */
+    restoreDefaultButton: string;
+    restoreDefaultConfirm: string;
+    errorDefaultLoad: string;
   };
   stage: {
     stageLabel: string;
@@ -117,6 +121,7 @@ export type PixelDropPuzzleDict = {
   toast: {
     settingsSaved: string;
     runReset: string;
+    restoreDefault: string;
   };
   anticheat: {
     warning: string;
@@ -149,7 +154,7 @@ export const pixelDropPuzzleJa: PixelDropPuzzleDict = {
   },
   upload: {
     title: "画像をアップロード",
-    lead: "横長（16:9）の枠内で、使いたい部分を切り取ってパズルにします。",
+    lead: "最初から同梱の風景画像で遊べます。別の写真に差し替える場合は 16:9 の枠で切り取ってください。",
     button: "画像を選択",
     buttonBusy: "読み込み中…",
     hint: "画像はブラウザ内でのみ処理されます（サーバー送信なし）。",
@@ -165,6 +170,10 @@ export const pixelDropPuzzleJa: PixelDropPuzzleDict = {
     changeOverlayLead:
       "プレイはいったん停止しています。新しい画像を選び、16:9 の枠で切り取ってください。",
     changeOverlayResume: "プレイに戻る",
+    restoreDefaultButton: "デフォルト画像に戻す",
+    restoreDefaultConfirm:
+      "同梱のデフォルト画像に戻しますか？（現在の切り取り画像は破棄されます）",
+    errorDefaultLoad: "デフォルト画像の読み込みに失敗しました。",
   },
   stage: {
     stageLabel: "STAGE",
@@ -231,6 +240,7 @@ export const pixelDropPuzzleJa: PixelDropPuzzleDict = {
   toast: {
     settingsSaved: "画像を設定しました",
     runReset: "進行状況をリセットしました",
+    restoreDefault: "デフォルト画像に戻しました",
   },
   anticheat: {
     warning: "[ WARNING: AUTOMATED INPUT DETECTED. LOCKDOWN INITIATED. ]",
@@ -263,7 +273,7 @@ export const pixelDropPuzzleEn: PixelDropPuzzleDict = {
   },
   upload: {
     title: "Upload an image",
-    lead: "Crop any photo to a fixed 16:9 frame—that area becomes the puzzle ground.",
+    lead: "A bundled landscape image is used by default. To use your own photo, crop it to the 16:9 frame.",
     button: "Choose image",
     buttonBusy: "Loading…",
     hint: "Processed entirely in your browser (nothing is ever uploaded).",
@@ -279,6 +289,10 @@ export const pixelDropPuzzleEn: PixelDropPuzzleDict = {
     changeOverlayLead:
       "Gameplay is paused. Choose a new image and crop it to the 16:9 frame.",
     changeOverlayResume: "Back to game",
+    restoreDefaultButton: "Use default image",
+    restoreDefaultConfirm:
+      "Switch back to the bundled default image? Your current crop will be discarded.",
+    errorDefaultLoad: "Could not load the default image.",
   },
   stage: {
     stageLabel: "STAGE",
@@ -345,6 +359,7 @@ export const pixelDropPuzzleEn: PixelDropPuzzleDict = {
   toast: {
     settingsSaved: "Image set",
     runReset: "Progress has been reset",
+    restoreDefault: "Restored the default image",
   },
   anticheat: {
     warning: "[ WARNING: AUTOMATED INPUT DETECTED. LOCKDOWN INITIATED. ]",
