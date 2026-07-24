@@ -70,7 +70,7 @@ const SUCCESS_MERGE_MS = 750;
 /** 縁を光が一周する時間（ms） */
 const SUCCESS_SWEEP_MS = 1300;
 /** 画像全体フラッシュの時間（ms） */
-const SUCCESS_FLASH_MS = 450;
+const SUCCESS_FLASH_MS = 720;
 
 /** 互換：溶解トランジションに使う */
 const MERGE_DURATION_MS = SUCCESS_MERGE_MS;
