@@ -2446,59 +2446,6 @@ html.pxd-pwa-standalone .pxd-block-guide {
   }
 }
 
-/* 一周後の成功演出：斜めのシャインスイープのみ（全面フラッシュなし） */
-.pxd-success-flash {
-  position: absolute;
-  inset: 0;
-  z-index: 9;
-  overflow: hidden;
-  pointer-events: none;
-  border-radius: 1px;
-}
-
-/* 左から右へ走る細い光帯（モダンなハイライト） */
-.pxd-success-flash::after {
-  content: "";
-  position: absolute;
-  top: -35%;
-  bottom: -35%;
-  left: -45%;
-  width: 42%;
-  background: linear-gradient(
-    100deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.04) 28%,
-    rgba(255, 255, 255, 0.5) 50%,
-    rgba(255, 255, 255, 0.04) 72%,
-    transparent 100%
-  );
-  transform: skewX(-14deg) translateX(0);
-  filter: blur(2px);
-  mix-blend-mode: screen;
-  opacity: 0;
-}
-
-.pxd-success-flash--active::after {
-  animation: pxd-success-shine 0.72s cubic-bezier(0.4, 0, 0.2, 1) both;
-}
-
-@keyframes pxd-success-shine {
-  0% {
-    opacity: 0;
-    transform: skewX(-14deg) translateX(-30%);
-  }
-  14% {
-    opacity: 1;
-  }
-  80% {
-    opacity: 0.85;
-  }
-  100% {
-    opacity: 0;
-    transform: skewX(-14deg) translateX(380%);
-  }
-}
-
 /* 成功中の盤面アウターグロー（光一周と同期・ステージ色） */
 .pxd-ground--celebrate {
   box-shadow:
@@ -2856,9 +2803,6 @@ html.pxd-pwa-standalone .pxd-block-guide {
   .pxd-success-ring,
   .pxd-success-ring--active,
   .pxd-success-ring__spin,
-  .pxd-success-flash,
-  .pxd-success-flash--active,
-  .pxd-success-flash--active::after,
   .pxd-overlay--success .pxd-result-title,
   .pxd-overlay--success .pxd-result-frame,
   .pxd-overlay--success .pxd-result-panel,
@@ -2867,9 +2811,7 @@ html.pxd-pwa-standalone .pxd-block-guide {
     animation: none;
   }
 
-  .pxd-success-ring--active,
-  .pxd-success-flash--active,
-  .pxd-success-flash--active::after {
+  .pxd-success-ring--active {
     opacity: 0;
   }
 }
