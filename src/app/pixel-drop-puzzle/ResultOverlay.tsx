@@ -48,11 +48,11 @@ export default function ResultOverlay({
   function continuePlay() {
     if (continuedRef.current) return;
     continuedRef.current = true;
-    if (judge.success) onNext();
-    else onRetry();
+    onRetry();
   }
 
   if (!judge.success) {
+    // 単なる失敗：どこをタップしても即座にリトライ（テンポ優先）
     return (
       <div
         className="pxd-overlay pxd-overlay--fail fixed inset-0 z-50 flex cursor-pointer items-center justify-center p-4"
@@ -106,13 +106,16 @@ export default function ResultOverlay({
 
   const nextTolerance = toleranceForStage(stage + 1);
 
+  function goNext() {
+    if (continuedRef.current) return;
+    continuedRef.current = true;
+    onNext();
+  }
+
+  // 成功：全画面タップ無効。NEXT ボタン明示タップのみ進行
   return (
     <div
-      className="pxd-overlay pxd-overlay--success fixed inset-0 z-50 flex cursor-pointer items-end justify-center p-4 pb-6 sm:items-center"
-      onPointerDown={(e) => {
-        e.preventDefault();
-        continuePlay();
-      }}
+      className="pxd-overlay pxd-overlay--success fixed inset-0 z-50 flex cursor-default items-end justify-center p-4 pb-6 sm:items-center"
       role="presentation"
     >
       <div className="pointer-events-none w-full max-w-md space-y-3 text-center font-mono">
@@ -170,9 +173,14 @@ export default function ResultOverlay({
           />
         </div>
 
-        <div className="pxd-result-next w-full rounded-md py-2.5 text-sm font-semibold tracking-wide">
+        <button
+          type="button"
+          onClick={goNext}
+          onPointerDown={(e) => e.stopPropagation()}
+          className="pxd-result-next pointer-events-auto w-full rounded-md py-2.5 text-sm font-semibold tracking-wide transition-transform active:scale-95"
+        >
           {copy.success.nextButton}
-        </div>
+        </button>
       </div>
     </div>
   );

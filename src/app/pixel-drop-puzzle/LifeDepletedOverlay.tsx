@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import type { PixelDropPuzzleDict } from "@/i18n/apps/pixelDropPuzzle";
 
-/** ライフ枯渇時の冷徹な降格警告 */
+/** ライフ枯渇時の冷徹な降格警告（全画面タップ無効・ボタン明示タップのみ） */
 export default function LifeDepletedOverlay({
   copy,
   fromStage,
@@ -17,7 +17,7 @@ export default function LifeDepletedOverlay({
 }) {
   const continuedRef = useRef(false);
 
-  function continuePlay() {
+  function acceptDowngrade() {
     if (continuedRef.current) return;
     continuedRef.current = true;
     onContinue();
@@ -25,11 +25,7 @@ export default function LifeDepletedOverlay({
 
   return (
     <div
-      className="pxd-overlay pxd-overlay--deplete fixed inset-0 z-50 flex cursor-pointer items-center justify-center p-4"
-      onPointerDown={(e) => {
-        e.preventDefault();
-        continuePlay();
-      }}
+      className="pxd-overlay pxd-overlay--deplete fixed inset-0 z-50 flex cursor-default items-center justify-center p-4"
       role="presentation"
     >
       <div className="pointer-events-none w-full max-w-md space-y-5 text-center font-mono">
@@ -47,9 +43,14 @@ export default function LifeDepletedOverlay({
             </span>
           </div>
         </div>
-        <div className="w-full rounded-md border border-red-700/70 bg-red-950/40 py-2.5 text-sm font-semibold tracking-[0.18em] text-red-200">
+        <button
+          type="button"
+          onClick={acceptDowngrade}
+          onPointerDown={(e) => e.stopPropagation()}
+          className="pxd-deplete-accept pointer-events-auto w-full rounded-md border border-red-700/70 bg-red-950/40 py-2.5 text-sm font-semibold tracking-[0.18em] text-red-200 transition-transform hover:bg-zinc-800 active:scale-95"
+        >
           {copy.continueButton}
-        </div>
+        </button>
       </div>
     </div>
   );

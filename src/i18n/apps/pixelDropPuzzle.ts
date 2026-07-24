@@ -217,7 +217,7 @@ export const pixelDropPuzzleJa: PixelDropPuzzleDict = {
     title: "LIFE DEPLETED. DOWNGRADING STAGE...",
     body: "観測リソースが枯渇した。難易度を1段階下げてプロトコルを再開する。",
     stageLabel: "降格先",
-    continueButton: "RESUME",
+    continueButton: "降格を受け入れる",
   },
   fail: {
     title: "位置ズレを検出",
@@ -241,7 +241,7 @@ export const pixelDropPuzzleJa: PixelDropPuzzleDict = {
     stageClearedLabel: "ステージクリア",
     nextToleranceLabel: "次の許容誤差",
     timestampLabel: "観測時刻",
-    nextButton: "次のステージへ",
+    nextButton: "NEXT STAGE",
     completedImageAlt: "完成した画像",
   },
   toast: {
@@ -342,7 +342,7 @@ export const pixelDropPuzzleEn: PixelDropPuzzleDict = {
     title: "LIFE DEPLETED. DOWNGRADING STAGE...",
     body: "Observation resources exhausted. Downgrading difficulty by one stage.",
     stageLabel: "DOWNGRADE TO",
-    continueButton: "RESUME",
+    continueButton: "ACCEPT & DOWNGRADE",
   },
   fail: {
     title: "MISALIGNMENT DETECTED",
@@ -366,7 +366,7 @@ export const pixelDropPuzzleEn: PixelDropPuzzleDict = {
     stageClearedLabel: "STAGE CLEARED",
     nextToleranceLabel: "NEXT TOLERANCE",
     timestampLabel: "OBSERVED AT",
-    nextButton: "Proceed to next stage",
+    nextButton: "NEXT STAGE",
     completedImageAlt: "Completed image",
   },
   toast: {
