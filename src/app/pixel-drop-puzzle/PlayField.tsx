@@ -1119,7 +1119,7 @@ export default function PlayField({
               <div
                 className={`pxd-ground absolute left-0 ${
                   merging || phase === "success" ? "pxd-ground--merged" : ""
-                } ${successFx === "sweep" ? "pxd-ground--celebrate" : ""}`
+                } ${successFx === "sweep" ? "pxd-ground--celebrate" : ""}`}
                 style={{
                   top: g.groundTopY,
                   width: g.width,
