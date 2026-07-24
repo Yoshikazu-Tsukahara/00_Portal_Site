@@ -118,7 +118,7 @@ export const FAIL_PARTICLE_BEFORE_RESULT_MS = 760;
 
 /**
  * 着地時に溜め演出を入れるか。
- * 絶対誤差 ±1px 以内は無条件。成功（許容内）も常に対象。
+ * 絶対誤差 ±3px 以内は無条件。成功（許容内）も常に対象。
  * 失敗は許容の約2.25倍以内の惜しいミスのみ。
  */
 export function shouldHoldAtImpact(
@@ -126,7 +126,7 @@ export function shouldHoldAtImpact(
   tolerancePx: number,
   success: boolean,
 ): boolean {
-  if (absErrorPx <= 1 + 1e-12) return true;
+  if (absErrorPx <= 3 + 1e-12) return true;
   if (success) return true;
   if (tolerancePx <= 0) return absErrorPx <= 1e-9;
   return absErrorPx <= tolerancePx * 2.25 + 1e-12;
