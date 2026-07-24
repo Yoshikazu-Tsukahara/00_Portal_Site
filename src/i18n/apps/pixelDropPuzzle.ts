@@ -63,6 +63,10 @@ export type PixelDropPuzzleDict = {
     /** ライフ表示ラベル */
     lifeLabel: string;
     lifeUnit: string;
+    /** ステージ7以降：連続ニアピンコンボ */
+    streakLabel: string;
+    streakLocked: string;
+    lifeRecovered: string;
   };
   /** 起動時のルール説明（毎回表示） */
   rules: {
@@ -185,6 +189,9 @@ export const pixelDropPuzzleJa: PixelDropPuzzleDict = {
     archiveEyebrow: "ARCHIVE",
     lifeLabel: "LIFE",
     lifeUnit: "pt",
+    streakLabel: "5px-COMBO",
+    streakLocked: "[ STAGE 7+ UNLOCK ]",
+    lifeRecovered: "+100pt LIFE RECOVERED",
   },
   rules: {
     eyebrow: "BRIEFING",
@@ -303,6 +310,9 @@ export const pixelDropPuzzleEn: PixelDropPuzzleDict = {
     archiveEyebrow: "ARCHIVE",
     lifeLabel: "LIFE",
     lifeUnit: "pt",
+    streakLabel: "5px-COMBO",
+    streakLocked: "[ STAGE 7+ UNLOCK ]",
+    lifeRecovered: "+100pt LIFE RECOVERED",
   },
   rules: {
     eyebrow: "BRIEFING",

@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  useEffect,
   useLayoutEffect,
   useMemo,
   useState,
@@ -9,7 +10,12 @@ import {
   type RefObject,
 } from "react";
 import type { PixelDropPuzzleDict } from "@/i18n/apps/pixelDropPuzzle";
-import { lifeMaxForStage, stageThemeStyle } from "./types";
+import {
+  lifeMaxForStage,
+  NEAR_HIT_STAGE_FROM,
+  NEAR_HIT_STREAK_TARGET,
+  stageThemeStyle,
+} from "./types";
 
 type RailLayout = {
   /** 黒いステージのビューポート上の左端 */
@@ -32,6 +38,15 @@ const GUTTER_PAD = 12;
 const SIDE_RAIL_MIN_PANEL_W = 96;
 /** コンパクト HUD に切り替えるビューポート幅（px） */
 const COMPACT_HUD_MAX_VIEW_W = 640;
+/** ライフ回復フラッシュの表示時間（ms） */
+const RECOVER_FLASH_MS = 1600;
+
+/** コンボの [■][■][ ][ ][ ] 型インジケーター文字列 */
+function buildStreakCells(streak: number): string {
+  return Array.from({ length: NEAR_HIT_STREAK_TARGET }, (_, i) =>
+    i < streak ? "[■]" : "[ ]",
+  ).join("");
+}
 
 export default function RecordsSideRails({
   copy,
@@ -40,6 +55,8 @@ export default function RecordsSideRails({
   stage,
   tolerancePx,
   lifePt,
+  nearHitStreak,
+  lifeRecoveredAtMs,
   records,
   changeImageControl,
   onResetProgress,
@@ -55,6 +72,10 @@ export default function RecordsSideRails({
   tolerancePx: number;
   /** 現在ステージの残りライフ（pt） */
   lifePt: number;
+  /** ステージ7以降の連続ニアピン（≤5px）カウント */
+  nearHitStreak: number;
+  /** ニアピン5連続でライフ回復した時刻（フラッシュ演出用） */
+  lifeRecoveredAtMs: number | null;
   records: {
     /** クリアした最高ステージ（0 = 未クリア） */
     highestClearedStage: number;
@@ -67,6 +88,18 @@ export default function RecordsSideRails({
   onRestoreDefaultImage: () => void;
 }) {
   const [layout, setLayout] = useState<RailLayout | null>(null);
+  /** ライフ回復フラッシュ中か（PlayField remount 後も残り時間だけ再現） */
+  const [recoverFlash, setRecoverFlash] = useState(false);
+
+  useEffect(() => {
+    if (lifeRecoveredAtMs === null) return;
+    const elapsed = Date.now() - lifeRecoveredAtMs;
+    const remain = RECOVER_FLASH_MS - elapsed;
+    if (remain <= 0) return;
+    setRecoverFlash(true);
+    const timer = window.setTimeout(() => setRecoverFlash(false), remain);
+    return () => window.clearTimeout(timer);
+  }, [lifeRecoveredAtMs]);
 
   useLayoutEffect(() => {
     const boundsEl = boundsRef.current;
@@ -134,6 +167,8 @@ export default function RecordsSideRails({
   const lifeDisplay = Number.isInteger(lifePt)
     ? String(lifePt)
     : lifePt.toFixed(1);
+  const streakUnlocked = stage >= NEAR_HIT_STAGE_FROM;
+  const streakCells = buildStreakCells(nearHitStreak);
 
   if (!layout) return null;
 
@@ -153,7 +188,11 @@ export default function RecordsSideRails({
       <div className="pxd-mobile-hud pxd-mobile-hud--footer fixed z-[30]">
         <div className="pxd-mobile-hud__dock">
           <div className="pxd-mobile-hud__shell pointer-events-none">
-          <div className="pxd-mobile-hud__col pxd-mobile-hud__col--now">
+          <div
+            className={`pxd-mobile-hud__col pxd-mobile-hud__col--now ${
+              recoverFlash ? "pxd-life-recover-flash" : ""
+            }`}
+          >
             <p className="pxd-mobile-hud__eyebrow">{copy.hud.statusEyebrow}</p>
             <div className="pxd-mobile-hud__row">
               <span className="pxd-mobile-hud__label">{copy.stage.stageLabel}</span>
@@ -162,6 +201,18 @@ export default function RecordsSideRails({
             <div className="pxd-mobile-hud__row pxd-mobile-hud__row--sub">
               <span className="pxd-mobile-hud__label">{copy.stage.toleranceLabel}</span>
               <span className="pxd-mobile-hud__value">±{tolerancePx}px</span>
+            </div>
+            <div className="pxd-mobile-hud__row pxd-mobile-hud__row--sub">
+              <span className="pxd-mobile-hud__label">{copy.hud.streakLabel}</span>
+              {streakUnlocked ? (
+                <span className="pxd-mobile-hud__value pxd-streak-cells">
+                  {streakCells}
+                </span>
+              ) : (
+                <span className="pxd-mobile-hud__value pxd-streak-locked">
+                  {copy.hud.streakLocked}
+                </span>
+              )}
             </div>
             <div className="pxd-mobile-hud__life">
               <div className="pxd-mobile-hud__row pxd-mobile-hud__row--sub">
@@ -186,6 +237,11 @@ export default function RecordsSideRails({
                   style={{ width: `${lifePct}%` }}
                 />
               </div>
+              {recoverFlash ? (
+                <p className="pxd-recover-text" role="status">
+                  {copy.hud.lifeRecovered}
+                </p>
+              ) : null}
             </div>
           </div>
 
@@ -262,7 +318,12 @@ export default function RecordsSideRails({
           className="pxd-records-rail pxd-records-rail--left"
           style={panelStyle}
         >
-          <div className="pxd-records-rail__panel" style={panelStyle}>
+          <div
+            className={`pxd-records-rail__panel ${
+              recoverFlash ? "pxd-life-recover-flash" : ""
+            }`}
+            style={panelStyle}
+          >
             <p className="pxd-records-rail__eyebrow">{copy.hud.statusEyebrow}</p>
             <div className="pxd-records-rail__block">
               <span className="pxd-records-rail__label">{copy.stage.stageLabel}</span>
@@ -274,6 +335,19 @@ export default function RecordsSideRails({
             <div className="pxd-records-rail__block">
               <span className="pxd-records-rail__label">{copy.stage.toleranceLabel}</span>
               <span className="pxd-records-rail__value">±{tolerancePx}px</span>
+            </div>
+            <div className="pxd-records-rail__divider" aria-hidden />
+            <div className="pxd-records-rail__block">
+              <span className="pxd-records-rail__label">{copy.hud.streakLabel}</span>
+              {streakUnlocked ? (
+                <span className="pxd-records-rail__value pxd-streak-cells">
+                  {streakCells}
+                </span>
+              ) : (
+                <span className="pxd-records-rail__value pxd-streak-locked">
+                  {copy.hud.streakLocked}
+                </span>
+              )}
             </div>
             <div className="pxd-records-rail__divider" aria-hidden />
             <div className="pxd-records-rail__block pxd-life-block">
@@ -297,6 +371,11 @@ export default function RecordsSideRails({
                   style={{ width: `${lifePct}%` }}
                 />
               </div>
+              {recoverFlash ? (
+                <p className="pxd-recover-text" role="status">
+                  {copy.hud.lifeRecovered}
+                </p>
+              ) : null}
             </div>
           </div>
         </aside>

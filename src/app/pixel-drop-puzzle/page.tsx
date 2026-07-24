@@ -11,9 +11,11 @@ import InstallAppButton from "./InstallAppButton";
 import PlayField from "./PlayField";
 import RulesIntroModal from "./RulesIntroModal";
 import {
+  advanceNearHitStreak,
   buildEmptyAppData,
   lifeAfterDamage,
   lifeMaxForStage,
+  NEAR_HIT_RECOVER_PT,
   normalizeAppData,
   stageAccentHex,
   stageThemeStyle,
@@ -41,6 +43,8 @@ export default function PixelDropPuzzlePage() {
   const [toast, setToast] = useState<string | null>(null);
   /** 失敗時のカメラ位置（リトライで復元。成功や画像変更でクリア） */
   const [failScrollY, setFailScrollY] = useState<number | null>(null);
+  /** ニアピン連続達成でライフ回復した時刻（NOW パネルのフラッシュ演出用） */
+  const [lifeRecoveredAtMs, setLifeRecoveredAtMs] = useState<number | null>(null);
   /** 起動時ルール。START までプレイ不可 */
   const [rulesOpen, setRulesOpen] = useState(false);
   const [experimentStarted, setExperimentStarted] = useState(false);
@@ -144,6 +148,8 @@ export default function PixelDropPuzzlePage() {
   }
 
   function handleSettled(judge: JudgeResult) {
+    let recoveredNow = false;
+
     setData((prev) => {
       const nextLife = lifeAfterDamage(prev.lifePt, judge.absErrorPx);
       const archive = { ...prev.archive };
@@ -156,9 +162,21 @@ export default function PixelDropPuzzlePage() {
           ...prev,
           stage: downStage,
           lifePt: lifeMaxForStage(downStage),
+          nearHitStreak: 0,
           archive,
         };
       }
+
+      // ステージ7以降：連続ニアピン（≤5px）判定と 5 連続での +100pt 回復
+      const nearHit = advanceNearHitStreak(
+        prev.stage,
+        prev.nearHitStreak,
+        judge.absErrorPx,
+      );
+      recoveredNow = nearHit.recovered;
+      const lifeWithRecovery = nearHit.recovered
+        ? Math.min(lifeMaxForStage(prev.stage), nextLife + NEAR_HIT_RECOVER_PT)
+        : nextLife;
 
       if (judge.success) {
         archive.totalAttempts += 1;
@@ -173,7 +191,8 @@ export default function PixelDropPuzzlePage() {
             : Math.min(archive.bestAbsErrorPx, judge.absErrorPx);
         return {
           ...prev,
-          lifePt: nextLife,
+          lifePt: lifeWithRecovery,
+          nearHitStreak: nearHit.streak,
           archive,
         };
       }
@@ -182,10 +201,15 @@ export default function PixelDropPuzzlePage() {
       archive.totalFails += 1;
       return {
         ...prev,
-        lifePt: nextLife,
+        lifePt: lifeWithRecovery,
+        nearHitStreak: nearHit.streak,
         archive,
       };
     });
+
+    if (recoveredNow) {
+      setLifeRecoveredAtMs(Date.now());
+    }
   }
 
   function handleRetry() {
@@ -212,6 +236,7 @@ export default function PixelDropPuzzlePage() {
     setData((prev) => ({
       stage: 1,
       lifePt: lifeMaxForStage(1),
+      nearHitStreak: 0,
       lastImage: prev.lastImage,
       archive: prev.archive,
     }));
@@ -266,6 +291,8 @@ export default function PixelDropPuzzlePage() {
               naturalHeight={image.height}
               stage={data.stage}
               lifePt={data.lifePt}
+              nearHitStreak={data.nearHitStreak}
+              lifeRecoveredAtMs={lifeRecoveredAtMs}
               playActive={experimentStarted && !rulesOpen}
               copy={copy}
               restoreScrollY={failScrollY}

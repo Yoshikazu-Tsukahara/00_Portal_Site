@@ -20,6 +20,39 @@ export function lifeMaxForStage(stage: number): number {
   return s >= LIFE_HIGH_STAGE_FROM ? LIFE_MAX_PT_HIGH : LIFE_MAX_PT;
 }
 
+/** ニアピン連続回復：有効になる最初のステージ */
+export const NEAR_HIT_STAGE_FROM = 7;
+/** ニアピン判定の絶対誤差しきい値（px） */
+export const NEAR_HIT_THRESHOLD_PX = 5;
+/** 回復に必要な連続ニアピン数 */
+export const NEAR_HIT_STREAK_TARGET = 5;
+/** 達成時のライフ回復量（pt） */
+export const NEAR_HIT_RECOVER_PT = 100;
+
+/**
+ * ニアピン連続カウントを1ドロップ分進める。
+ * - ステージ7未満：常に 0（作動しない）
+ * - 誤差 ≤ 5px：+1。5 に達した瞬間 recovered=true でカウントは 0 に戻る
+ * - 誤差 > 5px：0 にリセット
+ */
+export function advanceNearHitStreak(
+  stage: number,
+  prevStreak: number,
+  absErrorPx: number,
+): { streak: number; recovered: boolean } {
+  if (Math.floor(stage) < NEAR_HIT_STAGE_FROM) {
+    return { streak: 0, recovered: false };
+  }
+  if (absErrorPx <= NEAR_HIT_THRESHOLD_PX + 1e-12) {
+    const next = prevStreak + 1;
+    if (next >= NEAR_HIT_STREAK_TARGET) {
+      return { streak: 0, recovered: true };
+    }
+    return { streak: next, recovered: false };
+  }
+  return { streak: 0, recovered: false };
+}
+
 /**
  * ARCHIVE：アプリ全体の生涯記録。
  * 進行状況リセットでは消えない。
@@ -45,6 +78,8 @@ export type PixelDropAppData = {
   lastImage: string | null;
   /** 現在ステージの残りライフ（pt）。誤差の絶対値（px）だけ減る */
   lifePt: number;
+  /** ステージ7以降の連続ニアピン（≤5px）カウント（0〜4） */
+  nearHitStreak: number;
   /** 生涯記録（リセット対象外） */
   archive: PixelDropArchive;
 };
@@ -64,6 +99,7 @@ export function buildEmptyAppData(): PixelDropAppData {
     stage: 1,
     lastImage: null,
     lifePt: lifeMaxForStage(1),
+    nearHitStreak: 0,
     archive: buildEmptyArchive(),
   };
 }
@@ -309,6 +345,10 @@ export function normalizeAppData(raw: unknown): PixelDropAppData | null {
     isFiniteNumber(obj.lifePt) && obj.lifePt >= 0
       ? Math.min(lifeMaxForStage(stage), obj.lifePt)
       : lifeMaxForStage(stage);
+  const nearHitStreak =
+    isFiniteNumber(obj.nearHitStreak) && obj.nearHitStreak >= 0
+      ? Math.min(NEAR_HIT_STREAK_TARGET - 1, Math.floor(obj.nearHitStreak))
+      : 0;
 
   const archive = normalizeArchive(obj.archive, obj);
 
@@ -316,6 +356,7 @@ export function normalizeAppData(raw: unknown): PixelDropAppData | null {
     stage,
     lastImage,
     lifePt,
+    nearHitStreak,
     archive,
   };
 }

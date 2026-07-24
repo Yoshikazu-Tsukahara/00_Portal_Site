@@ -116,6 +116,8 @@ export default function PlayField({
   naturalHeight,
   stage,
   lifePt,
+  nearHitStreak,
+  lifeRecoveredAtMs,
   playActive,
   copy,
   restoreScrollY,
@@ -135,6 +137,10 @@ export default function PlayField({
   stage: number;
   /** 現在ステージの残りライフ（pt） */
   lifePt: number;
+  /** ステージ7以降の連続ニアピン（≤5px）カウント */
+  nearHitStreak: number;
+  /** ニアピン5連続でライフ回復した時刻（演出用。null なら未発生） */
+  lifeRecoveredAtMs: number | null;
   /** false の間はパトロール・DROP を停止（ルール説明中など） */
   playActive: boolean;
   copy: PixelDropPuzzleDict;
@@ -1086,6 +1092,8 @@ export default function PlayField({
           stage={stage}
           tolerancePx={tolerancePx}
           lifePt={lifePt}
+          nearHitStreak={nearHitStreak}
+          lifeRecoveredAtMs={lifeRecoveredAtMs}
           records={records}
           changeImageControl={changeImageControl}
           onResetProgress={onResetProgress}
