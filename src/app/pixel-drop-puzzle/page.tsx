@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import AppShell from "@/components/AppShell";
 import { LanguageToggle, useI18n } from "@/i18n";
 import { useLocalStorageState } from "@/lib/localData";
@@ -35,6 +35,8 @@ export default function PixelDropPuzzlePage() {
   );
   const [image, setImage] = useState<LoadedGameImage | null>(null);
   const [imageLoading, setImageLoading] = useState(false);
+  /** 画像読み込みの世代番号（古い非同期結果を捨てる） */
+  const imageLoadGenRef = useRef(0);
   const [roundId, setRoundId] = useState(0);
   const [toast, setToast] = useState<string | null>(null);
   /** 失敗時のカメラ位置（リトライで復元。成功や画像変更でクリア） */
@@ -65,43 +67,41 @@ export default function PixelDropPuzzlePage() {
   }
 
   // カスタム画像 or 同梱デフォルトを復元
-  // ※ imageLoading を依存に入れると setImageLoading(true) で cleanup が走り、
-  //   読み込みがキャンセルされたまま固まるため、意図的に依存から外す
   useEffect(() => {
-    if (!hydrated || image) return;
+    if (!hydrated) return;
+    if (image) {
+      setImageLoading(false);
+      return;
+    }
 
-    let cancelled = false;
+    const gen = ++imageLoadGenRef.current;
     setImageLoading(true);
+    const lastImage = data.lastImage;
 
-    async function loadStoredOrDefault() {
+    void (async () => {
       try {
-        if (data.lastImage) {
-          const { width, height } = await readImageSize(data.lastImage);
-          if (cancelled) return;
-          setImage({ dataUrl: data.lastImage, width, height });
+        if (lastImage) {
+          const { width, height } = await readImageSize(lastImage);
+          if (imageLoadGenRef.current !== gen) return;
+          setImage({ dataUrl: lastImage, width, height });
           return;
         }
         const next = await loadDefaultGameImage();
-        if (cancelled) return;
+        if (imageLoadGenRef.current !== gen) return;
         setImage(next);
       } catch {
-        if (cancelled) return;
-        if (data.lastImage) {
+        if (imageLoadGenRef.current !== gen) return;
+        if (lastImage) {
           // 壊れたカスタム画像を捨てて、次の効果でデフォルトへフォールバック
           setData((prev) => ({ ...prev, lastImage: null }));
-        } else {
-          setImage(null);
         }
       } finally {
-        if (!cancelled) setImageLoading(false);
+        if (imageLoadGenRef.current === gen) {
+          setImageLoading(false);
+        }
       }
-    }
-
-    void loadStoredOrDefault();
-    return () => {
-      cancelled = true;
-    };
-  }, [hydrated, data.lastImage, image]); // eslint-disable-line react-hooks/exhaustive-deps
+    })();
+  }, [hydrated, data.lastImage, image, setData]);
 
   useEffect(() => {
     if (!toast) return;
