@@ -69,6 +69,8 @@ type PatrolClock = PatrolSpeedState & { lastNow: number };
 const SUCCESS_MERGE_MS = 750;
 /** 縁を光が一周する時間（ms） */
 const SUCCESS_SWEEP_MS = 1300;
+/** 縁光一周後のシャインスイープ時間（ms）。全面フラッシュは使わない */
+const SUCCESS_SHINE_MS = 720;
 
 /** 互換：溶解トランジションに使う */
 const MERGE_DURATION_MS = SUCCESS_MERGE_MS;
@@ -96,7 +98,7 @@ function pointerCentroidY(
   return sum / positions.size;
 }
 
-type SuccessFx = "idle" | "merge" | "sweep" | "done";
+type SuccessFx = "idle" | "merge" | "sweep" | "shine" | "done";
 
 /**
  * 1回分の挑戦を管理するゲーム本体。
@@ -248,7 +250,7 @@ export default function PlayField({
   const [impactY, setImpactY] = useState(0);
   /** 成功時：枠・溝が溶けて完成絵になる演出中 */
   const [merging, setMerging] = useState(false);
-  /** 成功セレブレーション段階（溶解→縁光一周→リザルト） */
+  /** 成功セレブレーション段階（溶解→縁光一周→シャインスイープ→リザルト） */
   const [successFx, setSuccessFx] = useState<SuccessFx>("idle");
   const pendingSuccessRef = useRef<{
     x: number;
@@ -573,7 +575,7 @@ export default function PlayField({
     return () => window.removeEventListener("scroll", lockScroll);
   }, [judge]);
 
-  // 成功セレブレーション：溶解 → 縁光一周 → フラッシュ → リザルト
+  // 成功セレブレーション：溶解 → 縁光一周 → シャインスイープ → リザルト
   useEffect(() => {
     if (phase !== "merging") return;
     const pending = pendingSuccessRef.current;
@@ -587,7 +589,12 @@ export default function PlayField({
       }, SUCCESS_MERGE_MS),
     );
 
-    // 縁光一周のあと、全面フラッシュなしでリザルトへ
+    timers.push(
+      window.setTimeout(() => {
+        setSuccessFx("shine");
+      }, SUCCESS_MERGE_MS + SUCCESS_SWEEP_MS),
+    );
+
     timers.push(
       window.setTimeout(() => {
         const { x, g, phaseMsAtDrop, periodMsAtDrop } = pending;
@@ -612,7 +619,7 @@ export default function PlayField({
         setJudge(result);
         setPhase("success");
         onSettled(result);
-      }, SUCCESS_MERGE_MS + SUCCESS_SWEEP_MS),
+      }, SUCCESS_MERGE_MS + SUCCESS_SWEEP_MS + SUCCESS_SHINE_MS),
     );
 
     return () => {
@@ -1119,7 +1126,11 @@ export default function PlayField({
               <div
                 className={`pxd-ground absolute left-0 ${
                   merging || phase === "success" ? "pxd-ground--merged" : ""
-                } ${successFx === "sweep" ? "pxd-ground--celebrate" : ""}`}
+                } ${
+                  successFx === "sweep" || successFx === "shine"
+                    ? "pxd-ground--celebrate"
+                    : ""
+                }`}
                 style={{
                   top: g.groundTopY,
                   width: g.width,
@@ -1190,7 +1201,9 @@ export default function PlayField({
                 />
 
                 {/* 縁を光が一周する（完璧ハマり後） */}
-                {(successFx === "sweep" || successFx === "done") && (
+                {(successFx === "sweep" ||
+                  successFx === "shine" ||
+                  successFx === "done") && (
                   <div
                     className={`pxd-success-ring ${
                       successFx === "sweep" ? "pxd-success-ring--active" : ""
@@ -1199,6 +1212,16 @@ export default function PlayField({
                     <div className="pxd-success-ring__spin" aria-hidden />
                   </div>
                 )}
+
+                {/* 縁光一周後：斜めシャインスイープのみ（全面フラッシュなし） */}
+                {successFx === "shine" || successFx === "done" ? (
+                  <div
+                    className={`pxd-success-shine ${
+                      successFx === "shine" ? "pxd-success-shine--active" : ""
+                    }`}
+                    aria-hidden
+                  />
+                ) : null}
               </div>
 
               {/* 落ちる棒：画像中央帯を切り出した縦長長方形 */}
