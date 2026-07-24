@@ -210,7 +210,7 @@ function trimTrailingZeros(s: string): string {
 
 /**
  * 統一フォーマットの皮肉テキストを生成する。
- * JA: 誤差 {x}px もあったら、{物質名} が {動詞} ちゃいます。
+ * JA: 誤差{x}pxもあったら、{物質名}が{動詞}ちゃいます。
  */
 export function formatIronyQuip(
   absErrorPx: number,
@@ -219,7 +219,7 @@ export function formatIronyQuip(
   const scale = resolveIronyScale(absErrorPx);
   const err = formatAbsErrorForQuip(absErrorPx);
   if (locale === "ja") {
-    return `誤差 ${err}px もあったら、${scale.itemJa} が ${scale.actionJa} ちゃいます。`;
+    return `誤差${err}pxもあったら、${scale.itemJa}が${scale.actionJa}ちゃいます。`;
   }
   return `An error of ${err}px — ${scale.itemEn} would ${scale.actionEn}.`;
 }
