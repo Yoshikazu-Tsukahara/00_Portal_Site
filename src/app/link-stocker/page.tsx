@@ -24,8 +24,9 @@ import {
 } from "./types";
 import {
   clearLinkStockerQuery,
-  extractUrlFromSearch,
+  extractKeepPayloadFromSearch,
   normalizeInputUrl,
+  type KeepHints,
 } from "./urlParams";
 
 type OgpResponse = {
@@ -60,7 +61,9 @@ export default function LinkStockerPage() {
   linksRef.current = data.links;
   /** 直近に自動キープした URL（二重実行防止） */
   const lastAutoKeepRef = useRef<{ url: string; at: number } | null>(null);
-  const keepUrlRef = useRef<(raw: string) => Promise<boolean>>(async () => false);
+  const keepUrlRef = useRef<
+    (raw: string, hints?: KeepHints) => Promise<boolean>
+  >(async () => false);
 
   const links = data.links;
   const tags = data.tags;
@@ -128,7 +131,7 @@ export default function LinkStockerPage() {
   }
 
   const keepUrl = useCallback(
-    async (rawUrl: string): Promise<boolean> => {
+    async (rawUrl: string, hints: KeepHints = {}): Promise<boolean> => {
       setError(null);
 
       const normalized = normalizeInputUrl(rawUrl);
@@ -155,7 +158,12 @@ export default function LinkStockerPage() {
         const res = await fetch("/api/ogp", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ url: normalized }),
+          body: JSON.stringify({
+            url: normalized,
+            title: hints.title,
+            image: hints.image,
+            description: hints.description,
+          }),
         });
         const json = (await res.json()) as OgpResponse;
 
@@ -168,10 +176,10 @@ export default function LinkStockerPage() {
         const item: KeptLink = {
           id: createId(),
           url: json.url || normalized,
-          title: json.title || domainOf(normalized),
-          description: json.description || "",
+          title: json.title || hints.title || domainOf(normalized),
+          description: json.description || hints.description || "",
           memo: "",
-          image: json.image,
+          image: json.image || hints.image || null,
           siteName: json.siteName,
           favicon: json.favicon,
           domain: domainOf(json.url || normalized),
@@ -202,7 +210,7 @@ export default function LinkStockerPage() {
 
   /** クエリ / BroadcastChannel からの自動キープ（二重実行ガード付き） */
   const tryAutoKeep = useCallback(
-    (raw: string, fromQuery: boolean) => {
+    (raw: string, fromQuery: boolean, hints: KeepHints = {}) => {
       const normalized = normalizeInputUrl(raw);
       if (!normalized) {
         if (fromQuery) clearLinkStockerQuery();
@@ -226,7 +234,7 @@ export default function LinkStockerPage() {
       }
 
       // カード追加が終わってから ?url= を消す（再実行・履歴汚染を防ぐ）
-      void keepUrlRef.current(normalized).finally(() => {
+      void keepUrlRef.current(normalized, hints).finally(() => {
         if (fromQuery) clearLinkStockerQuery();
       });
     },
@@ -237,8 +245,8 @@ export default function LinkStockerPage() {
     if (!hydrated) return;
 
     const fromSearch = () => {
-      const incoming = extractUrlFromSearch(window.location.search);
-      if (incoming) tryAutoKeep(incoming, true);
+      const incoming = extractKeepPayloadFromSearch(window.location.search);
+      if (incoming) tryAutoKeep(incoming.url, true, incoming.hints);
     };
 
     fromSearch();
@@ -247,9 +255,20 @@ export default function LinkStockerPage() {
     try {
       channel = new BroadcastChannel(LINK_STOCKER_CHANNEL);
       channel.onmessage = (ev: MessageEvent) => {
-        const data = ev.data as { type?: string; url?: string } | null;
-        if (data?.type === "keep-request" && typeof data.url === "string") {
-          tryAutoKeep(data.url, false);
+        const msg = ev.data as {
+          type?: string;
+          url?: string;
+          title?: string;
+          image?: string;
+          description?: string;
+        } | null;
+        if (msg?.type === "keep-request" && typeof msg.url === "string") {
+          tryAutoKeep(msg.url, false, {
+            title: typeof msg.title === "string" ? msg.title : undefined,
+            image: typeof msg.image === "string" ? msg.image : undefined,
+            description:
+              typeof msg.description === "string" ? msg.description : undefined,
+          });
         }
       };
     } catch {

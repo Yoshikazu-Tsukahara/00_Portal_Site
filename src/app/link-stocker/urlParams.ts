@@ -1,5 +1,16 @@
 import { LINK_STOCKER_CHANNEL, LINK_STOCKER_WINDOW_NAME } from "./types";
 
+export type KeepHints = {
+  title?: string;
+  image?: string;
+  description?: string;
+};
+
+export type KeepPayload = {
+  url: string;
+  hints: KeepHints;
+};
+
 /**
  * 入力文字列を http(s) URL に正規化。失敗時は null。
  */
@@ -18,31 +29,77 @@ export function normalizeInputUrl(raw: string): string | null {
   }
 }
 
+function readHintParam(
+  params: URLSearchParams,
+  keys: string[],
+): string | undefined {
+  for (const key of keys) {
+    const v = params.get(key)?.trim();
+    if (v) return v;
+  }
+  return undefined;
+}
+
 /**
- * 共有／クエリ文字列から登録対象 URL を取り出す。
+ * 共有／クエリ文字列から登録対象 URL とメタヒントを取り出す。
+ * ot/oi/od はブックマークレットがページ上で拾った OGP（本番のサーバー取得失敗対策）。
  */
-export function extractUrlFromSearch(search: string): string | null {
+export function extractKeepPayloadFromSearch(
+  search: string,
+): KeepPayload | null {
   const params = new URLSearchParams(
     search.startsWith("?") ? search.slice(1) : search,
   );
 
-  const candidates = [params.get("url"), params.get("text"), params.get("title")];
+  const candidates = [
+    params.get("url"),
+    params.get("text"),
+    // Android 共有の title に URL が入る場合がある
+    params.get("title"),
+  ];
 
+  let url: string | null = null;
   for (const candidate of candidates) {
     if (!candidate) continue;
 
     const asWhole = normalizeInputUrl(candidate);
-    if (asWhole) return asWhole;
+    if (asWhole) {
+      url = asWhole;
+      break;
+    }
 
     const match = candidate.match(/https?:\/\/[^\s<>"'`]+/i);
     if (match) {
       const cleaned = match[0].replace(/[),.;]+$/g, "");
       const fromText = normalizeInputUrl(cleaned);
-      if (fromText) return fromText;
+      if (fromText) {
+        url = fromText;
+        break;
+      }
     }
   }
 
-  return null;
+  if (!url) return null;
+
+  const hints: KeepHints = {};
+  const title = readHintParam(params, ["ot", "ogTitle"]);
+  const image = readHintParam(params, ["oi", "ogImage"]);
+  const description = readHintParam(params, ["od", "ogDescription"]);
+  // title パラメータが URL でなければページタイトルとして使う
+  const shareTitle = params.get("title")?.trim();
+  if (title) hints.title = title.slice(0, 200);
+  else if (shareTitle && !normalizeInputUrl(shareTitle)) {
+    hints.title = shareTitle.slice(0, 200);
+  }
+  if (image) hints.image = image;
+  if (description) hints.description = description.slice(0, 400);
+
+  return { url, hints };
+}
+
+/** 後方互換 */
+export function extractUrlFromSearch(search: string): string | null {
+  return extractKeepPayloadFromSearch(search)?.url ?? null;
 }
 
 /** クエリを消してアプリのクリーンなパスに戻す */
@@ -53,20 +110,31 @@ export function clearLinkStockerQuery() {
 
 /**
  * ブックマークレット用 javascript: URL。
- * 固定ウィンドウ名で既存タブへフォーカスし、BroadcastChannel でも通知する。
+ * - 固定ウィンドウ名で既存タブへフォーカス
+ * - ページ上の OGP をクエリ／BroadcastChannel で渡し、本番の取得失敗を補う
  */
 export function buildBookmarkletHref(origin: string): string {
-  // 圧縮した IIFE（シングルクォート内に埋め込む）
   const code = [
     "(function(){",
     `var o=${JSON.stringify(origin)};`,
     "var u=location.href;",
+    "function m(p,n){",
+    "var e=document.querySelector('meta[property=\"'+p+'\"]')||document.querySelector('meta[name=\"'+n+'\"]');",
+    "return e&&e.content?e.content:'';",
+    "}",
+    "var t=m('og:title','twitter:title')||document.title||'';",
+    "var i=m('og:image','twitter:image')||'';",
+    "var d=m('og:description','twitter:description')||'';",
     "try{",
     `var c=new BroadcastChannel(${JSON.stringify(LINK_STOCKER_CHANNEL)});`,
-    "c.postMessage({type:'keep-request',url:u});",
+    "c.postMessage({type:'keep-request',url:u,title:t,image:i,description:d});",
     "c.close();",
     "}catch(e){}",
-    `window.open(o+'/link-stocker?url='+encodeURIComponent(u),${JSON.stringify(LINK_STOCKER_WINDOW_NAME)});`,
+    "var q='url='+encodeURIComponent(u);",
+    "if(t)q+='&ot='+encodeURIComponent(t.slice(0,200));",
+    "if(i)q+='&oi='+encodeURIComponent(i);",
+    "if(d)q+='&od='+encodeURIComponent(d.slice(0,400));",
+    `window.open(o+'/link-stocker?'+q,${JSON.stringify(LINK_STOCKER_WINDOW_NAME)});`,
     "})();",
   ].join("");
 

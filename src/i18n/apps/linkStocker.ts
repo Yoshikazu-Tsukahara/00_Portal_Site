@@ -136,7 +136,7 @@ export const linkStockerJa: LinkStockerDict = {
   },
   bookmarklet: {
     title: "💻 PC用：ブックマークバーにドラッグ",
-    hint: "下のボタンをブックマークバーへドラッグして追加。他サイトで押すと、既存のキープ用タブへ移動して自動登録します（タブが増え続けません）。",
+    hint: "下のボタンをブックマークバーへドラッグして追加。他サイトで押すと、そのページのタイトル／サムネも一緒に送り、既存のキープ用タブへ移動して自動登録します（タブが増え続けません）。",
     dragLabel: "キープに送る",
   },
   share: {
@@ -217,7 +217,7 @@ export const linkStockerEn: LinkStockerDict = {
   },
   bookmarklet: {
     title: "💻 Desktop: drag to bookmarks bar",
-    hint: "Drag the button onto your bookmarks bar. On any site, it focuses the existing Keep tab and auto-saves (won’t spawn endless tabs).",
+    hint: "Drag the button onto your bookmarks bar. It sends the page title/thumbnail, focuses the existing Keep tab, and auto-saves (won’t spawn endless tabs).",
     dragLabel: "Send to Keep",
   },
   share: {

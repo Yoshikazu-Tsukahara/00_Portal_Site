@@ -2,6 +2,7 @@
 
 import { ExternalLink, Tag, Trash2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { toProxiedImageUrl } from "./imageUrl";
 import TagPicker from "./TagPicker";
 import {
   primaryTagColor,
@@ -44,13 +45,19 @@ export default function LinkCard({
   const [draft, setDraft] = useState(memo);
   const [tagOpen, setTagOpen] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const showImage = Boolean(link.image) && !imgBroken;
+  // 本番ドメインからのホットリンク拒否を避けるためプロキシ経由で表示
+  const displayImage = toProxiedImageUrl(link.image);
+  const showImage = Boolean(displayImage) && !imgBroken;
   const tags = resolveLinkTags(link, allTags);
   const accent = primaryTagColor(link, allTags);
 
   useEffect(() => {
     if (!editing) setDraft(memo);
   }, [memo, editing]);
+
+  useEffect(() => {
+    setImgBroken(false);
+  }, [displayImage]);
 
   useEffect(() => {
     if (!editing) return;
@@ -88,10 +95,9 @@ export default function LinkCard({
         {showImage ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={link.image!}
+            src={displayImage!}
             alt=""
             loading="lazy"
-            referrerPolicy="no-referrer"
             className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
             onError={() => setImgBroken(true)}
           />
