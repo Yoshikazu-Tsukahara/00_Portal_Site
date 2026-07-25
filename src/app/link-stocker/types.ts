@@ -97,6 +97,7 @@ export function normalizeLinkStockerData(raw: unknown): LinkStockerData | null {
 
   let tags: CustomTag[] = [];
   if (Array.isArray(obj.tags)) {
+    // 空配列も「ユーザーが全部消した」正当な状態として尊重する
     for (const item of obj.tags) {
       if (!item || typeof item !== "object") continue;
       const t = item as Record<string, unknown>;
@@ -107,9 +108,8 @@ export function normalizeLinkStockerData(raw: unknown): LinkStockerData | null {
           : "#10b981";
       tags.push({ id: t.id, name: t.name.trim() || "タグ", color });
     }
-  }
-
-  if (tags.length === 0) {
+  } else {
+    // タグ配列なしの旧形式のみ、プリセットを土台にして移行する
     tags = DEFAULT_TAGS.map((t) => ({ ...t }));
   }
 

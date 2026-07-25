@@ -4,7 +4,7 @@ import { BookmarkPlus, LoaderCircle } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AppShell from "@/components/AppShell";
 import { LanguageToggle, useI18n } from "@/i18n";
-import { loadLocalJson, useLocalStorageState } from "@/lib/localData";
+import { loadLocalJson, removeLocalJson, useLocalStorageState } from "@/lib/localData";
 import InstallAppButton from "./InstallAppButton";
 import LinkCard from "./LinkCard";
 import ShortcutHelpModal from "./ShortcutHelpModal";
@@ -65,17 +65,30 @@ export default function LinkStockerPage() {
   const links = data.links;
   const tags = data.tags;
 
-  // 旧 v1 LocalStorage から一度だけ移行
+  // 旧 v1 → v2 は「v2 未保存の初回」だけ移行。空リストを v1 で上書きしない
   useEffect(() => {
     if (!hydrated) return;
-    if (data.links.length > 0) return;
+    if (typeof window === "undefined") return;
+
+    try {
+      // すでに v2 がある（リンク0件含む）＝現在の状態が正。残存 v1 は掃除のみ
+      if (window.localStorage.getItem(STORAGE_KEY) !== null) {
+        if (window.localStorage.getItem(STORAGE_KEY_V1) !== null) {
+          removeLocalJson(STORAGE_KEY_V1);
+        }
+        return;
+      }
+    } catch {
+      return;
+    }
+
     const legacy = loadLocalJson<unknown>(STORAGE_KEY_V1, null);
     if (!legacy) return;
     const migrated = normalizeLinkStockerData(legacy);
-    if (migrated && migrated.links.length > 0) {
-      setData(migrated);
-    }
-  }, [hydrated, data.links.length, setData]);
+    if (!migrated) return;
+    setData(migrated);
+    removeLocalJson(STORAGE_KEY_V1);
+  }, [hydrated, setData]);
 
   // このタブをブックマークレットの固定名に揃える
   useEffect(() => {
@@ -83,14 +96,15 @@ export default function LinkStockerPage() {
     window.name = LINK_STOCKER_WINDOW_NAME;
   }, []);
 
-  // 読み込み直後に tags 欠落を正規化
+  // tags プロパティ自体が壊れているときだけ補完（空配列はユーザー操作として残す）
   useEffect(() => {
     if (!hydrated) return;
-    if (!Array.isArray(data.tags) || data.tags.length === 0) {
-      const n = normalizeLinkStockerData(data);
-      if (n) setData(n);
-    }
-  }, [hydrated]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (Array.isArray(data.tags)) return;
+    setData((prev) => ({
+      ...prev,
+      tags: emptyData().tags,
+    }));
+  }, [hydrated, data.tags, setData]);
 
   const filtered = useMemo(() => {
     const list =
@@ -167,7 +181,7 @@ export default function LinkStockerPage() {
 
         setData((prev) => ({
           ...prev,
-          tags: prev.tags?.length ? prev.tags : emptyData().tags,
+          tags: Array.isArray(prev.tags) ? prev.tags : emptyData().tags,
           links: [item, ...prev.links],
         }));
         setUrlInput("");
@@ -341,7 +355,6 @@ export default function LinkStockerPage() {
   return (
     <AppShell
       title={copy.shell.title}
-      fillViewport
       wide
       hidePortalLink={isStandalone}
       afterDataManager={<InstallAppButton copy={copy.install} />}
@@ -358,8 +371,9 @@ export default function LinkStockerPage() {
         },
       }}
     >
-      <div className="flex h-[calc(100dvh-9.5rem)] min-h-[18rem] flex-col gap-2 sm:h-[calc(100dvh-8.5rem)]">
-        <form onSubmit={handleKeep} className="shrink-0">
+      {/* 内部スクロールなし：カード増加に合わせてページ全体とフッターが伸びる */}
+      <div className="flex flex-col gap-3 pb-2">
+        <form onSubmit={handleKeep}>
           <div className="flex items-center gap-2">
             <input
               type="url"
@@ -391,7 +405,7 @@ export default function LinkStockerPage() {
           ) : null}
         </form>
 
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex items-center gap-2">
           <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
             <button
               type="button"
@@ -447,13 +461,13 @@ export default function LinkStockerPage() {
           </div>
         </div>
 
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain rounded-2xl bg-gradient-to-b from-zinc-900/5 to-transparent pb-4">
+        <div className="rounded-2xl bg-gradient-to-b from-zinc-900/5 to-transparent pb-2">
           {!hydrated ? (
-            <div className="flex h-full min-h-[40vh] items-center justify-center text-zinc-400">
+            <div className="flex min-h-[40vh] items-center justify-center text-zinc-400">
               <LoaderCircle className="size-6 animate-spin" />
             </div>
           ) : filtered.length === 0 ? (
-            <div className="flex h-full min-h-[40vh] flex-col items-center justify-center rounded-2xl border border-dashed border-zinc-200 bg-white px-6 text-center">
+            <div className="flex min-h-[40vh] flex-col items-center justify-center rounded-2xl border border-dashed border-zinc-200 bg-white px-6 text-center">
               <p className="text-4xl" aria-hidden>
                 🔗
               </p>
