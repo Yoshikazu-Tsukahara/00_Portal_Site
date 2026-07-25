@@ -13,6 +13,8 @@ import {
   imageCompressorEn,
   imageCompressorJa,
 } from "./imageCompressor";
+import type { LinkStockerDict } from "./linkStocker";
+import { linkStockerEn, linkStockerJa } from "./linkStocker";
 import type { LunchSavingsDict } from "./lunchSavings";
 import { lunchSavingsEn, lunchSavingsJa } from "./lunchSavings";
 import type { MailTemplateDict } from "./mailTemplate";
@@ -43,6 +45,7 @@ export type AppsDictionary = {
   mediaMetadata: MediaMetadataDict;
   characterRelation: CharacterRelationDict;
   lunchSavings: LunchSavingsDict;
+  linkStocker: LinkStockerDict;
   ultimateProbabilitySlot: UltimateProbabilitySlotDict;
   pixelDropPuzzle: PixelDropPuzzleDict;
 };
@@ -56,6 +59,7 @@ export const appsJa: AppsDictionary = {
   mediaMetadata: mediaMetadataJa,
   characterRelation: characterRelationJa,
   lunchSavings: lunchSavingsJa,
+  linkStocker: linkStockerJa,
   ultimateProbabilitySlot: ultimateProbabilitySlotJa,
   pixelDropPuzzle: pixelDropPuzzleJa,
 };
@@ -69,6 +73,7 @@ export const appsEn: AppsDictionary = {
   mediaMetadata: mediaMetadataEn,
   characterRelation: characterRelationEn,
   lunchSavings: lunchSavingsEn,
+  linkStocker: linkStockerEn,
   ultimateProbabilitySlot: ultimateProbabilitySlotEn,
   pixelDropPuzzle: pixelDropPuzzleEn,
 };

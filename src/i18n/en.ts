@@ -84,6 +84,11 @@ export const en: Dictionary = {
       description:
         "Tap to log lunch spend vs budget and watch your savings grow—built for phones.",
     },
+    "link-stocker": {
+      title: "Link Stocker",
+      description:
+        "Keep “not quite bookmark” URLs as visual cards with auto-fetched OGP thumbnails.",
+    },
     "ultimate-probability-slot": {
       title: "Ultimate Probability Slot",
       description:
@@ -93,6 +98,11 @@ export const en: Dictionary = {
       title: "Tiny Pixel Gap Drop Puzzle",
       description:
         "Just drop a photo into the gap. Judged to a fraction of a pixel — an unforgiving precision puzzle.",
+    },
+    "monster-driver": {
+      title: "Monster Driver",
+      description:
+        "Stop on red, launch on green. A first-person takeoff action game of blinkers, memory, and reaction time.",
     },
   },
   card: {

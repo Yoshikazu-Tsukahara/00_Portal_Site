@@ -87,6 +87,11 @@ export const genres: Genre[] = [
         icon: "🍱",
         href: "/lunch-savings",
       },
+      {
+        id: "link-stocker",
+        icon: "🔗",
+        href: "/link-stocker",
+      },
     ],
   },
   {
@@ -103,6 +108,7 @@ export const genres: Genre[] = [
         icon: "🧩",
         href: "/pixel-drop-puzzle",
       },
+      // モンスタードライバーはポータル一覧非表示（ルート /monster-driver は残置）
     ],
   },
 ];

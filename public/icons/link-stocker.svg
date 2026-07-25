@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="とりあえずキープ">
+  <rect width="512" height="512" rx="112" fill="#ecfdf5"/>
+  <rect x="96" y="128" width="240" height="280" rx="28" fill="#ffffff" stroke="#a7f3d0" stroke-width="8"/>
+  <rect x="128" y="160" width="176" height="120" rx="16" fill="#34d399"/>
+  <rect x="128" y="304" width="140" height="16" rx="8" fill="#d1d5db"/>
+  <rect x="128" y="336" width="100" height="14" rx="7" fill="#e5e7eb"/>
+  <circle cx="360" cy="360" r="78" fill="#059669"/>
+  <path d="M360 318v84M318 360h84" stroke="#ecfdf5" stroke-width="22" stroke-linecap="round"/>
+</svg>

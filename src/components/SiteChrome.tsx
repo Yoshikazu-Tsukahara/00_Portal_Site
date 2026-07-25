@@ -11,27 +11,35 @@ const STANDALONE_APP_PATHS = [
   "/lunch-savings",
   "/ultimate-probability-slot",
   "/pixel-drop-puzzle",
+  "/link-stocker",
 ];
 
-function isStandaloneAppPath(pathname: string | null): boolean {
+/**
+ * ブラウザでもポータル枠を外し、没入型フルスクリーンで出すアプリ。
+ * （一人称ミニゲームなど）
+ */
+const ALWAYS_ISOLATE_PATHS = ["/monster-driver"];
+
+function matchesAppPath(pathname: string | null, bases: string[]): boolean {
   if (!pathname) return false;
-  return STANDALONE_APP_PATHS.some(
+  return bases.some(
     (base) => pathname === base || pathname.startsWith(`${base}/`),
   );
 }
 
 /**
  * サイト共通ヘッダー／フッター。
- * 独立 PWA 対応アプリを standalone で起動中のみポータル枠を完全非表示。
+ * 独立 PWA 対応アプリを standalone で起動中、または没入型アプリではポータル枠を非表示。
  * 通常ブラウザでは全ページ共通のヘッダー配置を維持する。
  */
 export default function SiteChrome({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const { isStandalone, ready } = useStandaloneDisplay();
   const isolatePwa =
-    ready && isStandalone && isStandaloneAppPath(pathname);
+    ready && isStandalone && matchesAppPath(pathname, STANDALONE_APP_PATHS);
+  const isolateFullscreen = matchesAppPath(pathname, ALWAYS_ISOLATE_PATHS);
 
-  if (isolatePwa) {
+  if (isolatePwa || isolateFullscreen) {
     return (
       <div className="flex min-h-dvh flex-1 flex-col">{children}</div>
     );

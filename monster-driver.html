@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>モンスタードライバー</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=JetBrains+Mono:wght@500;700;800&display=swap");
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      background: #05070c;
+      font-family: "JetBrains Mono", "Share Tech Mono", ui-monospace, monospace;
+      touch-action: manipulation;
+      overscroll-behavior: none;
+      user-select: none;
+      -webkit-user-select: none;
+      color: #e2e8f0;
+    }
+
+    .screen {
+      position: relative;
+      width: 100%;
+      max-width: 480px;
+      height: 100dvh;
+      margin: 0 auto;
+      overflow: hidden;
+      background: #020617;
+    }
+
+    .hidden-panel { display: none !important; }
+
+    /* ========== 背景ステージ（添付画像＝常時視点） ========== */
+    .bg-stage {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      transform-origin: 50% 62%;
+      will-change: transform;
+    }
+
+    .bg-photo {
+      position: absolute;
+      inset: 0;
+      background-image: url("/monster-driver/cockpit.png");
+      background-size: cover;
+      background-position: center 42%;
+      background-repeat: no-repeat;
+    }
+
+    /* 夜の緊張感を足す薄いトーン */
+    .bg-photo::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(2, 6, 23, 0.28) 0%, transparent 22%, transparent 58%, rgba(2, 6, 23, 0.35) 100%),
+        radial-gradient(ellipse at 50% 40%, transparent 40%, rgba(0, 0, 0, 0.28) 100%);
+      pointer-events: none;
+    }
+
+    /* 走行ピッチング（景色＋車体の微振動） */
+    @keyframes pitchDrive {
+      0%, 100% { transform: translateY(0) rotate(0deg) scale(1.02); }
+      25% { transform: translateY(-3px) rotate(-0.15deg) scale(1.025); }
+      50% { transform: translateY(2px) rotate(0.12deg) scale(1.02); }
+      75% { transform: translateY(-2px) rotate(-0.08deg) scale(1.028); }
+    }
+
+    .bg-stage.pitching {
+      animation: pitchDrive 0.22s linear infinite;
+    }
+
+    /* 成功時：一瞬奥へ → 手前へ急発進（G感） */
+    @keyframes perfectBoost {
+      0% { transform: scale(1) translateY(0); filter: brightness(1); }
+      18% { transform: scale(0.92) translateY(6px); filter: brightness(1.15); }
+      45% { transform: scale(1.14) translateY(-10px); filter: brightness(1.35); }
+      100% { transform: scale(1.22) translateY(-18px); filter: brightness(1.2); }
+    }
+
+    .bg-stage.boosting {
+      animation: perfectBoost 0.85s cubic-bezier(0.15, 0.85, 0.2, 1) forwards;
+    }
+
+    /* ========== オーバーレイ層 ========== */
+    .world-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    /* ① LED信号（画像内信号付近・ネオン寄り） */
+    .led-signal {
+      position: absolute;
+      left: 58%;
+      top: 19.5%;
+      transform: translateX(-50%);
+      min-width: 4.6rem;
+      padding: 0.28rem 0.45rem 0.35rem;
+      border-radius: 0.35rem;
+      background: rgba(2, 8, 20, 0.78);
+      border: 1px solid rgba(56, 189, 248, 0.45);
+      box-shadow:
+        0 0 18px rgba(14, 165, 233, 0.35),
+        inset 0 0 12px rgba(6, 182, 212, 0.15);
+      text-align: center;
+    }
+
+    .led-signal .tag {
+      font-size: 0.45rem;
+      letter-spacing: 0.22em;
+      color: #67e8f9;
+      opacity: 0.8;
+    }
+
+    .led-signal .lamp {
+      margin-top: 0.1rem;
+      font-size: 0.95rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      line-height: 1.1;
+    }
+
+    .led-signal.red .lamp {
+      color: #ff4d4d;
+      text-shadow: 0 0 10px #ef4444, 0 0 22px #dc2626;
+    }
+
+    .led-signal.green .lamp {
+      color: #4ade80;
+      text-shadow: 0 0 10px #22c55e, 0 0 24px #16a34a;
+      animation: ledPulse 0.8s ease-in-out infinite;
+    }
+
+    @keyframes ledPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.75; filter: brightness(1.3); }
+    }
+
+    /* ② 前方パトカー（交差点奥・小さく） */
+    .police-far {
+      position: absolute;
+      left: 50%;
+      top: 31%;
+      transform: translateX(-50%) scale(0.5);
+      font-size: 1.55rem;
+      line-height: 1;
+      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.55));
+      opacity: 0.92;
+    }
+
+    @keyframes policeSiren {
+      0%, 100% { filter: drop-shadow(0 0 0 transparent); transform: translateX(-50%) scale(0.5); }
+      25% { filter: drop-shadow(-8px 0 14px #ef4444); transform: translateX(-50%) scale(0.58); }
+      75% { filter: drop-shadow(8px 0 14px #3b82f6); transform: translateX(-50%) scale(0.58); }
+    }
+
+    .police-far.siren {
+      animation: policeSiren 0.28s ease-in-out infinite;
+    }
+
+    /* ③ ルームミラー（画像内ミラー枠に重ねる） */
+    .rear-mirror {
+      position: absolute;
+      left: 49%;
+      top: 5.8%;
+      width: min(42%, 190px);
+      transform: translateX(-50%);
+      z-index: 20;
+    }
+
+    .mirror-frame {
+      padding: 4px;
+      border-radius: 0.4rem;
+      background: linear-gradient(145deg, #cbd5e1, #475569 35%, #0f172a 70%, #94a3b8);
+      box-shadow:
+        0 8px 22px rgba(0, 0, 0, 0.55),
+        0 0 0 1px rgba(148, 163, 184, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    }
+
+    .mirror-glass {
+      position: relative;
+      overflow: hidden;
+      border-radius: 0.25rem;
+      min-height: 3.1rem;
+      background:
+        radial-gradient(ellipse at 50% 120%, #1e293b 0%, #020617 72%);
+      border: 1px solid rgba(15, 23, 42, 0.9);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0.25rem 0.35rem 0.35rem;
+    }
+
+    .mirror-glass::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(115deg, transparent 35%, rgba(125, 211, 252, 0.16) 48%, transparent 62%);
+      pointer-events: none;
+    }
+
+    .mirror-label {
+      font-size: 0.48rem;
+      letter-spacing: 0.28em;
+      color: #64748b;
+      font-weight: 700;
+      z-index: 1;
+    }
+
+    .mirror-car {
+      font-size: 1.55rem;
+      line-height: 1;
+      z-index: 1;
+      display: inline-block;
+      transform-origin: center bottom;
+    }
+
+    .mirror-hint {
+      font-size: 0.52rem;
+      color: #67e8f9;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      z-index: 1;
+      opacity: 0.9;
+    }
+
+    @keyframes mirrorCreep {
+      from { transform: scale(0.72); }
+      to { transform: scale(1.05); }
+    }
+
+    .mirror-car.creep { animation: mirrorCreep 3.2s ease-in forwards; }
+
+    @keyframes mirrorRage {
+      0%, 100% { transform: translate(0, 0) scale(1.55) rotate(0deg); }
+      20% { transform: translate(-4px, 2px) scale(1.75) rotate(-3deg); }
+      40% { transform: translate(5px, -2px) scale(1.9) rotate(4deg); }
+      60% { transform: translate(-3px, -1px) scale(2) rotate(-2deg); }
+      80% { transform: translate(4px, 3px) scale(2.1) rotate(3deg); }
+    }
+
+    .mirror-car.rage { animation: mirrorRage 0.12s linear infinite; }
+
+    /* ④ レーン指示：地平線→手前（車道中央） */
+    .lane-arrow {
+      position: absolute;
+      left: 50%;
+      top: 34%;
+      z-index: 15;
+      font-size: clamp(2.2rem, 11vw, 3.8rem);
+      font-weight: 800;
+      color: #86efac;
+      text-shadow:
+        0 0 12px rgba(34, 197, 94, 0.95),
+        0 0 28px rgba(74, 222, 128, 0.7),
+        0 2px 0 #14532d;
+      opacity: 0;
+      transform: translate(-50%, 0) scale(0.12);
+      pointer-events: none;
+    }
+
+    @keyframes arrowApproach {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, 0%) scale(0.12);
+        filter: blur(2px);
+      }
+      14% { opacity: 1; filter: blur(0); }
+      72% {
+        opacity: 1;
+        transform: translate(-50%, 78%) scale(1.7);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, 110%) scale(2.25);
+      }
+    }
+
+    .lane-arrow.rush {
+      animation: arrowApproach 1.05s cubic-bezier(0.22, 0.8, 0.25, 1) forwards;
+    }
+
+    /* HUDチップ */
+    .chip {
+      position: absolute;
+      z-index: 25;
+      border-radius: 0.35rem;
+      background: rgba(2, 8, 20, 0.72);
+      border: 1px solid rgba(34, 211, 238, 0.35);
+      box-shadow: 0 0 14px rgba(6, 182, 212, 0.2);
+      backdrop-filter: blur(6px);
+      padding: 0.3rem 0.5rem;
+      pointer-events: none;
+    }
+
+    .chip-signal {
+      top: max(0.55rem, env(safe-area-inset-top));
+      left: 0.55rem;
+    }
+
+    .chip-stage {
+      top: max(0.55rem, env(safe-area-inset-top));
+      right: 0.55rem;
+      text-align: right;
+    }
+
+    .phase-hint {
+      position: absolute;
+      left: 50%;
+      top: 48%;
+      transform: translateX(-50%);
+      z-index: 18;
+      white-space: nowrap;
+      border-radius: 0.25rem;
+      background: rgba(2, 8, 20, 0.7);
+      border: 1px solid rgba(52, 211, 153, 0.35);
+      padding: 0.28rem 0.7rem;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: #a7f3d0;
+      pointer-events: none;
+    }
+
+    /* ========== ダッシュ上ホログラム操作 ========== */
+    .holo-panel {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 30;
+      padding: 0.45rem 0.55rem max(0.55rem, env(safe-area-inset-bottom));
+      background: linear-gradient(180deg, transparent 0%, rgba(2, 8, 20, 0.35) 28%, rgba(2, 8, 20, 0.72) 100%);
+      pointer-events: none;
+    }
+
+    .holo-panel > * { pointer-events: auto; }
+
+    .blinker-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.35rem;
+      padding: 0 0.35rem;
+    }
+
+    .holo-ind {
+      width: 2.4rem;
+      height: 1.55rem;
+      border-radius: 0.25rem;
+      display: grid;
+      place-items: center;
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #064e3b;
+      background: rgba(6, 78, 59, 0.35);
+      border: 1px solid rgba(52, 211, 153, 0.25);
+      opacity: 0.45;
+    }
+
+    @keyframes indBlink {
+      0%, 49% {
+        opacity: 1;
+        color: #6ee7b7;
+        text-shadow: 0 0 12px rgba(52, 211, 153, 0.95);
+        background: rgba(6, 78, 59, 0.7);
+        border-color: #34d399;
+      }
+      50%, 100% {
+        opacity: 0.35;
+        color: #064e3b;
+        text-shadow: none;
+        background: rgba(6, 78, 59, 0.35);
+        border-color: rgba(52, 211, 153, 0.25);
+      }
+    }
+
+    .holo-ind.on { animation: indBlink 0.5s step-end infinite; }
+
+    .speed-readout {
+      text-align: center;
+      font-size: 0.58rem;
+      letter-spacing: 0.18em;
+      color: #67e8f9;
+    }
+
+    .speed-bar {
+      margin-top: 0.2rem;
+      height: 0.28rem;
+      width: 6.5rem;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(34, 211, 238, 0.25);
+      overflow: hidden;
+    }
+
+    .speed-fill {
+      height: 100%;
+      width: 30%;
+      background: linear-gradient(90deg, #22d3ee, #4ade80);
+      box-shadow: 0 0 8px rgba(34, 211, 238, 0.7);
+      transition: width 0.25s ease;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr 1fr;
+      gap: 0.4rem;
+    }
+
+    .ctrl-btn {
+      pointer-events: auto;
+      border-radius: 0.55rem;
+      padding: 0.55rem 0.25rem 0.45rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      transition: transform 0.08s ease, box-shadow 0.15s ease, background 0.15s ease;
+      -webkit-tap-highlight-color: transparent;
+      backdrop-filter: blur(8px);
+    }
+
+    .ctrl-btn:active { transform: scale(0.95); }
+
+    .ctrl-btn.left, .ctrl-btn.right {
+      color: #67e8f9;
+      background: linear-gradient(180deg, rgba(8, 47, 73, 0.55), rgba(2, 16, 32, 0.7));
+      border: 1px solid rgba(34, 211, 238, 0.55);
+      box-shadow:
+        0 0 16px rgba(6, 182, 212, 0.22),
+        inset 0 0 12px rgba(34, 211, 238, 0.08);
+    }
+
+    .ctrl-btn.accel {
+      color: #bbf7d0;
+      background: linear-gradient(180deg, rgba(6, 78, 59, 0.55), rgba(2, 24, 16, 0.72));
+      border: 1px solid rgba(74, 222, 128, 0.6);
+      box-shadow:
+        0 0 20px rgba(34, 197, 94, 0.28),
+        inset 0 0 14px rgba(74, 222, 128, 0.1);
+    }
+
+    .ctrl-btn.active-blink {
+      background: linear-gradient(180deg, rgba(14, 116, 144, 0.75), rgba(8, 47, 73, 0.85));
+      border-color: #22d3ee;
+      box-shadow: 0 0 22px rgba(34, 211, 238, 0.55);
+    }
+
+    .control-hint {
+      margin-top: 0.3rem;
+      text-align: center;
+      font-size: 0.58rem;
+      color: #64748b;
+      letter-spacing: 0.04em;
+      font-weight: 700;
+      min-height: 1rem;
+    }
+
+    /* キャビン端のウィンカー反射 */
+    @keyframes cabinBlinkL {
+      0%, 49% { box-shadow: inset 40px 0 55px -14px rgba(34, 211, 238, 0.45); }
+      50%, 100% { box-shadow: inset 40px 0 55px -14px transparent; }
+    }
+    @keyframes cabinBlinkR {
+      0%, 49% { box-shadow: inset -40px 0 55px -14px rgba(34, 211, 238, 0.45); }
+      50%, 100% { box-shadow: inset -40px 0 55px -14px transparent; }
+    }
+    .cabin-blink-l { animation: cabinBlinkL 0.5s step-end infinite; }
+    .cabin-blink-r { animation: cabinBlinkR 0.5s step-end infinite; }
+
+    /* エフェクト */
+    .fx-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 40;
+      pointer-events: none;
+    }
+
+    @keyframes sirenWorld {
+      0%, 100% { background: transparent; }
+      25% { background: rgba(220, 38, 38, 0.42); }
+      75% { background: rgba(37, 99, 235, 0.42); }
+    }
+
+    .fx-layer.siren-flash { animation: sirenWorld 0.22s step-end infinite; }
+
+    @keyframes warnRed {
+      0%, 100% { background: rgba(127, 29, 29, 0.18); }
+      50% { background: rgba(220, 38, 38, 0.48); }
+    }
+
+    .fx-layer.warn-red { animation: warnRed 0.35s ease-in-out 4; }
+
+    /* START / RESULT */
+    .overlay-panel {
+      position: absolute;
+      inset: 0;
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.15rem;
+      background:
+        radial-gradient(ellipse at 50% 18%, rgba(34, 211, 238, 0.12), transparent 48%),
+        linear-gradient(180deg, rgba(2, 6, 23, 0.92) 0%, rgba(2, 6, 23, 0.88) 100%);
+    }
+
+    .btn-main {
+      width: 100%;
+      border-radius: 0.55rem;
+      background: linear-gradient(90deg, #06b6d4, #22c55e);
+      color: #041016;
+      font-weight: 800;
+      font-size: 0.95rem;
+      letter-spacing: 0.08em;
+      padding: 0.9rem 1rem;
+      border: 1px solid rgba(165, 243, 252, 0.5);
+      box-shadow: 0 0 24px rgba(34, 211, 238, 0.35);
+    }
+
+    .btn-main:active { transform: scale(0.97); }
+
+    .btn-sub {
+      width: 100%;
+      border-radius: 0.55rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      color: #94a3b8;
+      font-weight: 700;
+      font-size: 0.78rem;
+      letter-spacing: 0.06em;
+      padding: 0.7rem;
+      margin-top: 0.4rem;
+    }
+
+    select#levelSelect {
+      font-family: inherit;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" class="screen">
+    <!-- 背景：添付の運転席画像 -->
+    <div id="bgStage" class="bg-stage" aria-hidden="true">
+      <div class="bg-photo"></div>
+    </div>
+
+    <div id="fxLayer" class="fx-layer" aria-hidden="true"></div>
+
+    <!-- START -->
+    <section id="panelStart" class="overlay-panel">
+      <div class="text-center">
+        <p class="text-cyan-300/90 text-[10px] tracking-[0.4em] font-bold mb-2">COCKPIT SIGNAL PROTOCOL</p>
+        <h1 class="text-3xl font-extrabold leading-tight tracking-wide">
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-emerald-300 to-lime-300">MONSTER</span><br />
+          <span class="text-white">DRIVER</span>
+        </h1>
+        <p class="mt-3 text-slate-400 text-xs leading-relaxed tracking-wide">
+          赤で止まれ。青で飛べ。<br />
+          ウィンカーを忘れなきゃ、あなたは伝説。
+        </p>
+      </div>
+
+      <div class="my-5 rounded-lg border border-cyan-500/30 bg-slate-950/70 p-4 space-y-3 shadow-[0_0_24px_rgba(34,211,238,0.12)]">
+        <label class="block text-[10px] text-cyan-300/80 font-bold tracking-[0.2em]">DIFFICULTY / PREFECTURE</label>
+        <select id="levelSelect" class="w-full rounded-md bg-slate-900 border border-cyan-500/40 px-3 py-2.5 text-sm font-bold text-cyan-100 focus:outline-none focus:ring-2 focus:ring-cyan-400"></select>
+        <p id="levelMessage" class="text-xs text-slate-300 leading-relaxed min-h-[2.75rem]"></p>
+        <div class="flex items-center justify-between text-[10px] text-slate-500 bg-black/40 rounded px-3 py-2 tracking-wider">
+          <span>TOLERANCE</span>
+          <span id="levelTolerance" class="text-emerald-300 font-bold text-xs">—</span>
+        </div>
+      </div>
+
+      <div>
+        <button id="btnStart" type="button" class="btn-main">ENGINE START</button>
+        <p class="text-center text-[10px] text-slate-500 leading-relaxed mt-3 tracking-wide">
+          PC: Q / E = BLINKER　Space = ACCEL<br />
+          MOBILE: HOLO BUTTONS
+        </p>
+      </div>
+    </section>
+
+    <!-- PLAY -->
+    <section id="panelPlay" class="hidden-panel absolute inset-0">
+      <div class="world-layer">
+        <div id="ledSignal" class="led-signal red">
+          <div class="tag">SIGNAL</div>
+          <div id="signalLamp" class="lamp">● RED</div>
+        </div>
+
+        <div id="policeCar" class="police-far">🚓</div>
+
+        <div id="laneArrow" class="lane-arrow">↑</div>
+
+        <div id="phaseHint" class="phase-hint">APPROACHING STOP LINE…</div>
+      </div>
+
+      <div class="chip chip-signal">
+        <p class="text-[9px] text-cyan-400/80 tracking-[0.22em] font-bold">STATUS</p>
+        <p id="signalLabel" class="text-sm font-extrabold leading-tight text-rose-300">🔴 RED</p>
+      </div>
+      <div class="chip chip-stage">
+        <p class="text-[9px] text-cyan-400/80 tracking-[0.22em] font-bold">STAGE</p>
+        <p id="prefectureBadge" class="text-xs font-extrabold text-emerald-300 leading-tight">—</p>
+      </div>
+
+      <!-- ルームミラー -->
+      <div class="rear-mirror">
+        <div class="mirror-frame">
+          <div class="mirror-glass">
+            <p class="mirror-label">REAR VIEW</p>
+            <span id="mirrorCar" class="mirror-car">🚕</span>
+            <p id="mirrorHint" class="mirror-hint">TAILGATING…</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ホログラム操作パネル -->
+      <div class="holo-panel">
+        <div class="blinker-row">
+          <div id="indLeft" class="holo-ind" aria-hidden="true">◀</div>
+          <div>
+            <div class="speed-readout">SPEED</div>
+            <div class="speed-bar mx-auto"><div id="speedBar" class="speed-fill"></div></div>
+          </div>
+          <div id="indRight" class="holo-ind" aria-hidden="true">▶</div>
+        </div>
+
+        <div class="controls">
+          <button id="btnLeft" type="button" class="ctrl-btn left">
+            <span class="block text-lg leading-none">◀</span>
+            <span class="block text-[10px] mt-0.5">L-BLINK</span>
+            <span class="block text-[9px] opacity-60">Q</span>
+          </button>
+          <button id="btnAccel" type="button" class="ctrl-btn accel">
+            <span class="block text-lg leading-none">▲</span>
+            <span class="block text-[10px] mt-0.5">ACCEL</span>
+            <span class="block text-[9px] opacity-60">SPACE</span>
+          </button>
+          <button id="btnRight" type="button" class="ctrl-btn right">
+            <span class="block text-lg leading-none">▶</span>
+            <span class="block text-[10px] mt-0.5">R-BLINK</span>
+            <span class="block text-[9px] opacity-60">E</span>
+          </button>
+        </div>
+        <p id="controlHint" class="control-hint">MATCH BLINKER TO MEMORIZED LANE</p>
+      </div>
+    </section>
+
+    <!-- RESULT -->
+    <section id="panelResult" class="hidden-panel overlay-panel">
+      <div class="w-full rounded-lg border border-cyan-500/30 bg-slate-950/90 p-5 shadow-[0_0_40px_rgba(34,211,238,0.15)] text-center">
+        <p id="resultEmoji" class="text-5xl mb-3">🎉</p>
+        <h2 id="resultTitle" class="text-xl font-extrabold text-emerald-300 tracking-wide">PERFECT GO</h2>
+        <p id="resultDetail" class="mt-3 text-xs text-slate-300 leading-relaxed"></p>
+        <p id="resultMeta" class="mt-3 text-[10px] text-slate-500 font-bold tracking-wider"></p>
+        <button id="btnRetry" type="button" class="btn-main mt-5">RETRY RUN</button>
+        <button id="btnHome" type="button" class="btn-sub">SELECT PREFECTURE</button>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    /**
+     * モンスタードライバー
+     * 判定ロジック・ステート管理は変更しない。UIのみ画像ベース一人称へ刷新。
+     */
+
+    const levelData = [
+      { prefecture: "沖縄県", carEmoji: "🚙", delayTolerance: 2.0, message: "うちなータイム。のんびり発進しても怒られない。" },
+      { prefecture: "北海道", carEmoji: "🛻", delayTolerance: 1.5, message: "おおらかだが、車間距離は近め。" },
+      { prefecture: "東京都", carEmoji: "🚕", delayTolerance: 1.0, message: "ビジネスせっかち。威圧感がある。" },
+      { prefecture: "大阪府", carEmoji: "🐆", delayTolerance: 0.3, message: "せっかち日本一。少しでも遅れると即クラクション。" },
+      { prefecture: "茨城県", carEmoji: "🏎️", delayTolerance: 0.1, message: "茨城ダッシュ。猶予はほぼゼロ。" }
+    ];
+
+    const LANES = [
+      { id: "straight", arrow: "↑", label: "直進", blinker: "none" },
+      { id: "left", arrow: "↰", label: "左折", blinker: "left" },
+      { id: "right", arrow: "↱", label: "右折", blinker: "right" }
+    ];
+
+    const State = {
+      START: "START",
+      APPROACHING: "APPROACHING",
+      WAITING_RED: "WAITING_RED",
+      GO_GREEN: "GO_GREEN",
+      RESULT: "RESULT"
+    };
+
+    const els = {
+      app: document.getElementById("app"),
+      bgStage: document.getElementById("bgStage"),
+      panelStart: document.getElementById("panelStart"),
+      panelPlay: document.getElementById("panelPlay"),
+      panelResult: document.getElementById("panelResult"),
+      levelSelect: document.getElementById("levelSelect"),
+      levelMessage: document.getElementById("levelMessage"),
+      levelTolerance: document.getElementById("levelTolerance"),
+      btnStart: document.getElementById("btnStart"),
+      signalLabel: document.getElementById("signalLabel"),
+      ledSignal: document.getElementById("ledSignal"),
+      signalLamp: document.getElementById("signalLamp"),
+      policeCar: document.getElementById("policeCar"),
+      prefectureBadge: document.getElementById("prefectureBadge"),
+      mirrorCar: document.getElementById("mirrorCar"),
+      mirrorHint: document.getElementById("mirrorHint"),
+      laneArrow: document.getElementById("laneArrow"),
+      phaseHint: document.getElementById("phaseHint"),
+      speedBar: document.getElementById("speedBar"),
+      indLeft: document.getElementById("indLeft"),
+      indRight: document.getElementById("indRight"),
+      btnLeft: document.getElementById("btnLeft"),
+      btnRight: document.getElementById("btnRight"),
+      btnAccel: document.getElementById("btnAccel"),
+      controlHint: document.getElementById("controlHint"),
+      fxLayer: document.getElementById("fxLayer"),
+      resultEmoji: document.getElementById("resultEmoji"),
+      resultTitle: document.getElementById("resultTitle"),
+      resultDetail: document.getElementById("resultDetail"),
+      resultMeta: document.getElementById("resultMeta"),
+      btnRetry: document.getElementById("btnRetry"),
+      btnHome: document.getElementById("btnHome")
+    };
+
+    const game = {
+      state: State.START,
+      level: levelData[2],
+      targetLane: null,
+      blinker: "none",
+      greenAt: 0,
+      timers: [],
+      judged: false
+    };
+
+    function clearTimers() {
+      game.timers.forEach((id) => clearTimeout(id));
+      game.timers = [];
+    }
+
+    function later(ms, fn) {
+      const id = setTimeout(fn, ms);
+      game.timers.push(id);
+      return id;
+    }
+
+    function setState(next) {
+      game.state = next;
+    }
+
+    function showPanel(name) {
+      els.panelStart.classList.toggle("hidden-panel", name !== "start");
+      els.panelPlay.classList.toggle("hidden-panel", name !== "play");
+      els.panelResult.classList.toggle("hidden-panel", name !== "result");
+    }
+
+    function resetVisuals() {
+      els.app.classList.remove("cabin-blink-l", "cabin-blink-r");
+      els.fxLayer.className = "fx-layer";
+      els.policeCar.classList.remove("siren");
+      els.mirrorCar.classList.remove("creep", "rage");
+      els.mirrorCar.style.transform = "";
+      els.bgStage.classList.remove("pitching", "boosting");
+      els.laneArrow.classList.remove("rush");
+      els.laneArrow.style.opacity = "0";
+      els.speedBar.style.width = "30%";
+      els.indLeft.classList.remove("on");
+      els.indRight.classList.remove("on");
+      els.btnLeft.classList.remove("active-blink");
+      els.btnRight.classList.remove("active-blink");
+      els.controlHint.textContent = "MATCH BLINKER TO MEMORIZED LANE";
+      els.phaseHint.textContent = "APPROACHING STOP LINE…";
+      els.mirrorHint.textContent = "TAILGATING…";
+    }
+
+    function pickLane() {
+      return LANES[Math.floor(Math.random() * LANES.length)];
+    }
+
+    function updateBlinkerUI() {
+      els.app.classList.remove("cabin-blink-l", "cabin-blink-r");
+      els.indLeft.classList.remove("on");
+      els.indRight.classList.remove("on");
+      els.btnLeft.classList.remove("active-blink");
+      els.btnRight.classList.remove("active-blink");
+
+      if (game.blinker === "left") {
+        els.app.classList.add("cabin-blink-l");
+        els.indLeft.classList.add("on");
+        els.btnLeft.classList.add("active-blink");
+      } else if (game.blinker === "right") {
+        els.app.classList.add("cabin-blink-r");
+        els.indRight.classList.add("on");
+        els.btnRight.classList.add("active-blink");
+      }
+    }
+
+    function toggleBlinker(side) {
+      if (game.state !== State.WAITING_RED && game.state !== State.GO_GREEN) return;
+      if (game.judged) return;
+      game.blinker = game.blinker === side ? "none" : side;
+      updateBlinkerUI();
+    }
+
+    function setSignal(color) {
+      if (color === "red") {
+        els.signalLabel.textContent = "🔴 RED";
+        els.signalLabel.className = "text-sm font-extrabold leading-tight text-rose-300";
+        els.ledSignal.classList.remove("green");
+        els.ledSignal.classList.add("red");
+        els.signalLamp.textContent = "● RED";
+      } else {
+        els.signalLabel.textContent = "🟢 GREEN";
+        els.signalLabel.className = "text-sm font-extrabold leading-tight text-emerald-300";
+        els.ledSignal.classList.remove("red");
+        els.ledSignal.classList.add("green");
+        els.signalLamp.textContent = "● GO";
+      }
+    }
+
+    /** フェーズ1：アプローチ（画像ピッチング＋矢印迫り出し） */
+    function startApproaching() {
+      clearTimers();
+      game.judged = false;
+      game.blinker = "none";
+      game.targetLane = pickLane();
+      resetVisuals();
+      setState(State.APPROACHING);
+      showPanel("play");
+
+      els.prefectureBadge.textContent = game.level.prefecture;
+      els.mirrorCar.textContent = game.level.carEmoji;
+      els.mirrorCar.classList.add("creep");
+      setSignal("red");
+      els.speedBar.style.width = "72%";
+      els.bgStage.classList.add("pitching");
+      els.phaseHint.textContent = "APPROACHING… MEMORIZE LANE";
+
+      later(1100, () => {
+        if (game.state !== State.APPROACHING) return;
+        els.laneArrow.textContent = game.targetLane.arrow;
+        els.laneArrow.classList.remove("rush");
+        void els.laneArrow.offsetWidth;
+        els.laneArrow.classList.add("rush");
+        els.phaseHint.textContent = `${game.targetLane.arrow} ${game.targetLane.label} — LOCKED`;
+      });
+
+      later(3000, () => {
+        if (game.state !== State.APPROACHING) return;
+        enterWaitingRed();
+      });
+    }
+
+    /** フェーズ2：赤待機 */
+    function enterWaitingRed() {
+      setState(State.WAITING_RED);
+      els.bgStage.classList.remove("pitching");
+      els.speedBar.style.width = "0%";
+      setSignal("red");
+      els.phaseHint.textContent = "RED — SET BLINKER & HOLD";
+      els.controlHint.textContent =
+        game.targetLane.blinker === "none"
+          ? "STRAIGHT: NO BLINKER — WAIT GREEN"
+          : `${game.targetLane.label}: ${game.targetLane.blinker === "left" ? "L" : "R"}-BLINKER ON`;
+
+      const waitMs = 2000 + Math.random() * 3000;
+      later(waitMs, () => {
+        if (game.state !== State.WAITING_RED) return;
+        enterGoGreen();
+      });
+    }
+
+    /** フェーズ3：青信号 */
+    function enterGoGreen() {
+      setState(State.GO_GREEN);
+      game.greenAt = performance.now();
+      setSignal("green");
+      els.phaseHint.textContent = "GREEN — ACCEL NOW";
+      els.controlHint.textContent = `TOLERANCE ${game.level.delayTolerance.toFixed(1)}s`;
+      els.speedBar.style.width = "18%";
+
+      later(game.level.delayTolerance * 1000, () => {
+        if (game.state !== State.GO_GREEN || game.judged) return;
+        judgeDelay();
+      });
+    }
+
+    function blinkerOk() {
+      return game.blinker === game.targetLane.blinker;
+    }
+
+    function pressAccel() {
+      if (game.judged) return;
+
+      if (game.state === State.WAITING_RED || game.state === State.APPROACHING) {
+        judgeFlying();
+        return;
+      }
+
+      if (game.state !== State.GO_GREEN) return;
+
+      const reaction = (performance.now() - game.greenAt) / 1000;
+
+      if (reaction > game.level.delayTolerance) {
+        judgeDelay();
+        return;
+      }
+
+      if (!blinkerOk()) {
+        judgeBlinkerFail(reaction);
+        return;
+      }
+
+      judgePerfect(reaction);
+    }
+
+    function finishToResult(payload) {
+      if (game.judged) return;
+      game.judged = true;
+      clearTimers();
+      setState(State.RESULT);
+
+      els.resultEmoji.textContent = payload.emoji;
+      els.resultTitle.textContent = payload.title;
+      els.resultTitle.className = `text-xl font-extrabold tracking-wide ${payload.titleClass}`;
+      els.resultDetail.textContent = payload.detail;
+      els.resultMeta.textContent = payload.meta || "";
+
+      later(payload.delay || 800, () => {
+        showPanel("result");
+      });
+    }
+
+    function judgePerfect(reaction) {
+      els.bgStage.classList.remove("pitching");
+      els.bgStage.classList.remove("boosting");
+      void els.bgStage.offsetWidth;
+      els.bgStage.classList.add("boosting");
+      els.speedBar.style.width = "100%";
+      els.phaseHint.textContent = "PERFECT GO";
+      els.app.classList.remove("cabin-blink-l", "cabin-blink-r");
+
+      finishToResult({
+        emoji: "🏆",
+        title: "見事な発進！",
+        titleClass: "text-emerald-300",
+        detail: `反応 ${reaction.toFixed(2)} 秒・ウィンカー完璧。交差点をブースト通過。${game.level.prefecture}の後続車も、ほんの少しだけ感心した顔をしていました（たぶん）。`,
+        meta: `LANE:${game.targetLane.label} / STAGE:${game.level.prefecture}`,
+        delay: 950
+      });
+    }
+
+    function judgeFlying() {
+      els.policeCar.classList.add("siren");
+      els.fxLayer.classList.add("siren-flash");
+      els.bgStage.classList.remove("pitching");
+      els.phaseHint.textContent = "JUMP START — ARRESTED";
+      els.speedBar.style.width = "0%";
+
+      finishToResult({
+        emoji: "🚓",
+        title: "フライング！警察に捕まりました",
+        titleClass: "text-rose-400",
+        detail: "青になる前にアクセルを踏むなんて…パトランプがフロントガラスを赤と青に染めます。",
+        meta: "VIOLATION: SIGNAL JUMP",
+        delay: 1000
+      });
+    }
+
+    function judgeDelay() {
+      els.fxLayer.classList.add("warn-red");
+      els.mirrorCar.classList.remove("creep");
+      els.mirrorCar.classList.add("rage");
+      els.bgStage.classList.remove("pitching");
+      els.phaseHint.textContent = "HORN ASSAULT";
+      els.mirrorHint.textContent = "BEEEEEP!!!";
+
+      finishToResult({
+        emoji: "📢",
+        title: "激しいクラクション！煽られました",
+        titleClass: "text-orange-300",
+        detail: `${game.level.prefecture}の後続 ${game.level.carEmoji} がミラーいっぱいに迫りました。「${game.level.message}」…いや、もう怒ってる。`,
+        meta: `OVER TOLERANCE ${game.level.delayTolerance.toFixed(1)}s`,
+        delay: 950
+      });
+    }
+
+    function judgeBlinkerFail(reaction) {
+      els.policeCar.classList.add("siren");
+      els.fxLayer.classList.add("siren-flash");
+      els.bgStage.classList.remove("pitching");
+      els.phaseHint.textContent = "NO SIGNAL — ARRESTED";
+
+      const needed =
+        game.targetLane.blinker === "none"
+          ? "直進なのでウィンカーなし"
+          : `${game.targetLane.label}なので${game.targetLane.blinker === "left" ? "左" : "右"}ウィンカー`;
+      const actual =
+        game.blinker === "none"
+          ? "出していない"
+          : game.blinker === "left"
+            ? "左ウィンカー"
+            : "右ウィンカー";
+
+      finishToResult({
+        emoji: "🚨",
+        title: "ウィンカー不履行！警察に捕まりました",
+        titleClass: "text-rose-400",
+        detail: `タイミング（${reaction.toFixed(2)}秒）は悪くなかったのに…正解は「${needed}」、あなたの操作は「${actual}」。道交法はロマンより先に来る。`,
+        meta: "VIOLATION: FAIL TO SIGNAL",
+        delay: 1000
+      });
+    }
+
+    function goHome() {
+      clearTimers();
+      game.judged = false;
+      game.blinker = "none";
+      setState(State.START);
+      resetVisuals();
+      showPanel("start");
+      updateLevelInfo();
+    }
+
+    function updateLevelInfo() {
+      const idx = Number(els.levelSelect.value);
+      const level = levelData[idx];
+      game.level = level;
+      els.levelMessage.textContent = `${level.carEmoji} ${level.message}`;
+      els.levelTolerance.textContent = `${level.delayTolerance.toFixed(1)} SEC`;
+    }
+
+    function initSelect() {
+      els.levelSelect.innerHTML = levelData
+        .map(
+          (lv, i) =>
+            `<option value="${i}">${lv.carEmoji} ${lv.prefecture}（${lv.delayTolerance.toFixed(1)}s）</option>`
+        )
+        .join("");
+      els.levelSelect.value = "2";
+      updateLevelInfo();
+    }
+
+    els.levelSelect.addEventListener("change", updateLevelInfo);
+    els.btnStart.addEventListener("click", () => {
+      updateLevelInfo();
+      startApproaching();
+    });
+    els.btnRetry.addEventListener("click", () => startApproaching());
+    els.btnHome.addEventListener("click", goHome);
+    els.btnLeft.addEventListener("click", () => toggleBlinker("left"));
+    els.btnRight.addEventListener("click", () => toggleBlinker("right"));
+    els.btnAccel.addEventListener("click", pressAccel);
+
+    const keyHeld = new Set();
+    window.addEventListener("keydown", (e) => {
+      if (e.repeat) return;
+      const key = e.key.toLowerCase();
+      if (key === "q") {
+        e.preventDefault();
+        toggleBlinker("left");
+      } else if (key === "e") {
+        e.preventDefault();
+        toggleBlinker("right");
+      } else if (e.code === "Space" || key === " ") {
+        e.preventDefault();
+        if (!keyHeld.has("space")) {
+          keyHeld.add("space");
+          pressAccel();
+        }
+      } else if (key === "enter" && game.state === State.START) {
+        e.preventDefault();
+        updateLevelInfo();
+        startApproaching();
+      }
+    });
+
+    window.addEventListener("keyup", (e) => {
+      if (e.code === "Space" || e.key === " ") keyHeld.delete("space");
+    });
+
+    initSelect();
+    showPanel("start");
+  </script>
+</body>
+</html>

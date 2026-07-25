@@ -84,6 +84,11 @@ export const ja: Dictionary = {
       description:
         "予算との差額をタップで記録。浮いたお金をゲーム感覚で貯めるスマホ向けアプリ。",
     },
+    "link-stocker": {
+      title: "とりあえずキープ",
+      description:
+        "ブックマークするほどではない URL を、OGP サムネ付きカードで視覚的にキープ。",
+    },
     "ultimate-probability-slot": {
       title: "究極確率スロット",
       description:
@@ -93,6 +98,11 @@ export const ja: Dictionary = {
       title: "極小ピクセル隙間落としパズル",
       description:
         "写真を隙間に落とすだけ。ただし判定は小数点以下のピクセル単位という、鬼畜な精度パズル。",
+    },
+    "monster-driver": {
+      title: "モンスタードライバー",
+      description:
+        "赤で止まれ、青で飛び出せ。ウィンカー記憶と反応速度が試される一人称発進アクション。",
     },
   },
   card: {
