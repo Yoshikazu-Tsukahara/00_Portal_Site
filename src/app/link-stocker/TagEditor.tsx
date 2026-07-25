@@ -70,17 +70,17 @@ export default function TagEditor({
       ref={panelRef}
       role="dialog"
       aria-labelledby={titleId}
-      className="absolute bottom-10 left-3 right-3 z-30 rounded-xl border border-white/15 bg-zinc-950/95 p-3 shadow-2xl backdrop-blur-md"
+      className="absolute bottom-10 left-3 right-3 z-30 rounded-xl border border-zinc-200 bg-white p-3 shadow-xl"
       onClick={(e) => e.stopPropagation()}
     >
       <div className="mb-2 flex items-center justify-between gap-2">
-        <p id={titleId} className="text-xs font-semibold text-zinc-200">
+        <p id={titleId} className="text-xs font-semibold text-zinc-800">
           {labels.title}
         </p>
         <button
           type="button"
           onClick={onClose}
-          className="rounded-lg p-1 text-zinc-500 hover:bg-white/5 hover:text-zinc-300"
+          className="rounded-lg p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700"
           aria-label="close"
         >
           <X className="size-3.5" />
@@ -94,17 +94,17 @@ export default function TagEditor({
           return (
             <li
               key={tag.id}
-              className="flex items-center gap-1.5 rounded-lg px-1 py-1 hover:bg-white/5"
+              className="flex items-center gap-1.5 rounded-lg px-1 py-1 hover:bg-zinc-50"
             >
               <button
                 type="button"
                 onClick={() => onToggleTag(tag.id)}
                 className={`flex min-w-0 flex-1 items-center gap-2 rounded-md px-1.5 py-1 text-left text-[11px] ${
-                  on ? "bg-white/10 text-white" : "text-zinc-400"
+                  on ? "bg-emerald-50 text-emerald-900" : "text-zinc-500"
                 }`}
               >
                 <span
-                  className="size-2.5 shrink-0 rounded-full ring-1 ring-white/20"
+                  className="size-2.5 shrink-0 rounded-full ring-1 ring-zinc-200"
                   style={{ backgroundColor: tag.color }}
                 />
                 {editing ? (
@@ -114,7 +114,7 @@ export default function TagEditor({
                     onChange={(e) =>
                       onUpdateTag(tag.id, { name: e.target.value })
                     }
-                    className="min-w-0 flex-1 rounded bg-zinc-900 px-1 py-0.5 text-[11px] text-zinc-100 outline-none ring-1 ring-white/20"
+                    className="min-w-0 flex-1 rounded border border-zinc-200 bg-white px-1 py-0.5 text-[11px] text-zinc-800 outline-none ring-emerald-400/40 focus:ring-1"
                   />
                 ) : (
                   <span className="truncate">{tag.name}</span>
@@ -132,14 +132,14 @@ export default function TagEditor({
                 onClick={() =>
                   setEditingId((id) => (id === tag.id ? null : tag.id))
                 }
-                className="rounded px-1 text-[10px] text-zinc-500 hover:text-zinc-300"
+                className="rounded px-1 text-[10px] text-zinc-400 hover:text-zinc-700"
               >
                 {editing ? "OK" : "✎"}
               </button>
               <button
                 type="button"
                 onClick={() => onDeleteTag(tag.id)}
-                className="rounded px-1 text-[10px] text-rose-400/80 hover:text-rose-300"
+                className="rounded px-1 text-[10px] text-rose-400 hover:text-rose-600"
               >
                 ×
               </button>
@@ -148,12 +148,12 @@ export default function TagEditor({
         })}
       </ul>
 
-      <div className="space-y-2 border-t border-white/10 pt-2">
+      <div className="space-y-2 border-t border-zinc-100 pt-2">
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder={labels.newName}
-          className="w-full rounded-lg border border-white/10 bg-zinc-900 px-2 py-1.5 text-[11px] text-zinc-100 outline-none focus:ring-1 focus:ring-emerald-400/50"
+          className="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-2 py-1.5 text-[11px] text-zinc-800 outline-none focus:bg-white focus:ring-1 focus:ring-emerald-400/50"
         />
         <div className="flex flex-wrap gap-1.5">
           {TAG_COLOR_PRESETS.map((p) => (
@@ -163,12 +163,12 @@ export default function TagEditor({
               title={p.label}
               onClick={() => setColor(p.color)}
               className={`size-5 rounded-full ring-2 transition ${
-                color === p.color ? "ring-white" : "ring-transparent"
+                color === p.color ? "ring-emerald-600" : "ring-transparent"
               }`}
               style={{ backgroundColor: p.color }}
             />
           ))}
-          <label className="flex size-5 cursor-pointer items-center justify-center overflow-hidden rounded-full ring-1 ring-white/30">
+          <label className="flex size-5 cursor-pointer items-center justify-center overflow-hidden rounded-full ring-1 ring-zinc-300">
             <input
               type="color"
               value={color}
@@ -187,7 +187,7 @@ export default function TagEditor({
             onCreateTag(n, color);
             setName("");
           }}
-          className="inline-flex w-full items-center justify-center gap-1 rounded-lg bg-emerald-600/90 px-2 py-1.5 text-[11px] font-semibold text-white disabled:opacity-40"
+          className="inline-flex w-full items-center justify-center gap-1 rounded-lg bg-emerald-600 px-2 py-1.5 text-[11px] font-semibold text-white disabled:opacity-40"
         >
           <Plus className="size-3.5" />
           {labels.create}

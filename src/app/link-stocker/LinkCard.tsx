@@ -35,7 +35,7 @@ type Props = {
   onDeleteTag: (tagId: string) => void;
 };
 
-/** モダンなダークガラス風キープカード（メモ・カラータグ付き） */
+/** やさしいライトモードのキープカード（タグは左下固定） */
 export default function LinkCard({
   link,
   allTags,
@@ -82,21 +82,21 @@ export default function LinkCard({
 
   return (
     <article
-      className="group relative flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border bg-zinc-900/80 shadow-lg shadow-black/20 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/30"
+      className="group relative flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border bg-white/90 shadow-sm backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
       style={
         accent
           ? {
               borderColor: accent,
-              boxShadow: `0 0 12px ${accent}33, 0 10px 24px rgba(0,0,0,0.35)`,
+              boxShadow: `0 0 0 1px ${accent}33, 0 8px 20px ${accent}18`,
             }
-          : { borderColor: "rgba(255,255,255,0.1)" }
+          : { borderColor: "rgba(228, 228, 231, 0.95)" }
       }
     >
       <a
         href={link.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="relative block aspect-[16/10] w-full shrink-0 overflow-hidden bg-zinc-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/70"
+        className="relative block aspect-[16/10] w-full shrink-0 overflow-hidden bg-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/70"
       >
         {showImage ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -109,36 +109,37 @@ export default function LinkCard({
             onError={() => setImgBroken(true)}
           />
         ) : (
-          <div className="flex h-full w-full flex-col items-center justify-center gap-1 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-950 px-3 text-center">
-            <p className="text-[10px] font-bold tracking-[0.2em] text-zinc-500">
+          <div className="flex h-full w-full flex-col items-center justify-center gap-1 bg-gradient-to-br from-emerald-50 via-white to-teal-50 px-3 text-center">
+            <p className="text-[10px] font-bold tracking-[0.2em] text-emerald-600/70">
               {noImageLabel}
             </p>
-            <p className="line-clamp-2 break-all text-base font-semibold tracking-tight text-zinc-200">
+            <p className="line-clamp-2 break-all text-base font-semibold tracking-tight text-emerald-900">
               {link.domain}
             </p>
           </div>
         )}
       </a>
 
-      <div className="flex min-h-0 flex-1 flex-col gap-1 p-3">
+      {/* 本文：タグ行を mt-auto で左下に固定 */}
+      <div className="flex min-h-0 flex-1 flex-col p-3">
         <a
           href={link.url}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-start gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/70"
         >
-          <h2 className="line-clamp-2 min-w-0 flex-1 text-sm font-bold leading-snug text-gray-100">
+          <h2 className="line-clamp-2 min-w-0 flex-1 text-sm font-bold leading-snug text-zinc-900">
             {link.title}
           </h2>
           <ExternalLink
-            className="mt-0.5 size-3.5 shrink-0 text-zinc-500 opacity-0 transition group-hover:opacity-100"
+            className="mt-0.5 size-3.5 shrink-0 text-zinc-400 opacity-0 transition group-hover:opacity-100"
             aria-hidden
           />
         </a>
 
-        <p className="truncate text-xs text-gray-400">{link.domain}</p>
+        <p className="mt-1 truncate text-xs text-zinc-500">{link.domain}</p>
 
-        <div className="mt-0.5 min-h-[3.75rem]">
+        <div className="mt-1.5 min-h-[3.75rem]">
           {editing ? (
             <textarea
               ref={textareaRef}
@@ -158,7 +159,7 @@ export default function LinkCard({
                   setEditing(false);
                 }
               }}
-              className="w-full resize-none rounded-lg border border-white/10 bg-zinc-950/50 px-2 py-1.5 text-xs leading-relaxed text-gray-200 outline-none ring-emerald-400/40 placeholder:text-zinc-500 focus:ring-2"
+              className="w-full resize-none rounded-lg border border-zinc-200 bg-zinc-50 px-2 py-1.5 text-xs leading-relaxed text-zinc-700 outline-none ring-emerald-400/40 placeholder:text-zinc-400 focus:bg-white focus:ring-2"
               placeholder={memoPlaceholder}
             />
           ) : (
@@ -169,20 +170,21 @@ export default function LinkCard({
                 e.stopPropagation();
                 setEditing(true);
               }}
-              className="w-full rounded-lg px-0.5 py-0.5 text-left transition hover:bg-white/5"
+              className="w-full rounded-lg px-0.5 py-0.5 text-left transition hover:bg-zinc-50"
             >
               {memo.trim() ? (
-                <p className="line-clamp-3 text-xs leading-relaxed text-gray-300">
+                <p className="line-clamp-3 text-xs leading-relaxed text-zinc-600">
                   {memo}
                 </p>
               ) : (
-                <p className="text-xs text-zinc-500">{memoPlaceholder}</p>
+                <p className="text-xs text-zinc-400">{memoPlaceholder}</p>
               )}
             </button>
           )}
         </div>
 
-        <div className="mt-2 flex flex-wrap items-center gap-1">
+        {/* 左下固定のタグ行 */}
+        <div className="mt-auto flex flex-wrap items-center gap-1 pt-2">
           {tags.map((tag) => (
             <span
               key={tag.id}
@@ -199,7 +201,7 @@ export default function LinkCard({
               e.stopPropagation();
               setTagOpen((v) => !v);
             }}
-            className="inline-flex items-center gap-0.5 rounded-full border border-white/15 bg-zinc-800/80 px-2 py-0.5 text-[10px] text-zinc-300 transition hover:border-white/30 hover:text-white"
+            className="inline-flex items-center gap-0.5 rounded-full border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-[10px] text-zinc-600 transition hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-800"
           >
             <Tag className="size-2.5" />
             {tags.length === 0 ? "タグ" : "+"}
@@ -228,7 +230,7 @@ export default function LinkCard({
           if (!window.confirm(deleteConfirm)) return;
           onDelete(link.id);
         }}
-        className="absolute top-2 right-2 rounded-xl border border-white/10 bg-zinc-950/70 p-1.5 text-zinc-400 shadow-sm backdrop-blur transition hover:border-rose-400/40 hover:text-rose-300 sm:opacity-0 sm:group-hover:opacity-100"
+        className="absolute top-2 right-2 rounded-xl border border-zinc-200/80 bg-white/90 p-1.5 text-zinc-400 shadow-sm backdrop-blur transition hover:border-rose-200 hover:text-rose-500 sm:opacity-0 sm:group-hover:opacity-100"
       >
         <Trash2 className="size-3.5" />
       </button>
