@@ -1,84 +1,223 @@
 "use client";
 
-import { ExternalLink, Trash2 } from "lucide-react";
-import { useState } from "react";
-import type { KeptLink } from "./types";
+import { ExternalLink, Tag, Trash2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import TagEditor from "./TagEditor";
+import {
+  primaryTagColor,
+  resolveLinkTags,
+  type CustomTag,
+  type KeptLink,
+} from "./types";
 
 type Props = {
   link: KeptLink;
+  allTags: CustomTag[];
   deleteLabel: string;
   deleteConfirm: string;
   noImageLabel: string;
+  memoPlaceholder: string;
+  tagEditorLabels: {
+    title: string;
+    newName: string;
+    create: string;
+    customColor: string;
+    apply: string;
+  };
   onDelete: (id: string) => void;
+  onUpdateMemo: (id: string, memo: string) => void;
+  onToggleTag: (linkId: string, tagId: string) => void;
+  onCreateTag: (linkId: string, name: string, color: string) => void;
+  onUpdateTag: (
+    tagId: string,
+    patch: { name?: string; color?: string },
+  ) => void;
+  onDeleteTag: (tagId: string) => void;
 };
 
-/** ランチ貯金風の明るいカード（OGP サムネ付き） */
+/** モダンなダークガラス風キープカード（メモ・カラータグ付き） */
 export default function LinkCard({
   link,
+  allTags,
   deleteLabel,
   deleteConfirm,
   noImageLabel,
+  memoPlaceholder,
+  tagEditorLabels,
   onDelete,
+  onUpdateMemo,
+  onToggleTag,
+  onCreateTag,
+  onUpdateTag,
+  onDeleteTag,
 }: Props) {
+  const memo = link.memo ?? "";
   const [imgBroken, setImgBroken] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(memo);
+  const [tagOpen, setTagOpen] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const showImage = Boolean(link.image) && !imgBroken;
+  const tags = resolveLinkTags(link, allTags);
+  const accent = primaryTagColor(link, allTags);
+
+  useEffect(() => {
+    if (!editing) setDraft(memo);
+  }, [memo, editing]);
+
+  useEffect(() => {
+    if (!editing) return;
+    const el = textareaRef.current;
+    if (!el) return;
+    el.focus();
+    el.setSelectionRange(el.value.length, el.value.length);
+  }, [editing]);
+
+  function commitMemo() {
+    const next = draft.trimEnd();
+    setEditing(false);
+    if (next !== memo) onUpdateMemo(link.id, next);
+    else setDraft(memo);
+  }
 
   return (
-    <article className="group relative mb-4 break-inside-avoid overflow-hidden rounded-2xl border border-zinc-200/70 bg-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] hover:border-emerald-300/70 hover:shadow-md">
+    <article
+      className="group relative flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border bg-zinc-900/80 shadow-lg shadow-black/20 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/30"
+      style={
+        accent
+          ? {
+              borderColor: accent,
+              boxShadow: `0 0 12px ${accent}33, 0 10px 24px rgba(0,0,0,0.35)`,
+            }
+          : { borderColor: "rgba(255,255,255,0.1)" }
+      }
+    >
       <a
         href={link.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
+        className="relative block aspect-[16/10] w-full shrink-0 overflow-hidden bg-zinc-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/70"
       >
-        <div className="relative aspect-[16/10] w-full overflow-hidden bg-zinc-100">
-          {showImage ? (
-            // eslint-disable-next-line @next/next/no-img-element -- 外部 OGP はドメイン不定のため img を使用
-            <img
-              src={link.image!}
-              alt=""
-              loading="lazy"
-              referrerPolicy="no-referrer"
-              className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
-              onError={() => setImgBroken(true)}
+        {showImage ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={link.image!}
+            alt=""
+            loading="lazy"
+            referrerPolicy="no-referrer"
+            className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+            onError={() => setImgBroken(true)}
+          />
+        ) : (
+          <div className="flex h-full w-full flex-col items-center justify-center gap-1 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-950 px-3 text-center">
+            <p className="text-[10px] font-bold tracking-[0.2em] text-zinc-500">
+              {noImageLabel}
+            </p>
+            <p className="line-clamp-2 break-all text-base font-semibold tracking-tight text-zinc-200">
+              {link.domain}
+            </p>
+          </div>
+        )}
+      </a>
+
+      <div className="flex min-h-0 flex-1 flex-col gap-1 p-3">
+        <a
+          href={link.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-start gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/70"
+        >
+          <h2 className="line-clamp-2 min-w-0 flex-1 text-sm font-bold leading-snug text-gray-100">
+            {link.title}
+          </h2>
+          <ExternalLink
+            className="mt-0.5 size-3.5 shrink-0 text-zinc-500 opacity-0 transition group-hover:opacity-100"
+            aria-hidden
+          />
+        </a>
+
+        <p className="truncate text-xs text-gray-400">{link.domain}</p>
+
+        <div className="mt-0.5 min-h-[3.75rem]">
+          {editing ? (
+            <textarea
+              ref={textareaRef}
+              value={draft}
+              rows={3}
+              onChange={(e) => setDraft(e.target.value)}
+              onBlur={commitMemo}
+              onClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  commitMemo();
+                }
+                if (e.key === "Escape") {
+                  e.preventDefault();
+                  setDraft(memo);
+                  setEditing(false);
+                }
+              }}
+              className="w-full resize-none rounded-lg border border-white/10 bg-zinc-950/50 px-2 py-1.5 text-xs leading-relaxed text-gray-200 outline-none ring-emerald-400/40 placeholder:text-zinc-500 focus:ring-2"
+              placeholder={memoPlaceholder}
             />
           ) : (
-            <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-gradient-to-br from-emerald-50 via-white to-teal-50 px-4 text-center">
-              <p className="text-[10px] font-bold tracking-[0.2em] text-emerald-600/70">
-                {noImageLabel}
-              </p>
-              <p className="break-all text-xl font-semibold tracking-tight text-emerald-900 sm:text-2xl">
-                {link.domain}
-              </p>
-            </div>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setEditing(true);
+              }}
+              className="w-full rounded-lg px-0.5 py-0.5 text-left transition hover:bg-white/5"
+            >
+              {memo.trim() ? (
+                <p className="line-clamp-3 text-xs leading-relaxed text-gray-300">
+                  {memo}
+                </p>
+              ) : (
+                <p className="text-xs text-zinc-500">{memoPlaceholder}</p>
+              )}
+            </button>
           )}
-          {link.tag ? (
-            <span className="absolute left-2 top-2 rounded-full border border-emerald-200/80 bg-white/90 px-2 py-0.5 text-[10px] font-semibold text-emerald-800 shadow-sm backdrop-blur">
-              {link.tag}
-            </span>
-          ) : null}
         </div>
 
-        <div className="space-y-1.5 p-3.5">
-          <div className="flex items-start gap-2">
-            <h2 className="line-clamp-2 min-w-0 flex-1 text-sm font-semibold leading-snug text-zinc-900">
-              {link.title}
-            </h2>
-            <ExternalLink
-              className="mt-0.5 size-3.5 shrink-0 text-zinc-400 opacity-0 transition group-hover:opacity-100"
-              aria-hidden
-            />
-          </div>
-          <p className="truncate text-[11px] font-medium text-emerald-700/80">
-            {link.domain}
-          </p>
-          {link.description ? (
-            <p className="line-clamp-2 text-xs leading-relaxed text-zinc-500">
-              {link.description}
-            </p>
-          ) : null}
+        <div className="mt-2 flex flex-wrap items-center gap-1">
+          {tags.map((tag) => (
+            <span
+              key={tag.id}
+              className="rounded-full px-2 py-0.5 text-[10px] font-medium text-white"
+              style={{ backgroundColor: `${tag.color}cc` }}
+            >
+              {tag.name}
+            </span>
+          ))}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setTagOpen((v) => !v);
+            }}
+            className="inline-flex items-center gap-0.5 rounded-full border border-white/15 bg-zinc-800/80 px-2 py-0.5 text-[10px] text-zinc-300 transition hover:border-white/30 hover:text-white"
+          >
+            <Tag className="size-2.5" />
+            {tags.length === 0 ? "タグ" : "+"}
+          </button>
         </div>
-      </a>
+      </div>
+
+      <TagEditor
+        open={tagOpen}
+        onClose={() => setTagOpen(false)}
+        allTags={allTags}
+        selectedIds={link.tagIds}
+        labels={tagEditorLabels}
+        onToggleTag={(tagId) => onToggleTag(link.id, tagId)}
+        onCreateTag={(name, color) => onCreateTag(link.id, name, color)}
+        onUpdateTag={onUpdateTag}
+        onDeleteTag={onDeleteTag}
+      />
 
       <button
         type="button"
@@ -89,7 +228,7 @@ export default function LinkCard({
           if (!window.confirm(deleteConfirm)) return;
           onDelete(link.id);
         }}
-        className="absolute bottom-3 right-3 rounded-xl border border-zinc-200 bg-white/95 p-1.5 text-zinc-400 shadow-sm transition hover:border-rose-200 hover:text-rose-500 sm:opacity-0 sm:group-hover:opacity-100"
+        className="absolute top-2 right-2 rounded-xl border border-white/10 bg-zinc-950/70 p-1.5 text-zinc-400 shadow-sm backdrop-blur transition hover:border-rose-400/40 hover:text-rose-300 sm:opacity-0 sm:group-hover:opacity-100"
       >
         <Trash2 className="size-3.5" />
       </button>

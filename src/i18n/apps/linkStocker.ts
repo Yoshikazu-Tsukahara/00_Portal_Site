@@ -23,6 +23,7 @@ export type LinkStockerDict = {
     delete: string;
     deleteConfirm: string;
     noImage: string;
+    memoPlaceholder: string;
   };
   errors: {
     emptyUrl: string;
@@ -43,6 +44,28 @@ export type LinkStockerDict = {
   stats: {
     keptCount: string;
     keptCountUnit: string;
+    badge: string;
+  };
+  help: {
+    button: string;
+    buttonAria: string;
+    modalTitle: string;
+    close: string;
+  };
+  bookmarklet: {
+    title: string;
+    hint: string;
+    dragLabel: string;
+  };
+  share: {
+    hint: string;
+  };
+  tagEditor: {
+    title: string;
+    newName: string;
+    create: string;
+    customColor: string;
+    apply: string;
   };
 };
 
@@ -52,8 +75,8 @@ export const linkStockerJa: LinkStockerDict = {
     description: "ブックマークするほどではない URL を、サムネ付きでサッと残す",
   },
   form: {
-    placeholder: "https:// をペーストしてキープ",
-    submit: "キープする",
+    placeholder: "https:// をペースト",
+    submit: "キープ",
     loading: "取得中…",
     tagLabel: "タグ",
     noTag: "なし",
@@ -64,13 +87,14 @@ export const linkStockerJa: LinkStockerDict = {
   },
   empty: {
     title: "まだキープなし",
-    hint: "上の欄に URL を貼って「キープする」を押すだけ。",
+    hint: "上の欄に URL を貼って「キープ」を押すだけ。",
   },
   card: {
     open: "開く",
     delete: "削除",
     deleteConfirm: "このキープを削除しますか？",
     noImage: "NO IMAGE",
+    memoPlaceholder: "📝 メモを追加...",
   },
   errors: {
     emptyUrl: "URL を入力してください",
@@ -92,6 +116,28 @@ export const linkStockerJa: LinkStockerDict = {
   stats: {
     keptCount: "キープ数",
     keptCountUnit: "件",
+    badge: "{n}件",
+  },
+  help: {
+    button: "💡 簡単登録",
+    buttonAria: "簡単登録の使い方を開く",
+    modalTitle: "簡単登録の使い方",
+    close: "とじる",
+  },
+  bookmarklet: {
+    title: "💻 PC用：ブックマークバーにドラッグ",
+    hint: "下のボタンをブックマークバーへドラッグして追加。他サイトで押すと、既存のキープ用タブへ移動して自動登録します（タブが増え続けません）。",
+    dragLabel: "キープに送る",
+  },
+  share: {
+    hint: "ホーム画面に追加後、ブラウザの「共有」からこのアプリを選ぶと自動キープできます。",
+  },
+  tagEditor: {
+    title: "タグを編集",
+    newName: "新しいタグ名",
+    create: "タグを作成して付ける",
+    customColor: "カスタム色",
+    apply: "適用",
   },
 };
 
@@ -101,9 +147,9 @@ export const linkStockerEn: LinkStockerDict = {
     description: "Park “maybe later” URLs as visual cards with OGP thumbs",
   },
   form: {
-    placeholder: "Paste https:// to keep",
+    placeholder: "Paste https://",
     submit: "Keep",
-    loading: "Fetching…",
+    loading: "…",
     tagLabel: "Tag",
     noTag: "None",
   },
@@ -120,6 +166,7 @@ export const linkStockerEn: LinkStockerDict = {
     delete: "Delete",
     deleteConfirm: "Delete this keep?",
     noImage: "NO IMAGE",
+    memoPlaceholder: "📝 Add a memo...",
   },
   errors: {
     emptyUrl: "Enter a URL",
@@ -140,5 +187,27 @@ export const linkStockerEn: LinkStockerDict = {
   stats: {
     keptCount: "Kept",
     keptCountUnit: "",
+    badge: "{n}",
+  },
+  help: {
+    button: "💡 Tips",
+    buttonAria: "Open quick-keep tips",
+    modalTitle: "Quick keep tips",
+    close: "Close",
+  },
+  bookmarklet: {
+    title: "💻 Desktop: drag to bookmarks bar",
+    hint: "Drag the button onto your bookmarks bar. On any site, it focuses the existing Keep tab and auto-saves (won’t spawn endless tabs).",
+    dragLabel: "Send to Keep",
+  },
+  share: {
+    hint: "Install to Home Screen, then use Share → this app to auto-keep links.",
+  },
+  tagEditor: {
+    title: "Edit tags",
+    newName: "New tag name",
+    create: "Create & attach",
+    customColor: "Custom color",
+    apply: "Apply",
   },
 };

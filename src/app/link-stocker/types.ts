@@ -1,44 +1,73 @@
-/** LocalStorage キー */
-export const STORAGE_KEY = "my-tool-box:link-stocker:v1";
+/** LocalStorage キー（タグ構造変更のため v2） */
+export const STORAGE_KEY = "my-tool-box:link-stocker:v2";
+/** 旧データ移行元 */
+export const STORAGE_KEY_V1 = "my-tool-box:link-stocker:v1";
 
-/** かんたんタグ（絞り込み用） */
-export const LINK_TAGS = [
-  "あとで読む",
-  "ツール",
-  "デザイン",
-  "参考",
-  "その他",
+/** ブックマークレット／タブ識別・BroadcastChannel 名 */
+export const LINK_STOCKER_WINDOW_NAME = "MyToolBox_LinkStocker_Tab";
+export const LINK_STOCKER_CHANNEL = "MyToolBox_LinkStocker";
+
+/** タグ色プリセット */
+export const TAG_COLOR_PRESETS = [
+  { key: "emerald", color: "#10b981", label: "エメラルド" },
+  { key: "cyan", color: "#06b6d4", label: "シアン" },
+  { key: "sky", color: "#0ea5e9", label: "スカイ" },
+  { key: "violet", color: "#8b5cf6", label: "パープル" },
+  { key: "amber", color: "#f59e0b", label: "アンバー" },
+  { key: "rose", color: "#f43f5e", label: "ローズ" },
+  { key: "pink", color: "#ec4899", label: "ピンク" },
+  { key: "lime", color: "#84cc16", label: "ライム" },
 ] as const;
 
-export type LinkTag = (typeof LINK_TAGS)[number];
+/** 初期プリセットタグ */
+export const DEFAULT_TAGS: CustomTag[] = [
+  { id: "tag-later", name: "あとで読む", color: "#10b981" },
+  { id: "tag-work", name: "仕事", color: "#0ea5e9" },
+  { id: "tag-tool", name: "ツール", color: "#06b6d4" },
+  { id: "tag-design", name: "デザイン", color: "#8b5cf6" },
+  { id: "tag-ref", name: "参考", color: "#f59e0b" },
+  { id: "tag-other", name: "その他", color: "#f43f5e" },
+];
+
+export type CustomTag = {
+  id: string;
+  name: string;
+  color: string;
+};
 
 export type KeptLink = {
   id: string;
   url: string;
   title: string;
+  /** OGP 説明（内部保持） */
   description: string;
+  memo: string;
   image: string | null;
   siteName: string | null;
   favicon: string | null;
-  /** ホスト名（フォールバック表示用） */
   domain: string;
-  tag: LinkTag | null;
+  /** 紐づくタグ ID 一覧 */
+  tagIds: string[];
   createdAt: string;
 };
 
 export type LinkStockerData = {
   links: KeptLink[];
+  tags: CustomTag[];
 };
 
 export function emptyData(): LinkStockerData {
-  return { links: [] };
+  return {
+    links: [],
+    tags: DEFAULT_TAGS.map((t) => ({ ...t })),
+  };
 }
 
 export function createId(): string {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
     return crypto.randomUUID();
   }
-  return `lnk_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+  return `id_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
 }
 
 export function domainOf(url: string): string {
@@ -49,36 +78,97 @@ export function domainOf(url: string): string {
   }
 }
 
-/** バックアップ／インポート用のゆるい正規化 */
+function ensureTag(
+  tags: CustomTag[],
+  name: string,
+  color: string,
+): { tags: CustomTag[]; id: string } {
+  const found = tags.find((t) => t.name === name);
+  if (found) return { tags, id: found.id };
+  const id = createId();
+  return { tags: [...tags, { id, name, color }], id };
+}
+
+/** バックアップ／インポート／旧形式からの正規化 */
 export function normalizeLinkStockerData(raw: unknown): LinkStockerData | null {
   if (!raw || typeof raw !== "object") return null;
-  const links = (raw as { links?: unknown }).links;
-  if (!Array.isArray(links)) return null;
+  const obj = raw as { links?: unknown; tags?: unknown };
+  if (!Array.isArray(obj.links)) return null;
+
+  let tags: CustomTag[] = [];
+  if (Array.isArray(obj.tags)) {
+    for (const item of obj.tags) {
+      if (!item || typeof item !== "object") continue;
+      const t = item as Record<string, unknown>;
+      if (typeof t.id !== "string" || typeof t.name !== "string") continue;
+      const color =
+        typeof t.color === "string" && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(t.color)
+          ? t.color
+          : "#10b981";
+      tags.push({ id: t.id, name: t.name.trim() || "タグ", color });
+    }
+  }
+
+  if (tags.length === 0) {
+    tags = DEFAULT_TAGS.map((t) => ({ ...t }));
+  }
 
   const cleaned: KeptLink[] = [];
-  for (const item of links) {
+  for (const item of obj.links) {
     if (!item || typeof item !== "object") continue;
     const o = item as Record<string, unknown>;
     if (typeof o.url !== "string" || !o.url.trim()) continue;
     const url = o.url.trim();
+
+    let tagIds: string[] = [];
+    if (Array.isArray(o.tagIds)) {
+      tagIds = o.tagIds.filter((id): id is string => typeof id === "string");
+    } else if (typeof o.tag === "string" && o.tag.trim()) {
+      // v1: 単一文字列タグ → カスタムタグへ移行
+      const migrated = ensureTag(tags, o.tag.trim(), "#10b981");
+      tags = migrated.tags;
+      tagIds = [migrated.id];
+    }
+
+    // 存在しない ID は落とす
+    const tagIdSet = new Set(tags.map((t) => t.id));
+    tagIds = tagIds.filter((id) => tagIdSet.has(id));
+
     cleaned.push({
       id: typeof o.id === "string" ? o.id : createId(),
       url,
       title: typeof o.title === "string" ? o.title : domainOf(url),
       description: typeof o.description === "string" ? o.description : "",
+      memo: typeof o.memo === "string" ? o.memo : "",
       image: typeof o.image === "string" ? o.image : null,
       siteName: typeof o.siteName === "string" ? o.siteName : null,
       favicon: typeof o.favicon === "string" ? o.favicon : null,
       domain: typeof o.domain === "string" ? o.domain : domainOf(url),
-      tag:
-        typeof o.tag === "string" &&
-        (LINK_TAGS as readonly string[]).includes(o.tag)
-          ? (o.tag as LinkTag)
-          : null,
+      tagIds,
       createdAt:
         typeof o.createdAt === "string" ? o.createdAt : new Date().toISOString(),
     });
   }
 
-  return { links: cleaned };
+  return { links: cleaned, tags };
+}
+
+/** カードに付いたタグ一覧（先頭順） */
+export function resolveLinkTags(
+  link: KeptLink,
+  tags: CustomTag[],
+): CustomTag[] {
+  const map = new Map(tags.map((t) => [t.id, t]));
+  return link.tagIds
+    .map((id) => map.get(id))
+    .filter((t): t is CustomTag => Boolean(t));
+}
+
+/** 枠線色（先頭タグ、なければ null） */
+export function primaryTagColor(
+  link: KeptLink,
+  tags: CustomTag[],
+): string | null {
+  const resolved = resolveLinkTags(link, tags);
+  return resolved[0]?.color ?? null;
 }

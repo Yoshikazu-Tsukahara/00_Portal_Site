@@ -10,6 +10,8 @@ import { useI18n } from "@/i18n";
 type AppShellProps = {
   /** アプリ名（ヘッダー1行目に表示） */
   title: string;
+  /** タイトル直後のコンパクト表示（件数バッジなど） */
+  titleAddon?: ReactNode;
   /** 短い説明（タイトル下に1行で表示。省略可） */
   description?: string;
   /** ヘッダー右端のアクション（例: ZIP生成ボタン） */
@@ -43,6 +45,7 @@ type AppShellProps = {
  */
 export default function AppShell({
   title,
+  titleAddon,
   description,
   actions,
   dataManager,
@@ -81,6 +84,9 @@ export default function AppShell({
             <h1 className="min-w-0 truncate text-base font-semibold tracking-tight text-zinc-900">
               {title}
             </h1>
+            {titleAddon ? (
+              <div className="shrink-0">{titleAddon}</div>
+            ) : null}
             {dataManager ? (
               <div className="shrink-0">
                 <DataManager {...dataManager} />

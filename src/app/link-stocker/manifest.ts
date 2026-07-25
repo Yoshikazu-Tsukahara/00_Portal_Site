@@ -1,7 +1,6 @@
-import type { MetadataRoute } from "next";
-
 /**
  * とりあえずキープ（Link Stocker）専用 Web App Manifest。
+ * share_target は型定義に無いことがあるため、JSON 配信用のプレーンオブジェクトとする。
  */
 export const LINK_STOCKER_MANIFEST = {
   name: "とりあえずキープ",
@@ -32,7 +31,18 @@ export const LINK_STOCKER_MANIFEST = {
       purpose: "maskable",
     },
   ],
-} as const satisfies MetadataRoute.Manifest;
+  /** OS の共有メニューから URL を受け取る（PWA インストール後） */
+  share_target: {
+    action: "/link-stocker",
+    method: "GET",
+    enctype: "application/x-www-form-urlencoded",
+    params: {
+      title: "title",
+      text: "text",
+      url: "url",
+    },
+  },
+} as const;
 
 export const LINK_STOCKER_MANIFEST_PATH =
   "/link-stocker/manifest.webmanifest";
