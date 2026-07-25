@@ -1,6 +1,11 @@
 import * as cheerio from "cheerio";
 import { NextResponse } from "next/server";
 import { browserLikeHeaders, parsePublicHttpUrl } from "./safeUrl";
+import {
+  fetchYoutubeMeta,
+  isWeakYoutubeTitle,
+  isYoutubeUrl,
+} from "./youtube";
 
 export const runtime = "nodejs";
 
@@ -199,11 +204,51 @@ function mergeWithHints(
   };
 }
 
+function needsYoutubeEnrichment(result: OgpResult, pageUrl: URL): boolean {
+  if (!isYoutubeUrl(pageUrl)) return false;
+  if (!result.image) return true;
+  if (isWeakYoutubeTitle(result.title)) return true;
+  return false;
+}
+
+/** YouTube は oEmbed でタイトル／サムネを補完（本番スクレイプ失敗対策） */
+async function applyYoutubeEnrichment(
+  result: OgpResult,
+  pageUrl: URL,
+): Promise<OgpResult> {
+  if (!needsYoutubeEnrichment(result, pageUrl)) return result;
+  const yt = await fetchYoutubeMeta(pageUrl);
+  if (!yt) return result;
+
+  const weak = isWeakYoutubeTitle(result.title);
+  return {
+    ...result,
+    title: weak ? yt.title : result.title,
+    description: result.description || yt.description,
+    image: result.image || yt.image,
+    siteName: result.siteName || yt.siteName,
+    favicon: result.favicon || "https://www.youtube.com/favicon.ico",
+  };
+}
+
+async function youtubeOnlyResult(pageUrl: URL): Promise<OgpResult | null> {
+  if (!isYoutubeUrl(pageUrl)) return null;
+  const yt = await fetchYoutubeMeta(pageUrl);
+  if (!yt) return null;
+  return {
+    url: pageUrl.href,
+    title: yt.title,
+    description: yt.description,
+    image: yt.image,
+    siteName: yt.siteName,
+    favicon: "https://www.youtube.com/favicon.ico",
+  };
+}
+
 /**
  * URL の HTML から OGP / 基本メタを抽出する。
  * クライアント直 fetch は CORS で失敗するため、サーバー側で取得する。
- * 本番（Vercel）でも通りやすいようブラウザ風ヘッダーを使い、
- * ブックマークレット等からのヒントで補完する。
+ * YouTube は oEmbed で本番でもタイトル／サムネを取れるようにする。
  */
 export async function POST(request: Request) {
   let body: unknown;
@@ -236,6 +281,14 @@ export async function POST(request: Request) {
   const hasHints = Boolean(hints.title || hints.image || hints.description);
 
   try {
+    // YouTube は先に oEmbed（HTML スクレイプより確実）
+    if (isYoutubeUrl(target)) {
+      const ytFirst = await youtubeOnlyResult(target);
+      if (ytFirst && !isWeakYoutubeTitle(ytFirst.title) && ytFirst.image) {
+        return NextResponse.json(mergeWithHints(ytFirst, hints, target));
+      }
+    }
+
     let fetched = await fetchHtml(target);
 
     // 一時的な拒否は1回だけリトライ
@@ -254,31 +307,18 @@ export async function POST(request: Request) {
       const challenged = looksLikeChallengeHtml(fetched.html, parsed.title);
 
       if (!challenged) {
-        return NextResponse.json(
-          mergeWithHints(parsed, hints, fetched.finalUrl),
-        );
-      }
-
-      // チャレンジページならヒント優先で救済
-      if (hasHints) {
-        return NextResponse.json(
-          mergeWithHints(
-            {
-              url: target.href,
-              title: hints.title,
-              description: hints.description,
-              image: null,
-              siteName: target.hostname,
-              favicon: null,
-            },
-            hints,
-            target,
-          ),
-        );
+        const merged = mergeWithHints(parsed, hints, fetched.finalUrl);
+        const enriched = await applyYoutubeEnrichment(merged, target);
+        return NextResponse.json(enriched);
       }
     }
 
-    // サーバー取得失敗でも、ページ上で取ったヒントがあればキープ成功扱い
+    // スクレイプ失敗 → YouTube oEmbed / クライアントヒントで救済
+    const ytFallback = await youtubeOnlyResult(target);
+    if (ytFallback) {
+      return NextResponse.json(mergeWithHints(ytFallback, hints, target));
+    }
+
     if (hasHints) {
       return NextResponse.json(
         mergeWithHints(
@@ -318,6 +358,11 @@ export async function POST(request: Request) {
     const aborted =
       err instanceof Error &&
       (err.name === "AbortError" || err.message.includes("abort"));
+
+    const ytFallback = await youtubeOnlyResult(target);
+    if (ytFallback) {
+      return NextResponse.json(mergeWithHints(ytFallback, hints, target));
+    }
 
     if (hasHints) {
       return NextResponse.json(
