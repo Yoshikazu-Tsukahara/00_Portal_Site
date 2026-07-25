@@ -1,7 +1,8 @@
 // 極小ピクセル隙間落としパズル: 座標・物理エンジン
 //
-// 棒のX位置は「経過時間の純関数（三角波）」として計算する（毎フレーム加算しない）。
-// DROP 瞬間に performance.now() から一度だけ算出し、倍精度のまま判定に使う。
+// 棒のXは「壁時計（performance.now）の連続関数」として算出する。
+// STOP 時は samplePatrolAt でクリック瞬間の理論座標をサブフレーム精度で確定し、
+// 描画フレーム（60Hz 等）の飛び飛び位置には一切依存しない。
 // 落下Yは等加速度（½gt²）で積分。成功時の隙間ハマりだけ別途イージング演出。
 
 import { GAME_GROUND_ASPECT } from "./imageUtil";
@@ -173,16 +174,19 @@ export type PatrolSpeedState = {
 /**
  * 経過時間ぶん位相を進め、往復完了で速度段階を更新する。
  * 速度切替時は位相をスケールし、位置が飛ばないようにする。
+ *
+ * @param clampDtMs 描画用 rAF 向けの dt 上限。判定サンプリングでは必ず null（無制限）にし、
+ *                  クリック瞬間の壁時計を欠落させない。
  */
 export function advancePatrolSpeedState(
   state: PatrolSpeedState,
   dtMs: number,
   basePeriodMs: number,
+  clampDtMs: number | null = null,
 ): void {
   let dt = dtMs;
   if (dt < 0) dt = 0;
-  // タブ復帰などで極端なジャンプが起きても、1フレーム分に抑える
-  if (dt > 64) dt = 64;
+  if (clampDtMs !== null && dt > clampDtMs) dt = clampDtMs;
 
   state.phaseMs += dt;
 
@@ -202,12 +206,44 @@ export function advancePatrolSpeedState(
   }
 }
 
-/** 三角波：0 → maxX → 0 を periodMs 周期で往復（時刻の純関数） */
+/** パトロール時計（速度減衰 + 最終サンプル時刻） */
+export type PatrolClockState = PatrolSpeedState & { lastNow: number };
+
+/**
+ * 指定タイムスタンプ時点のパトロール状態と理論Xを、描画フレームに依存せず算出する。
+ * STOP 判定はこの結果だけを使い、DOM の見た目位置は参照しない（サブフレーム精度）。
+ */
+export function samplePatrolAt(
+  state: PatrolClockState,
+  atNowMs: number,
+  basePeriodMs: number,
+  maxX: number,
+): PatrolClockState & { x: number } {
+  const sample: PatrolClockState = {
+    periodMs: state.periodMs,
+    phaseMs: state.phaseMs,
+    completedTrips: state.completedTrips,
+    speedLevel: state.speedLevel,
+    lastNow: state.lastNow,
+  };
+  // 判定用：壁時計どおりフルに進める（フレームスキップのクランプなし）
+  advancePatrolSpeedState(sample, atNowMs - sample.lastNow, basePeriodMs, null);
+  sample.lastNow = atNowMs;
+  const x = triangleWave(sample.phaseMs, sample.periodMs, maxX);
+  return { ...sample, x };
+}
+
+/** 三角波：0 → maxX → 0 を periodMs 周期で往復（時刻の純関数・連続座標） */
 export function triangleWave(elapsedMs: number, periodMs: number, maxX: number): number {
   if (periodMs <= 0 || maxX <= 0) return 0;
   const half = periodMs / 2;
+  // 周期内位相を [0, period) に正規化（負の経過にも耐える）
   const t = ((elapsedMs % periodMs) + periodMs) % periodMs;
-  return t < half ? (t / half) * maxX : maxX - ((t - half) / half) * maxX;
+  // 線形往復：上昇辺・下降辺とも連続（フレーム量子化なし）
+  if (t < half) {
+    return (t / half) * maxX;
+  }
+  return maxX - ((t - half) / half) * maxX;
 }
 
 /**

@@ -19,8 +19,9 @@ import {
   MAX_BOARD_WIDTH,
   periodMsForPatrolSpeedLevel,
   randomPatrolPhaseMs,
+  samplePatrolAt,
   triangleWave,
-  type PatrolSpeedState,
+  type PatrolClockState,
   type PlayGeometry,
 } from "./engine";
 import type { LoadedGameImage } from "./imageUtil";
@@ -63,7 +64,7 @@ type DropPayload = {
 };
 
 /** パトロール時計（往復カウントと速度減衰。UI非表示の隠し仕様） */
-type PatrolClock = PatrolSpeedState & { lastNow: number };
+type PatrolClock = PatrolClockState;
 
 /** 成功時に枠・溝が溶けて1枚絵になる演出の長さ（ms）＝ガシャン＆溶解 */
 const SUCCESS_MERGE_MS = 750;
@@ -656,9 +657,17 @@ export default function PlayField({
       const clock = patrolClockRef.current;
       if (g && clock && blockRef.current && phaseRef.current === "patrolling") {
         const now = performance.now();
-        const dt = now - clock.lastNow;
-        clock.lastNow = now;
-        advancePatrolSpeedState(clock, dt, basePeriodMsRef.current);
+        const rawDt = now - clock.lastNow;
+        // 描画はタブ復帰時の跳びを抑えるため dt を上限付きで進める。
+        // lastNow も適用した分だけ進め、STOP 判定時に残り時間をフル補間できるようにする。
+        const visualDt = Math.min(Math.max(0, rawDt), 64);
+        advancePatrolSpeedState(
+          clock,
+          visualDt,
+          basePeriodMsRef.current,
+          null,
+        );
+        clock.lastNow += visualDt;
 
         const x = triangleWave(clock.phaseMs, clock.periodMs, g.maxX);
         blockRef.current.style.left = `${x}px`;
@@ -843,15 +852,24 @@ export default function PlayField({
     const clock = patrolClockRef.current;
     if (!g || !clock) return;
 
-    // DROP直前にもう一度位相を進め、表示位置と判定位置を一致させる
-    const now = performance.now();
-    const dt = now - clock.lastNow;
-    clock.lastNow = now;
-    advancePatrolSpeedState(clock, dt, basePeriodMsRef.current);
+    // STOP 瞬間の高精度タイムスタンプから、連続関数で理論Xを逆算する。
+    // DOM の見た目（フレーム量子化）は使わず、詰み（飛び越え不能）を防ぐ。
+    const stopNow = performance.now();
+    const sampled = samplePatrolAt(
+      clock,
+      stopNow,
+      basePeriodMsRef.current,
+      g.maxX,
+    );
+    clock.periodMs = sampled.periodMs;
+    clock.phaseMs = sampled.phaseMs;
+    clock.completedTrips = sampled.completedTrips;
+    clock.speedLevel = sampled.speedLevel;
+    clock.lastNow = sampled.lastNow;
 
-    const phaseMsAtDrop = clock.phaseMs;
-    const periodMsAtDrop = clock.periodMs;
-    const x = triangleWave(phaseMsAtDrop, periodMsAtDrop, g.maxX);
+    const phaseMsAtDrop = sampled.phaseMs;
+    const periodMsAtDrop = sampled.periodMs;
+    const x = sampled.x;
 
     // DROP瞬間のカメラ位置をロック（この時点ではスクロールしない）
     cameraFollowRef.current = {
