@@ -8,6 +8,7 @@ import { loadLocalJson, useLocalStorageState } from "@/lib/localData";
 import InstallAppButton from "./InstallAppButton";
 import LinkCard from "./LinkCard";
 import ShortcutHelpModal from "./ShortcutHelpModal";
+import TagManager from "./TagManager";
 import { usePwaInstall } from "./usePwaInstall";
 import {
   LINK_STOCKER_CHANNEL,
@@ -48,15 +49,13 @@ export default function LinkStockerPage() {
   );
 
   const [urlInput, setUrlInput] = useState("");
-  const [tagDraftId, setTagDraftId] = useState<string>("");
   const [filter, setFilter] = useState<string>("all");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [helpOpen, setHelpOpen] = useState(false);
+  const [tagManagerOpen, setTagManagerOpen] = useState(false);
 
-  const tagDraftRef = useRef(tagDraftId);
-  tagDraftRef.current = tagDraftId;
   const linksRef = useRef(data.links);
   linksRef.current = data.links;
   /** 直近に自動キープした URL（二重実行防止） */
@@ -152,7 +151,6 @@ export default function LinkStockerPage() {
           return false;
         }
 
-        const draftId = tagDraftRef.current;
         const item: KeptLink = {
           id: createId(),
           url: json.url || normalized,
@@ -163,7 +161,7 @@ export default function LinkStockerPage() {
           siteName: json.siteName,
           favicon: json.favicon,
           domain: domainOf(json.url || normalized),
-          tagIds: draftId ? [draftId] : [],
+          tagIds: [],
           createdAt: new Date().toISOString(),
         };
 
@@ -192,10 +190,14 @@ export default function LinkStockerPage() {
   const tryAutoKeep = useCallback(
     (raw: string, fromQuery: boolean) => {
       const normalized = normalizeInputUrl(raw);
-      if (!normalized) return;
+      if (!normalized) {
+        if (fromQuery) clearLinkStockerQuery();
+        return;
+      }
 
       const now = Date.now();
       const last = lastAutoKeepRef.current;
+      // 同じ URL の短時間二重実行を防ぐ（BC + window.open の両方が来る想定）
       if (last && last.url === normalized && now - last.at < 4000) {
         if (fromQuery) clearLinkStockerQuery();
         return;
@@ -203,13 +205,16 @@ export default function LinkStockerPage() {
       lastAutoKeepRef.current = { url: normalized, at: now };
 
       setUrlInput(normalized);
-      if (fromQuery) clearLinkStockerQuery();
-      void keepUrlRef.current(normalized);
       try {
         window.focus();
       } catch {
         // ignore
       }
+
+      // カード追加が終わってから ?url= を消す（再実行・履歴汚染を防ぐ）
+      void keepUrlRef.current(normalized).finally(() => {
+        if (fromQuery) clearLinkStockerQuery();
+      });
     },
     [],
   );
@@ -284,13 +289,11 @@ export default function LinkStockerPage() {
     }));
   }
 
-  function handleCreateTag(linkId: string, name: string, color: string) {
+  function handleCreateTag(name: string, color: string) {
     const id = createId();
     setData((prev) => ({
+      ...prev,
       tags: [...prev.tags, { id, name, color }],
-      links: prev.links.map((l) =>
-        l.id === linkId ? { ...l, tagIds: [...l.tagIds, id] } : l,
-      ),
     }));
   }
 
@@ -321,15 +324,18 @@ export default function LinkStockerPage() {
       })),
     }));
     if (filter === tagId) setFilter("all");
-    if (tagDraftId === tagId) setTagDraftId("");
   }
 
-  const tagEditorLabels = {
-    title: copy.tagEditor.title,
-    newName: copy.tagEditor.newName,
-    create: copy.tagEditor.create,
-    customColor: copy.tagEditor.customColor,
-    apply: copy.tagEditor.apply,
+  const tagManagerLabels = {
+    title: copy.tagManager.title,
+    newName: copy.tagManager.newName,
+    create: copy.tagManager.create,
+    customColor: copy.tagManager.customColor,
+    deleteConfirm: copy.tagManager.deleteConfirm,
+    empty: copy.tagManager.empty,
+    rename: copy.tagManager.rename,
+    renameDone: copy.tagManager.renameDone,
+    delete: copy.tagManager.delete,
   };
 
   return (
@@ -387,22 +393,14 @@ export default function LinkStockerPage() {
 
         <div className="flex shrink-0 items-center gap-2">
           <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
-            <select
-              value={tagDraftId}
-              onChange={(e) => setTagDraftId(e.target.value)}
-              disabled={loading}
-              aria-label={copy.form.tagLabel}
-              className="rounded-full border border-zinc-200 bg-white px-2.5 py-1 text-[11px] font-medium text-zinc-600 outline-none focus:ring-2 focus:ring-emerald-400/40"
+            <button
+              type="button"
+              onClick={() => setTagManagerOpen(true)}
+              aria-label={copy.tagManager.buttonAria}
+              className="rounded-full border border-zinc-300 bg-zinc-50 px-2.5 py-1 text-[11px] font-semibold text-zinc-700 shadow-sm transition hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-800"
             >
-              <option value="">
-                {copy.form.tagLabel}: {copy.form.noTag}
-              </option>
-              {tags.map((tag) => (
-                <option key={tag.id} value={tag.id}>
-                  {copy.form.tagLabel}: {tag.name}
-                </option>
-              ))}
-            </select>
+              {copy.tagManager.button}
+            </button>
             <button
               type="button"
               onClick={() => setFilter("all")}
@@ -475,19 +473,27 @@ export default function LinkStockerPage() {
                   deleteConfirm={copy.card.deleteConfirm}
                   noImageLabel={copy.card.noImage}
                   memoPlaceholder={copy.card.memoPlaceholder}
-                  tagEditorLabels={tagEditorLabels}
+                  tagPickerTitle={copy.tagPicker.title}
+                  tagPickerEmpty={copy.tagPicker.empty}
                   onDelete={handleDelete}
                   onUpdateMemo={handleUpdateMemo}
                   onToggleTag={handleToggleTag}
-                  onCreateTag={handleCreateTag}
-                  onUpdateTag={handleUpdateTag}
-                  onDeleteTag={handleDeleteTag}
                 />
               ))}
             </div>
           )}
         </div>
       </div>
+
+      <TagManager
+        open={tagManagerOpen}
+        onClose={() => setTagManagerOpen(false)}
+        allTags={tags}
+        labels={tagManagerLabels}
+        onCreateTag={handleCreateTag}
+        onUpdateTag={handleUpdateTag}
+        onDeleteTag={handleDeleteTag}
+      />
 
       <ShortcutHelpModal
         open={helpOpen}

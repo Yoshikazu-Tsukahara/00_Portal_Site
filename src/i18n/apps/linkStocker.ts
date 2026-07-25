@@ -60,12 +60,22 @@ export type LinkStockerDict = {
   share: {
     hint: string;
   };
-  tagEditor: {
+  tagManager: {
+    button: string;
+    buttonAria: string;
     title: string;
     newName: string;
     create: string;
     customColor: string;
-    apply: string;
+    deleteConfirm: string;
+    empty: string;
+    rename: string;
+    renameDone: string;
+    delete: string;
+  };
+  tagPicker: {
+    title: string;
+    empty: string;
   };
 };
 
@@ -132,12 +142,22 @@ export const linkStockerJa: LinkStockerDict = {
   share: {
     hint: "ホーム画面に追加後、ブラウザの「共有」からこのアプリを選ぶと自動キープできます。",
   },
-  tagEditor: {
+  tagManager: {
+    button: "タグ編集",
+    buttonAria: "タグの追加・編集・削除を開く",
     title: "タグを編集",
     newName: "新しいタグ名",
-    create: "タグを作成して付ける",
+    create: "タグを追加",
     customColor: "カスタム色",
-    apply: "適用",
+    deleteConfirm: "このタグを削除しますか？付けているカードからも外れます。",
+    empty: "まだタグがありません。下で追加できます。",
+    rename: "改名",
+    renameDone: "OK",
+    delete: "削除",
+  },
+  tagPicker: {
+    title: "タグを付ける",
+    empty: "先に左上の「タグ編集」でタグを作ってください。",
   },
 };
 
@@ -203,11 +223,21 @@ export const linkStockerEn: LinkStockerDict = {
   share: {
     hint: "Install to Home Screen, then use Share → this app to auto-keep links.",
   },
-  tagEditor: {
+  tagManager: {
+    button: "Edit tags",
+    buttonAria: "Add, rename, recolor, or delete tags",
     title: "Edit tags",
     newName: "New tag name",
-    create: "Create & attach",
+    create: "Add tag",
     customColor: "Custom color",
-    apply: "Apply",
+    deleteConfirm: "Delete this tag? It will be removed from all cards.",
+    empty: "No tags yet. Create one below.",
+    rename: "Rename",
+    renameDone: "OK",
+    delete: "Delete",
+  },
+  tagPicker: {
+    title: "Attach tags",
+    empty: "Create tags first via “Edit tags” on the left.",
   },
 };

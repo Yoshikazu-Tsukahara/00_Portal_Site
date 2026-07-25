@@ -2,7 +2,7 @@
 
 import { ExternalLink, Tag, Trash2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import TagEditor from "./TagEditor";
+import TagPicker from "./TagPicker";
 import {
   primaryTagColor,
   resolveLinkTags,
@@ -17,22 +17,11 @@ type Props = {
   deleteConfirm: string;
   noImageLabel: string;
   memoPlaceholder: string;
-  tagEditorLabels: {
-    title: string;
-    newName: string;
-    create: string;
-    customColor: string;
-    apply: string;
-  };
+  tagPickerTitle: string;
+  tagPickerEmpty: string;
   onDelete: (id: string) => void;
   onUpdateMemo: (id: string, memo: string) => void;
   onToggleTag: (linkId: string, tagId: string) => void;
-  onCreateTag: (linkId: string, name: string, color: string) => void;
-  onUpdateTag: (
-    tagId: string,
-    patch: { name?: string; color?: string },
-  ) => void;
-  onDeleteTag: (tagId: string) => void;
 };
 
 /** やさしいライトモードのキープカード（タグは左下固定） */
@@ -43,13 +32,11 @@ export default function LinkCard({
   deleteConfirm,
   noImageLabel,
   memoPlaceholder,
-  tagEditorLabels,
+  tagPickerTitle,
+  tagPickerEmpty,
   onDelete,
   onUpdateMemo,
   onToggleTag,
-  onCreateTag,
-  onUpdateTag,
-  onDeleteTag,
 }: Props) {
   const memo = link.memo ?? "";
   const [imgBroken, setImgBroken] = useState(false);
@@ -96,7 +83,7 @@ export default function LinkCard({
         href={link.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="relative block aspect-[16/10] w-full shrink-0 overflow-hidden bg-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/70"
+        className="relative block aspect-[4/3] w-full shrink-0 overflow-hidden bg-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/70"
       >
         {showImage ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -139,12 +126,12 @@ export default function LinkCard({
 
         <p className="mt-1 truncate text-xs text-zinc-500">{link.domain}</p>
 
-        <div className="mt-1.5 min-h-[3.75rem]">
+        <div className="mt-1 min-h-[2.25rem]">
           {editing ? (
             <textarea
               ref={textareaRef}
               value={draft}
-              rows={3}
+              rows={2}
               onChange={(e) => setDraft(e.target.value)}
               onBlur={commitMemo}
               onClick={(e) => e.stopPropagation()}
@@ -159,7 +146,7 @@ export default function LinkCard({
                   setEditing(false);
                 }
               }}
-              className="w-full resize-none rounded-lg border border-zinc-200 bg-zinc-50 px-2 py-1.5 text-xs leading-relaxed text-zinc-700 outline-none ring-emerald-400/40 placeholder:text-zinc-400 focus:bg-white focus:ring-2"
+              className="w-full resize-none rounded-lg border border-zinc-200 bg-zinc-50 px-2 py-1 text-xs leading-relaxed text-zinc-700 outline-none ring-emerald-400/40 placeholder:text-zinc-400 focus:bg-white focus:ring-2"
               placeholder={memoPlaceholder}
             />
           ) : (
@@ -173,7 +160,7 @@ export default function LinkCard({
               className="w-full rounded-lg px-0.5 py-0.5 text-left transition hover:bg-zinc-50"
             >
               {memo.trim() ? (
-                <p className="line-clamp-3 text-xs leading-relaxed text-zinc-600">
+                <p className="line-clamp-2 text-xs leading-relaxed text-zinc-600">
                   {memo}
                 </p>
               ) : (
@@ -183,16 +170,22 @@ export default function LinkCard({
           )}
         </div>
 
-        {/* 左下固定のタグ行 */}
+        {/* 左下固定のタグ行（付け外しのみ） */}
         <div className="mt-auto flex flex-wrap items-center gap-1 pt-2">
           {tags.map((tag) => (
-            <span
+            <button
               key={tag.id}
-              className="rounded-full px-2 py-0.5 text-[10px] font-medium text-white"
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onToggleTag(link.id, tag.id);
+              }}
+              className="rounded-full px-2 py-0.5 text-[10px] font-medium text-white transition hover:opacity-80"
               style={{ backgroundColor: `${tag.color}cc` }}
             >
               {tag.name}
-            </span>
+            </button>
           ))}
           <button
             type="button"
@@ -209,16 +202,14 @@ export default function LinkCard({
         </div>
       </div>
 
-      <TagEditor
+      <TagPicker
         open={tagOpen}
         onClose={() => setTagOpen(false)}
         allTags={allTags}
         selectedIds={link.tagIds}
-        labels={tagEditorLabels}
+        title={tagPickerTitle}
+        emptyHint={tagPickerEmpty}
         onToggleTag={(tagId) => onToggleTag(link.id, tagId)}
-        onCreateTag={(name, color) => onCreateTag(link.id, name, color)}
-        onUpdateTag={onUpdateTag}
-        onDeleteTag={onDeleteTag}
       />
 
       <button
