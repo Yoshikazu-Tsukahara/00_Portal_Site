@@ -76,6 +76,11 @@ export const genres: Genre[] = [
         icon: "🕸️",
         href: "/tools/character-relation-editor",
       },
+      {
+        id: "palette-collector",
+        icon: "🎨",
+        href: "/palette-collector",
+      },
     ],
   },
   {

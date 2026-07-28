@@ -79,6 +79,11 @@ export const ja: Dictionary = {
       description:
         "登場人物カードを配置し、関係性の線とラベルで物語の相関図を視覚的に整理。",
     },
+    "palette-collector": {
+      title: "Palette Collector",
+      description:
+        "画像にスポイトを当てて配色を抽出。主要色の自動抽出やコントラスト判定も備えたカラーパレット作成ツール。",
+    },
     "lunch-savings": {
       title: "ランチ貯金",
       description:

@@ -21,6 +21,8 @@ import type { MailTemplateDict } from "./mailTemplate";
 import { mailTemplateEn, mailTemplateJa } from "./mailTemplate";
 import type { MediaMetadataDict } from "./mediaMetadata";
 import { mediaMetadataEn, mediaMetadataJa } from "./mediaMetadata";
+import type { PaletteCollectorDict } from "./paletteCollector";
+import { paletteCollectorEn, paletteCollectorJa } from "./paletteCollector";
 import type { PdfEditorDict } from "./pdfEditor";
 import { pdfEditorEn, pdfEditorJa } from "./pdfEditor";
 import type { PixelDropPuzzleDict } from "./pixelDropPuzzle";
@@ -44,6 +46,7 @@ export type AppsDictionary = {
   pdfEditor: PdfEditorDict;
   mediaMetadata: MediaMetadataDict;
   characterRelation: CharacterRelationDict;
+  paletteCollector: PaletteCollectorDict;
   lunchSavings: LunchSavingsDict;
   linkStocker: LinkStockerDict;
   ultimateProbabilitySlot: UltimateProbabilitySlotDict;
@@ -58,6 +61,7 @@ export const appsJa: AppsDictionary = {
   pdfEditor: pdfEditorJa,
   mediaMetadata: mediaMetadataJa,
   characterRelation: characterRelationJa,
+  paletteCollector: paletteCollectorJa,
   lunchSavings: lunchSavingsJa,
   linkStocker: linkStockerJa,
   ultimateProbabilitySlot: ultimateProbabilitySlotJa,
@@ -72,6 +76,7 @@ export const appsEn: AppsDictionary = {
   pdfEditor: pdfEditorEn,
   mediaMetadata: mediaMetadataEn,
   characterRelation: characterRelationEn,
+  paletteCollector: paletteCollectorEn,
   lunchSavings: lunchSavingsEn,
   linkStocker: linkStockerEn,
   ultimateProbabilitySlot: ultimateProbabilitySlotEn,

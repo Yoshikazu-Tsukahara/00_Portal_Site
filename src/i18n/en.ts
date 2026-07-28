@@ -79,6 +79,11 @@ export const en: Dictionary = {
       description:
         "Place character cards and draw labeled links to map story relationships.",
     },
+    "palette-collector": {
+      title: "Palette Collector",
+      description:
+        "Pick colors from any image with an eyedropper. Auto-extract dominant colors and check WCAG contrast, all in one palette tool.",
+    },
     "lunch-savings": {
       title: "Lunch Savings",
       description:
