@@ -36,8 +36,11 @@ export default function GenreSection({
         {copy.description}
       </p>
 
-      {/* カード最小幅を固定し、余白が広がったら列数だけ増やす（カード自体は大きくしない） */}
-      <div className="grid grid-cols-1 gap-4 sm:gap-5 sm:[grid-template-columns:repeat(auto-fill,minmax(15.5rem,1fr))]">
+      {/*
+        カード幅を固定（標準モードの見え方に合わせる）。
+        余白が広がってもカードは伸びず、列数だけ増える。
+      */}
+      <div className="grid grid-cols-1 justify-items-stretch gap-4 sm:grid-cols-[repeat(auto-fill,15.5rem)] sm:justify-start sm:gap-5">
         {genre.tools.map((tool) => (
           <ToolCard
             key={tool.comingSoon ? `${genre.id}-coming-soon` : tool.id}

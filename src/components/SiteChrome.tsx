@@ -5,7 +5,6 @@ import type { ReactNode } from "react";
 import KeepTabBridge from "@/app/link-stocker/KeepTabBridge";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
-import { useLayout } from "@/lib/layout";
 import { useStandaloneDisplay } from "@/lib/useStandaloneDisplay";
 
 /**
@@ -41,21 +40,17 @@ function matchesAppPath(pathname: string | null, bases: string[]): boolean {
  * サイト共通ヘッダー／フッター。
  *
  * - Type B（通常ツール）: Header と Footer を必ず出す。
- *   1画面完結（AppShell の fillViewport）でも Footer は隠さない。
  * - Type C（独立 PWA）: standalone 起動中のみポータル枠を外す。
  * - Type D（没入型）: 常にポータル枠を外す。
  *
  * ブラウザ表示時:
- * - Header / Footer の背景・境界線は画面端まで伸ばす（箱の境目を出さない）
- * - Main / Footer / Header 内のロゴ列は layoutMode の max-width で揃える
- * - 表示幅スイッチだけヘッダー中央（ビューポート中央）に固定する
- *
- * タイプの定義そのものは AppShell の JSDoc を参照。
+ * - Header / Main / Footer の「舞台」は常に画面いっぱい（背景の境目を出さない）
+ * - テキスト列の max-width は AppShell / 各ページ側が contentClassName で揃える
+ * - 表示幅スイッチはヘッダー中央に固定
  */
 export default function SiteChrome({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const { isStandalone, ready } = useStandaloneDisplay();
-  const { contentClassName } = useLayout();
   const isolatePwa =
     ready && isStandalone && matchesAppPath(pathname, STANDALONE_APP_PATHS);
   const isolateFullscreen = matchesAppPath(pathname, ALWAYS_ISOLATE_PATHS);
@@ -74,9 +69,8 @@ export default function SiteChrome({ children }: { children: ReactNode }) {
       <KeepTabBridge />
       <div className="flex min-h-dvh flex-1 flex-col">
         <Header />
-        <div className={`flex flex-1 flex-col ${contentClassName}`}>
-          {children}
-        </div>
+        {/* Main 舞台はフル幅。幅制限は各ページ / AppShell 内でかける */}
+        <div className="relative flex min-h-0 flex-1 flex-col">{children}</div>
         <Footer />
       </div>
     </>

@@ -3,13 +3,15 @@
 import { genres } from "@/data/tools";
 import GenreSection from "@/components/GenreSection";
 import { useI18n } from "@/i18n";
+import { useLayout } from "@/lib/layout";
 
 export default function Home() {
   const { t } = useI18n();
+  const { contentClassName } = useLayout();
 
   return (
     <main className="relative flex-1 overflow-hidden">
-      {/* アンビエント・グラデーション（主張しすぎない奥行き） */}
+      {/* アンビエントは画面いっぱい（幅制限の箱に閉じない＝境目を出さない） */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
@@ -20,29 +22,30 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-transparent to-zinc-100/50" />
       </div>
 
-      {/* ヒーロー：ブランド＋短い説明のみ（幅は共通コンテナに委ねる） */}
-      <section className="portal-fade-up pt-16 pb-4 sm:pt-20">
-        <h1 className="max-w-2xl text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl">
-          {t.home.heroTitleLine1}
-          <br />
-          {t.home.heroTitleLine2}
-        </h1>
-        <p className="mt-4 max-w-lg text-sm leading-relaxed text-zinc-500 sm:text-base">
-          {t.home.heroLead1}
-          <br />
-          {t.home.heroLead2}
-        </p>
-      </section>
+      {/* テキスト列だけ layoutMode の幅に揃える */}
+      <div className={contentClassName}>
+        <section className="portal-fade-up pt-16 pb-4 sm:pt-20">
+          <h1 className="max-w-2xl text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl">
+            {t.home.heroTitleLine1}
+            <br />
+            {t.home.heroTitleLine2}
+          </h1>
+          <p className="mt-4 max-w-lg text-sm leading-relaxed text-zinc-500 sm:text-base">
+            {t.home.heroLead1}
+            <br />
+            {t.home.heroLead2}
+          </p>
+        </section>
 
-      {/* ジャンルごとのツール一覧 */}
-      <div className="divide-y divide-zinc-200/60">
-        {genres.map((genre, index) => (
-          <GenreSection
-            key={genre.id}
-            genre={genre}
-            animationDelayMs={120 + index * 90}
-          />
-        ))}
+        <div className="divide-y divide-zinc-200/60">
+          {genres.map((genre, index) => (
+            <GenreSection
+              key={genre.id}
+              genre={genre}
+              animationDelayMs={120 + index * 90}
+            />
+          ))}
+        </div>
       </div>
     </main>
   );

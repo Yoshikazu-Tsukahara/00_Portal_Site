@@ -6,6 +6,7 @@ import { isValidElement, type ReactNode } from "react";
 import DataManager from "@/components/DataManager";
 import type { DataManagerConfig } from "@/lib/localData";
 import { LanguageToggle, useI18n } from "@/i18n";
+import { useLayout } from "@/lib/layout";
 import { useStandaloneDisplay } from "@/lib/useStandaloneDisplay";
 
 /**
@@ -115,6 +116,7 @@ export default function AppShell({
   // wide は deprecated（幅は LayoutToggle が管理）。受け取っても無視する。
   const { t } = useI18n();
   const { isStandalone } = useStandaloneDisplay();
+  const { contentClassName } = useLayout();
 
   // standalone 起動中はサイト Header が消えるため、シェル側で代替する
   const isStandaloneApp = isPwa && isStandalone;
@@ -127,10 +129,10 @@ export default function AppShell({
     )
   ) : null;
 
-  // 幅・横 padding は SiteChrome の共通コンテナが担当（ここでは付けない）
+  // 背景はフル幅のまま、中身の列だけ layoutMode の幅に揃える
   return (
     <main
-      className={`flex w-full flex-1 flex-col ${
+      className={`flex w-full flex-1 flex-col ${contentClassName} ${
         fillViewport
           ? // 4.5rem = サイト共通 Header の高さ。作業領域を1画面分だけ確保し、
             // Footer は隠さずその下に続かせる

@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { useI18n } from "@/i18n";
 import type { LegalBlock, LegalDoc } from "@/i18n/types";
+import { useLayout } from "@/lib/layout";
 
 type LegalDocumentProps = {
   doc: LegalDoc;
@@ -15,35 +16,38 @@ type LegalDocumentProps = {
  */
 export default function LegalDocument({ doc }: LegalDocumentProps) {
   const { t } = useI18n();
+  const { contentClassName } = useLayout();
 
   return (
     <main className="w-full flex-1 py-12 sm:py-16">
-      <Link
-        href="/"
-        className="inline-flex text-sm text-zinc-500 transition-colors hover:text-zinc-900"
-      >
-        {t.legal.back}
-      </Link>
+      <div className={contentClassName}>
+        <Link
+          href="/"
+          className="inline-flex text-sm text-zinc-500 transition-colors hover:text-zinc-900"
+        >
+          {t.legal.back}
+        </Link>
 
-      <header className="mt-8 border-b border-zinc-200 pb-8">
-        <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">
-          {doc.title}
-        </h1>
-        <p className="mt-3 text-sm text-zinc-400">
-          {t.legal.updatedPrefix}
-          {doc.updatedAt}
-        </p>
-      </header>
+        <header className="mt-8 border-b border-zinc-200 pb-8">
+          <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">
+            {doc.title}
+          </h1>
+          <p className="mt-3 text-sm text-zinc-400">
+            {t.legal.updatedPrefix}
+            {doc.updatedAt}
+          </p>
+        </header>
 
-      <article className="legal-prose mt-10 space-y-10 text-sm leading-relaxed text-zinc-600 sm:text-[15px] sm:leading-7">
-        {doc.sections.map((section) => (
-          <LegalSection key={section.title} title={section.title}>
-            {section.blocks.map((block, i) => (
-              <LegalBlockView key={`${section.title}-${i}`} block={block} />
-            ))}
-          </LegalSection>
-        ))}
-      </article>
+        <article className="legal-prose mt-10 space-y-10 text-sm leading-relaxed text-zinc-600 sm:text-[15px] sm:leading-7">
+          {doc.sections.map((section) => (
+            <LegalSection key={section.title} title={section.title}>
+              {section.blocks.map((block, i) => (
+                <LegalBlockView key={`${section.title}-${i}`} block={block} />
+              ))}
+            </LegalSection>
+          ))}
+        </article>
+      </div>
     </main>
   );
 }
