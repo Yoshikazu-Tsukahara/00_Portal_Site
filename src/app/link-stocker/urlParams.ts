@@ -1,4 +1,4 @@
-import { LINK_STOCKER_CHANNEL, LINK_STOCKER_WINDOW_NAME } from "./types";
+import { LINK_STOCKER_WINDOW_NAME } from "./types";
 
 export type KeepHints = {
   title?: string;
@@ -110,9 +110,8 @@ export function clearLinkStockerQuery() {
 
 /**
  * ブックマークレット用 javascript: URL。
- * - 固定ウィンドウ名で、すでに開いているマイツールボックスタブを再利用（新規タブを増やさない）
- * - ページ上の OGP をクエリで渡し、本番のサーバー取得失敗を補う
- * - 同一オリジン上で実行されたときだけ BroadcastChannel でも通知（補助）
+ * 別オリジンからは BroadcastChannel が届かないため、同一オリジンの bridge を開き、
+ * 既存のマイツールボックスタブへ引き継いでから bridge タブを閉じる。
  */
 export function buildBookmarkletHref(origin: string): string {
   const code = [
@@ -127,17 +126,12 @@ export function buildBookmarkletHref(origin: string): string {
     "var t=m('og:title','twitter:title')||document.title||'';",
     "var i=m('og:image','twitter:image')||'';",
     "var d=m('og:description','twitter:description')||'';",
-    "try{",
-    `var c=new BroadcastChannel(${JSON.stringify(LINK_STOCKER_CHANNEL)});`,
-    "c.postMessage({type:'keep-request',url:u,title:t,image:i,description:d});",
-    "c.close();",
-    "}catch(e){}",
     "var q='url='+encodeURIComponent(u);",
     "if(t)q+='&ot='+encodeURIComponent(t.slice(0,200));",
     "if(i)q+='&oi='+encodeURIComponent(i);",
     "if(d)q+='&od='+encodeURIComponent(d.slice(0,400));",
-    // 同名タブがあればそれを遷移・フォーカス。なければ 1 枚だけ新規
-    "var w=window.open(o+'/link-stocker?'+q,wn);",
+    // bridge が既存タブへ渡し、あれば自分を閉じる
+    "var w=window.open(o+'/link-stocker/bridge?'+q,wn);",
     "try{if(w)w.focus();}catch(e){}",
     "})();",
   ].join("");

@@ -140,7 +140,7 @@ export const linkStockerJa: LinkStockerDict = {
   },
   bookmarklet: {
     title: "💻 PC用：ブックマークバーにドラッグ",
-    hint: "下のボタンをブックマークバーへドラッグして追加。他サイトで押すと、そのページのタイトル／サムネも一緒に送り、すでに開いているマイツールボックスのタブ（どのページでも可）へ移動して自動登録します。新規タブは増えません。",
+    hint: "下のボタンをブックマークバーへドラッグして追加（更新時は差し替え直してください）。他サイトで押すと、すでに開いているマイツールボックスのタブへ送って自動登録し、一時タブはすぐ閉じます。",
     dragLabel: "キープに送る",
   },
   share: {
@@ -223,7 +223,7 @@ export const linkStockerEn: LinkStockerDict = {
   },
   bookmarklet: {
     title: "💻 Desktop: drag to bookmarks bar",
-    hint: "Drag the button onto your bookmarks bar. It sends the page title/thumbnail, reuses any open My Tool Box tab (any page), and auto-saves—no extra tabs.",
+    hint: "Drag the button onto your bookmarks bar (replace it after updates). It hands off to any open My Tool Box tab and auto-saves; the helper tab closes right away.",
     dragLabel: "Send to Keep",
   },
   share: {

@@ -226,10 +226,32 @@ export default function LinkStockerPage() {
 
       const now = Date.now();
       const last = lastAutoKeepRef.current;
-      // 同じ URL の短時間二重実行を防ぐ（BC + window.open の両方が来る想定）
+      // 同じ URL の短時間二重実行を防ぐ（BC + クエリの両方が来る想定）
       if (last && last.url === normalized && now - last.at < 4000) {
         if (fromQuery) clearLinkStockerQuery();
         return;
+      }
+      // 複数タブ同時受信でも 1 回だけ追加する
+      try {
+        const claimKey = "my-tool-box:link-stocker:auto-claim";
+        const raw = window.localStorage.getItem(claimKey);
+        if (raw) {
+          const prev = JSON.parse(raw) as { url?: string; at?: number };
+          if (
+            prev.url === normalized &&
+            typeof prev.at === "number" &&
+            now - prev.at < 4000
+          ) {
+            if (fromQuery) clearLinkStockerQuery();
+            return;
+          }
+        }
+        window.localStorage.setItem(
+          claimKey,
+          JSON.stringify({ url: normalized, at: now }),
+        );
+      } catch {
+        // ignore
       }
       lastAutoKeepRef.current = { url: normalized, at: now };
 
