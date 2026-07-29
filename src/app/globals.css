@@ -2976,6 +2976,446 @@ html.pxd-pwa-standalone .pxd-block-guide {
   }
 }
 
+/* ============================================================
+   ひみつメッセージ：ハッカー／スパイ演出のダーク端末風UI
+   ============================================================ */
+
+.cm-root {
+  @apply flex min-h-0 flex-1 flex-col gap-3;
+}
+
+.cm-console {
+  @apply flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-zinc-800 font-mono text-zinc-100 sm:rounded-2xl;
+  background: radial-gradient(
+    ellipse at top,
+    rgba(39, 39, 42, 0.55),
+    rgba(9, 9, 11, 0.98)
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 20px 60px -24px rgba(0, 0, 0, 0.9);
+}
+
+.cm-mode-tabs {
+  @apply grid shrink-0 grid-cols-2 gap-1 border-b border-zinc-800 bg-zinc-950/60 p-1.5;
+}
+
+.cm-mode-tab {
+  @apply rounded-lg px-2 py-2.5 text-center text-xs font-semibold tracking-wide text-zinc-400 transition-all duration-150 hover:text-zinc-100 sm:text-sm;
+}
+
+.cm-mode-tab--active {
+  @apply bg-emerald-400/12 text-emerald-300;
+  box-shadow: inset 0 0 0 1px rgba(52, 211, 153, 0.4);
+  text-shadow: 0 0 12px rgba(52, 211, 153, 0.35);
+}
+
+.cm-console__body {
+  @apply min-h-0 flex-1 overflow-y-auto p-3 sm:p-5;
+}
+
+.cm-privacy-note {
+  @apply shrink-0 text-center text-[11px] leading-relaxed text-zinc-500;
+}
+
+.cm-panel {
+  @apply flex flex-col gap-4;
+}
+
+.cm-subpanel {
+  @apply flex flex-col gap-4;
+}
+
+.cm-field {
+  @apply flex flex-col gap-1.5;
+}
+
+.cm-field__label {
+  @apply text-[11px] font-semibold tracking-wide text-emerald-300/80;
+}
+
+.cm-field__hint {
+  @apply text-[10px] leading-relaxed text-zinc-500;
+}
+
+.cm-textarea,
+.cm-input {
+  @apply w-full rounded-md border border-zinc-700 bg-zinc-950/70 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 transition-colors focus:border-emerald-400/70 focus:outline-none focus:ring-1 focus:ring-emerald-400/40;
+}
+
+.cm-textarea {
+  @apply resize-y leading-relaxed;
+}
+
+.cm-textarea--mono {
+  @apply font-mono text-[13px];
+}
+
+.cm-password-row {
+  @apply flex items-center gap-2;
+}
+
+.cm-password-row .cm-input {
+  @apply flex-1;
+}
+
+.cm-primary-btn {
+  @apply inline-flex w-full items-center justify-center gap-2 rounded-lg border border-emerald-400/50 bg-gradient-to-b from-emerald-400 to-emerald-600 px-4 py-2.5 text-sm font-bold tracking-wide text-zinc-950 shadow-[0_0_24px_-6px_rgba(52,211,153,0.55)] transition-transform duration-100 hover:brightness-105 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:brightness-100 disabled:active:scale-100;
+}
+
+.cm-primary-btn--sm {
+  @apply w-auto px-3 py-1.5 text-xs;
+}
+
+.cm-ghost-btn {
+  @apply inline-flex shrink-0 items-center justify-center gap-1 rounded-md border border-zinc-700 bg-zinc-900/70 px-2.5 py-1.5 text-[11px] font-medium text-zinc-300 transition-colors hover:border-emerald-400/40 hover:text-emerald-300;
+}
+
+.cm-error {
+  @apply rounded-md border border-rose-500/40 bg-rose-950/30 px-3 py-2 text-xs leading-relaxed text-rose-300;
+}
+
+.cm-error--shake {
+  animation: cm-shake 0.42s ease-in-out;
+}
+
+.cm-success {
+  @apply text-center text-xs font-semibold tracking-wide text-emerald-300;
+  text-shadow: 0 0 12px rgba(52, 211, 153, 0.45);
+}
+
+.cm-decrypt-actions {
+  @apply flex items-center gap-2;
+}
+
+.cm-decrypt-actions .cm-primary-btn {
+  @apply w-auto flex-1;
+}
+
+.cm-ghost-btn--muted {
+  @apply border-zinc-600 text-zinc-500;
+}
+
+.cm-install-btn {
+  @apply inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-1 text-[11px] font-medium tracking-tight text-emerald-300 shadow-[0_1px_0_rgba(52,211,153,0.08)] transition-all duration-200 ease-out hover:-translate-y-px hover:border-emerald-400/50 hover:bg-emerald-400/15 hover:text-emerald-200 hover:shadow-sm active:translate-y-0 active:shadow-none disabled:cursor-wait disabled:opacity-60 sm:gap-1.5 sm:px-3 sm:py-1 sm:text-xs;
+}
+
+.cm-install-modal {
+  animation: lunch-install-modal-in 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ひみつメッセージ：バウンススクロール抑制 */
+html.cm-app-active,
+body.cm-app-active {
+  overscroll-behavior-y: contain;
+}
+
+html.cm-pwa-standalone,
+body.cm-pwa-standalone {
+  overscroll-behavior-x: none;
+  touch-action: pan-y;
+}
+
+/* ---------- 暗号テーマ選択 ---------- */
+.cm-theme-selector {
+  @apply grid grid-cols-3 gap-1.5;
+}
+
+.cm-theme-btn {
+  @apply flex flex-col items-center gap-1 rounded-lg border border-zinc-700 bg-zinc-900/60 px-2 py-2 text-[11px] font-medium text-zinc-400 transition-all duration-150 hover:border-zinc-500 hover:text-zinc-200;
+}
+
+.cm-theme-btn__icon {
+  @apply text-base;
+}
+
+.cm-theme-btn--cyber.cm-theme-btn--active {
+  @apply border-emerald-400/70 bg-emerald-400/10 text-emerald-300;
+  box-shadow: 0 0 16px -4px rgba(52, 211, 153, 0.5);
+}
+
+.cm-theme-btn--fantasy.cm-theme-btn--active {
+  @apply border-violet-400/70 bg-violet-400/10 text-violet-300;
+  box-shadow: 0 0 16px -4px rgba(167, 139, 250, 0.5);
+}
+
+.cm-theme-btn--spy.cm-theme-btn--active {
+  @apply border-rose-400/70 bg-rose-400/10 text-rose-300;
+  box-shadow: 0 0 16px -4px rgba(251, 113, 133, 0.5);
+}
+
+/* ---------- 暗号文の出力エリア ---------- */
+.cm-output {
+  @apply rounded-lg border border-zinc-700 bg-zinc-950/60 p-3;
+}
+
+.cm-output[data-theme="cyber"] {
+  border-color: rgba(52, 211, 153, 0.4);
+}
+
+.cm-output[data-theme="fantasy"] {
+  border-color: rgba(167, 139, 250, 0.4);
+}
+
+.cm-output[data-theme="spy"] {
+  border-color: rgba(251, 113, 133, 0.4);
+}
+
+.cm-output__head {
+  @apply mb-2 flex items-center justify-between gap-2;
+}
+
+.cm-output__label {
+  @apply text-[11px] font-semibold tracking-wide text-zinc-300;
+}
+
+.cm-output__text {
+  @apply max-h-40 overflow-y-auto whitespace-pre-wrap break-all rounded-md bg-black/40 p-2.5 font-mono text-[12px] leading-relaxed text-zinc-100;
+}
+
+.cm-share-row {
+  @apply mt-2.5 flex flex-wrap gap-1.5;
+}
+
+.cm-share-btn {
+  @apply inline-flex items-center justify-center gap-1 rounded-full px-3 py-1.5 text-[11px] font-semibold text-white transition-transform active:scale-95;
+}
+
+.cm-share-btn--line {
+  @apply bg-[#06C755] hover:brightness-105;
+}
+
+.cm-share-btn--x {
+  @apply bg-zinc-800 hover:bg-zinc-700;
+}
+
+/* ---------- 解読タブ内サブ切り替え ---------- */
+.cm-subtabs {
+  @apply mb-1 grid grid-cols-2 gap-1.5;
+}
+
+.cm-subtab {
+  @apply rounded-md border border-zinc-700 bg-zinc-900/50 px-2 py-2 text-[11px] font-semibold text-zinc-400 transition-colors hover:text-zinc-200 sm:text-xs;
+}
+
+.cm-subtab--active {
+  @apply border-emerald-400/60 bg-emerald-400/10 text-emerald-300;
+}
+
+/* ---------- 解読スピードスライダー ---------- */
+.cm-speed {
+  @apply rounded-lg border border-zinc-700 bg-zinc-900/40 p-3;
+}
+
+.cm-speed__head {
+  @apply mb-1.5 flex items-center justify-between text-[11px];
+}
+
+.cm-speed__label {
+  @apply font-semibold tracking-wide text-zinc-400;
+}
+
+.cm-speed__value {
+  @apply font-semibold text-emerald-300;
+}
+
+.cm-speed__range {
+  @apply w-full accent-emerald-400;
+}
+
+.cm-speed__ticks {
+  @apply mt-1 flex justify-between text-[10px] text-zinc-500;
+}
+
+.cm-speed__tick--active {
+  @apply font-semibold text-emerald-300;
+}
+
+/* ---------- シフト量スライダー（シーザー暗号チャレンジ） ---------- */
+.cm-shift-slider {
+  @apply rounded-lg border border-zinc-700 bg-zinc-900/40 p-3;
+}
+
+.cm-shift-slider__head {
+  @apply mb-1.5 flex items-center justify-between text-[11px] font-semibold tracking-wide text-zinc-400;
+}
+
+.cm-shift-slider__value {
+  @apply font-mono text-sm text-amber-300;
+  text-shadow: 0 0 10px rgba(252, 211, 77, 0.4);
+}
+
+.cm-shift-slider__range {
+  @apply w-full accent-amber-400;
+}
+
+.cm-shift-slider__ticks {
+  @apply mt-1 flex justify-between text-[10px] text-zinc-500;
+}
+
+/* ---------- 解読・プレビュー用「端末」パネル ---------- */
+.cm-terminal {
+  @apply overflow-hidden rounded-lg border border-zinc-700 bg-black/50;
+}
+
+.cm-terminal__head {
+  @apply flex items-center gap-1.5 border-b border-zinc-800 bg-zinc-900/70 px-2.5 py-1.5;
+}
+
+.cm-terminal__dot {
+  @apply size-2 rounded-full;
+}
+
+.cm-terminal__dot--red {
+  @apply bg-rose-500/80;
+}
+
+.cm-terminal__dot--yellow {
+  @apply bg-amber-400/80;
+}
+
+.cm-terminal__dot--green {
+  @apply bg-emerald-400/80;
+}
+
+.cm-terminal__title {
+  @apply ml-1.5 text-[10px] tracking-wide text-zinc-500;
+}
+
+.cm-terminal__body {
+  @apply min-h-[4.5rem] px-3 py-3;
+}
+
+/* ---------- スクランブル解読テキスト ---------- */
+.cm-scramble-text {
+  @apply m-0 whitespace-pre-wrap break-words text-[15px] leading-relaxed tracking-wide text-zinc-100 sm:text-base;
+}
+
+.cm-scramble-text--empty {
+  @apply text-sm text-zinc-600;
+}
+
+.cm-scramble-char {
+  @apply inline-block;
+}
+
+.cm-scramble-char--pending {
+  @apply text-emerald-500/50;
+}
+
+.cm-scramble-char--locked {
+  @apply text-emerald-300;
+}
+
+.cm-scramble-char--pop {
+  animation: cm-char-pop 0.26s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ---------- ダミー解析ログ ---------- */
+.cm-log {
+  @apply mt-2 max-h-24 overflow-hidden border-t border-zinc-800/80 px-3 py-2 font-mono text-[10px] leading-relaxed text-emerald-500/70;
+}
+
+.cm-log__line {
+  animation: cm-log-line-in 0.18s ease-out;
+}
+
+/* ---------- 出題を作る（折りたたみ） ---------- */
+.cm-collapse {
+  @apply rounded-lg border border-zinc-700 bg-zinc-900/40 p-3;
+}
+
+.cm-collapse__summary {
+  @apply cursor-pointer text-[11px] font-semibold tracking-wide text-amber-300;
+}
+
+.cm-collapse__body {
+  @apply mt-3 flex flex-col gap-2.5;
+}
+
+.cm-spoiler {
+  @apply mt-2 text-[10px] text-zinc-500;
+}
+
+.cm-spoiler summary {
+  @apply cursor-pointer text-zinc-400 hover:text-zinc-200;
+}
+
+.cm-spoiler__body {
+  @apply mt-1 font-mono text-amber-300;
+}
+
+/* ---------- 文字の出現頻度グラフ ---------- */
+.cm-freq-chart {
+  @apply flex h-28 items-end gap-1.5 overflow-x-auto rounded-lg border border-zinc-700 bg-zinc-950/50 p-2.5;
+}
+
+.cm-freq-empty {
+  @apply text-[11px] leading-relaxed text-zinc-500;
+}
+
+.cm-freq-col {
+  @apply flex h-full min-w-[1.6rem] flex-col items-center justify-end gap-1;
+}
+
+.cm-freq-col__count {
+  @apply text-[9px] text-zinc-500;
+}
+
+.cm-freq-col__track {
+  @apply flex h-full w-2.5 items-end overflow-hidden rounded-full bg-zinc-800;
+}
+
+.cm-freq-col__fill {
+  @apply w-full rounded-full bg-gradient-to-t from-emerald-500 to-emerald-300 transition-[height] duration-200 ease-out;
+}
+
+.cm-freq-col__char {
+  @apply text-[11px] font-semibold text-zinc-300;
+}
+
+@keyframes cm-char-pop {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  40% {
+    transform: scale(1.28);
+    filter: brightness(1.6);
+    text-shadow: 0 0 12px rgba(52, 211, 153, 0.85);
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
+@keyframes cm-log-line-in {
+  from {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cm-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20%,
+  60% {
+    transform: translateX(-5px);
+  }
+  40%,
+  80% {
+    transform: translateX(5px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .btn-support__label {
     animation: none;
@@ -3025,7 +3465,11 @@ html.pxd-pwa-standalone .pxd-block-guide {
   .pxd-overlay--success .pxd-result-frame,
   .pxd-overlay--success .pxd-result-panel,
   .pxd-overlay--success .pxd-result-next,
-  .pxd-anticheat-lock__text {
+  .pxd-anticheat-lock__text,
+  .cm-scramble-char--pop,
+  .cm-log__line,
+  .cm-error--shake,
+  .cm-install-modal {
     animation: none;
   }
 

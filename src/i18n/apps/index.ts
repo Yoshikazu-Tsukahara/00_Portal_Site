@@ -3,6 +3,8 @@ import {
   characterRelationEn,
   characterRelationJa,
 } from "./characterRelation";
+import type { CryptoMessageDict } from "./cryptoMessage";
+import { cryptoMessageEn, cryptoMessageJa } from "./cryptoMessage";
 import type { FolderGeneratorDict } from "./folderGenerator";
 import {
   folderGeneratorEn,
@@ -51,6 +53,7 @@ export type AppsDictionary = {
   linkStocker: LinkStockerDict;
   ultimateProbabilitySlot: UltimateProbabilitySlotDict;
   pixelDropPuzzle: PixelDropPuzzleDict;
+  cryptoMessage: CryptoMessageDict;
 };
 
 export const appsJa: AppsDictionary = {
@@ -66,6 +69,7 @@ export const appsJa: AppsDictionary = {
   linkStocker: linkStockerJa,
   ultimateProbabilitySlot: ultimateProbabilitySlotJa,
   pixelDropPuzzle: pixelDropPuzzleJa,
+  cryptoMessage: cryptoMessageJa,
 };
 
 export const appsEn: AppsDictionary = {
@@ -81,4 +85,5 @@ export const appsEn: AppsDictionary = {
   linkStocker: linkStockerEn,
   ultimateProbabilitySlot: ultimateProbabilitySlotEn,
   pixelDropPuzzle: pixelDropPuzzleEn,
+  cryptoMessage: cryptoMessageEn,
 };

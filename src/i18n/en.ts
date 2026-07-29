@@ -104,6 +104,16 @@ export const en: Dictionary = {
       description:
         "Just drop a photo into the gap. Judged to a fraction of a pixel — an unforgiving precision puzzle.",
     },
+    "robot-freethrow": {
+      title: "Notebook Projectile Freethrow",
+      description:
+        "Doodles come alive with physics. Aim the ring with angle, launch speed, and spin in a pencil-notebook mini game.",
+    },
+    "crypto-message": {
+      title: "Secret Message",
+      description:
+        "Encrypt and decrypt secret notes with a shared passphrase, or crack a Caesar cipher in the decoding challenge—full hacker-movie flair included.",
+    },
     "monster-driver": {
       title: "Monster Driver",
       description:

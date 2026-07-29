@@ -110,16 +110,18 @@ export function clearLinkStockerQuery() {
 
 /**
  * ブックマークレット用 javascript: URL。
- * - 固定ウィンドウ名で既存タブへフォーカス
- * - ページ上の OGP をクエリ／BroadcastChannel で渡し、本番の取得失敗を補う
+ * - 固定ウィンドウ名で、すでに開いているマイツールボックスタブを再利用（新規タブを増やさない）
+ * - ページ上の OGP をクエリで渡し、本番のサーバー取得失敗を補う
+ * - 同一オリジン上で実行されたときだけ BroadcastChannel でも通知（補助）
  */
 export function buildBookmarkletHref(origin: string): string {
   const code = [
     "(function(){",
     `var o=${JSON.stringify(origin)};`,
+    `var wn=${JSON.stringify(LINK_STOCKER_WINDOW_NAME)};`,
     "var u=location.href;",
-    "function m(p,n){",
-    "var e=document.querySelector('meta[property=\"'+p+'\"]')||document.querySelector('meta[name=\"'+n+'\"]');",
+    "function m(p,nm){",
+    "var e=document.querySelector('meta[property=\"'+p+'\"]')||document.querySelector('meta[name=\"'+nm+'\"]');",
     "return e&&e.content?e.content:'';",
     "}",
     "var t=m('og:title','twitter:title')||document.title||'';",
@@ -134,7 +136,9 @@ export function buildBookmarkletHref(origin: string): string {
     "if(t)q+='&ot='+encodeURIComponent(t.slice(0,200));",
     "if(i)q+='&oi='+encodeURIComponent(i);",
     "if(d)q+='&od='+encodeURIComponent(d.slice(0,400));",
-    `window.open(o+'/link-stocker?'+q,${JSON.stringify(LINK_STOCKER_WINDOW_NAME)});`,
+    // 同名タブがあればそれを遷移・フォーカス。なければ 1 枚だけ新規
+    "var w=window.open(o+'/link-stocker?'+q,wn);",
+    "try{if(w)w.focus();}catch(e){}",
     "})();",
   ].join("");
 

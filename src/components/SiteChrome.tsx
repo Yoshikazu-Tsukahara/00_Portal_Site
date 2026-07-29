@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import KeepTabBridge from "@/app/link-stocker/KeepTabBridge";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { useStandaloneDisplay } from "@/lib/useStandaloneDisplay";
@@ -13,13 +14,14 @@ const STANDALONE_APP_PATHS = [
   "/pixel-drop-puzzle",
   "/link-stocker",
   "/palette-collector",
+  "/crypto-message",
 ];
 
 /**
  * ブラウザでもポータル枠を外し、没入型フルスクリーンで出すアプリ。
  * （一人称ミニゲームなど）
  */
-const ALWAYS_ISOLATE_PATHS = ["/monster-driver"];
+const ALWAYS_ISOLATE_PATHS = ["/monster-driver", "/robot-freethrow"];
 
 function matchesAppPath(pathname: string | null, bases: string[]): boolean {
   if (!pathname) return false;
@@ -42,12 +44,16 @@ export default function SiteChrome({ children }: { children: ReactNode }) {
 
   if (isolatePwa || isolateFullscreen) {
     return (
-      <div className="flex min-h-dvh flex-1 flex-col">{children}</div>
+      <>
+        <KeepTabBridge />
+        <div className="flex min-h-dvh flex-1 flex-col">{children}</div>
+      </>
     );
   }
 
   return (
     <>
+      <KeepTabBridge />
       <Header />
       {children}
       <Footer />

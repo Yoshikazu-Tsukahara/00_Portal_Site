@@ -104,6 +104,16 @@ export const ja: Dictionary = {
       description:
         "写真を隙間に落とすだけ。ただし判定は小数点以下のピクセル単位という、鬼畜な精度パズル。",
     },
+    "robot-freethrow": {
+      title: "手書きノート風 投射フリースロー",
+      description:
+        "授業中の落書きが物理演算で動き出す。角度・初速・スピンでリングを狙うノート風ミニゲーム。",
+    },
+    "crypto-message": {
+      title: "ひみつメッセージ",
+      description:
+        "合言葉で暗号化・復号する秘密のやり取りと、シーザー暗号を解き明かす解読チャレンジ。演出全開のハッカー風パズル。",
+    },
     "monster-driver": {
       title: "モンスタードライバー",
       description:

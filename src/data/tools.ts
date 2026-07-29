@@ -113,6 +113,16 @@ export const genres: Genre[] = [
         icon: "🧩",
         href: "/pixel-drop-puzzle",
       },
+      {
+        id: "robot-freethrow",
+        icon: "🏀",
+        href: "/robot-freethrow",
+      },
+      {
+        id: "crypto-message",
+        icon: "🔐",
+        href: "/crypto-message",
+      },
       // モンスタードライバーはポータル一覧非表示（ルート /monster-driver は残置）
     ],
   },

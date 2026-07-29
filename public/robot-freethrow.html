@@ -1,0 +1,3939 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>力学演習 — 投射運動（フリースロー）</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Klee+One:wght@400;600&family=Yomogi&display=swap"
+    rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #333333;
+      --ink-soft: rgba(40, 40, 40, 0.7);
+      --pencil: rgba(40, 40, 40, 0.85);
+      --pencil-soft: rgba(40, 40, 40, 0.65);
+      --red-pen: #c62828;
+      --red-pen-soft: rgba(198, 40, 40, 0.85);
+      --paper: #f3e6c4;
+      --paper-deep: #ead7b0;
+      --sticky-y: #fff4a8;
+      --sticky-p: #ffd6e7;
+      --sticky-b: #d8eefc;
+      --sticky-g: #dff5d4;
+      --sticky-o: #ffe0c2;
+      --shoot: #ffb86b;
+      --shadow: 0 4px 14px rgba(60, 45, 20, 0.12);
+      --radius: 14px;
+      --font-exam: "Caveat", "Yomogi", "Klee One", cursive;
+      --font-jp: "Yomogi", "Klee One", "Caveat", cursive;
+    }
+
+    /* 宇宙ステージ：黒い画用紙に白い鉛筆 */
+    body.dark-mode {
+      --ink: #f2f2f2;
+      --ink-soft: rgba(238, 238, 238, 0.78);
+      --pencil: rgba(238, 238, 238, 0.92);
+      --pencil-soft: rgba(238, 238, 238, 0.7);
+      --red-pen: #ff8a80;
+      --red-pen-soft: rgba(255, 138, 128, 0.9);
+      --paper: #141414;
+      --paper-deep: #0e0e0e;
+      --sticky-y: #222018;
+      --sticky-p: #241820;
+      --sticky-b: #182028;
+      --sticky-g: #182018;
+      --sticky-o: #241c14;
+      --shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+      background: #080808;
+      color: var(--pencil);
+    }
+
+    body.dark-mode .app {
+      background-color: var(--paper);
+      background-image:
+        linear-gradient(rgba(220, 220, 230, 0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(220, 220, 230, 0.07) 1px, transparent 1px),
+        repeating-linear-gradient(transparent 0 26px,
+          rgba(160, 180, 220, 0.12) 26px 27px);
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 18px 50px rgba(0, 0, 0, 0.55);
+    }
+
+    body.dark-mode .canvas-wrap {
+      background: #111;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+    }
+
+    body.dark-mode .hud {
+      background: #1c1c1c;
+      border: 1px solid rgba(238, 238, 238, 0.32);
+      border-bottom: 1px dashed rgba(238, 238, 238, 0.45);
+      box-shadow:
+        2px 3px 0 rgba(0, 0, 0, 0.45),
+        0 1px 0 rgba(255, 255, 255, 0.06) inset;
+    }
+
+    body.dark-mode .hud .given-title {
+      border-bottom-color: rgba(238, 238, 238, 0.4);
+    }
+
+    body.dark-mode .margin-memo .memo-icon.analyze-btn {
+      background: #2a2412;
+      color: var(--red-pen);
+      border-color: rgba(255, 138, 128, 0.45);
+      box-shadow: 1px 2px 0 rgba(0, 0, 0, 0.35);
+    }
+
+    body.dark-mode .margin-memo input[type="number"] {
+      color: var(--pencil);
+      border-bottom-color: rgba(238, 238, 238, 0.65);
+    }
+
+    body.dark-mode .margin-memo input[type="number"]:focus {
+      border-bottom-color: #eee;
+      background: transparent;
+      color: var(--pencil);
+    }
+
+    body.dark-mode .title {
+      border-bottom-color: var(--pencil-soft);
+    }
+
+    body.dark-mode .status span {
+      border-bottom-color: var(--pencil-soft);
+    }
+
+    body.dark-mode .panel {
+      background: #1a1a1a;
+      color: var(--pencil);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+    }
+
+    body.dark-mode .panel::before {
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    body.dark-mode button {
+      background: #222;
+      color: #eee;
+      border: 1px solid rgba(238, 238, 238, 0.28);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+    }
+
+    body.dark-mode .sticky {
+      color: var(--red-pen);
+    }
+
+    body.dark-mode .sticky h3 {
+      border-bottom-color: rgba(255, 138, 128, 0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      background: #cbb892;
+      font-family: var(--font-exam);
+      color: var(--pencil);
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .app {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      max-width: 960px;
+      height: 100dvh;
+      margin: 0 auto;
+      position: relative;
+      background-color: var(--paper);
+      background-image:
+        linear-gradient(rgba(80, 60, 40, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(80, 60, 40, 0.06) 1px, transparent 1px),
+        repeating-linear-gradient(transparent 0 26px,
+          rgba(100, 130, 170, 0.16) 26px 27px);
+      background-size: 20px 20px, 20px 20px, 100% 27px;
+      box-shadow: 0 0 0 1px rgba(60, 40, 20, 0.12), 0 18px 50px rgba(40, 30, 10, 0.22);
+    }
+
+    .topbar {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 16px 4px;
+      flex-shrink: 0;
+      transform: rotate(-0.3deg);
+    }
+
+    .title {
+      font-family: var(--font-jp);
+      font-weight: 600;
+      font-size: clamp(15px, 3.4vw, 18px);
+      letter-spacing: 0.02em;
+      padding: 0;
+      background: transparent;
+      border-radius: 0;
+      box-shadow: none;
+      color: var(--pencil);
+      border-bottom: 1px dashed var(--pencil-soft);
+    }
+
+    .status {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 15px;
+      font-family: var(--font-exam);
+      color: var(--pencil);
+    }
+
+    .status span {
+      white-space: nowrap;
+      padding: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      font-weight: 600;
+      border-bottom: 1px dotted var(--pencil-soft);
+    }
+
+    .status span:nth-child(2),
+    .status span:nth-child(3) {
+      background: transparent;
+    }
+
+    .canvas-wrap {
+      position: relative;
+      flex: 1;
+      min-height: 0;
+      margin: 2px 10px 12px;
+      border-radius: 0;
+      overflow: hidden;
+      box-shadow: inset 0 0 0 1px rgba(58, 52, 44, 0.1);
+      /* 方眼はキャンバス上で発射原点に厳密合わせるため、ここは紙色のみ */
+      background: #fffaf0;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: default;
+      touch-action: none;
+    }
+
+    /* 右上：[問] 与えられた条件（ANALYZE同系の付箋） */
+    .hud {
+      position: absolute;
+      right: 12px;
+      top: 10px;
+      z-index: 7;
+      font-family: var(--font-exam);
+      font-size: 15px;
+      line-height: 1.45;
+      color: var(--pencil);
+      pointer-events: none;
+      padding: 10px 12px 11px;
+      background: var(--sticky-y);
+      border: 1px solid rgba(60, 40, 20, 0.22);
+      border-bottom: 1px dashed rgba(60, 40, 20, 0.35);
+      border-radius: 1px;
+      box-shadow:
+        2px 3px 0 rgba(60, 40, 20, 0.1),
+        0 1px 0 rgba(255, 255, 255, 0.55) inset;
+      max-width: min(320px, 56vw);
+      text-align: left;
+      opacity: 1;
+      transform: rotate(1.2deg);
+      transform-origin: top right;
+    }
+
+    .hud .given-title {
+      font-family: var(--font-jp);
+      font-weight: 700;
+      font-size: 13px;
+      margin-bottom: 6px;
+      border-bottom: 1px dashed rgba(60, 40, 20, 0.35);
+      padding-bottom: 4px;
+      white-space: nowrap;
+      color: var(--pencil);
+    }
+
+    .hud .given-line {
+      display: block;
+      font-size: 13px;
+      margin: 2px 0;
+      white-space: nowrap;
+      color: var(--pencil);
+    }
+
+    /* 長い注釈は折り返し可 */
+    .hud .given-line.given-wrap {
+      white-space: normal;
+      line-height: 1.35;
+      margin-top: 6px;
+    }
+
+    .hud .given-sym {
+      font-style: italic;
+      font-weight: 700;
+    }
+
+    .hud .given-note {
+      opacity: 0.72;
+    }
+
+    /* 左上：未知数（答え欄） */
+    .margin-memo {
+      position: absolute;
+      left: 12px;
+      top: 10px;
+      z-index: 8;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      padding: 2px 0 0;
+      color: var(--pencil);
+      font-family: var(--font-exam);
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 1.7;
+      transform: rotate(-0.8deg);
+      transform-origin: top left;
+      user-select: text;
+      -webkit-user-select: text;
+      max-width: min(360px, 74vw);
+    }
+
+    .margin-memo .memo-head {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 4px;
+      font-family: var(--font-jp);
+      font-weight: 400;
+      font-size: 13px;
+      color: var(--pencil-soft);
+      transform: rotate(0.3deg);
+    }
+
+    .margin-memo .memo-head .memo-title {
+      border-bottom: 1px dotted var(--pencil-soft);
+      padding-bottom: 1px;
+    }
+
+    .margin-memo .memo-tools {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .margin-memo .memo-icon,
+    .margin-memo .memo-link {
+      font-family: var(--font-exam);
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--pencil);
+      background: transparent;
+      border: none;
+      outline: none;
+      box-shadow: none;
+      padding: 0 2px;
+      cursor: pointer;
+      border-radius: 0;
+      opacity: 0.9;
+      text-decoration: none;
+    }
+
+    .margin-memo .memo-icon.analyze-btn {
+      color: var(--red-pen);
+      background: #fff4a8;
+      border: 1px solid rgba(198, 40, 40, 0.35);
+      border-bottom: 1px dashed var(--red-pen-soft);
+      box-shadow: 1px 2px 0 rgba(60, 40, 20, 0.12);
+      padding: 2px 8px 3px;
+      transform: rotate(2.5deg);
+      font-size: 14px;
+    }
+
+    .margin-memo .memo-link {
+      font-family: var(--font-jp);
+      font-size: 12px;
+      text-decoration: underline;
+      text-decoration-style: dashed;
+      text-underline-offset: 3px;
+    }
+
+    .margin-memo .memo-icon:hover,
+    .margin-memo .memo-link:hover {
+      opacity: 1;
+      filter: none;
+      transform: none;
+    }
+
+    .margin-memo .memo-icon.analyze-btn:hover {
+      transform: rotate(2deg);
+    }
+
+    .margin-memo .memo-icon:active,
+    .margin-memo .memo-link:active {
+      transform: none;
+    }
+
+    .margin-memo .memo-row {
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 0 1px;
+      white-space: nowrap;
+      margin: 2px 0;
+      color: var(--pencil);
+    }
+
+    .margin-memo .memo-row:nth-child(2) {
+      transform: rotate(-0.5deg);
+    }
+
+    .margin-memo .memo-row:nth-child(3) {
+      transform: rotate(0.55deg);
+    }
+
+    .margin-memo .memo-row:nth-child(4) {
+      transform: rotate(-0.35deg);
+    }
+
+    .margin-memo .memo-label {
+      color: var(--pencil);
+      font-weight: 600;
+      font-size: 18px;
+      letter-spacing: 0.01em;
+    }
+
+    .margin-memo .memo-sym {
+      font-style: italic;
+      font-weight: 700;
+      font-size: 1.12em;
+    }
+
+    .margin-memo .memo-eq {
+      margin: 0 0.15em;
+      font-weight: 600;
+    }
+
+    .margin-memo .memo-unit {
+      color: var(--pencil);
+      margin-left: 2px;
+      font-size: 16px;
+    }
+
+    .margin-memo input[type="number"] {
+      font-family: var(--font-exam);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--pencil);
+      width: 3em;
+      min-width: 2.4em;
+      padding: 0 3px 2px;
+      margin: 0 3px;
+      background: transparent;
+      border: none;
+      outline: none;
+      box-shadow: none;
+      border-radius: 0;
+      border-bottom: 1px dashed #333;
+      text-align: center;
+      -moz-appearance: textfield;
+      appearance: textfield;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    .margin-memo input[type="number"]::-webkit-outer-spin-button,
+    .margin-memo input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .margin-memo input[type="number"]:focus {
+      outline: none;
+      border: none;
+      border-bottom: 1px solid #333;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .margin-memo .memo-hint {
+      margin-top: 6px;
+      font-family: var(--font-jp);
+      font-size: 12px;
+      color: var(--pencil-soft);
+      opacity: 0.9;
+      white-space: normal;
+      line-height: 1.45;
+      transform: rotate(0.6deg);
+    }
+
+    button {
+      font-family: var(--font-jp);
+      font-weight: 600;
+      font-size: 14px;
+      border: none;
+      background: #fff;
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 10px 16px;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+    }
+
+    button:hover {
+      filter: brightness(1.03);
+    }
+
+    button:active {
+      transform: translateY(1px) scale(0.98);
+    }
+
+    /* ノート余白のUIは押し込み変形を無効（位置がズレない） */
+    .cam-home-btn:hover,
+    .cam-home-btn:active,
+    .cam-home-btn:focus {
+      transform: translateY(-50%) rotate(-1.2deg);
+      filter: none;
+    }
+
+    .goal-indicator:hover,
+    .goal-indicator:active,
+    .goal-indicator:focus {
+      transform: translateY(-50%) rotate(1.4deg);
+      filter: none;
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+      filter: none;
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(50, 40, 25, 0.22);
+      backdrop-filter: blur(1px);
+      z-index: 20;
+      padding: 16px;
+    }
+
+    .overlay.show {
+      display: flex;
+    }
+
+    .panel {
+      width: min(420px, 100%);
+      background: #fffaf0;
+      border: none;
+      border-radius: 4px;
+      padding: 22px 18px 18px;
+      box-shadow: 0 8px 28px rgba(40, 30, 10, 0.18);
+      position: relative;
+      transform: rotate(-0.6deg);
+      font-family: var(--font-exam);
+      color: var(--pencil);
+    }
+
+    .panel::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 18%;
+      right: 18%;
+      height: 8px;
+      border-radius: 0 0 6px 6px;
+      background: rgba(255, 244, 168, 0.55);
+    }
+
+    .panel h2 {
+      margin: 0 0 10px;
+      font-family: var(--font-jp);
+      font-size: 20px;
+      color: var(--pencil);
+    }
+
+    .panel p {
+      margin: 0 0 14px;
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--ink-soft);
+      font-family: var(--font-jp);
+    }
+
+    /* 先生の赤ペン走り書き（ANALYZE） */
+    .sticky {
+      position: absolute;
+      right: 14px;
+      bottom: 14px;
+      width: min(320px, calc(100% - 28px));
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      padding: 8px 6px 6px;
+      z-index: 15;
+      display: none;
+      transform: rotate(1.4deg);
+      color: var(--red-pen);
+      font-family: var(--font-exam);
+    }
+
+    .sticky.show {
+      display: block;
+      animation: redPenIn 0.35s ease-out;
+    }
+
+    @keyframes redPenIn {
+      from {
+        opacity: 0;
+        transform: rotate(1.4deg) translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: rotate(1.4deg) translateY(0);
+      }
+    }
+
+    .sticky h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+      font-family: var(--font-jp);
+      color: var(--red-pen);
+      padding-bottom: 4px;
+      border-bottom: 1px solid rgba(198, 40, 40, 0.35);
+    }
+
+    .sticky pre {
+      margin: 0;
+      white-space: pre-wrap;
+      font-family: var(--font-exam);
+      font-size: 15px;
+      line-height: 1.5;
+      color: var(--red-pen-soft);
+      font-weight: 600;
+    }
+
+    .sticky .close {
+      position: absolute;
+      top: 0;
+      right: 0;
+      border: none;
+      background: transparent;
+      box-shadow: none;
+      padding: 2px 8px;
+      font-size: 18px;
+      border-radius: 0;
+      color: var(--red-pen);
+      font-family: var(--font-exam);
+    }
+
+    .msg {
+      position: absolute;
+      left: 50%;
+      top: 16%;
+      transform: translateX(-50%) rotate(-1deg);
+      font-family: var(--font-jp);
+      font-size: clamp(18px, 5vw, 26px);
+      font-weight: 600;
+      color: var(--pencil);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      padding: 6px 12px;
+      border-radius: 0;
+      background: transparent;
+      border-bottom: 2px solid var(--pencil-soft);
+      box-shadow: none;
+      z-index: 10;
+    }
+
+    .msg.show {
+      opacity: 1;
+    }
+
+    /* 左側（Target と同高さ）：視点を発射点（原点）へ戻す */
+    .cam-home-btn {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      z-index: 8;
+      font-family: var(--font-exam);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--pencil);
+      background: transparent;
+      border: none;
+      outline: none;
+      box-shadow: none;
+      padding: 2px 4px;
+      cursor: pointer;
+      transform: translateY(-50%) rotate(-1.2deg);
+      opacity: 0.78;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      text-decoration-style: dotted;
+      pointer-events: auto;
+      transition: opacity 0.15s ease;
+    }
+
+    .cam-home-btn:hover {
+      opacity: 1;
+      color: var(--ink);
+    }
+
+    .cam-home-btn:active {
+      transform: translateY(calc(-50% + 1px)) rotate(-1.2deg);
+    }
+
+    .cam-home-btn[hidden] {
+      display: none;
+    }
+
+    /* 右端：画面外ゴールの殴り書きインジケーター（クリックでゴールへ） */
+    .goal-indicator {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      z-index: 7;
+      transform: translateY(-50%) rotate(1.4deg);
+      font-family: var(--font-exam);
+      font-weight: 700;
+      color: var(--pencil);
+      background: transparent;
+      border: none;
+      outline: none;
+      box-shadow: none;
+      padding: 4px 2px;
+      margin: 0;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      text-shadow: 0 0 10px rgba(245, 240, 230, 0.85);
+      white-space: normal;
+      max-width: min(280px, 46vw);
+      text-align: right;
+      line-height: 1.2;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .goal-indicator.show {
+      opacity: 0.88;
+      pointer-events: auto;
+    }
+
+    .goal-indicator.show:hover {
+      opacity: 1;
+      color: var(--ink);
+    }
+
+    .goal-indicator .gi-title {
+      display: block;
+      font-size: 22px;
+    }
+
+    .goal-indicator .gi-meta {
+      display: block;
+      font-size: 16px;
+      font-weight: 600;
+      opacity: 0.92;
+      margin-top: 2px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div class="title">力学演習Ⅱ　／　投射運動（図解問題）</div>
+      <div class="status">
+        <span id="lvLabel">問.1</span>
+        <span id="lifeLabel">試行 3</span>
+        <span id="scoreLabel">正答 0</span>
+      </div>
+    </div>
+
+    <div class="canvas-wrap">
+      <canvas id="game"></canvas>
+
+      <!-- 答案：未知数（求める変数） -->
+      <div class="margin-memo" id="marginMemo">
+        <div class="memo-head">
+          <span class="memo-title">[解] θ・F・Δy を求め、図で検証せよ</span>
+          <span class="memo-tools">
+            <button type="button" class="memo-icon analyze-btn" id="btnHint" title="地球標準での模範解答" aria-label="ANALYZE">💡
+              ANALYZE</button>
+            <button type="button" class="memo-link" id="btnResetBall" title="初期条件に戻す">↺ reset</button>
+          </span>
+        </div>
+        <div class="memo-row">
+          <label class="memo-label" for="angle">
+            <span class="memo-sym">θ</span> (Launch Angle)
+            <span class="memo-eq">=</span>
+          </label>
+          <input id="angle" type="number" min="0" max="90" step="1" value="45" inputmode="numeric"
+            aria-label="θ Launch Angle" />
+          <span class="memo-unit">°</span>
+        </div>
+        <div class="memo-row">
+          <label class="memo-label" for="power">
+            <span class="memo-sym">F</span> (Thrust)
+            <span class="memo-eq">=</span>
+          </label>
+          <input id="power" type="number" min="10" max="20000" step="5" value="100" inputmode="numeric"
+            aria-label="F Thrust" />
+          <span class="memo-unit">N</span>
+        </div>
+        <div class="memo-row">
+          <label class="memo-label" for="dy">
+            <span class="memo-sym">Δy</span> (Hit Offset)
+            <span class="memo-eq">=</span>
+          </label>
+          <input id="dy" type="number" min="-8" max="8" step="0.5" value="0" inputmode="decimal"
+            aria-label="Δy Hit Offset" />
+          <span class="memo-unit">cm</span>
+        </div>
+        <div class="memo-hint">※ 記入後、図中の射手がたをタップして軌道を検証（Δy≠0 でスピン）</div>
+      </div>
+
+      <div class="hud" id="envHud"></div>
+      <div class="msg" id="flashMsg"></div>
+
+      <button type="button" class="cam-home-btn" id="btnCamHome" hidden title="視点を発射原点へ戻す">
+        ◀ 発射点へ戻る
+      </button>
+      <div class="goal-indicator" id="goalIndicator" role="button" aria-hidden="true" title="クリックでゴール位置へ移動"></div>
+
+      <div class="sticky" id="hintSticky">
+        <button type="button" class="close" id="hintClose" aria-label="閉じる">×</button>
+        <h3>✎ 先生メモ（赤ペン）— Earth ref.</h3>
+        <pre id="hintText"></pre>
+      </div>
+
+      <div class="overlay" id="startOverlay">
+        <div class="panel">
+          <h2>力学試験：投射運動</h2>
+          <p>
+            右上の [問] に示された条件のもと、<br />
+            左上に θ・F・Δy を記入し、図の射手がたをタップして検証せよ。<br />
+            各問につき試行は 3 回まで。
+          </p>
+          <button type="button" id="btnStart">試験開始</button>
+        </div>
+      </div>
+
+      <div class="overlay" id="gameOverOverlay">
+        <div class="panel">
+          <h2>試験終了</h2>
+          <p id="gameOverText">答案用紙の余白が尽きた…</p>
+          <button type="button" id="btnRetry">再受験</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+  <script>
+    /**
+     * 手書きノート風 投射フリースロー（力学演習）
+     * Matter.js による 2D 物理プロトタイプ
+     */
+    (() => {
+      const Matter = window.Matter;
+      if (!Matter) {
+        alert("Matter.js の読み込みに失敗しました。通信環境を確認してください。");
+        return;
+      }
+
+      const { Engine, Bodies, Body, Composite, Vector } = Matter;
+
+      const canvas = document.getElementById("game");
+      const wrap = canvas.parentElement;
+      const angleEl = document.getElementById("angle");
+      const powerEl = document.getElementById("power");
+      const dyEl = document.getElementById("dy");
+      const btnCamHome = document.getElementById("btnCamHome");
+      const goalIndicator = document.getElementById("goalIndicator");
+      const btnStart = document.getElementById("btnStart");
+      const btnRetry = document.getElementById("btnRetry");
+      const startOverlay = document.getElementById("startOverlay");
+      const gameOverOverlay = document.getElementById("gameOverOverlay");
+      const gameOverText = document.getElementById("gameOverText");
+      const hintSticky = document.getElementById("hintSticky");
+      const hintText = document.getElementById("hintText");
+      const hintClose = document.getElementById("hintClose");
+      const envHud = document.getElementById("envHud");
+      const flashMsg = document.getElementById("flashMsg");
+      const lvLabel = document.getElementById("lvLabel");
+      const lifeLabel = document.getElementById("lifeLabel");
+      const scoreLabel = document.getElementById("scoreLabel");
+      const marginMemo = document.getElementById("marginMemo");
+
+      const INK = "#3a342c";
+      const PAPER_FILL = "#fffaf0";
+      const SHOOTER_WHITE = "#fffdf8";
+      const SHOOTER_SHADE = "#ebe4d6";
+      const SHOOTER_LINE = "#4a433a";
+      const FACE_BG = "#2f3a48";
+      const FACE_GLOW = "#7fe9ff";
+      const BALL_ORANGE = "#f08a2a";
+      const BALL_ORANGE_DK = "#c96512";
+      const RIM_ORANGE = "#ef6c2f";
+      const BOARD_FILL = "#fffef8";
+      /**
+       * 実物比：男子公式ボール直径 ÷ リング内径
+       * ボール周長 29.5in → 直径 ≈ 9.39in、リング内径 18in → 約 0.522
+       */
+      const REAL_BALL_OVER_RIM_INNER = 29.5 / Math.PI / 18;
+      /** リング内径に合わせて毎フレーム／ステージで更新される半径 */
+      let BALL_R = 12;
+      /** 質量をほぼ一定に保つための基準半径（推力感の安定用） */
+      const BALL_REF_R = 12;
+      /** 実物に近いバスケ物性（落下反発 ≈ 0.6〜0.75） */
+      const BALL_REST = 0.72;
+      /**
+       * 摩擦：スピン（Δy によるトルク）がボード／リム衝突で効くよう高めに設定。
+       * バックスピン時は当たったあと下方向へ落ちやすくなる。
+       */
+      const BALL_FRICTION = 0.72;
+      const BALL_FRICTION_STATIC = 0.75;
+      /** 飛行中の空気抵抗はオフ（与条件の真空近似と一致） */
+      const BALL_FRICTION_AIR = 0;
+      const BALL_DENSITY = 0.0032;
+      /**
+       * 初期推力 F [N] と打点オフセット Δy [cm]。
+       * 接触時間 τ=1/60s の間、一定推力 F を加えるイメージ（Δv = F/m·τ）。
+       * Matter 0.19 は力を (F/m)·Δt² で積分するため、SI→エンジン単位へ換算する。
+       */
+      const F_MIN = 10;
+      const F_MAX = 20000; // Steel 15kg でも 10m 級の放物線が取れるよう解放
+      const F_DEFAULT = 100; // Basketball で旧 v₀≈2.7 m/s 相当の目安
+      /** シュート時の推力が作用する時間 [s]（1フレーム分） */
+      const THRUST_CONTACT_S = 1 / 60;
+      /** Δy：ボール中心からの鉛直オフセット（＋＝下側を打つ → バックスピン気味） */
+      const DY_CM_MIN = -8;
+      const DY_CM_MAX = 8;
+      const DY_CM_DEFAULT = 0;
+
+      /**
+       * ボールの種類（材質）：サイズ（半径）は共通、質量と反発係数だけが変わる。
+       * ステージ生成のたびにランダムで1種類選ばれる。
+       */
+      const BALL_TYPES = {
+        basketball: {
+          id: "basketball",
+          label: "Basketball",
+          mass: 0.6,
+          restitution: 0.72,
+        },
+        bowling: {
+          id: "bowling",
+          label: "Bowling Ball",
+          mass: 7.0,
+          restitution: 0.1,
+        },
+        beach: {
+          id: "beach",
+          label: "Beach Ball",
+          mass: 0.1,
+          restitution: 0.95,
+        },
+        steel: {
+          id: "steel",
+          label: "Steel Ball",
+          mass: 15.0,
+          restitution: 0.05,
+        },
+      };
+      const BALL_TYPE_KEYS = Object.keys(BALL_TYPES);
+
+      function pickBallType() {
+        return BALL_TYPE_KEYS[
+          Math.floor(Math.random() * BALL_TYPE_KEYS.length)
+        ];
+      }
+
+      function getBallType(stage) {
+        return BALL_TYPES[stage && stage.ballType] || BALL_TYPES.basketball;
+      }
+
+      /**
+       * 球種の質量を Matter ボディへ適用。
+       * setStatic(true/false) の前後どちらでも呼べるよう、静的中は _original も更新する。
+       */
+      function applyBallMass(body, massKg) {
+        if (!body || !(massKg > 0)) return;
+        Body.setMass(body, massKg);
+        if (body._original) {
+          body._original.mass = massKg;
+          body._original.inverseMass = 1 / massKg;
+          body._original.density = body.density;
+        }
+      }
+
+      // =====================================================================
+      // DEBUG_HITBOX：当たり判定の可視化（ずれ確認用）
+      // 消し方：① DEFAULT を false  ② 定数・drawHitboxDebug・呼び出し・Hキー処理を削除
+      // URL ?debugHit=1 でもON。ゲーム中は H キーで切替。
+      // =====================================================================
+      const DEBUG_HITBOX_DEFAULT = false;
+      let debugHitboxOn =
+        DEBUG_HITBOX_DEFAULT || /(?:\?|&)debugHit=1(?:&|$)/.test(location.search);
+      /** デバッグ時の物理ボディ塗り（赤半透明） */
+      const DEBUG_BODY_FILL = "rgba(255, 0, 0, 0.5)";
+
+      /**
+       * 物理パラメータ（実物のバスケットボールに寄せる）
+       * - リム（金属管）：反発高め・摩擦低め → Matter の通常衝突だけで弾かれる
+       * - ボード（アクリル板）：反発 0.6〜0.7・摩擦少なめ
+       */
+      const RIM_REST = 0.78; // 金属リングらしい弾み
+      /** スピンが効くようリム摩擦を高めに（つるつるだと Δy トルクが消える） */
+      const RIM_FRICTION = 0.65;
+      const BOARD_REST = 0.65;
+      const BOARD_FRICTION = 0.7;
+      /** ボード物理ボディの最小厚み（奥側へだけ足す。打面はイラストに一致） */
+      const BOARD_MIN_THICK = 10;
+      /**
+       * トンネリング対策：1描画フレームを物理サブステップに分割。
+       * 高速球でも細いリムをトンネリングしにくくする。
+       */
+      const PHYS_SUBSTEPS = 6;
+      /**
+       * ネットの減衰係数はサブステップごとに掛かるため、
+       * 「1フレームあたりの値」から1ステップ分へ換算する（4回掛けて設計値になる）。
+       */
+      const subStepDamp = (perFrame) => Math.pow(perFrame, 1 / PHYS_SUBSTEPS);
+      /**
+       * 実物ネット（ナイロン網）の物性イメージ
+       * - 反発ほぼなし（エネルギー吸収）
+       * - 高摩擦で横滑りを殺す
+       * - しなり：めり込みを一気に弾かず、少し受けてから戻す
+       */
+      const NET_REST = 0; // Matter 側の硬反発は使わず自前で処理
+      const NET_FRICTION = 0; // 同上（摩擦も自前）
+      // ナイロン網のしなり：跳ね返しではなく、受けてエネルギーを落とす
+      const NET_SOFT_E = 0.02; // 壁へ向かう速度の残存（ほぼ吸収）
+      const NET_POS_SOFT = 0.42; // 許容しなり内の押し戻し（柔らかい）
+      const NET_MAX_GIVE = 0.22; // 外郭からはみ出せる上限（× BALL_R）
+      const NET_DRAG_X = 0.955; // 網内の横方向減衰（1フレーム換算）
+      const NET_DRAG_UP = 0.82; // 上向き速度の減衰（網が受け止める感）
+      const NET_DRAG_DOWN = 0.97; // 下向きもわずかに減速（クッション）
+      const NET_EXIT_BOOST = 1.2; // すぼまりで噛んだときの下方向押し出し
+      /** 手書き風景のシームレス背景（環境ごとに切替） */
+      const LANDSCAPE_SRCS = {
+        earth: "/robot-freethrow/bg-landscape.png",
+        moon: "/robot-freethrow/bg-moon.png",
+        jupiter: "/robot-freethrow/bg-jupiter.png",
+      };
+      /** cameraX に対する背景スクロール比率（小さいほど奥に感じる） */
+      const LANDSCAPE_PARALLAX = 0.32;
+      /** 画面高さに対する拡大率（1＝縦ぴったり、大きいほど寄り気味） */
+      const LANDSCAPE_SIZE = 1.28;
+      /** 背景画像の縦オフセット（正で下へずらす） */
+      const LANDSCAPE_OFFSET_Y = 52;
+      /** 目盛り視認性のための背景の薄さ（地球） */
+      const LANDSCAPE_ALPHA = 0.58;
+      /** 宇宙背景は黒紙に白線なのでやや濃く */
+      const LANDSCAPE_ALPHA_SPACE = 0.72;
+
+      /** goal.png（537×717・側面スケッチ）内の部品位置（画像解析ベース） */
+      const GOAL_SRC = "/robot-freethrow/goal.png";
+      const GOAL_NATURAL_W = 537;
+      const GOAL_NATURAL_H = 717;
+      const GOAL_LAYOUT = {
+        /**
+         * リム（側面）：前端フチ〜後端フチ。
+         * ゴールポイント＝この直径の中心（(front+back)/2, rimY）。
+         * 座標は goal.png 画素解析（リング本体 ≈ x140〜240 @ y229）。
+         */
+        rimFrontX: 140 / GOAL_NATURAL_W,
+        rimBackX: 240 / GOAL_NATURAL_W,
+        rimY: 229 / GOAL_NATURAL_H,
+        rimTube: 7 / GOAL_NATURAL_H,
+        // バックボード（細い縦板）
+        boardL: 264 / GOAL_NATURAL_W,
+        boardR: 275 / GOAL_NATURAL_W,
+        boardTop: 65 / GOAL_NATURAL_H,
+        boardBot: 282 / GOAL_NATURAL_H,
+        // 支柱
+        poleL: 337 / GOAL_NATURAL_W,
+        poleR: 358 / GOAL_NATURAL_W,
+        poleTop: 204 / GOAL_NATURAL_H,
+        poleBot: 655 / GOAL_NATURAL_H,
+        // 水平アーム：goal.png にはボード〜支柱の横断棒が無いため無効
+        // （旧 armY/armH は見えない壁になっていた）
+        armEnabled: false,
+        armY: 208 / GOAL_NATURAL_H,
+        armH: 3 / GOAL_NATURAL_H,
+        // 斜めブレース（画素解析：約 (287,165)→(325,204) の細棒）
+        braceX1: 282 / GOAL_NATURAL_W,
+        braceY1: 162 / GOAL_NATURAL_H,
+        braceX2: 332 / GOAL_NATURAL_W,
+        braceY2: 208 / GOAL_NATURAL_H,
+        braceThick: 8 / GOAL_NATURAL_H,
+        /**
+         * ネット外郭（goal.png 画素解析＋平滑化）。
+         * 直線テーパーではなく、イラストの凹カーブに沿った左/右シルエット。
+         * y,l,r は画像正規化座標（0〜1）。
+         */
+        netProfile: [
+          { y: 0.32078, l: 0.26071, r: 0.46555 },
+          { y: 0.32915, l: 0.26816, r: 0.43762 },
+          { y: 0.33752, l: 0.27188, r: 0.43575 },
+          { y: 0.34589, l: 0.27561, r: 0.43500 },
+          { y: 0.35425, l: 0.27933, r: 0.42831 },
+          { y: 0.36262, l: 0.28492, r: 0.42458 },
+          { y: 0.37099, l: 0.29050, r: 0.42086 },
+          { y: 0.37936, l: 0.29423, r: 0.41713 },
+          { y: 0.38773, l: 0.29795, r: 0.41341 },
+          { y: 0.39609, l: 0.30354, r: 0.40968 },
+          { y: 0.40446, l: 0.30540, r: 0.40782 },
+          { y: 0.41283, l: 0.30726, r: 0.40596 },
+          { y: 0.42120, l: 0.30726, r: 0.40596 },
+          { y: 0.42957, l: 0.31099, r: 0.40410 },
+          { y: 0.43794, l: 0.30912, r: 0.40410 },
+          { y: 0.44630, l: 0.30912, r: 0.40596 },
+          { y: 0.45467, l: 0.30912, r: 0.40596 },
+          { y: 0.46165, l: 0.30912, r: 0.40596 },
+        ],
+      };
+      /** 互換用：動的に getGoalMetrics で上書きされる */
+      let RIM_LEN = 48;
+      const DEFAULT_SCALE = 0.001;
+      const DEFAULT_WIND = 0;
+      const DEFAULT_REST = BALL_REST;
+
+      /**
+       * 方眼スケール（グラフ用紙）
+       * 1マス = 10cm 四方。ピクセルと物理座標の換算もここを基準にする。
+       */
+      const GRID_CM_PER_CELL = 10;
+      const GRID_CELL_PX = 20; // 1マスの画面上サイズ
+      const PX_PER_CM = GRID_CELL_PX / GRID_CM_PER_CELL;
+      const CM_PER_PX = GRID_CM_PER_CELL / GRID_CELL_PX;
+      /** 目盛りラベルは N マスごと（＝ N×10cm） */
+      const GRID_LABEL_EVERY = 5;
+
+      /**
+       * SI 換算（方眼 1px = CM_PER_PX cm、Engine.update 60fps 前提）
+       * - Matter 重力 y と m/s² は SI_ACCEL_PER_GRAVITY_UNIT で対応
+       * - Matter setVelocity 1 → 初速 0.3 m/s
+       */
+      const SI_ACCEL_PER_GRAVITY_UNIT =
+        (DEFAULT_SCALE * 1e6 * CM_PER_PX) / 100; // 5.0
+      const MATTER_V_TO_MS = (60 * CM_PER_PX) / 100; // 0.3
+      function accelUnitToMs2(unit) {
+        return unit * SI_ACCEL_PER_GRAVITY_UNIT;
+      }
+      function ms2ToGravityUnit(gMs2) {
+        return gMs2 / SI_ACCEL_PER_GRAVITY_UNIT;
+      }
+
+      /**
+       * 環境ごとの表面重力 g（m/s²）。ステージ種別ごとに固定（ランダムなし）。
+       * 地球 9.81、月 ≈1.62、木星赤道付近 ≈24.79。
+       */
+      const G_EARTH_MS2 = 9.81;
+      const G_MOON_MS2 = 1.62;
+      const G_JUPITER_MS2 = 24.79;
+
+      const GRAVITY_UNIT_BY_ENV = {
+        earth: ms2ToGravityUnit(G_EARTH_MS2),
+        moon: ms2ToGravityUnit(G_MOON_MS2),
+        jupiter: ms2ToGravityUnit(G_JUPITER_MS2),
+      };
+
+      /** 地球標準（Matter 重力 y）。ANALYZE の参照解などに使用 */
+      const DEFAULT_G = GRAVITY_UNIT_BY_ENV.earth;
+
+      function gravityMs2ForEnv(env) {
+        if (env === "moon") return G_MOON_MS2;
+        if (env === "jupiter") return G_JUPITER_MS2;
+        return G_EARTH_MS2;
+      }
+
+      /** 環境に対応する Matter の gravity.y（3パターン固定） */
+      function gravityForEnv(env) {
+        return GRAVITY_UNIT_BY_ENV[env] ?? GRAVITY_UNIT_BY_ENV.earth;
+      }
+      function matterSpeedFromV0(v0Ms) {
+        return v0Ms / MATTER_V_TO_MS;
+      }
+      function v0FromMatterSpeed(matterV) {
+        return matterV * MATTER_V_TO_MS;
+      }
+      /**
+       * Matter の基準タイムステップ [ms]（Common._baseDelta = 1000/60）。
+       * setVelocity の速度単位はこの基準での「px / ベースフレーム」。
+       */
+      const ENGINE_FRAME_MS = 1000 / 60;
+      /**
+       * 飛行中速度上限（軽い球＋大推力でも発散しないよう余裕を持たせる）。
+       * 単位は setVelocity と同じ「ベースフレーム換算」の速度。
+       */
+      const BALL_SPEED_CAP = matterSpeedFromV0(18);
+
+      /**
+       * サブステップ更新直後の body.velocity は「その Δt 分の位置増分」。
+       * ベース単位に戻してから BALL_SPEED_CAP と比較し、setVelocity へはベース単位で渡す
+       * （Matter が内部で timeScale = Δt/Δt₀ を掛けるため）。
+       */
+      function clampBallSpeed(body) {
+        if (!body || body.isStatic) return;
+        const step = ENGINE_FRAME_MS / PHYS_SUBSTEPS;
+        const timeScale = step / ENGINE_FRAME_MS; // = 1/PHYS_SUBSTEPS
+        if (!(timeScale > 0)) return;
+        const vxBase = body.velocity.x / timeScale;
+        const vyBase = body.velocity.y / timeScale;
+        const sp = Math.hypot(vxBase, vyBase);
+        if (sp <= BALL_SPEED_CAP) return;
+        const s = BALL_SPEED_CAP / sp;
+        Body.setVelocity(body, {
+          x: vxBase * s,
+          y: vyBase * s,
+        });
+      }
+
+      /**
+       * 入力 F [N] → Matter.applyForce 用の力。
+       * Matter 0.19 の Verlet 積分: Δ(位置) += (F_m/m)·Δt²
+       * 一方 setVelocity(v) の v はベースフレーム（Δt₀）あたりの移動量。
+       * 「τ 秒だけ F を加えた SI 初速」が、次のサブステップ更新で同じ移動量になるよう換算する。
+       */
+      function thrustNewtonsToMatterForce(Fsi) {
+        const baseDelta = ENGINE_FRAME_MS;
+        // Δv_si = (F/m)·τ → v_matter = Δv_si / MATTER_V_TO_MS
+        // (F_m/m)·Δt_step² = v_matter · (Δt_step/Δt₀)
+        // 質量は両辺で打ち消し: F_m = F_si · τ · PHYS_SUBSTEPS / (MATTER_V_TO_MS · Δt₀²)
+        return (
+          (Fsi * THRUST_CONTACT_S * PHYS_SUBSTEPS) /
+          (MATTER_V_TO_MS * baseDelta * baseDelta)
+        );
+      }
+
+      /**
+       * 7物理量に基づく発射：
+       * F[N]・θ → 力ベクトル、Δy → 作用点オフセット（トルク＝スピン）。
+       * 同じ F でも重い球ほど初速が小さい（Δv = F/m · τ）。
+       */
+      function applyShotForce(body, thetaRad, Fsi, deltaYPx) {
+        if (!body) return;
+        const Fm = thrustNewtonsToMatterForce(Fsi);
+        const forceX = Fm * Math.cos(thetaRad);
+        const forceY = -Fm * Math.sin(thetaRad); // 画面上方向はマイナス
+        Body.setVelocity(body, { x: 0, y: 0 });
+        Body.setAngularVelocity(body, 0);
+        // 重心から Δy ずらした点に力を加え、トルクでスピンを生む
+        Body.applyForce(
+          body,
+          {
+            x: body.position.x,
+            y: body.position.y + deltaYPx,
+          },
+          {
+            x: forceX,
+            y: forceY,
+          },
+        );
+      }
+
+      /** Δy [cm] → 画面 px（ボール半径内にクランプ） */
+      function dyCmToPx(dyCm) {
+        const px = dyCm * PX_PER_CM;
+        const lim = Math.max(1, BALL_R * 0.95);
+        return clamp(px, -lim, lim);
+      }
+
+      /** シューター立ち絵（shooter.png） */
+      const SHOOTER_SRC = "/robot-freethrow/shooter.png";
+      const SHOOTER_NATURAL_W = 321;
+      const SHOOTER_NATURAL_H = 753;
+      const SHOOTER_LAYOUT = {
+        // 足元（接地）・手のボール保持点・肩（当たり判定用）※画像正規化座標
+        footX: 0.46,
+        footY: 0.987,
+        // 上げた手のひらに上面が接する位置（いまよりやや右・上）
+        ballX: 1.0,
+        ballY: 0.05,
+        shoulderX: 0.44,
+        shoulderY: 0.33,
+      };
+
+      let W = 800;
+      let H = 480;
+      /**
+       * 絶対原点 O(0,0)：ボール初期発射位置＝手先＝方眼の交差点。
+       * 画面ピクセル座標でこの点を保持し、物理量はここからの相対（右＋x、上＋y）で測る。
+       */
+      let origin = { x: 160, y: 260 };
+
+      const state = {
+        level: 1,
+        lives: 3,
+        clears: 0,
+        playing: false,
+        ballInFlight: false,
+        armAngleDeg: 45,
+        armSwingT: 0,
+        armAnimating: false,
+        stage: null,
+        trail: [],
+        windLines: [],
+        scoredThisShot: false,
+        /** 直前フレームのボール中心（リング通過の連続判定用） */
+        prevBallX: null,
+        prevBallY: null,
+        /** このショットで一度でもリングより上にいたか */
+        wasAboveRim: false,
+        /** 開口を上→下に進入したが、まだネット側へ抜け切っていない */
+        rimPassPending: false,
+        missTimer: 0,
+        stuckTimer: 0,
+        /** ネットが瞬間的にしなる量（0〜1） */
+        netSway: 0,
+        flashTimer: 0,
+        /**
+         * カメラ横オフセット（ワールドX）。画面描画は worldX - cameraX。
+         * 投球前は手動パン可、飛行中はボール追従、ステージ開始で 0。
+         */
+        cameraX: 0,
+        /** スムーズ復帰の目標（null=なし） */
+        cameraAnimTo: null,
+      };
+
+      /** 飛行中：ボールを画面のやや左寄り中央に保つ目標オフセット */
+      const CAMERA_BALL_SCREEN_X = 0.42; // 画面幅に対する比率
+      const CAMERA_FOLLOW_LERP = 0.14;
+      const CAMERA_HOME_LERP = 0.16;
+      /** 射手タップとパンを区別する移動しきい値（画面px） */
+      const PAN_DRAG_THRESHOLD = 8;
+
+      let engine, world;
+      let ball, backboard, rimFront, rimMount, ringSensor;
+      let rimBodies = [];
+      let netBodies = [];
+      let structureBodies = [];
+      let shooterBodies = [];
+
+      /** 風景パララックス背景（地球／月／木星を先読み） */
+      const landscapeImgs = {};
+      const landscapeReady = { earth: false, moon: false, jupiter: false };
+      for (const key of Object.keys(LANDSCAPE_SRCS)) {
+        const img = new Image();
+        img.onload = () => {
+          landscapeReady[key] = true;
+        };
+        img.onerror = () => {
+          console.warn("背景画像の読み込みに失敗しました:", LANDSCAPE_SRCS[key]);
+        };
+        img.src = LANDSCAPE_SRCS[key];
+        landscapeImgs[key] = img;
+      }
+
+      /** ゴールイラスト */
+      const goalImg = new Image();
+      let goalImgReady = false;
+      goalImg.onload = () => {
+        goalImgReady = true;
+      };
+      goalImg.onerror = () => {
+        console.warn("goal.png の読み込みに失敗しました:", GOAL_SRC);
+      };
+      goalImg.src = GOAL_SRC;
+
+      /** シューター立ち絵 */
+      const shooterImg = new Image();
+      let shooterImgReady = false;
+      shooterImg.onload = () => {
+        shooterImgReady = true;
+      };
+      shooterImg.onerror = () => {
+        console.warn("shooter.png の読み込みに失敗しました:", SHOOTER_SRC);
+      };
+      shooterImg.src = SHOOTER_SRC;
+
+      /**
+       * 発射原点（手先＝絶対原点）を基準に立ち絵の矩形・足元・手座標を算出。
+       * 静止時は手が必ず launchPt に一致する。
+       */
+      function getShooterMetrics(launchPt = origin, withSwing = true) {
+        // 実物感：身長 ≈ リング高(3.05m)の約6割。ゴール絵（ポール込み）より一回り小さく
+        const goalDrawH = Math.min(H * 0.62, W * 0.58);
+        const targetH = Math.min(goalDrawH * 0.38, H * 0.28, 175);
+        const scale = targetH / SHOOTER_NATURAL_H;
+        const w = SHOOTER_NATURAL_W * scale;
+        const h = SHOOTER_NATURAL_H * scale;
+        // 手が発射点に来るよう画像左上を逆算
+        const left = launchPt.x - SHOOTER_LAYOUT.ballX * w;
+        const top = launchPt.y - SHOOTER_LAYOUT.ballY * h;
+        const foot = {
+          x: left + SHOOTER_LAYOUT.footX * w,
+          y: top + SHOOTER_LAYOUT.footY * h,
+        };
+        let handX = launchPt.x;
+        let handY = launchPt.y;
+        let tilt = 0;
+        // シュート動作中：前傾＋投球方向へ軽くリリース（描画と手座標を同期）
+        if (withSwing && state.armAnimating) {
+          const t = easeInOut(Math.min(1, state.armSwingT));
+          tilt = Math.sin(t * Math.PI) * -0.12;
+          const ang = (state.armAngleDeg * Math.PI) / 180;
+          const release = Math.sin(t * Math.PI) * Math.min(36, h * 0.08);
+          handX += Math.cos(ang) * release;
+          handY -= Math.sin(ang) * release;
+          // 足元まわりの前傾を手座標にも反映
+          const dx = handX - foot.x;
+          const dy = handY - foot.y;
+          const c = Math.cos(tilt);
+          const s = Math.sin(tilt);
+          handX = foot.x + dx * c - dy * s;
+          handY = foot.y + dx * s + dy * c;
+        }
+        let shoulder = {
+          x: left + SHOOTER_LAYOUT.shoulderX * w,
+          y: top + SHOOTER_LAYOUT.shoulderY * h,
+        };
+        if (tilt !== 0) {
+          const dx = shoulder.x - foot.x;
+          const dy = shoulder.y - foot.y;
+          const c = Math.cos(tilt);
+          const s = Math.sin(tilt);
+          shoulder = {
+            x: foot.x + dx * c - dy * s,
+            y: foot.y + dx * s + dy * c,
+          };
+        }
+        return {
+          left,
+          top,
+          w,
+          h,
+          scale,
+          tilt,
+          foot,
+          hand: { x: handX, y: handY },
+          shoulder,
+          elbow: {
+            x: (shoulder.x + handX) * 0.5,
+            y: (shoulder.y + handY) * 0.5,
+          },
+        };
+      }
+
+      /** 画面ピクセル → 物理座標（cm）。原点は発射点、y は上向き正 */
+      function screenToPhys(sx, sy) {
+        return {
+          x: (sx - origin.x) * CM_PER_PX,
+          y: (origin.y - sy) * CM_PER_PX,
+        };
+      }
+
+      /** 物理座標（cm）→ 画面ピクセル */
+      function physToScreen(px, py) {
+        return {
+          x: origin.x + px * PX_PER_CM,
+          y: origin.y - py * PX_PER_CM,
+        };
+      }
+
+      /** 値を方眼交差点へスナップ */
+      function snapToGrid(v) {
+        return Math.round(v / GRID_CELL_PX) * GRID_CELL_PX;
+      }
+
+      /**
+       * stage.ringX/Y＝ゴールポイント＝リング直径の中心
+       * （前端フチと後端フチの中点、リム高さ）。方眼交差点に置く。
+       * ここを基準に goal.png と当たり判定を展開する。
+       */
+      function getGoalMetrics(stage) {
+        const targetH = Math.min(H * 0.62, W * 0.58);
+        const scale = targetH / GOAL_NATURAL_H;
+        const w = GOAL_NATURAL_W * scale;
+        const h = GOAL_NATURAL_H * scale;
+        // 直径中心が stage.ringX に来るよう画像左端を決める
+        const rimMidNorm =
+          (GOAL_LAYOUT.rimFrontX + GOAL_LAYOUT.rimBackX) / 2;
+        const left = stage.ringX - rimMidNorm * w;
+        const top = stage.ringY - GOAL_LAYOUT.rimY * h;
+        const X = (n) => left + n * w;
+        const Y = (n) => top + n * h;
+        const rimFront = {
+          x: X(GOAL_LAYOUT.rimFrontX),
+          y: Y(GOAL_LAYOUT.rimY),
+        };
+        const rimBack = {
+          x: X(GOAL_LAYOUT.rimBackX),
+          y: Y(GOAL_LAYOUT.rimY),
+        };
+        const boardL = X(GOAL_LAYOUT.boardL);
+        const boardR = X(GOAL_LAYOUT.boardR);
+        const boardTop = Y(GOAL_LAYOUT.boardTop);
+        const boardBot = Y(GOAL_LAYOUT.boardBot);
+        const board = {
+          // イラスト上の実寸（下限で膨らませない＝打面がずれない）
+          x: (boardL + boardR) / 2,
+          y: (boardTop + boardBot) / 2,
+          w: Math.max(1, boardR - boardL),
+          h: Math.max(1, boardBot - boardTop),
+          left: boardL,
+          right: boardR,
+          top: boardTop,
+          bot: boardBot,
+        };
+        const poleL = X(GOAL_LAYOUT.poleL);
+        const poleR = X(GOAL_LAYOUT.poleR);
+        const poleTop = Y(GOAL_LAYOUT.poleTop);
+        const poleBot = Y(GOAL_LAYOUT.poleBot);
+        const pole = {
+          x: (poleL + poleR) / 2,
+          y: (poleTop + poleBot) / 2,
+          w: Math.max(10, poleR - poleL),
+          h: Math.max(40, poleBot - poleTop),
+        };
+        const arm = {
+          enabled: !!GOAL_LAYOUT.armEnabled,
+          x: (boardR + poleL) / 2,
+          y: Y(GOAL_LAYOUT.armY),
+          w: Math.max(12, poleL - boardR),
+          h: Math.max(2.5, GOAL_LAYOUT.armH * h),
+        };
+        const brace = {
+          x1: X(GOAL_LAYOUT.braceX1),
+          y1: Y(GOAL_LAYOUT.braceY1),
+          x2: X(GOAL_LAYOUT.braceX2),
+          y2: Y(GOAL_LAYOUT.braceY2),
+          thick: Math.max(2.5, (GOAL_LAYOUT.braceThick || 8 / GOAL_NATURAL_H) * h),
+        };
+        const rimLen = rimBack.x - rimFront.x;
+        // リム管の断面半径（小さめ＝開口を塞がない）
+        const tubeR = Math.max(2.4, Math.min(4.2, GOAL_LAYOUT.rimTube * h * 0.5));
+        // 開口はイラスト幾何のみ（ボールサイズに合わせて広げない＝実物比を守る）
+        const openL = rimFront.x + tubeR * 1.35;
+        const openR = rimBack.x - tubeR * 1.35;
+        const rimInner = Math.max(8, openR - openL);
+
+        // ネット外郭：画像解析ポリラインを画面座標へ
+        const netProfile = GOAL_LAYOUT.netProfile.map((p) => ({
+          y: Y(p.y),
+          l: X(p.l),
+          r: X(p.r),
+        }));
+        // 最上段をリム開口にスナップ（イラストの取り付け位置）
+        if (netProfile.length) {
+          netProfile[0] = {
+            y: rimFront.y + tubeR * 1.1,
+            l: openL,
+            r: openR,
+          };
+        }
+        const netLast = netProfile[netProfile.length - 1] || {
+          y: rimFront.y + 80,
+          l: openL + 10,
+          r: openR - 10,
+        };
+        const net = {
+          topL: netProfile[0] ? netProfile[0].l : openL,
+          topR: netProfile[0] ? netProfile[0].r : openR,
+          botL: netLast.l,
+          botR: netLast.r,
+          botY: netLast.y,
+          profile: netProfile,
+        };
+        RIM_LEN = rimLen;
+        // ゴールポイント（直径の中心）— 配置の ringX/Y と一致するよう設計
+        const goalPoint = {
+          x: (rimFront.x + rimBack.x) / 2,
+          y: rimFront.y,
+        };
+        return {
+          left,
+          top,
+          w,
+          h,
+          scale,
+          rimFront,
+          rimBack,
+          board,
+          pole,
+          arm,
+          brace,
+          net,
+          tubeR,
+          rimLen,
+          rimInner,
+          rimY: rimFront.y,
+          rimCx: goalPoint.x,
+          goalPoint,
+          openL,
+          openR,
+        };
+      }
+
+      /** ゴールポイント（リング直径の中心）のワールド座標 */
+      function getGoalPoint(stage = state.stage) {
+        if (!stage) return { x: origin.x, y: origin.y };
+        const gm = getGoalMetrics(stage);
+        return { x: gm.goalPoint.x, y: gm.goalPoint.y };
+      }
+
+      /** ネット外郭ポリライン上で、高さ y における左右壁座標を補間 */
+      function netWallsAtY(gm, y) {
+        const p = gm.net.profile;
+        if (!p || !p.length) {
+          return { l: gm.net.topL, r: gm.net.topR };
+        }
+        if (y <= p[0].y) return { l: p[0].l, r: p[0].r };
+        const last = p[p.length - 1];
+        if (y >= last.y) return { l: last.l, r: last.r };
+        for (let i = 0; i < p.length - 1; i++) {
+          const a = p[i];
+          const b = p[i + 1];
+          if (y >= a.y && y <= b.y) {
+            const t = (y - a.y) / Math.max(1e-6, b.y - a.y);
+            return {
+              l: a.l + (b.l - a.l) * t,
+              r: a.r + (b.r - a.r) * t,
+            };
+          }
+        }
+        return { l: last.l, r: last.r };
+      }
+
+      /** リング内径に対し、実物と同じ直径比になるようボール半径を合わせる */
+      function syncBallRadius(stage) {
+        const s = stage || state.stage || {
+          ringX: origin.x + 220,
+          ringY: origin.y - 140,
+        };
+        const m = getGoalMetrics(s);
+        // 直径 = リング内径 × 0.522 → 半径はその半分
+        BALL_R = (m.rimInner * REAL_BALL_OVER_RIM_INNER) / 2;
+        BALL_R = Math.max(6, Math.min(30, BALL_R));
+        return BALL_R;
+      }
+
+      function ballDensityForSize() {
+        // 面積比で密度を補正し、質量（＝飛び方）をほぼ一定に保つ
+        const s = BALL_REF_R / Math.max(BALL_R, 1);
+        return BALL_DENSITY * s * s;
+      }
+
+      function easeInOut(t) {
+        return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+      }
+
+      /**
+       * 手の位置は立ち絵の保持点。angleDeg は投球方向（エイム）に使う。
+       * 見た目の腕は画像固定なので、Angle は軌道だけ変える。
+       */
+      function getArmPose(angleDeg) {
+        const m = getShooterMetrics(origin, true);
+        const ang = (angleDeg * Math.PI) / 180;
+        return {
+          shoulder: m.shoulder,
+          elbow: m.elbow,
+          hand: m.hand,
+          ang,
+          metrics: m,
+        };
+      }
+
+      function displayArmDeg() {
+        // 立ち絵は固定ポーズ。エイム角度はそのまま（スイングは手座標側で表現）
+        return state.armAngleDeg;
+      }
+
+      function resize() {
+        const rect = wrap.getBoundingClientRect();
+        W = Math.max(320, Math.floor(rect.width));
+        H = Math.max(280, Math.floor(rect.height));
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.floor(W * dpr);
+        canvas.height = Math.floor(H * dpr);
+        canvas.style.width = W + "px";
+        canvas.style.height = H + "px";
+
+        // 発射点（絶対原点＝手先）を方眼交差へ。リングが手の上下に置けるようやや高め
+        const cell = GRID_CELL_PX;
+        let ox = snapToGrid(W * 0.18);
+        let oy = snapToGrid(H * 0.40);
+        const probe = getShooterMetrics({ x: ox, y: oy }, false);
+        // 立ち絵左のはみ出しだけ補正（足元は奈落側へ出てよい）
+        if (probe.left < 4) ox = snapToGrid(ox + (4 - probe.left));
+        if (probe.top < 6) oy = snapToGrid(oy + (6 - probe.top));
+        ox = clamp(ox, cell * 2, W - cell * 8);
+        oy = clamp(oy, cell * 4, H - cell * 3);
+        origin = { x: snapToGrid(ox), y: snapToGrid(oy) };
+
+        if (engine) rebuildWorld(false);
+      }
+
+      function rand(a, b) {
+        return a + Math.random() * (b - a);
+      }
+
+      /** レベルが進むほど月・木星が出やすくなる */
+      function pickStageEnv(level) {
+        const d = Math.min(level, 24);
+        const spaceChance = Math.min(0.58, 0.1 + Math.max(0, d - 1) * 0.045);
+        if (Math.random() >= spaceChance) return "earth";
+        return Math.random() < 0.5 ? "moon" : "jupiter";
+      }
+
+      function generateStage(level) {
+        const d = Math.min(level, 24);
+        const ballType = pickBallType();
+        /**
+         * ゴールポイント＝リング直径の中心（前端〜後端フチの中点 @ リム高さ）。
+         * 必ず方眼の交差点に配置する。
+         */
+        let ringX = snapToGrid(
+          origin.x + rand(800 + d * 50, 2200 + d * 80),
+        );
+        let ringY = snapToGrid(
+          origin.y - rand(-110 - d * 2, 35 + d * 3),
+        );
+
+        // 縦方向だけ画面内に収めて再スナップ（交差点を崩さない）
+        const marginTop = snapToGrid(40);
+        const marginBot = snapToGrid(Math.min(H * 0.72, H - 40));
+        if (ringY < marginTop) ringY = marginTop;
+        else if (ringY > marginBot) ringY = marginBot;
+        ringX = snapToGrid(ringX);
+        ringY = snapToGrid(ringY);
+
+        const dist = ringX - origin.x;
+        const height = origin.y - ringY;
+
+        const env = pickStageEnv(level);
+        const wind = (Math.random() - 0.5) * (0.15 + d * 0.04);
+        const gravityY = gravityForEnv(env);
+        // 反発係数は球種ごとの実測値をそのまま採用（ランダム幅は持たせない）
+        const restitution = BALL_TYPES[ballType].restitution;
+        return {
+          env, // "earth" | "moon" | "jupiter"
+          ballType, // "basketball" | "bowling" | "beach" | "steel"
+          dist,
+          height,
+          wind,
+          gravityY,
+          restitution,
+          /** リング直径の中心（ワールド px・方眼交差） */
+          ringX,
+          ringY,
+        };
+      }
+
+      /** 画面座標 → ワールド座標（カメラオフセット込み） */
+      function screenToWorld(sx, sy) {
+        return { x: sx + state.cameraX, y: sy };
+      }
+
+      /** カメラの手動パン上限（ゴールを画面内に収められるまで） */
+      function maxCameraX() {
+        if (!state.stage) return Math.max(0, 400);
+        const gp = getGoalPoint(state.stage);
+        return Math.max(0, gp.x - W * 0.15);
+      }
+
+      function clampCameraX(x) {
+        return clamp(x, 0, maxCameraX());
+      }
+
+      /** カメラを指定ワールド位置へ（スムーズ or 即時） */
+      function panCameraTo(worldFocusX, smooth = true) {
+        // 注目点が画面中央付近に来るオフセット
+        const target = clampCameraX(worldFocusX - W * 0.5);
+        if (smooth) {
+          state.cameraAnimTo = target;
+        } else {
+          state.cameraAnimTo = null;
+          state.cameraX = target;
+        }
+      }
+
+      /** カメラを発射点側（オフセット0）へ戻す */
+      function resetCamera(smooth = false) {
+        state.cameraAnimTo = null;
+        if (smooth) {
+          state.cameraAnimTo = 0;
+        } else {
+          state.cameraX = 0;
+        }
+      }
+
+      /** ゴール（リング直径の中心）が見える位置まで自動スクロール */
+      function panCameraToGoal() {
+        if (!state.stage) return;
+        if (!state.playing || state.ballInFlight) return;
+        if (startOverlay.classList.contains("show")) return;
+        if (gameOverOverlay.classList.contains("show")) return;
+        const gp = getGoalPoint(state.stage);
+        const target = clampCameraX(gp.x - W * 0.58);
+        state.cameraAnimTo = target;
+      }
+
+      /**
+       * カメラ更新
+       * - 飛行中：ボール追従（手動パン無効）
+       * - 待機中：ホイール／タッチパン／復帰・ゴールへアニメ
+       */
+      function updateCamera() {
+        if (state.ballInFlight && ball) {
+          state.cameraAnimTo = null;
+          const target = clampCameraX(ball.position.x - W * CAMERA_BALL_SCREEN_X);
+          state.cameraX += (target - state.cameraX) * CAMERA_FOLLOW_LERP;
+          return;
+        }
+        if (state.cameraAnimTo != null) {
+          const lerp = 0.22; // Target ジャンプはきびきびめ
+          state.cameraX += (state.cameraAnimTo - state.cameraX) * lerp;
+          if (Math.abs(state.cameraX - state.cameraAnimTo) < 2) {
+            state.cameraX = state.cameraAnimTo;
+            state.cameraAnimTo = null;
+          }
+        }
+      }
+
+      /** 原点復帰ボタン・画面外ゴール案内の表示更新（画面固定HUD） */
+      function updateCameraHud() {
+        const canPan =
+          state.playing &&
+          !state.ballInFlight &&
+          !startOverlay.classList.contains("show") &&
+          !gameOverOverlay.classList.contains("show");
+
+        // 原点へ戻る：カメラが少しでも右へ行っているとき
+        if (btnCamHome) {
+          const showHome = canPan && state.cameraX > 12;
+          btnCamHome.hidden = !showHome;
+        }
+
+        // ゴールが画面右外のときだけインジケーター（クリック可）
+        // ※毎フレーム innerHTML するとクリックが潰れるので、表示内容が変わったときだけ更新
+        if (goalIndicator) {
+          let show = false;
+          let html = "";
+          if (canPan && state.stage) {
+            const gp = getGoalPoint(state.stage);
+            const rimScreenX = gp.x - state.cameraX;
+            if (rimScreenX > W - 20) {
+              const goalPhys = screenToPhys(gp.x, gp.y);
+              const gx = Math.round(goalPhys.x);
+              const gy = Math.round(goalPhys.y);
+              html =
+                `<span class="gi-title">Target ➔</span>` +
+                `<span class="gi-meta">x ≈ ${gx} cm</span>` +
+                `<span class="gi-meta">y ≈ ${gy} cm</span>`;
+              show = true;
+            }
+          }
+          const wasShow = goalIndicator.classList.contains("show");
+          if (show !== wasShow) {
+            goalIndicator.classList.toggle("show", show);
+            goalIndicator.setAttribute("aria-hidden", show ? "false" : "true");
+            goalIndicator.tabIndex = show ? 0 : -1;
+          }
+          if (show && goalIndicator.dataset.sig !== html) {
+            goalIndicator.innerHTML = html;
+            goalIndicator.dataset.sig = html;
+          }
+          if (!show) {
+            goalIndicator.dataset.sig = "";
+          }
+        }
+      }
+
+      function applyEnvironment(stage) {
+        engine.world.gravity.x = stage.wind;
+        engine.world.gravity.y = stage.gravityY;
+        engine.world.gravity.scale = DEFAULT_SCALE;
+        applyTheme(stage);
+        updateEnvHud();
+        // 風の鉛筆ストロークを再生成（弱いほど少なく・薄い）
+        state.windLines = [];
+        const strength = Math.abs(stage.wind);
+        if (strength <= 0.015) return;
+        const dir = stage.wind >= 0 ? 1 : -1;
+        const n = Math.min(14, 4 + Math.round(strength * 28));
+        for (let i = 0; i < n; i++) {
+          const band = i / Math.max(1, n - 1); // 0〜1 で高さ帯を散らす
+          state.windLines.push({
+            x: Math.random() * (W + 80) - 40,
+            y: 28 + band * (H * 0.62) + (Math.random() - 0.5) * 28,
+            len: 22 + Math.random() * 34 + strength * 40,
+            speed: dir * (1.1 + strength * 9 + Math.random() * 1.4),
+            wobble: Math.random() * Math.PI * 2,
+            wobbleSp: 0.035 + Math.random() * 0.04,
+            amp: 2.5 + Math.random() * 3.5,
+            alpha: 0.14 + Math.random() * 0.1 + strength * 0.25,
+            thick: 0.9 + Math.random() * 0.5,
+            phase: Math.random() * Math.PI * 2,
+          });
+        }
+      }
+
+      function isSpaceEnv(env) {
+        return env === "moon" || env === "jupiter";
+      }
+
+      function isDarkTheme() {
+        return !!(state.stage && isSpaceEnv(state.stage.env));
+      }
+
+      /** HTML/CSS のダークテーマ切替（宇宙ステージ時） */
+      function applyTheme(stage) {
+        const dark = !!(stage && isSpaceEnv(stage.env));
+        document.body.classList.toggle("dark-mode", dark);
+      }
+
+      /** Canvas 描画色（地球＝黒鉛筆／宇宙＝白鉛筆） */
+      function getTheme() {
+        if (isDarkTheme()) {
+          return {
+            dark: true,
+            paper: "#111111",
+            paperRule: "rgba(180, 200, 230, 0.08)",
+            gridFine: "rgba(238, 238, 238, 0.14)",
+            gridMajor: "rgba(238, 238, 238, 0.24)",
+            axis: "rgba(238, 238, 238, 0.5)",
+            origin: "rgba(238, 238, 238, 0.72)",
+            label: "rgba(238, 238, 238, 0.58)",
+            ink: "#eeeeee",
+            wind: "rgba(230, 230, 230, 0.9)",
+            windLabel: "rgba(238, 238, 238, 0.92)",
+            abyss0: "rgba(255,255,255,0)",
+            abyss1: "rgba(255,255,255,0.1)",
+            footnote: "rgba(238,238,238,0.42)",
+            landscapeAlpha: LANDSCAPE_ALPHA_SPACE,
+            spriteFilter: "grayscale(1) invert(1) contrast(1.05) brightness(1.08)",
+          };
+        }
+        return {
+          dark: false,
+          paper: PAPER_FILL,
+          paperRule: "rgba(100, 130, 170, 0.08)",
+          gridFine: "rgba(80, 60, 40, 0.11)",
+          gridMajor: "rgba(60, 45, 30, 0.18)",
+          axis: "rgba(40, 40, 40, 0.38)",
+          origin: "rgba(40, 40, 40, 0.55)",
+          label: "rgba(40, 40, 40, 0.42)",
+          ink: SHOOTER_LINE,
+          wind: "rgba(55, 48, 40, 0.9)",
+          windLabel: "rgba(50, 44, 36, 0.95)",
+          abyss0: "rgba(58,52,44,0)",
+          abyss1: "rgba(58,52,44,0.12)",
+          footnote: "rgba(40,40,40,0.32)",
+          landscapeAlpha: LANDSCAPE_ALPHA,
+          spriteFilter: "none",
+        };
+      }
+
+      function stageEnvLabel(s) {
+        if (!s) return "Earth";
+        if (s.env === "moon") return "Moon";
+        if (s.env === "jupiter") return "Jupiter";
+        return "Earth";
+      }
+
+      function describeGravityEnv(s) {
+        if (s && typeof s === "object") {
+          if (s.env === "moon") return "Moon";
+          if (s.env === "jupiter") return "Jupiter";
+          return "Earth";
+        }
+        return "Earth";
+      }
+
+      function updateLabels() {
+        lvLabel.textContent = `問.${state.level}`;
+        lifeLabel.textContent = `試行 ${state.lives}`;
+        scoreLabel.textContent = `正答 ${state.clears}`;
+      }
+
+      function updateEnvHud() {
+        const s = state.stage;
+        if (!s) {
+          envHud.textContent = "";
+          return;
+        }
+        // 方眼スケールに合わせた実加速度（環境ごと固定の g）
+        const gMs2 = gravityMs2ForEnv(s.env).toFixed(2);
+        const windAx = accelUnitToMs2(s.wind).toFixed(2);
+        const windLabel =
+          s.wind > 0.02 ? "追い風相当" : s.wind < -0.02 ? "向かい風相当" : "ほぼ無風";
+        // ゴール＝リング直径の中心（前端〜後端フチの中点）
+        const gp = getGoalPoint(s);
+        const goalPhys = screenToPhys(gp.x, gp.y);
+        const gx = Math.round(goalPhys.x);
+        const gy = Math.round(goalPhys.y);
+        const gNote = describeGravityEnv(s);
+        const bt = getBallType(s);
+        envHud.innerHTML =
+          `<div class="given-title">[ 問 ${state.level} ] 次の条件でシュート軌道を予測せよ。</div>` +
+          `<span class="given-line">・環境 <span class="given-sym">${stageEnvLabel(s)}</span></span>` +
+          `<span class="given-line">・原点 O(0,0)＝発射点／1マス=${GRID_CM_PER_CELL}cm</span>` +
+          `<span class="given-line">・重力 <span class="given-sym">g</span> = ${gMs2} m/s²` +
+          ` <span class="given-note">(${gNote})</span></span>` +
+          `<span class="given-line">・水平加速度 <span class="given-sym">a<sub>x</sub></span> = ${windAx} m/s²` +
+          ` <span class="given-note">(${windLabel})</span></span>` +
+          `<span class="given-line">・ボール質量 <span class="given-sym">m</span> = ${bt.mass.toFixed(1)} kg` +
+          ` <span class="given-note">(球種: ${bt.label}／a=F/m)</span></span>` +
+          `<span class="given-line">・ゴール <span class="given-sym">(x,y)</span> = (${gx}, ${gy}) cm` +
+          ` <span class="given-note">(リング直径の中心)</span></span>` +
+          `<span class="given-line">・空気抵抗 <span class="given-sym">なし</span>` +
+          ` <span class="given-note">(飛行中)</span></span>` +
+          `<span class="given-line given-note">・反発係数 e = ${s.restitution.toFixed(2)}（衝突）</span>` +
+          `<span class="given-line given-note">・未知数：θ・F・Δy（打点オフセットでスピン）</span>` +
+          `<span class="given-line given-note given-wrap">※推力 F は接触時間 τ(約1/60s) の平均力とする。風 W<sub>x</sub> は一定の水平加速度 a<sub>x</sub> として働く。</span>`;
+      }
+
+      function showHint() {
+        if (!state.stage) return;
+        const s = state.stage;
+        const ideal = computeIdealEarthParams(s.dist, s.height, s);
+        const gEarth = G_EARTH_MS2.toFixed(2);
+        const gNow = gravityMs2ForEnv(s.env).toFixed(2);
+        const envName = stageEnvLabel(s);
+        const bt = getBallType(s);
+        hintText.textContent =
+          `（本問：${envName}  g≈${gNow} m/s²／${bt.label} m=${bt.mass}kg）\n` +
+          `（参考：地球標準 g≈${gEarth} m/s², a_x=0 のとき）\n` +
+          `\n` +
+          (ideal.found
+            ? `推奨解答（目安・推力 F と打点 Δy）：\n` +
+            `  θ  = ${ideal.angle} °\n` +
+            `  F  = ${ideal.F}\n` +
+            `  Δy = ${ideal.dyCm} cm\n`
+            : `概算：\n` +
+            `  θ  ≈ ${ideal.angle} °\n` +
+            `  F  ≈ ${ideal.F}\n` +
+            `  Δy ≈ ${ideal.dyCm} cm\n`) +
+          `\n` +
+          `※ F は約 1/60 秒だけ加わる推力 [N]。Δv≈F/m·τ。\n` +
+          `  同じ F でも重い球ほど初速が小さい。Δy でスピン。\n` +
+          `  与条件（${envName}・g・a_x・m）に合わせて補正せよ。`;
+        hintSticky.classList.add("show");
+      }
+
+      function initShooter() {
+        // 見た目のみ。足元は衝突なし（奈落なので床代わりにしない）
+        shooterBodies = [];
+      }
+
+      /** 細い棒セグメント（ネット／ブレース共用） */
+      function makeBarSegment(x1, y1, x2, y2, thick, label, rest, fric) {
+        const cx = (x1 + x2) / 2;
+        const cy = (y1 + y2) / 2;
+        const len = Math.max(4, Math.hypot(x2 - x1, y2 - y1));
+        const angle = Math.atan2(y2 - y1, x2 - x1);
+        return Bodies.rectangle(cx, cy, len, thick, {
+          isStatic: true,
+          angle,
+          label,
+          restitution: rest,
+          friction: fric,
+          frictionStatic: fric,
+          chamfer: { radius: Math.min(1.2, thick * 0.4) },
+          render: { visible: false },
+        });
+      }
+
+      function makeNetSegment(x1, y1, x2, y2) {
+        // センサーのみ：Matter の剛体分離と自前応答が喧嘩しないようにする
+        const cx = (x1 + x2) / 2;
+        const cy = (y1 + y2) / 2;
+        const len = Math.max(4, Math.hypot(x2 - x1, y2 - y1));
+        const angle = Math.atan2(y2 - y1, x2 - x1);
+        return Bodies.rectangle(cx, cy, len, 2.8, {
+          isStatic: true,
+          isSensor: true,
+          angle,
+          label: "net",
+          restitution: NET_REST,
+          friction: NET_FRICTION,
+          render: { visible: false },
+        });
+      }
+
+      /**
+       * ナイロン網の挙動（毎フレーム・幾何ベース）
+       * - 外郭シルエットを基準にし、しなりは上限付き
+       * - 上限を超えたはみ出しは毎ステップ確実に戻す
+       * - 壁方向の速度は吸収（剛体バウンドにしない）
+       * - 下端がボールより狭いときは必要最小限だけ広げて通す
+       * 中央への誘引力は使わない（吸い込みの原因になるため）。
+       */
+      function updateNylonNet() {
+        if (!ball || !state.ballInFlight || !state.stage || ball.isStatic) return;
+        const gm = getGoalMetrics(state.stage);
+        if (!gm.net.profile || !gm.net.profile.length) return;
+
+        const x = ball.position.x;
+        const y = ball.position.y;
+        const netTop = gm.net.profile[0].y;
+        const netBot = gm.net.botY + BALL_R + 10;
+
+        if (y < netTop - BALL_R * 1.2 || y > netBot) {
+          state.netSway *= 0.94;
+          return;
+        }
+
+        // リム縁付近は Matter の金属フチに任せる（ネット干渉なし）
+        const rimZoneTop = gm.rimY - BALL_R * 1.2;
+        const rimZoneBot = gm.rimY + gm.tubeR * 2.5 + BALL_R * 0.8;
+        if (y >= rimZoneTop && y <= rimZoneBot) {
+          state.netSway *= subStepDamp(0.96);
+          return;
+        }
+
+        const yClamp = clamp(y, netTop, gm.net.botY);
+        const walls = netWallsAtY(gm, yClamp);
+        const gap = Math.max(4, walls.r - walls.l);
+        const mid = (walls.l + walls.r) / 2;
+        const maxGive = Math.max(1.6, BALL_R * NET_MAX_GIVE);
+
+        // 通路から大きく離れたら干渉しない（誤めり込み防止）
+        if (x < walls.l - BALL_R - maxGive * 2 || x > walls.r + BALL_R + maxGive * 2) {
+          state.netSway *= 0.96;
+          return;
+        }
+
+        // すぼまり：通れる最小幅までだけ広げる（過剰なはみ出しを防ぐ）
+        const need = BALL_R * 2;
+        const squeezed = need > gap;
+        let half = gap * 0.5;
+        if (squeezed) {
+          half = BALL_R; // 左右ぴったり＝外郭よりはみ出すが必要最小限
+          state.netSway = Math.min(1, state.netSway + 0.06);
+        } else {
+          // しなりは maxGive 以内に抑える
+          half = gap * 0.5 + Math.min(maxGive, state.netSway * maxGive * 0.45);
+        }
+        const softL = mid - half;
+        const softR = mid + half;
+
+        // 外郭基準のはみ出し量（正＝網の外へ出ている）
+        const overL = softL - (x - BALL_R);
+        const overR = x + BALL_R - softR;
+
+        let vx = ball.velocity.x;
+        let vy = ball.velocity.y;
+        let touching = false;
+        let pushX = 0;
+
+        /**
+         * しなり内は柔らかく、上限超過分はフルで戻す。
+         * → クッション感を残しつつ「はみ出しすぎ」を止める。
+         */
+        const correctOver = (over) => {
+          if (over <= 0) return 0;
+          touching = true;
+          if (over <= maxGive) {
+            return over * NET_POS_SOFT;
+          }
+          return maxGive * NET_POS_SOFT + (over - maxGive);
+        };
+
+        if (overL > 0) {
+          pushX += correctOver(overL);
+          if (vx < 0) vx *= NET_SOFT_E;
+          state.netSway = Math.min(1, state.netSway + Math.min(0.1, overL * 0.035));
+        }
+        if (overR > 0) {
+          pushX -= correctOver(overR);
+          if (vx > 0) vx *= NET_SOFT_E;
+          state.netSway = Math.min(1, state.netSway + Math.min(0.1, overR * 0.035));
+        }
+
+        if (pushX !== 0) {
+          Body.translate(ball, { x: pushX, y: 0 });
+        }
+
+        // 網内クッション：跳ねずにエネルギーを落とす（誘引はしない）
+        if (touching || (x >= softL && x <= softR)) {
+          vx *= subStepDamp(NET_DRAG_X);
+          if (vy < 0) vy *= subStepDamp(NET_DRAG_UP);
+          else if (touching) vy *= subStepDamp(NET_DRAG_DOWN);
+        }
+
+        // すぼまりで噛んだら下へ抜けやすくする（横へ引っ張らない）
+        if (squeezed && vy >= 0) {
+          vy = Math.max(vy, NET_EXIT_BOOST * 0.55 + state.netSway * 0.55);
+        }
+
+        Body.setVelocity(ball, { x: vx, y: vy });
+        Body.setAngularVelocity(ball, ball.angularVelocity * subStepDamp(0.96));
+        state.netSway *= subStepDamp(0.96);
+      }
+
+      /** リム金属管の断面＝通常の静的円ボディ（Matter の衝突に任せる） */
+      function makeRimNode(x, y, r) {
+        return Bodies.circle(x, y, r, {
+          isStatic: true,
+          label: "rim",
+          restitution: RIM_REST,
+          friction: RIM_FRICTION,
+          frictionStatic: 0.05,
+          slop: 0.01,
+          render: { fillStyle: DEBUG_BODY_FILL },
+        });
+      }
+
+      function makeRing(stage) {
+        // 横視点：リムは「前端フチ」と「後端フチ」だけ。中央は必ず穴（開口）
+        const m = getGoalMetrics(stage);
+        rimBodies = [];
+        netBodies = [];
+        structureBodies = [];
+
+        // バックボード：打面（左端）はイラストの板の左端に一致させる。
+        // 厚みが足りないときだけ奥（右）へ足す。前側へは絶対にはみ出さない。
+        const boardFrontX = m.board.left;
+        const boardThick = Math.max(BOARD_MIN_THICK, m.board.w);
+        backboard = Bodies.rectangle(
+          boardFrontX + boardThick / 2,
+          (m.board.top + m.board.bot) / 2,
+          boardThick,
+          m.board.h,
+          {
+            isStatic: true,
+            label: "backboard",
+            restitution: BOARD_REST,
+            friction: BOARD_FRICTION,
+            slop: 0.01,
+            chamfer: { radius: 1 },
+            render: { fillStyle: DEBUG_BODY_FILL },
+          },
+        );
+
+        const pole = Bodies.rectangle(m.pole.x, m.pole.y, m.pole.w, m.pole.h, {
+          isStatic: true,
+          label: "structure",
+          restitution: 0.35,
+          friction: 0.55,
+          render: { visible: false },
+        });
+        // 水平アームは画像に無いのでデフォルト無効（見えない壁を作らない）
+        const armBodies = [];
+        if (m.arm.enabled) {
+          armBodies.push(
+            Bodies.rectangle(m.arm.x, m.arm.y, m.arm.w, m.arm.h, {
+              isStatic: true,
+              label: "structure",
+              restitution: 0.4,
+              friction: 0.5,
+              render: { visible: false },
+            }),
+          );
+        }
+        const brace = makeBarSegment(
+          m.brace.x1,
+          m.brace.y1,
+          m.brace.x2,
+          m.brace.y2,
+          m.brace.thick,
+          "structure",
+          0.4,
+          0.5,
+        );
+        structureBodies = [pole, ...armBodies, brace];
+
+        const fx = m.rimFront.x;
+        const bx = m.rimBack.x;
+        const ry = m.rimY;
+        const tube = m.tubeR;
+
+        // —— リムのフチ＝円ボディ2つのみ（矩形キャップは廃止）——
+        // 円に当たると接点の法線方向へ弾かれるため「リングに嫌われる」動きが出る。
+        // 細すぎるとカスリが検出されず「弾かれない」ので、下限を確保する。
+        const RIM_NODE_MIN_R = 3.2;
+        let rimNodeR = Math.max(RIM_NODE_MIN_R, tube * 1.35);
+        // フチ間の素通り幅はボール直径＋余裕を維持（スポッと通る）
+        const needClear = BALL_R * 2 + Math.max(3, BALL_R * 0.2);
+        if (bx - fx - rimNodeR * 2 < needClear) {
+          rimNodeR = Math.max(RIM_NODE_MIN_R, (bx - fx - needClear) / 2);
+        }
+        rimFront = makeRimNode(fx, ry, rimNodeR);
+        rimMount = makeRimNode(bx, ry, rimNodeR);
+        rimBodies.push(rimFront, rimMount);
+
+        // ネット：イラスト外郭ポリラインに沿った細かい線分（直線テーパー禁止）
+        const profile = m.net.profile;
+        const subdivide = (a, b, n) => {
+          const out = [];
+          for (let i = 0; i < n; i++) {
+            const t0 = i / n;
+            const t1 = (i + 1) / n;
+            out.push({
+              x0: a.x + (b.x - a.x) * t0,
+              y0: a.y + (b.y - a.y) * t0,
+              x1: a.x + (b.x - a.x) * t1,
+              y1: a.y + (b.y - a.y) * t1,
+            });
+          }
+          return out;
+        };
+        for (let i = 0; i < profile.length - 1; i++) {
+          const a = profile[i];
+          const b = profile[i + 1];
+          // 各区間を2分割してカーブ近似の精度を上げる
+          for (const seg of subdivide(
+            { x: a.l, y: a.y },
+            { x: b.l, y: b.y },
+            2,
+          )) {
+            netBodies.push(makeNetSegment(seg.x0, seg.y0, seg.x1, seg.y1));
+          }
+          for (const seg of subdivide(
+            { x: a.r, y: a.y },
+            { x: b.r, y: b.y },
+            2,
+          )) {
+            netBodies.push(makeNetSegment(seg.x0, seg.y0, seg.x1, seg.y1));
+          }
+        }
+
+        // スコア用センサー（開口直下・衝突なし）
+        const openW = Math.max(10, m.rimInner);
+        ringSensor = Bodies.rectangle(m.rimCx, ry + Math.max(10, BALL_R * 0.6), openW * 0.95, Math.max(22, BALL_R * 1.4), {
+          isStatic: true,
+          isSensor: true,
+          label: "ringSensor",
+          render: { fillStyle: DEBUG_BODY_FILL },
+        });
+
+        Composite.add(world, [
+          backboard,
+          ...structureBodies,
+          ...rimBodies,
+          ...netBodies,
+          ringSensor,
+        ]);
+      }
+
+      /** シュート前は手に固定（重力で落とさない） */
+      function holdBallInHand() {
+        if (!ball || state.ballInFlight) return;
+        const pose = getArmPose(displayArmDeg());
+        if (!ball.isStatic) Body.setStatic(ball, true);
+        Body.setPosition(ball, { x: pose.hand.x, y: pose.hand.y });
+        Body.setVelocity(ball, { x: 0, y: 0 });
+        Body.setAngularVelocity(ball, 0);
+        Body.setAngle(ball, 0);
+      }
+
+      function makeBall() {
+        if (ball) Composite.remove(world, ball);
+        syncBallRadius(state.stage);
+        const rest = state.stage ? state.stage.restitution : BALL_REST;
+        const bt = getBallType(state.stage);
+        // いったん動的生成→静的化して、発射時の質量復元用 _original を正しく残す
+        ball = Bodies.circle(origin.x, origin.y, BALL_R, {
+          label: "ball",
+          isStatic: false,
+          restitution: rest,
+          friction: BALL_FRICTION,
+          frictionStatic: BALL_FRICTION_STATIC,
+          frictionAir: BALL_FRICTION_AIR,
+          density: ballDensityForSize(),
+          slop: 0.02,
+          render: { visible: false },
+        });
+        // 球種ごとの質量（衝突慣性用）。setStatic 前に入れて _original へ残す
+        applyBallMass(ball, bt.mass);
+        Body.setStatic(ball, true);
+        // 静的化後も _original.mass を球種値に揃えておく（復元漏れ防止）
+        applyBallMass(ball, bt.mass);
+        Body.setVelocity(ball, { x: 0, y: 0 });
+        Body.setAngularVelocity(ball, 0);
+        Composite.add(world, ball);
+        state.ballInFlight = false;
+        state.scoredThisShot = false;
+        state.wasAboveRim = false;
+        state.rimPassPending = false;
+        state.prevBallX = null;
+        state.prevBallY = null;
+        state.trail = [];
+        state.missTimer = 0;
+        state.stuckTimer = 0;
+        state.netSway = 0;
+        // リトライ／ミス後は必ず原点視点へ戻す
+        resetCamera(false);
+        holdBallInHand();
+      }
+
+      function rebuildWorld(newStage) {
+        if (!engine) return;
+        Composite.clear(world, false);
+        ball = null;
+        backboard = rimFront = rimMount = ringSensor = null;
+        rimBodies = [];
+        netBodies = [];
+        structureBodies = [];
+        shooterBodies = [];
+        resetCamera(false);
+        // 地面なし＝奈落。ボールは画面下へ落ちたらミス
+        initShooter();
+        if (newStage || !state.stage) {
+          state.stage = generateStage(state.level);
+        } else {
+          state.stage.ringX = snapToGrid(origin.x + state.stage.dist);
+          state.stage.ringY = snapToGrid(origin.y - state.stage.height);
+          state.stage.dist = state.stage.ringX - origin.x;
+          state.stage.height = origin.y - state.stage.ringY;
+        }
+        syncBallRadius(state.stage);
+        makeRing(state.stage);
+        applyEnvironment(state.stage);
+        makeBall();
+        updateLabels();
+      }
+
+      function flash(text, ms = 1100) {
+        flashMsg.textContent = text;
+        flashMsg.classList.add("show");
+        state.flashTimer = ms;
+      }
+
+      function clamp(n, lo, hi) {
+        return Math.min(hi, Math.max(lo, n));
+      }
+
+      function parseMemoNumber(el, fallback) {
+        const raw = String(el.value).trim();
+        // 入力途中（空・符号だけ）はフォールバック
+        if (raw === "" || raw === "-" || raw === "+" || raw === "." || raw === "-.") {
+          return { ok: false, value: fallback };
+        }
+        const n = Number(raw);
+        if (!Number.isFinite(n)) return { ok: false, value: fallback };
+        return { ok: true, value: n };
+      }
+
+      /** 余白メモの数値を読み取り・正規化（空欄や不正値は直前の値を維持） */
+      function readShotParams() {
+        const degRaw = parseMemoNumber(angleEl, state.armAngleDeg);
+        const fRaw = parseMemoNumber(powerEl, F_DEFAULT);
+        const dyRaw = parseMemoNumber(dyEl, DY_CM_DEFAULT);
+        return {
+          deg: clamp(Math.round(degRaw.value), 0, 90),
+          F: clamp(Math.round(fRaw.value), F_MIN, F_MAX),
+          dyCm: clamp(Math.round(dyRaw.value * 2) / 2, DY_CM_MIN, DY_CM_MAX),
+          degOk: degRaw.ok,
+          fOk: fRaw.ok,
+          dyOk: dyRaw.ok,
+        };
+      }
+
+      function syncFromMemo() {
+        // 表示はユーザー入力のまま。角度の見た目追従だけ反映する
+        const p = readShotParams();
+        state.armAngleDeg = p.deg;
+        holdBallInHand();
+      }
+
+      function shoot() {
+        if (!state.playing || state.ballInFlight || !ball || !state.stage) return;
+        const { deg, F, dyCm } = readShotParams();
+        // 入力欄の表示は書き換えない（クランプ値は挙動にだけ使う）
+        state.armAngleDeg = deg;
+        const theta = (deg * Math.PI) / 180;
+        const deltaYPx = dyCmToPx(dyCm);
+
+        // 発射は常に絶対原点 O（手先・方眼交差）。見た目のスイングは後から追従
+        if (ball.isStatic) Body.setStatic(ball, false);
+        // 静的解除後も球種質量を再適用（復元漏れ・density 由来の質量ずれを防ぐ）
+        applyBallMass(ball, getBallType(state.stage).mass);
+        // 反発係数も球種どおり（setStatic 復元後のずれ防止）
+        ball.restitution = state.stage.restitution;
+        ball.friction = BALL_FRICTION;
+        ball.frictionStatic = BALL_FRICTION_STATIC;
+        Body.setPosition(ball, { x: origin.x, y: origin.y });
+        Body.setAngle(ball, 0);
+
+        // —— 7物理量に基づく applyForce ——
+        // m,e = 球種 / g,Wx = ステージ重力 / θ,F,Δy = 入力
+        applyShotForce(ball, theta, F, deltaYPx);
+
+        state.ballInFlight = true;
+        state.scoredThisShot = false;
+        state.wasAboveRim = false;
+        state.rimPassPending = false;
+        state.prevBallX = origin.x;
+        state.prevBallY = origin.y;
+        state.trail = [];
+        state.missTimer = 0;
+        state.stuckTimer = 0;
+        state.netSway = 0;
+        state.armAnimating = true;
+        state.armSwingT = 0;
+      }
+
+      /** 点と線分の最短距離（アームの当たり判定用） */
+      function distToSegment(px, py, x1, y1, x2, y2) {
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const len2 = dx * dx + dy * dy || 1;
+        let t = ((px - x1) * dx + (py - y1) * dy) / len2;
+        t = clamp(t, 0, 1);
+        const qx = x1 + dx * t;
+        const qy = y1 + dy * t;
+        return Math.hypot(px - qx, py - qy);
+      }
+
+      /** キャンバス座標がシューター立ち絵（または手元ボール）の上か */
+      function hitTestShooter(sx, sy) {
+        const p = screenToWorld(sx, sy);
+        const m = getShooterMetrics(origin, false);
+        const pad = 8;
+        if (
+          p.x > m.left - pad &&
+          p.x < m.left + m.w + pad &&
+          p.y > m.top - pad &&
+          p.y < m.top + m.h + pad
+        ) {
+          return true;
+        }
+        if (ball && !state.ballInFlight) {
+          if (Math.hypot(p.x - ball.position.x, p.y - ball.position.y) < BALL_R + 12)
+            return true;
+        }
+        return false;
+      }
+
+      function canvasPointFromEvent(e) {
+        const rect = canvas.getBoundingClientRect();
+        const src = e.changedTouches && e.changedTouches[0]
+          ? e.changedTouches[0]
+          : e.touches && e.touches[0]
+            ? e.touches[0]
+            : e;
+        return {
+          x: ((src.clientX - rect.left) / rect.width) * W,
+          y: ((src.clientY - rect.top) / rect.height) * H,
+        };
+      }
+
+      /** ポインタ操作：待機中はパン／射手タップでシュート、飛行中は無効 */
+      const pointerGesture = {
+        active: false,
+        id: null,
+        startSX: 0,
+        startSY: 0,
+        startCam: 0,
+        onShooter: false,
+        panning: false,
+        /** タッチのみドラッグパン可（マウス横移動はホイール担当） */
+        allowDragPan: false,
+      };
+
+      function canManualPan() {
+        return (
+          state.playing &&
+          !state.ballInFlight &&
+          !startOverlay.classList.contains("show") &&
+          !gameOverOverlay.classList.contains("show")
+        );
+      }
+
+      function onPointerDownCanvas(e) {
+        if (!canManualPan()) return;
+        if (e.type === "mousedown" && e.button !== 0) return;
+        const isTouch = e.type.startsWith("touch");
+        const p = canvasPointFromEvent(e);
+        pointerGesture.active = true;
+        pointerGesture.id =
+          e.changedTouches && e.changedTouches[0]
+            ? e.changedTouches[0].identifier
+            : "mouse";
+        pointerGesture.startSX = p.x;
+        pointerGesture.startSY = p.y;
+        pointerGesture.startCam = state.cameraX;
+        pointerGesture.onShooter = hitTestShooter(p.x, p.y);
+        pointerGesture.panning = false;
+        pointerGesture.allowDragPan = isTouch;
+        state.cameraAnimTo = null; // 手動操作で復帰アニメを中断
+        if (isTouch && e.cancelable) e.preventDefault();
+      }
+
+      function onPointerMoveCanvas(e) {
+        if (!pointerGesture.active || !canManualPan()) {
+          // カーソル見た目のみ（マウス）
+          if (e.type === "mousemove" && state.playing && !state.ballInFlight) {
+            const p = canvasPointFromEvent(e);
+            canvas.style.cursor = hitTestShooter(p.x, p.y) ? "pointer" : "default";
+          }
+          return;
+        }
+        const p = canvasPointFromEvent(e);
+        const dx = p.x - pointerGesture.startSX;
+        const dy = p.y - pointerGesture.startSY;
+        if (!pointerGesture.panning) {
+          if (Math.hypot(dx, dy) >= PAN_DRAG_THRESHOLD) {
+            pointerGesture.panning = true;
+            pointerGesture.onShooter = false; // ドラッグ開始したらシュートしない
+          }
+        }
+        // マウスはドラッグパンしない（ホイール専用）。タッチのみスワイプパン
+        if (pointerGesture.panning && pointerGesture.allowDragPan) {
+          state.cameraX = clampCameraX(pointerGesture.startCam - dx);
+          if (e.cancelable) e.preventDefault();
+        }
+      }
+
+      function onPointerUpCanvas(e) {
+        if (!pointerGesture.active) return;
+        const wasPan = pointerGesture.panning && pointerGesture.allowDragPan;
+        const wasShooter = pointerGesture.onShooter;
+        pointerGesture.active = false;
+        pointerGesture.panning = false;
+        pointerGesture.allowDragPan = false;
+        if (!canManualPan()) {
+          canvas.style.cursor = "default";
+          return;
+        }
+        // ほぼ動かさず射手上で離したらシュート
+        if (!wasPan && wasShooter) {
+          if (e.cancelable) e.preventDefault();
+          shoot();
+        }
+        const p = canvasPointFromEvent(e);
+        canvas.style.cursor = hitTestShooter(p.x, p.y) ? "pointer" : "default";
+      }
+
+      function onPointerCancelCanvas() {
+        pointerGesture.active = false;
+        pointerGesture.panning = false;
+        pointerGesture.allowDragPan = false;
+        canvas.style.cursor = state.ballInFlight ? "default" : "default";
+      }
+
+      /** マウス：ホイールで横スクロール（待機中のみ） */
+      function onWheelCanvas(e) {
+        if (!canManualPan()) return;
+        e.preventDefault();
+        state.cameraAnimTo = null;
+        // 縦ホイールも横移動に使う（ノートを左右にめくる感）。Shift+縦も同様。
+        const raw =
+          Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+        state.cameraX = clampCameraX(state.cameraX + raw * 0.9);
+      }
+
+      /**
+       * ゴール判定（2段階）
+       * 1) 開口を上から下へ進入（pending）
+       * 2) ボール全体がリムより下へ抜け切る（このときだけ正答）
+       * 入りかけて跳ね返り／横へ飛び出した球は pending を破棄する。
+       */
+      function checkScorePassage() {
+        if (!ball || !state.stage || state.scoredThisShot || !state.ballInFlight) return false;
+        const gm = getGoalMetrics(state.stage);
+        const cx = ball.position.x;
+        const cy = ball.position.y;
+        const prevX = state.prevBallX == null ? cx : state.prevBallX;
+        const prevY = state.prevBallY == null ? cy : state.prevBallY;
+        const top = cy - BALL_R;
+        const bot = cy + BALL_R;
+        const falling = ball.velocity.y > 0.02;
+        const risingHard = ball.velocity.y < -0.35;
+
+        // リングより十分上にいた
+        if (bot < gm.rimY - 1) state.wasAboveRim = true;
+
+        const inOpenX = cx >= gm.openL && cx <= gm.openR;
+        // 現在高さのネット外形に沿った通路（曲線プロファイル）
+        const walls = netWallsAtY(gm, Math.max(cy, gm.rimY));
+        const corridorL = Math.min(gm.openL, walls.l) - 2;
+        const corridorR = Math.max(gm.openR, walls.r) + 2;
+        const inCorridorX = cx >= corridorL && cx <= corridorR;
+
+        // —— 段階1：開口線を上→下に進入 ——
+        if (
+          !state.rimPassPending &&
+          state.wasAboveRim &&
+          falling &&
+          prevY < gm.rimY &&
+          cy >= gm.rimY
+        ) {
+          const dy = cy - prevY;
+          const t = dy > 1e-6 ? (gm.rimY - prevY) / dy : 1;
+          const crossX = prevX + (cx - prevX) * clamp(t, 0, 1);
+          if (crossX >= gm.openL && crossX <= gm.openR) {
+            state.rimPassPending = true;
+          }
+        }
+
+        // —— pending 破棄：飛び出し／跳ね返り ——
+        if (state.rimPassPending) {
+          // ボールが再びリムより上へ戻った（入りきらず反発）
+          if (bot < gm.rimY) {
+            state.rimPassPending = false;
+          }
+          // リム付近で強く上向き（こすって飛び出し）
+          else if (risingHard && top < gm.rimY + BALL_R * 0.5) {
+            state.rimPassPending = false;
+          }
+          // 抜け切る前に横へ外れた
+          else if (top < gm.rimY + BALL_R * 1.2 && !inCorridorX && !inOpenX) {
+            state.rimPassPending = false;
+          }
+        }
+
+        // —— 段階2：ボール全体がリム下へ抜け、落下継続 ——
+        const fullyBelowRim = top >= gm.rimY + 0.5;
+        if (
+          state.rimPassPending &&
+          fullyBelowRim &&
+          falling &&
+          inCorridorX
+        ) {
+          onScore();
+          state.prevBallX = cx;
+          state.prevBallY = cy;
+          return true;
+        }
+
+        state.prevBallX = cx;
+        state.prevBallY = cy;
+        return false;
+      }
+
+      function onScore() {
+        if (state.scoredThisShot) return;
+        state.scoredThisShot = true;
+        state.clears += 1;
+        flash("正答！", 1000);
+        setTimeout(() => {
+          state.level += 1;
+          state.lives = 3;
+          state.ballInFlight = false;
+          rebuildWorld(true);
+          flash(`問.${state.level}`, 800);
+        }, 900);
+      }
+
+      function onMiss() {
+        state.lives -= 1;
+        updateLabels();
+        state.ballInFlight = false;
+        if (state.lives <= 0) {
+          state.playing = false;
+          gameOverText.textContent = `正答数 ${state.clears} ／ 到達 問.${state.level}`;
+          gameOverOverlay.classList.add("show");
+          resetCamera(false);
+          return;
+        }
+        flash(`残り試行 ${state.lives}`, 900);
+        makeBall(); // 内部で原点へカメラ復帰
+      }
+
+      /** 無風・地球相当での基準解（F・Δy 探索）。stage を渡すと球種 m/e を反映 */
+      function computeIdealEarthParams(dist, height, stage) {
+        const angles = [];
+        for (let a = 25; a <= 70; a += 5) angles.push(a);
+
+        const restitution = stage ? stage.restitution : DEFAULT_REST;
+        const bt = getBallType(stage);
+        // 質量に応じて探索する F レンジを広げる（重い球は大きな推力が必要）
+        const fLo = clamp(F_DEFAULT * (bt.mass / 0.6) * 0.35, F_MIN, F_MAX);
+        const fHi = clamp(F_DEFAULT * (bt.mass / 0.6) * 4.0, F_MIN, F_MAX);
+        const fStep = Math.max(5, (fHi - fLo) / 28);
+
+        let best = { angle: 45, F: F_DEFAULT, dyCm: 0, score: Infinity };
+
+        for (const angle of angles) {
+          for (let F = fLo; F <= fHi; F += fStep) {
+            const Fr = Math.round(F);
+            const ok = simulateShot(dist, height, angle, Fr, 0, {
+              wind: 0,
+              gravityY: DEFAULT_G,
+              restitution,
+              mass: bt.mass,
+            });
+            if (ok) {
+              const score =
+                Math.abs(Fr - F_DEFAULT * (bt.mass / 0.6)) * 0.02 +
+                Math.abs(angle - 45) * 0.12;
+              if (score < best.score) {
+                best = { angle, F: Fr, dyCm: 0, score };
+              }
+            }
+          }
+        }
+
+        if (best.score === Infinity) {
+          // 見つからないとき：必要初速を F = m·Δv/τ へ粗く換算
+          const theta = Math.PI / 4;
+          const distM = (dist * CM_PER_PX) / 100;
+          const heightM = (height * CM_PER_PX) / 100;
+          const g = accelUnitToMs2(DEFAULT_G);
+          const denom =
+            distM * Math.sin(2 * theta) - 2 * heightM * Math.pow(Math.cos(theta), 2);
+          let vMs = 2.7;
+          if (denom > 0) {
+            vMs = Math.sqrt((g * distM * distM) / Math.max(denom, 1e-6));
+          }
+          let Fguess = (bt.mass * vMs) / THRUST_CONTACT_S;
+          Fguess = clamp(Math.round(Fguess), F_MIN, F_MAX);
+          return { angle: 45, F: Fguess, dyCm: 0, found: false };
+        }
+        return { ...best, found: true };
+      }
+
+      function simulateShot(dist, height, angleDeg, F, dyCm, env) {
+        const eng = Engine.create({
+          gravity: { x: env.wind, y: env.gravityY, scale: DEFAULT_SCALE },
+          positionIterations: 20,
+          velocityIterations: 16,
+          constraintIterations: 6,
+        });
+        // ヒント用も本番と同じく「発射点＝原点」から距離・高さを測る
+        const o = { x: 200, y: 280 };
+        const target = { x: o.x + dist, y: o.y - height };
+        const fakeStage = { ringX: target.x, ringY: target.y };
+        syncBallRadius(fakeStage);
+        const gm = getGoalMetrics(fakeStage);
+        const ang = (angleDeg * Math.PI) / 180;
+        // 本番同様、発射原点座標から投げる
+        const b = Bodies.circle(o.x, o.y, BALL_R, {
+          restitution: env.restitution,
+          friction: BALL_FRICTION,
+          frictionStatic: BALL_FRICTION_STATIC,
+          frictionAir: BALL_FRICTION_AIR,
+          density: ballDensityForSize(),
+        });
+        // 球種の質量を厳密反映（a = F/m）
+        if (env.mass) applyBallMass(b, env.mass);
+        // 本番 makeRing と同じ形状（打面＝イラスト左端、厚みは奥へ）
+        const simBoardFrontX = gm.board.left;
+        const simBoardThick = Math.max(BOARD_MIN_THICK, gm.board.w);
+        const board = Bodies.rectangle(
+          simBoardFrontX + simBoardThick / 2,
+          (gm.board.top + gm.board.bot) / 2,
+          simBoardThick,
+          gm.board.h,
+          { isStatic: true, restitution: BOARD_REST, friction: BOARD_FRICTION },
+        );
+        const lipF = Bodies.circle(gm.rimFront.x, gm.rimFront.y, gm.tubeR * 1.25, {
+          isStatic: true,
+          restitution: RIM_REST,
+          friction: RIM_FRICTION,
+        });
+        const lipB = Bodies.circle(gm.rimBack.x, gm.rimBack.y, gm.tubeR * 1.25, {
+          isStatic: true,
+          restitution: RIM_REST,
+          friction: RIM_FRICTION,
+        });
+        // ヒント用も地面なし（奈落）
+        Composite.add(eng.world, [b, board, lipF, lipB]);
+
+        Body.setPosition(b, { x: o.x, y: o.y });
+        applyShotForce(b, ang, F, dyCmToPx(dyCm));
+
+        let hit = false;
+        let wasAbove = false;
+        let pending = false;
+        let prevX = o.x;
+        let prevY = o.y;
+        for (let i = 0; i < 280; i++) {
+          // 本番と同じサブステップ幅で更新（挙動を一致させる）
+          for (let s = 0; s < PHYS_SUBSTEPS; s++) {
+            Engine.update(eng, 1000 / 60 / PHYS_SUBSTEPS);
+          }
+          const cx = b.position.x;
+          const cy = b.position.y;
+          const top = cy - BALL_R;
+          const bot = cy + BALL_R;
+          const falling = b.velocity.y > 0.02;
+          const risingHard = b.velocity.y < -0.35;
+          if (bot < gm.rimY - 1) wasAbove = true;
+
+          if (
+            !pending &&
+            wasAbove &&
+            falling &&
+            prevY < gm.rimY &&
+            cy >= gm.rimY
+          ) {
+            const dy = cy - prevY;
+            const t = dy > 1e-6 ? (gm.rimY - prevY) / dy : 1;
+            const crossX = prevX + (cx - prevX) * Math.min(1, Math.max(0, t));
+            if (crossX >= gm.openL && crossX <= gm.openR) pending = true;
+          }
+
+          if (pending) {
+            if (bot < gm.rimY) pending = false;
+            else if (risingHard && top < gm.rimY + BALL_R * 0.5) pending = false;
+            else if (
+              top < gm.rimY + BALL_R * 1.2 &&
+              (cx < gm.openL || cx > gm.openR)
+            ) {
+              pending = false;
+            }
+          }
+
+          if (pending && top >= gm.rimY + 0.5 && falling && cx >= gm.openL && cx <= gm.openR) {
+            hit = true;
+            break;
+          }
+
+          prevX = cx;
+          prevY = cy;
+          if (b.position.y > 560 || b.position.x < -80 || b.position.x > 980) break;
+        }
+        Engine.clear(eng);
+        return hit;
+      }
+
+
+      // —— イラスト描画 ——
+      function inkStroke(ctx, w) {
+        ctx.strokeStyle = SHOOTER_LINE;
+        ctx.lineWidth = w;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+      }
+
+      function roundRect(ctx, x, y, w, h, r) {
+        const rr = Math.min(r, w / 2, h / 2);
+        ctx.beginPath();
+        ctx.moveTo(x + rr, y);
+        ctx.arcTo(x + w, y, x + w, y + h, rr);
+        ctx.arcTo(x + w, y + h, x, y + h, rr);
+        ctx.arcTo(x, y + h, x, y, rr);
+        ctx.arcTo(x, y, x + w, y, rr);
+        ctx.closePath();
+      }
+
+      function drawCapsuleLimb(ctx, x1, y1, x2, y2, thick) {
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const len = Math.hypot(dx, dy) || 1;
+        const ang = Math.atan2(dy, dx);
+        ctx.save();
+        ctx.translate(x1, y1);
+        ctx.rotate(ang);
+        roundRect(ctx, 0, -thick / 2, len, thick, thick / 2);
+        ctx.fillStyle = SHOOTER_WHITE;
+        ctx.fill();
+        inkStroke(ctx, 1.8);
+        ctx.stroke();
+        ctx.restore();
+        for (const [jx, jy] of [
+          [x1, y1],
+          [x2, y2],
+        ]) {
+          ctx.beginPath();
+          ctx.arc(jx, jy, thick * 0.42, 0, Math.PI * 2);
+          ctx.fillStyle = SHOOTER_SHADE;
+          ctx.fill();
+          inkStroke(ctx, 1.5);
+          ctx.stroke();
+        }
+      }
+
+      function drawShooter(ctx) {
+        // withSwing=false で矩形を取り、tilt は足元まわりに適用（手座標と一致）
+        const m = getShooterMetrics(origin, false);
+        const pose = getArmPose(displayArmDeg());
+        const foot = m.foot;
+        ctx.save();
+
+        ctx.translate(foot.x, foot.y);
+        ctx.rotate(pose.metrics.tilt || 0);
+        ctx.translate(-foot.x, -foot.y);
+
+        if (shooterImgReady) {
+          // 宇宙ステージでも人物色は反転しない
+          ctx.drawImage(shooterImg, m.left, m.top, m.w, m.h);
+        } else {
+          // 読み込み前の簡易シルエット
+          ctx.strokeStyle = getTheme().ink;
+          ctx.globalAlpha = 0.35;
+          ctx.strokeRect(m.left, m.top, m.w, m.h);
+          ctx.beginPath();
+          ctx.arc(pose.hand.x, pose.hand.y, 10, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        ctx.restore();
+      }
+
+      /** goal.png を描画（ネット込み）。物理ボディは透明のまま */
+      function drawRing(ctx) {
+        if (!state.stage) return;
+        const m = getGoalMetrics(state.stage);
+        const th = getTheme();
+        if (goalImgReady) {
+          ctx.save();
+          ctx.filter = th.spriteFilter;
+          ctx.drawImage(goalImg, m.left, m.top, m.w, m.h);
+          ctx.filter = "none";
+          ctx.restore();
+          return;
+        }
+        // 読み込み前の簡易プレースホルダ
+        ctx.save();
+        ctx.strokeStyle = th.ink;
+        ctx.globalAlpha = 0.35;
+        ctx.strokeRect(m.left, m.top, m.w, m.h);
+        ctx.restore();
+      }
+
+      function drawBall(ctx) {
+        if (!ball) return;
+        const bt = getBallType(state.stage);
+        ctx.save();
+        ctx.translate(ball.position.x, ball.position.y);
+        ctx.rotate(ball.angle);
+
+        // 球種ごとの見た目（模様は ctx.rotate 済みの座標系に描くのでスピンに追従する）
+        switch (bt.id) {
+          case "bowling":
+            drawBowlingBall(ctx);
+            break;
+          case "beach":
+            drawBeachBall(ctx);
+            break;
+          case "steel":
+            drawSteelBall(ctx, bt);
+            break;
+          default:
+            drawBasketball(ctx);
+            break;
+        }
+
+        ctx.restore();
+      }
+
+      /** Basketball：伝統的な十字＋曲線の縫い目 */
+      function drawBasketball(ctx) {
+        ctx.beginPath();
+        ctx.arc(0, 0, BALL_R, 0, Math.PI * 2);
+        const g = ctx.createRadialGradient(-4, -5, 1.5, 2, 3, BALL_R);
+        g.addColorStop(0, "#ffc48a");
+        g.addColorStop(0.35, "#f09838");
+        g.addColorStop(0.75, BALL_ORANGE);
+        g.addColorStop(1, "#a84e0e");
+        ctx.fillStyle = g;
+        ctx.fill();
+
+        // 黒の縫い目（公式球に近いカーブ）
+        ctx.strokeStyle = "#1a1410";
+        ctx.lineWidth = 1.55;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(0, -BALL_R + 1);
+        ctx.lineTo(0, BALL_R - 1);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(-BALL_R + 1, 0);
+        ctx.lineTo(BALL_R - 1, 0);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(-BALL_R * 0.15, 0, BALL_R * 0.78, -1.15, 1.15);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(BALL_R * 0.15, 0, BALL_R * 0.78, Math.PI - 1.15, Math.PI + 1.15);
+        ctx.stroke();
+        // パネルの細い補助線
+        ctx.globalAlpha = 0.55;
+        ctx.lineWidth = 1.1;
+        ctx.beginPath();
+        ctx.arc(0, -BALL_R * 0.1, BALL_R * 0.92, 0.35, Math.PI - 0.35);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(0, BALL_R * 0.1, BALL_R * 0.92, Math.PI + 0.35, -0.35);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+
+        // 輪郭
+        ctx.beginPath();
+        ctx.arc(0, 0, BALL_R, 0, Math.PI * 2);
+        ctx.strokeStyle = "#2c241c";
+        ctx.lineWidth = 1.4;
+        ctx.stroke();
+
+        // ハイライト
+        ctx.beginPath();
+        ctx.ellipse(-4, -5, 3.2, 2.2, -0.4, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255,255,255,0.28)";
+        ctx.fill();
+      }
+
+      /** Bowling Ball：艶のある濃紺〜黒＋指穴3つ */
+      function drawBowlingBall(ctx) {
+        ctx.beginPath();
+        ctx.arc(0, 0, BALL_R, 0, Math.PI * 2);
+        const g = ctx.createRadialGradient(-4, -5, 1, 2, 3, BALL_R);
+        g.addColorStop(0, "#5b6b86");
+        g.addColorStop(0.4, "#2b3547");
+        g.addColorStop(0.8, "#171d29");
+        g.addColorStop(1, "#0a0d13");
+        ctx.fillStyle = g;
+        ctx.fill();
+
+        // 指穴（三角配置）
+        const holeR = Math.max(1.3, BALL_R * 0.16);
+        const holeOffset = BALL_R * 0.32;
+        const holes = [
+          { x: 0, y: -holeOffset * 1.05 },
+          { x: -holeOffset * 0.85, y: holeOffset * 0.55 },
+          { x: holeOffset * 0.85, y: holeOffset * 0.55 },
+        ];
+        for (const h of holes) {
+          ctx.beginPath();
+          ctx.arc(h.x, h.y, holeR, 0, Math.PI * 2);
+          ctx.fillStyle = "#05070a";
+          ctx.fill();
+          ctx.lineWidth = 0.8;
+          ctx.strokeStyle = "rgba(255,255,255,0.15)";
+          ctx.stroke();
+        }
+
+        // 輪郭
+        ctx.beginPath();
+        ctx.arc(0, 0, BALL_R, 0, Math.PI * 2);
+        ctx.strokeStyle = "#000000";
+        ctx.lineWidth = 1.3;
+        ctx.stroke();
+
+        // 強いハイライト（光沢）
+        ctx.beginPath();
+        ctx.ellipse(-4.2, -5.2, 3, 1.8, -0.4, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255,255,255,0.55)";
+        ctx.fill();
+      }
+
+      /** Beach Ball：縦縞（パネル）模様 */
+      function drawBeachBall(ctx) {
+        const colors = [
+          "#ff5a5a",
+          "#ffd23f",
+          "#4fc3f7",
+          "#fffdf5",
+          "#63d471",
+          "#fffdf5",
+        ];
+        const n = colors.length;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(0, 0, BALL_R, 0, Math.PI * 2);
+        ctx.clip();
+        for (let i = 0; i < n; i++) {
+          const a0 = (i / n) * Math.PI * 2 - Math.PI / 2;
+          const a1 = ((i + 1) / n) * Math.PI * 2 - Math.PI / 2;
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.arc(0, 0, BALL_R + 1, a0, a1);
+          ctx.closePath();
+          ctx.fillStyle = colors[i];
+          ctx.fill();
+        }
+        ctx.restore();
+
+        // パネルの継ぎ目線
+        ctx.strokeStyle = "rgba(40,40,40,0.35)";
+        ctx.lineWidth = 1;
+        for (let i = 0; i < n; i++) {
+          const a = (i / n) * Math.PI * 2 - Math.PI / 2;
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(Math.cos(a) * BALL_R, Math.sin(a) * BALL_R);
+          ctx.stroke();
+        }
+
+        // 極の小さな丸キャップ
+        ctx.beginPath();
+        ctx.arc(0, 0, BALL_R * 0.16, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255,255,255,0.85)";
+        ctx.fill();
+        ctx.lineWidth = 0.8;
+        ctx.strokeStyle = "rgba(40,40,40,0.3)";
+        ctx.stroke();
+
+        // 輪郭
+        ctx.beginPath();
+        ctx.arc(0, 0, BALL_R, 0, Math.PI * 2);
+        ctx.strokeStyle = "rgba(40,40,40,0.55)";
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+
+        // ハイライト
+        ctx.beginPath();
+        ctx.ellipse(-4, -5, 3, 2, -0.4, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255,255,255,0.5)";
+        ctx.fill();
+      }
+
+      /** Steel Ball：太い外枠＋リベット＋質量テキスト */
+      function drawSteelBall(ctx, bt) {
+        ctx.beginPath();
+        ctx.arc(0, 0, BALL_R, 0, Math.PI * 2);
+        const g = ctx.createRadialGradient(-4, -5, 1, 2, 3, BALL_R);
+        g.addColorStop(0, "#f2f4f7");
+        g.addColorStop(0.35, "#c7ccd4");
+        g.addColorStop(0.7, "#8b909a");
+        g.addColorStop(1, "#4d5158");
+        ctx.fillStyle = g;
+        ctx.fill();
+
+        // リベット（縁沿いの点々）
+        const rivetN = 10;
+        const rivetR = Math.max(1, BALL_R * 0.09);
+        for (let i = 0; i < rivetN; i++) {
+          const a = (i / rivetN) * Math.PI * 2;
+          const rx = Math.cos(a) * BALL_R * 0.84;
+          const ry = Math.sin(a) * BALL_R * 0.84;
+          ctx.beginPath();
+          ctx.arc(rx, ry, rivetR, 0, Math.PI * 2);
+          ctx.fillStyle = "#2c2f33";
+          ctx.fill();
+        }
+
+        // 太い外枠（重厚感）
+        ctx.beginPath();
+        ctx.arc(0, 0, BALL_R, 0, Math.PI * 2);
+        ctx.strokeStyle = "#22252a";
+        ctx.lineWidth = 2.2;
+        ctx.stroke();
+
+        // 中心に質量テキスト（回転にも追従）
+        ctx.fillStyle = "#20232a";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.font = `bold ${Math.max(7, BALL_R * 0.5)}px 'Yomogi', 'Caveat', cursive`;
+        ctx.fillText(`${bt.mass}kg`, 0, 1);
+
+        // 鋭いハイライト（金属光沢）
+        ctx.beginPath();
+        ctx.ellipse(-4, -5.5, 2.6, 1.6, -0.4, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255,255,255,0.85)";
+        ctx.fill();
+      }
+
+      function drawTrail(ctx) {
+        const now = performance.now();
+        const pts = state.trail.filter((p) => now - p.t < 4200);
+        if (pts.length < 2) return;
+        const th = getTheme();
+        ctx.save();
+        ctx.lineCap = "round";
+        for (let i = 1; i < pts.length; i++) {
+          if (i % 2 === 0) continue;
+          const fade = 1 - (now - pts[i].t) / 4200;
+          if (fade <= 0) continue;
+          ctx.globalAlpha = fade * 0.8;
+          ctx.strokeStyle = th.ink;
+          ctx.lineWidth = 1.8;
+          ctx.beginPath();
+          ctx.moveTo(pts[i - 1].x, pts[i - 1].y);
+          ctx.lineTo(pts[i].x, pts[i].y);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      /**
+       * 風の視覚：ノートに薄い鉛筆で描いた気流。
+       * 矢印付きの曲線が流れる方向＝風向き（右＝追い風、左＝向かい風）。
+       * 邪魔にならないよう淡く、画面固定（カメラ非追従）。
+       */
+      function drawWind(ctx) {
+        if (!state.stage) return;
+        const wind = state.stage.wind;
+        const strength = Math.abs(wind);
+        if (strength <= 0.015 && !state.windLines.length) return;
+        const th = getTheme();
+
+        ctx.save();
+
+        // —— 流れる気流ストローク ——
+        for (const w of state.windLines) {
+          const dir = Math.sign(w.speed) || 1;
+          const wy = w.y + Math.sin(w.wobble) * w.amp;
+          const x0 = w.x;
+          const x1 = w.x + dir * w.len;
+          const midX = (x0 + x1) * 0.5;
+          const midY = wy + Math.sin(w.phase + w.wobble * 0.7) * (w.amp * 0.55);
+
+          ctx.globalAlpha = Math.min(0.38, w.alpha);
+          ctx.strokeStyle = th.wind;
+          ctx.lineWidth = w.thick;
+          ctx.lineCap = "round";
+          ctx.lineJoin = "round";
+
+          // 本体：ゆるい S 字の気流
+          ctx.beginPath();
+          ctx.moveTo(x0, wy);
+          ctx.bezierCurveTo(
+            x0 + dir * w.len * 0.28,
+            wy - w.amp * 0.8,
+            midX,
+            midY + w.amp * 0.6,
+            x1,
+            wy,
+          );
+          ctx.stroke();
+
+          // 先端の小さな矢印（方向が一目で分かる）
+          const tipAngle = Math.atan2(wy - midY, x1 - midX) * 0.35;
+          const head = 5.5 + strength * 6;
+          const ang = (dir > 0 ? 0 : Math.PI) + tipAngle;
+          ctx.beginPath();
+          ctx.moveTo(x1, wy);
+          ctx.lineTo(
+            x1 - Math.cos(ang - 0.45) * head,
+            wy - Math.sin(ang - 0.45) * head,
+          );
+          ctx.moveTo(x1, wy);
+          ctx.lineTo(
+            x1 - Math.cos(ang + 0.45) * head,
+            wy - Math.sin(ang + 0.45) * head,
+          );
+          ctx.stroke();
+        }
+
+        // —— 画面端の方向メモ（手書き風・控えめ）——
+        if (strength > 0.015) {
+          const toRight = wind > 0;
+          const label = toRight ? "風 →  追い風" : "← 風  向かい風";
+          const axLabel = accelUnitToMs2(wind).toFixed(2);
+          ctx.globalAlpha = 0.42 + Math.min(0.2, strength * 1.2);
+          ctx.font = "16px 'Caveat', 'Yomogi', cursive";
+          ctx.fillStyle = th.windLabel;
+          ctx.textBaseline = "middle";
+          if (toRight) {
+            ctx.textAlign = "right";
+            ctx.fillText(`${label}  (${axLabel} m/s²)`, W - 14, 36);
+          } else {
+            ctx.textAlign = "left";
+            ctx.fillText(`${label}  (${axLabel} m/s²)`, 14, 36);
+          }
+        }
+
+        ctx.restore();
+      }
+
+      /**
+       * 1番奥：ノートの地の色（薄い横罫線つき）。
+       * 方眼・背景画像より手前に出さない。
+       */
+      function drawPaperBase(ctx) {
+        const th = getTheme();
+        ctx.save();
+        ctx.fillStyle = th.paper;
+        ctx.fillRect(0, 0, W, H);
+        // ごく薄いノート罫線（計算用方眼とは別レイヤ）
+        ctx.strokeStyle = th.paperRule;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        for (let y = 27; y < H; y += 27) {
+          ctx.moveTo(0, y + 0.5);
+          ctx.lineTo(W, y + 0.5);
+        }
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      /**
+       * 2番目：風景イラストをパララックスでシームレス横スクロール。
+       * 環境（地球／月／木星）に応じて画像を切替。
+       */
+      function drawLandscapeBg(ctx) {
+        const key =
+          state.stage && isSpaceEnv(state.stage.env) ? state.stage.env : "earth";
+        if (!landscapeReady[key]) return;
+        const landscapeImg = landscapeImgs[key];
+        const iw = landscapeImg.naturalWidth || landscapeImg.width;
+        const ih = landscapeImg.naturalHeight || landscapeImg.height;
+        if (iw <= 0 || ih <= 0) return;
+        const th = getTheme();
+
+        // 画面高さ基準で拡大（丘を大きく見せる。はみ出しは下寄せでクリップ）
+        const scale = (H / ih) * LANDSCAPE_SIZE;
+        const tileW = iw * scale;
+        const tileH = ih * scale;
+        if (tileW <= 0) return;
+        const drawY = H - tileH + LANDSCAPE_OFFSET_Y; // 下端揃え＋下方向オフセット
+
+        // カメラより遅いオフセット → 無限ループ用に正の剰余へ
+        const scroll = state.cameraX * LANDSCAPE_PARALLAX;
+        const mod = ((scroll % tileW) + tileW) % tileW;
+        const startX = -mod;
+
+        ctx.save();
+        ctx.globalAlpha = th.landscapeAlpha;
+        // 画面を覆うまでタイルを並べる（左端が負でも1枚余分に出る）
+        for (let x = startX; x < W; x += tileW) {
+          ctx.drawImage(landscapeImg, x, drawY, tileW, tileH);
+        }
+        ctx.restore();
+      }
+
+      /**
+       * グラフ用紙の方眼。交差点の1つが絶対原点 O（発射点）に一致する。
+       * cameraX に応じて横方向へ無限ループ描画し、外縁目盛りはワールド座標の cm。
+       */
+      function drawGraphPaper(ctx) {
+        const cell = GRID_CELL_PX;
+        const ox = origin.x;
+        const oy = origin.y;
+        const majorEvery = GRID_LABEL_EVERY;
+        const majorPx = cell * majorEvery;
+        const cam = state.cameraX;
+        // 画面に見えるワールドX範囲（少し余白）
+        const worldLeft = cam - cell;
+        const worldRight = cam + W + cell;
+        const th = getTheme();
+
+        ctx.save();
+
+        // —— 細線（1マス＝10cm）——
+        ctx.strokeStyle = th.gridFine;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        const xFine0 = ox + Math.floor((worldLeft - ox) / cell) * cell;
+        for (let wx = xFine0; wx <= worldRight; wx += cell) {
+          const sx = wx - cam;
+          ctx.moveTo(sx + 0.5, 0);
+          ctx.lineTo(sx + 0.5, H);
+        }
+        for (let y = oy; y >= 0; y -= cell) {
+          ctx.moveTo(0, y + 0.5);
+          ctx.lineTo(W, y + 0.5);
+        }
+        for (let y = oy + cell; y <= H; y += cell) {
+          ctx.moveTo(0, y + 0.5);
+          ctx.lineTo(W, y + 0.5);
+        }
+        ctx.stroke();
+
+        // —— 太めの補助（50cmごと）——
+        ctx.strokeStyle = th.gridMajor;
+        ctx.lineWidth = 1.15;
+        ctx.beginPath();
+        const xMaj0 = ox + Math.floor((worldLeft - ox) / majorPx) * majorPx;
+        for (let wx = xMaj0; wx <= worldRight; wx += majorPx) {
+          const sx = wx - cam;
+          ctx.moveTo(sx + 0.5, 0);
+          ctx.lineTo(sx + 0.5, H);
+        }
+        for (let y = oy; y >= 0; y -= majorPx) {
+          ctx.moveTo(0, y + 0.5);
+          ctx.lineTo(W, y + 0.5);
+        }
+        for (let y = oy + majorPx; y <= H; y += majorPx) {
+          ctx.moveTo(0, y + 0.5);
+          ctx.lineTo(W, y + 0.5);
+        }
+        ctx.stroke();
+
+        // —— 座標軸（原点通過：見える範囲だけ）——
+        ctx.strokeStyle = th.axis;
+        ctx.lineWidth = 1.35;
+        ctx.beginPath();
+        // x軸（常に横いっぱい）
+        ctx.moveTo(0, oy + 0.5);
+        ctx.lineTo(W, oy + 0.5);
+        // y軸（原点の縦線）
+        const originScreenX = ox - cam;
+        if (originScreenX >= -2 && originScreenX <= W + 2) {
+          ctx.moveTo(originScreenX + 0.5, 0);
+          ctx.lineTo(originScreenX + 0.5, H);
+        }
+        ctx.stroke();
+
+        // 原点マーク（画面内のときだけ）
+        if (originScreenX >= -4 && originScreenX <= W + 4) {
+          ctx.fillStyle = th.origin;
+          ctx.beginPath();
+          ctx.arc(originScreenX, oy, 2.2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // —— 外縁の目盛り数値（ワールド cm）——
+        ctx.font = "11px 'Caveat', 'Yomogi', cursive";
+        ctx.fillStyle = th.label;
+        const edgePad = 3;
+
+        // 下辺：x（右が正）— 画面端に見えるマスのワールド座標
+        ctx.textAlign = "center";
+        ctx.textBaseline = "bottom";
+        for (let wx = xMaj0; wx <= worldRight; wx += majorPx) {
+          const sx = wx - cam;
+          if (sx < 8 || sx > W - 8) continue;
+          const cm = Math.round((wx - ox) * CM_PER_PX);
+          ctx.fillText(String(cm), sx, H - edgePad);
+        }
+
+        // 左辺：y（上が正）— 縦はカメラ非追従
+        ctx.textAlign = "left";
+        ctx.textBaseline = "middle";
+        const y0 = oy - Math.floor(oy / majorPx) * majorPx;
+        for (let y = y0; y <= H; y += majorPx) {
+          if (y < 10 || y > H - 14) continue;
+          const cm = Math.round((oy - y) * CM_PER_PX);
+          if (cm === 0) {
+            ctx.fillText("0", edgePad + 1, y - 8);
+          } else {
+            ctx.fillText(String(cm), edgePad + 1, y);
+          }
+        }
+
+        // 単位注記（右下外縁）
+        ctx.textAlign = "right";
+        ctx.textBaseline = "bottom";
+        ctx.font = "10px 'Yomogi', 'Caveat', cursive";
+        ctx.fillStyle = th.label;
+        ctx.fillText(`単位: cm　1マス=${GRID_CM_PER_CELL}cm`, W - 8, H - edgePad);
+
+        ctx.restore();
+      }
+
+      function renderFrame() {
+        const ctx = canvas.getContext("2d");
+        const dpr = canvas.width / W;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, W, H);
+        const th = getTheme();
+
+        // 描画順（奥→手前）:
+        // 1) ノート地色 → 2) 風景パララックス → 3) 方眼・目盛り → 4) 物体
+        drawPaperBase(ctx);
+        drawLandscapeBg(ctx);
+        // 方眼はカメラに追従（無限ループ）。HUD HTML は DOM 固定なので影響なし
+        drawGraphPaper(ctx);
+
+        // 風は画面固定の演出（スクロールしても密度を保つ）
+        drawWind(ctx);
+
+        // ワールド描画（射手・ボール・ゴール・軌跡・ヒットボックス）
+        ctx.save();
+        ctx.translate(-state.cameraX, 0);
+        drawTrail(ctx);
+        drawShooter(ctx);
+        drawBall(ctx);
+        drawRing(ctx);
+        if (debugHitboxOn) drawHitboxDebug(ctx);
+        ctx.restore();
+
+        // 画面下端＝奈落の気配（床線は引かない）※画面固定
+        ctx.save();
+        const abyss = ctx.createLinearGradient(0, H - 56, 0, H);
+        abyss.addColorStop(0, th.abyss0);
+        abyss.addColorStop(1, th.abyss1);
+        ctx.fillStyle = abyss;
+        ctx.fillRect(0, H - 56, W, 56);
+        ctx.font = "11px 'Yomogi', 'Caveat', cursive";
+        ctx.fillStyle = th.footnote;
+        ctx.fillText("O(0,0)=発射点　／　下は奈落（答案外）　／　横スクロール可", 36, H - 12);
+        ctx.restore();
+      }
+
+      /**
+       * DEBUG_HITBOX 専用。当たり判定ボディと得点ゾーンを半透明で描く。
+       * 不要になったら関数ごと削除してよい。
+       */
+      function drawHitboxDebug(ctx) {
+        ctx.save();
+        ctx.lineWidth = 1.5;
+        ctx.font = "11px Consolas, 'Courier New', monospace";
+
+        const strokeBody = (body, stroke, fill) => {
+          if (!body) return;
+          // 円ボディは真円で描く（頂点近似だと当たりの見た目がずれる）
+          if (body.circleRadius && body.circleRadius > 0) {
+            ctx.beginPath();
+            ctx.arc(body.position.x, body.position.y, body.circleRadius, 0, Math.PI * 2);
+            if (fill) {
+              ctx.fillStyle = fill;
+              ctx.fill();
+            }
+            ctx.strokeStyle = stroke;
+            ctx.stroke();
+            return;
+          }
+          if (!body.vertices || body.vertices.length < 2) return;
+          ctx.beginPath();
+          ctx.moveTo(body.vertices[0].x, body.vertices[0].y);
+          for (let i = 1; i < body.vertices.length; i++) {
+            ctx.lineTo(body.vertices[i].x, body.vertices[i].y);
+          }
+          ctx.closePath();
+          if (fill) {
+            ctx.fillStyle = fill;
+            ctx.fill();
+          }
+          ctx.strokeStyle = stroke;
+          ctx.stroke();
+        };
+
+        // —— 物理ボディを赤半透明で塗る（イラストとの一致確認用）——
+        // バックボード
+        if (backboard) strokeBody(backboard, "rgba(255,0,0,0.9)", DEBUG_BODY_FILL);
+        // 支柱・アームなどの構造
+        for (const b of structureBodies) {
+          strokeBody(b, "rgba(255,0,0,0.6)", "rgba(255,0,0,0.25)");
+        }
+        // リング前後のフチ（小円）
+        for (const b of rimBodies) {
+          strokeBody(b, "rgba(255,0,0,0.95)", DEBUG_BODY_FILL);
+        }
+        // ネット（センサー線分）
+        for (const b of netBodies) {
+          strokeBody(b, "rgba(40,160,80,0.7)", "rgba(40,160,80,0.15)");
+        }
+        // ゴール判定センサー
+        if (ringSensor) {
+          strokeBody(ringSensor, "rgba(255,0,0,0.8)", DEBUG_BODY_FILL);
+        }
+
+        // 幾何ゾーン（開口・得点ライン・ネット外郭カーブ）
+        if (state.stage) {
+          const gm = getGoalMetrics(state.stage);
+          // ネット外郭ポリライン（イラスト一致確認用・太め）
+          if (gm.net.profile && gm.net.profile.length) {
+            ctx.lineWidth = 2.2;
+            ctx.strokeStyle = "rgba(0,220,120,0.95)";
+            ctx.beginPath();
+            ctx.moveTo(gm.net.profile[0].l, gm.net.profile[0].y);
+            for (let i = 1; i < gm.net.profile.length; i++) {
+              ctx.lineTo(gm.net.profile[i].l, gm.net.profile[i].y);
+            }
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(gm.net.profile[0].r, gm.net.profile[0].y);
+            for (let i = 1; i < gm.net.profile.length; i++) {
+              ctx.lineTo(gm.net.profile[i].r, gm.net.profile[i].y);
+            }
+            ctx.stroke();
+          }
+          // 開口線（上→下進入判定）
+          ctx.strokeStyle = "rgba(255,140,0,0.95)";
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.moveTo(gm.openL, gm.rimY);
+          ctx.lineTo(gm.openR, gm.rimY);
+          ctx.stroke();
+          // フチ位置
+          ctx.fillStyle = "rgba(220,40,40,0.95)";
+          ctx.beginPath();
+          ctx.arc(gm.rimFront.x, gm.rimFront.y, 3, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(gm.rimBack.x, gm.rimBack.y, 3, 0, Math.PI * 2);
+          ctx.fill();
+          // ボール全体がここより下＝抜け切り（正答）
+          const clearY = gm.rimY + BALL_R + 0.5;
+          ctx.setLineDash([4, 4]);
+          ctx.strokeStyle = "rgba(0,180,255,0.9)";
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(gm.openL - 8, clearY);
+          ctx.lineTo(gm.openR + 8, clearY);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        }
+
+        // ボール当たり円＋中心
+        if (ball) {
+          ctx.strokeStyle = "rgba(255,90,0,0.95)";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(ball.position.x, ball.position.y, BALL_R, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.fillStyle = "rgba(255,90,0,0.95)";
+          ctx.beginPath();
+          ctx.arc(ball.position.x, ball.position.y, 2.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // 発射原点
+        ctx.strokeStyle = "rgba(0,0,0,0.7)";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(origin.x - 8, origin.y);
+        ctx.lineTo(origin.x + 8, origin.y);
+        ctx.moveTo(origin.x, origin.y - 8);
+        ctx.lineTo(origin.x, origin.y + 8);
+        ctx.stroke();
+
+        // 凡例＋状態（カメラ変換内なので screen 固定のため cameraX を足す）
+        const legend = [
+          "HITBOX DEBUG (HでON/OFF)",
+          "赤塗り = 物理ボディ（ボード/フチ円/センサー）",
+          "緑太線 = ネット外郭（曲線）",
+          "橙線 = 開口 / 水色破線 = 抜け切り",
+          `pending=${state.rimPassPending ? 1 : 0} above=${state.wasAboveRim ? 1 : 0} scored=${state.scoredThisShot ? 1 : 0}`,
+          `camX=${Math.round(state.cameraX)}`,
+        ];
+        const legX = 8 + state.cameraX;
+        ctx.fillStyle = "rgba(255,255,240,0.82)";
+        ctx.fillRect(legX, H - 14 - legend.length * 13, 240, legend.length * 13 + 6);
+        ctx.fillStyle = "rgba(20,20,20,0.85)";
+        ctx.textAlign = "left";
+        ctx.textBaseline = "bottom";
+        for (let i = 0; i < legend.length; i++) {
+          ctx.fillText(legend[i], legX + 4, H - 10 - (legend.length - 1 - i) * 13);
+        }
+
+        ctx.restore();
+      }
+
+      function tick() {
+        // —— 物理更新：固定サブステップ（トンネリング防止）——
+        // 1フレームを PHYS_SUBSTEPS 分割して進め、各ステップでネット応答と速度上限を適用
+        if (engine) {
+          for (let s = 0; s < PHYS_SUBSTEPS; s++) {
+            Engine.update(engine, 1000 / 60 / PHYS_SUBSTEPS);
+            if (state.ballInFlight && ball && !ball.isStatic) {
+              updateNylonNet();
+              clampBallSpeed(ball);
+            }
+          }
+        }
+
+        for (const w of state.windLines) {
+          w.x += w.speed;
+          w.wobble += w.wobbleSp || 0.05;
+          w.phase = (w.phase || 0) + 0.04;
+          const margin = 50 + (w.len || 0);
+          if (w.speed > 0 && w.x > W + margin) w.x = -margin;
+          if (w.speed < 0 && w.x < -margin) w.x = W + margin;
+        }
+
+        if (state.armAnimating) {
+          state.armSwingT += 0.038;
+          if (state.armSwingT >= 1) {
+            state.armSwingT = 0;
+            state.armAnimating = false;
+          }
+        }
+
+        // シュートするまでボールは手に握ったまま
+        if (!state.ballInFlight) holdBallInHand();
+
+        if (state.flashTimer > 0) {
+          state.flashTimer -= 16;
+          if (state.flashTimer <= 0) flashMsg.classList.remove("show");
+        }
+
+        if (state.ballInFlight && ball) {
+          const last = state.trail[state.trail.length - 1];
+          const dx = last ? ball.position.x - last.x : 99;
+          const dy = last ? ball.position.y - last.y : 99;
+          // 点線の弧が綺麗に出るよう、間隔を空けてサンプル
+          if (!last || dx * dx + dy * dy >= 49) {
+            state.trail.push({
+              x: ball.position.x,
+              y: ball.position.y,
+              t: performance.now(),
+            });
+          }
+          if (state.trail.length > 160) state.trail.shift();
+
+          // リング開口を上から下へ通過したら得点
+          if (!state.scoredThisShot && state.stage) {
+            checkScorePassage();
+          }
+
+          // ※ ネット応答（updateNylonNet）は物理サブステップ内で適用済み
+
+          // 万一起動不能になったときの救済（物理はそのまま、長時間止まったらミス）
+          const speed = Vector.magnitude(ball.velocity);
+          if (speed < 0.25 && state.stage) {
+            const gm = getGoalMetrics(state.stage);
+            const nearRimOrNet =
+              ball.position.y > gm.rimY - BALL_R * 1.6 &&
+              ball.position.y < gm.net.botY + 50 &&
+              ball.position.x > gm.rimFront.x - BALL_R * 2 &&
+              ball.position.x < gm.rimBack.x + BALL_R * 2;
+            if (nearRimOrNet) {
+              state.stuckTimer += 16;
+              // 速度を書き換えず、自然に落ちないままならミス扱い
+              if (state.stuckTimer > 2000 && !state.scoredThisShot) onMiss();
+            } else {
+              state.stuckTimer = 0;
+            }
+          } else {
+            state.stuckTimer = 0;
+          }
+
+          // 奈落判定：画面下、またはカメラ視界の外へ出たらミス
+          const intoAbyss =
+            ball.position.y > H + 70 ||
+            ball.position.x < -120 ||
+            ball.position.x < state.cameraX - 140 ||
+            ball.position.x > state.cameraX + W + 180;
+
+          if (intoAbyss) {
+            state.missTimer += 16;
+            if (state.missTimer > 280 && !state.scoredThisShot) {
+              onMiss();
+            }
+          } else {
+            state.missTimer = 0;
+          }
+        }
+
+        updateCamera();
+        updateCameraHud();
+
+        const now = performance.now();
+        state.trail = state.trail.filter((p) => now - p.t < 4200);
+
+        renderFrame();
+        requestAnimationFrame(tick);
+      }
+
+      function startGame() {
+        state.level = 1;
+        state.lives = 3;
+        state.clears = 0;
+        state.playing = true;
+        state.ballInFlight = false;
+        resetCamera(false);
+        startOverlay.classList.remove("show");
+        gameOverOverlay.classList.remove("show");
+        hintSticky.classList.remove("show");
+        rebuildWorld(true);
+        flash("問.1 開始", 900);
+      }
+
+      function initEngine() {
+        // 反復回数を上げて接触解決を厳密化（すり抜け・めり込み対策）
+        engine = Engine.create({
+          positionIterations: 20,
+          velocityIterations: 16,
+          constraintIterations: 6,
+        });
+        world = engine.world;
+        // Runner は使わず、tick() 内で固定サブステップ更新（トンネリング防止）
+        // リム縁は Matter の通常衝突のみ（restitution / friction で金属リング感を出す）
+        // ネットはセンサー＋ updateNylonNet、得点は tick の通過判定
+
+        resize();
+        startOverlay.classList.add("show");
+        requestAnimationFrame(tick);
+      }
+
+      // 余白メモ入力 → 腕の角度を追従（入力表示は自動で書き換えない）
+      for (const el of [angleEl, powerEl, dyEl]) {
+        el.addEventListener("input", () => syncFromMemo());
+        el.addEventListener("change", () => syncFromMemo());
+        el.addEventListener("blur", () => syncFromMemo());
+        // Enter でフォーカス解除（すぐロボを叩ける）
+        el.addEventListener("keydown", (ev) => {
+          if (ev.key === "Enter") {
+            ev.preventDefault();
+            syncFromMemo();
+            el.blur();
+          }
+        });
+      }
+
+      btnHint.addEventListener("click", (e) => {
+        e.stopPropagation();
+        showHint();
+      });
+      hintClose.addEventListener("click", () => hintSticky.classList.remove("show"));
+      btnResetBall.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (!state.playing) return;
+        state.ballInFlight = false;
+        makeBall();
+      });
+      btnCamHome.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (!canManualPan()) return;
+        resetCamera(true);
+      });
+      btnCamHome.addEventListener("mousedown", (e) => e.stopPropagation());
+      btnCamHome.addEventListener("touchstart", (e) => e.stopPropagation());
+      goalIndicator.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        panCameraToGoal();
+      });
+      goalIndicator.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          panCameraToGoal();
+        }
+      });
+      goalIndicator.addEventListener("pointerdown", (e) => {
+        e.stopPropagation();
+      });
+      goalIndicator.addEventListener("mousedown", (e) => e.stopPropagation());
+      goalIndicator.addEventListener("touchstart", (e) => e.stopPropagation());
+      btnStart.addEventListener("click", startGame);
+      btnRetry.addEventListener("click", startGame);
+
+      // キャンバス：マウスはホイール横スクロール、タッチはスワイプ。射手タップでシュート
+      canvas.addEventListener("mousedown", onPointerDownCanvas);
+      canvas.addEventListener("mousemove", onPointerMoveCanvas);
+      window.addEventListener("mouseup", onPointerUpCanvas);
+      canvas.addEventListener("wheel", onWheelCanvas, { passive: false });
+      canvas.addEventListener("touchstart", onPointerDownCanvas, { passive: false });
+      canvas.addEventListener("touchmove", onPointerMoveCanvas, { passive: false });
+      canvas.addEventListener("touchend", onPointerUpCanvas, { passive: false });
+      canvas.addEventListener("touchcancel", onPointerCancelCanvas);
+
+      // メモ上のクリックがキャンバスへ抜けないようにする
+      marginMemo.addEventListener("mousedown", (e) => e.stopPropagation());
+      marginMemo.addEventListener("touchstart", (e) => e.stopPropagation());
+
+      window.addEventListener("resize", () => {
+        resize();
+        syncFromMemo();
+      });
+
+      // DEBUG_HITBOX：H キーで表示切替（不要ならこのリスナーも削除）
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "h" || e.key === "H") {
+          if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return;
+          debugHitboxOn = !debugHitboxOn;
+        }
+      });
+
+      initEngine();
+      syncFromMemo();
+    })();
+  </script>
+</body>
+
+</html>
