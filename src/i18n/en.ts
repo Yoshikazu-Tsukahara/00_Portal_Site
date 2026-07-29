@@ -57,13 +57,12 @@ export const en: Dictionary = {
   tools: {
     "mail-template": {
       title: "Mail Template Organizer",
-      description:
-        "A local tool that speeds up email replies with tags and variable substitution.",
+      description: "Speed up email replies with tags and variable substitution.",
     },
     "folder-generator": {
       title: "Folder Generator",
       description:
-        "Build naming rules with dates, numbers, and lists—then export nested folders as a ZIP.",
+        "Build naming rules, then batch-create folders and export as ZIP.",
     },
     "pdf-editor": {
       title: "Simple PDF Editor",
@@ -71,63 +70,51 @@ export const en: Dictionary = {
     },
     "image-compressor": {
       title: "Batch Image Compressor",
-      description:
-        "Resize and compress images in the browser with max width and quality settings.",
+      description: "Resize and compress images in-browser with width and quality.",
     },
     "text-cleaner": {
       title: "Text Cleaner & Bulk Replace",
-      description:
-        "Clean unwanted line breaks, spaces, and control characters. Custom replace rules can be saved.",
+      description: "Clean breaks, spaces, and control chars. Save custom rules.",
     },
     "media-metadata-editor": {
       title: "Media Metadata Editor",
-      description:
-        "Edit audio/video tags and cover/thumbnail art locally in your browser.",
+      description: "Edit audio/video tags and cover art locally in the browser.",
     },
     "character-relation-editor": {
       title: "Character Relation Editor",
-      description:
-        "Place character cards and draw labeled links to map story relationships.",
+      description: "Map story ties with character cards and labeled links.",
     },
     "palette-collector": {
       title: "Palette Collector",
-      description:
-        "Pick colors from any image with an eyedropper. Auto-extract dominant colors and check WCAG contrast, all in one palette tool.",
+      description: "Eyedrop colors from images. Auto-extract and contrast checks.",
     },
     "lunch-savings": {
       title: "Lunch Savings",
-      description:
-        "Tap to log lunch spend vs budget and watch your savings grow—built for phones.",
+      description: "Tap lunch vs budget and watch savings grow—built for phones.",
     },
     "link-stocker": {
       title: "Link Stocker",
-      description:
-        "Keep “not quite bookmark” URLs as visual cards with auto-fetched OGP thumbnails.",
+      description: "Keep “maybe later” URLs as visual cards with OGP thumbs.",
     },
     "ultimate-probability-slot": {
       title: "Ultimate Probability Slot",
-      description:
-        "A cold computation engine for chasing—or dodging—your own astronomically low-odds jackpot.",
+      description: "Chase or dodge your own ultra-low-odds jackpot slot.",
     },
     "pixel-drop-puzzle": {
       title: "Tiny Pixel Gap Drop Puzzle",
-      description:
-        "Just drop a photo into the gap. Judged to a fraction of a pixel — an unforgiving precision puzzle.",
+      description: "Drop a photo into the gap—judged to a fraction of a pixel.",
     },
     "robot-freethrow": {
       title: "Notebook Projectile Freethrow",
-      description:
-        "Doodles come alive with physics. Aim the ring with angle, launch speed, and spin in a pencil-notebook mini game.",
+      description: "Aim with angle, speed, and spin in a notebook freethrow game.",
     },
     "crypto-message": {
       title: "Secret Message",
-      description:
-        "Encrypt and decrypt secret notes with a shared passphrase, or crack a Caesar cipher in the decoding challenge—full hacker-movie flair included.",
+      description: "Passphrase encrypt/decrypt, plus a Caesar decoding challenge.",
     },
     "monster-driver": {
       title: "Monster Driver",
-      description:
-        "Stop on red, launch on green. A first-person takeoff action game of blinkers, memory, and reaction time.",
+      description: "Stop on red, launch on green. Blinkers, memory, reaction.",
     },
   },
   card: {

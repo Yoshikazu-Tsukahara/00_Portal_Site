@@ -13,9 +13,9 @@ const ACCENT_BY_GENRE: Record<string, CardAccent> = {
   minigames: "gold",
 };
 
-/** カード共通：ベース構造（色味はアクセント側で付与） */
+/** カード共通：高さ固定（日英で文言量が違ってもカード高さが変わらない） */
 const CARD_BASE =
-  "portal-tool-card group relative flex h-full min-h-[10.5rem] flex-col rounded-xl bg-white/95 p-5 shadow-md backdrop-blur-[2px] transition-all duration-300 ease-out sm:min-h-[11rem] sm:p-6";
+  "portal-tool-card group relative flex h-[11.75rem] flex-col rounded-xl bg-white/95 p-5 shadow-md backdrop-blur-[2px] transition-all duration-300 ease-out sm:h-[12rem] sm:p-5";
 
 const ACCENT_CLASS: Record<CardAccent, string> = {
   blue: "portal-tool-card--blue",
@@ -43,17 +43,17 @@ function ComingSoonCard({
         Coming Soon
       </span>
 
-      <div className="flex flex-1 flex-col items-center justify-center px-2 py-6 text-center">
+      <div className="flex flex-1 flex-col items-center justify-center px-2 text-center">
         <span
           aria-hidden
-          className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl border border-zinc-200/60 bg-white/80 text-xl text-zinc-300 sm:h-12 sm:w-12 sm:text-2xl"
+          className="mb-2.5 flex h-11 w-11 items-center justify-center rounded-xl border border-zinc-200/60 bg-white/80 text-xl text-zinc-300 sm:h-12 sm:w-12 sm:text-2xl"
         >
           ···
         </span>
         <p className="text-sm font-medium tracking-tight text-zinc-400">
           {label}
         </p>
-        <p className="mt-1.5 text-[12px] leading-relaxed text-zinc-400/90">
+        <p className="mt-1 line-clamp-2 text-[12px] leading-snug text-zinc-400/90">
           {hint}
         </p>
       </div>
@@ -88,10 +88,10 @@ export default function ToolCard({
 
   const content = (
     <>
-      <div className="mb-3 flex min-w-0 items-center gap-3 sm:mb-3.5 sm:gap-3.5">
+      <div className="mb-2.5 flex min-w-0 items-center gap-3">
         <span
           aria-hidden
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-zinc-100 bg-gradient-to-b from-zinc-50 to-zinc-100/80 text-[1.35rem] leading-none shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_1px_2px_rgba(24,24,27,0.04)] transition-all duration-300 group-hover:border-zinc-200 group-hover:from-white group-hover:to-zinc-50 group-hover:shadow-[inset_0_1px_0_rgba(255,255,255,1),0_2px_6px_rgba(24,24,27,0.06)] sm:h-12 sm:w-12 sm:text-2xl"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-zinc-100 bg-gradient-to-b from-zinc-50 to-zinc-100/80 text-[1.25rem] leading-none shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_1px_2px_rgba(24,24,27,0.04)] transition-all duration-300 group-hover:border-zinc-200 group-hover:from-white group-hover:to-zinc-50 group-hover:shadow-[inset_0_1px_0_rgba(255,255,255,1),0_2px_6px_rgba(24,24,27,0.06)] sm:h-11 sm:w-11 sm:text-[1.35rem]"
         >
           {icon}
         </span>
@@ -103,7 +103,10 @@ export default function ToolCard({
         </h3>
       </div>
 
-      <p className="mb-4 flex-1 text-[13px] leading-[1.65] text-zinc-500 transition-colors duration-300 group-hover:text-zinc-600 sm:text-sm sm:leading-relaxed">
+      <p
+        title={description}
+        className="mb-3 line-clamp-2 flex-1 text-[13px] leading-snug text-zinc-500 transition-colors duration-300 group-hover:text-zinc-600 sm:text-sm sm:leading-snug"
+      >
         {description}
       </p>
 

@@ -57,13 +57,11 @@ export const ja: Dictionary = {
   tools: {
     "mail-template": {
       title: "メールテンプレ整理アプリ",
-      description:
-        "タグ分類と変数置換で、日々のメール返信を爆速にするローカルツール。",
+      description: "タグ分類と変数置換で、日々のメール返信を爆速に。",
     },
     "folder-generator": {
       title: "フォルダ自動生成アプリ",
-      description:
-        "命名規則を組み立て、日付・番号・リストで複数フォルダを一括生成。",
+      description: "命名規則を組み立て、日付・番号・リストで一括生成。",
     },
     "pdf-editor": {
       title: "簡易PDF編集アプリ",
@@ -71,63 +69,51 @@ export const ja: Dictionary = {
     },
     "image-compressor": {
       title: "画像一括軽量化",
-      description:
-        "最大幅と画質を指定して、画像をブラウザ内で一括リサイズ・圧縮。",
+      description: "最大幅と画質を指定して、ブラウザ内で一括リサイズ・圧縮。",
     },
     "text-cleaner": {
       title: "テキスト・クレンジング＆一括置換",
-      description:
-        "不要な改行・空白・制御文字を一発掃除。独自の置換ルールも保存可能。",
+      description: "改行・空白・制御文字を一発掃除。独自の置換ルールも保存可能。",
     },
     "media-metadata-editor": {
       title: "メディア・メタデータ エディター",
-      description:
-        "音楽・動画のタグとカバー／サムネを、ブラウザ内だけで編集・プレビュー。",
+      description: "音楽・動画のタグとカバーを、ブラウザ内だけで編集・プレビュー。",
     },
     "character-relation-editor": {
       title: "小説相関図エディター",
-      description:
-        "登場人物カードを配置し、関係性の線とラベルで物語の相関図を視覚的に整理。",
+      description: "人物カードと関係線で、物語の相関図を視覚的に整理。",
     },
     "palette-collector": {
       title: "Palette Collector",
-      description:
-        "画像にスポイトを当てて配色を抽出。主要色の自動抽出やコントラスト判定も備えたカラーパレット作成ツール。",
+      description: "画像から配色を抽出。自動抽出やコントラスト判定付き。",
     },
     "lunch-savings": {
       title: "ランチ貯金",
-      description:
-        "予算との差額をタップで記録。浮いたお金をゲーム感覚で貯めるスマホ向けアプリ。",
+      description: "予算との差額をタップで記録。浮いたお金をゲーム感覚で貯金。",
     },
     "link-stocker": {
       title: "とりあえずキープ",
-      description:
-        "ブックマークするほどではない URL を、OGP サムネ付きカードで視覚的にキープ。",
+      description: "ブックマークほどではない URL を、OGP 付きカードでキープ。",
     },
     "ultimate-probability-slot": {
       title: "究極確率スロット",
-      description:
-        "自作の天文学的低確率スロットで「当たるまで」／「外し続ける」に挑む、無機質な演算エンジン。",
+      description: "自作の低確率スロットで「当たるまで」「外し続ける」に挑む。",
     },
     "pixel-drop-puzzle": {
       title: "極小ピクセル隙間落としパズル",
-      description:
-        "写真を隙間に落とすだけ。ただし判定は小数点以下のピクセル単位という、鬼畜な精度パズル。",
+      description: "写真を隙間に落とすだけ。小数点以下ピクセル判定の精度パズル。",
     },
     "robot-freethrow": {
       title: "手書きノート風 投射フリースロー",
-      description:
-        "授業中の落書きが物理演算で動き出す。角度・初速・スピンでリングを狙うノート風ミニゲーム。",
+      description: "角度・初速・スピンでリングを狙う、ノート風ミニゲーム。",
     },
     "crypto-message": {
       title: "ひみつメッセージ",
-      description:
-        "合言葉で暗号化・復号する秘密のやり取りと、シーザー暗号を解き明かす解読チャレンジ。演出全開のハッカー風パズル。",
+      description: "合言葉で暗号化・復号。シーザー解読チャレンジ付き。",
     },
     "monster-driver": {
       title: "モンスタードライバー",
-      description:
-        "赤で止まれ、青で飛び出せ。ウィンカー記憶と反応速度が試される一人称発進アクション。",
+      description: "赤で止まれ、青で飛び出せ。ウィンカー記憶の一人称アクション。",
     },
   },
   card: {
