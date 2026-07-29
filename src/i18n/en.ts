@@ -19,6 +19,16 @@ export const en: Dictionary = {
     supportAria: "Support the developer (opens Stripe Checkout)",
     supportTitle: "Open support page",
     langToggleAria: "Switch display language",
+    layoutToggle: {
+      aria: "Switch content width",
+      caption: "Width",
+      defaultShort: "Std",
+      wideShort: "Wide",
+      fullShort: "Full",
+      default: "Default width",
+      wide: "Wide layout",
+      full: "Full width",
+    },
   },
   home: {
     heroTitleLine1: "A toolbox that makes",
@@ -72,7 +82,7 @@ export const en: Dictionary = {
     "media-metadata-editor": {
       title: "Media Metadata Editor",
       description:
-        "Inspect media properties and embed album artwork into MP3s—right in your browser.",
+        "Edit audio/video tags and cover/thumbnail art locally in your browser.",
     },
     "character-relation-editor": {
       title: "Character Relation Editor",

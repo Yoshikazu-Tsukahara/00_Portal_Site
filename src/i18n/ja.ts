@@ -19,6 +19,16 @@ export const ja: Dictionary = {
     supportAria: "開発者を応援する（Stripe決済ページを開く）",
     supportTitle: "支援ページを開く",
     langToggleAria: "表示言語を切り替える",
+    layoutToggle: {
+      aria: "表示幅を切り替える",
+      caption: "Width",
+      defaultShort: "標準",
+      wideShort: "広め",
+      fullShort: "全幅",
+      default: "標準幅で表示",
+      wide: "広めの幅で表示",
+      full: "画面いっぱいに表示",
+    },
   },
   home: {
     heroTitleLine1: "日々の作業を、",
@@ -72,7 +82,7 @@ export const ja: Dictionary = {
     "media-metadata-editor": {
       title: "メディア・メタデータ エディター",
       description:
-        "音声・画像のプロパティ確認と、MP3へのジャケット写真の埋め込みをブラウザ内で完結。",
+        "音楽・動画のタグとカバー／サムネを、ブラウザ内だけで編集・プレビュー。",
     },
     "character-relation-editor": {
       title: "小説相関図エディター",

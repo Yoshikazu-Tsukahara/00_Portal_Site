@@ -70,7 +70,10 @@ type AppShellProps = {
    * **Footer は隠さない**。画面下までスクロールすれば共通 Footer に到達できる。
    */
   fillViewport?: boolean;
-  /** 相関図など広めのキャンバス向け */
+  /**
+   * @deprecated 表示幅は Header の LayoutToggle（layoutMode）が一元管理する。
+   * 互換のため受け取っても幅には影響しない。
+   */
   wide?: boolean;
   /**
    * Type C（独立 PWA）として振る舞う。
@@ -106,10 +109,10 @@ export default function AppShell({
   dataManager,
   afterDataManager,
   fillViewport = false,
-  wide = false,
   isPwa = false,
   children,
 }: AppShellProps) {
+  // wide は deprecated（幅は LayoutToggle が管理）。受け取っても無視する。
   const { t } = useI18n();
   const { isStandalone } = useStandaloneDisplay();
 
@@ -124,11 +127,10 @@ export default function AppShell({
     )
   ) : null;
 
+  // 幅・横 padding は SiteChrome の共通コンテナが担当（ここでは付けない）
   return (
     <main
-      className={`mx-auto flex w-full flex-1 flex-col px-4 sm:px-6 ${
-        wide ? "max-w-[min(100%,90rem)]" : "max-w-6xl"
-      } ${
+      className={`flex w-full flex-1 flex-col ${
         fillViewport
           ? // 4.5rem = サイト共通 Header の高さ。作業領域を1画面分だけ確保し、
             // Footer は隠さずその下に続かせる

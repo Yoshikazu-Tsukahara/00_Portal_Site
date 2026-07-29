@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import SiteChrome from "@/components/SiteChrome";
 import { I18nProvider } from "@/i18n";
+import { LayoutProvider } from "@/lib/layout";
 import "./globals.css";
 
 const inter = Inter({
@@ -25,7 +26,9 @@ export default function RootLayout({
     <html lang="ja" className={`${inter.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col bg-zinc-50 font-sans text-zinc-900">
         <I18nProvider>
-          <SiteChrome>{children}</SiteChrome>
+          <LayoutProvider>
+            <SiteChrome>{children}</SiteChrome>
+          </LayoutProvider>
         </I18nProvider>
       </body>
     </html>

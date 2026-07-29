@@ -46,6 +46,20 @@ export type Dictionary = {
     supportAria: string;
     supportTitle: string;
     langToggleAria: string;
+    /** PC 向け表示幅切替（lg 以上で表示） */
+    layoutToggle: {
+      aria: string;
+      /** トグル上の小さな見出し */
+      caption: string;
+      /** ボタン上の短いラベル */
+      defaultShort: string;
+      wideShort: string;
+      fullShort: string;
+      /** title / aria-label 用の説明 */
+      default: string;
+      wide: string;
+      full: string;
+    };
   };
   home: {
     heroTitleLine1: string;

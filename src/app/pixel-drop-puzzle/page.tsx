@@ -314,7 +314,7 @@ export default function PixelDropPuzzlePage() {
         className="pxd-theme-root flex min-h-0 flex-1 flex-col"
         style={stageThemeStyle(data.stage)}
       >
-        <div className="pxd-console -mx-4 flex w-[calc(100%+2rem)] max-w-none flex-1 flex-col rounded-none bg-zinc-950 px-0 pb-6 pt-3 sm:-mx-6 sm:w-[calc(100%+3rem)]">
+        <div className="pxd-console flex w-full flex-1 flex-col rounded-none bg-zinc-950 px-0 pb-6 pt-3">
           {!hydrated || imageLoading ? (
             <p className="text-center text-sm text-zinc-500">{t.common.loading}</p>
           ) : !image ? (

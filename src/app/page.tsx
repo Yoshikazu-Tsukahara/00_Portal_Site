@@ -20,8 +20,8 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-transparent to-zinc-100/50" />
       </div>
 
-      {/* ヒーロー：ブランド＋短い説明のみ */}
-      <section className="portal-fade-up mx-auto max-w-6xl px-6 pt-16 pb-4 sm:px-8 sm:pt-20">
+      {/* ヒーロー：ブランド＋短い説明のみ（幅は共通コンテナに委ねる） */}
+      <section className="portal-fade-up pt-16 pb-4 sm:pt-20">
         <h1 className="max-w-2xl text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl">
           {t.home.heroTitleLine1}
           <br />
@@ -35,7 +35,7 @@ export default function Home() {
       </section>
 
       {/* ジャンルごとのツール一覧 */}
-      <div className="mx-auto max-w-6xl divide-y divide-zinc-200/60 px-6 sm:px-8">
+      <div className="divide-y divide-zinc-200/60">
         {genres.map((genre, index) => (
           <GenreSection
             key={genre.id}

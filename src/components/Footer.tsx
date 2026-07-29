@@ -2,12 +2,12 @@
 
 /**
  * サイト全体共通の運営者情報フッター。
- * 連絡先・外部リンクは下の定数だけ書き換えれば反映される。
- * 表示文言は i18n 辞書を参照する。
+ * 上線は画面いっぱい。中身の列だけ layoutMode の幅に揃える。
  */
 
 import Link from "next/link";
 import { useI18n } from "@/i18n";
+import { useLayout } from "@/lib/layout";
 
 /** note プロフィールなど（未設定時は "#" のまま） */
 const NOTE_URL = "#";
@@ -17,10 +17,11 @@ const CONTACT_EMAIL = "contact@example.com";
 
 export default function Footer() {
   const { t } = useI18n();
+  const { contentClassName } = useLayout();
 
   return (
     <footer className="mt-auto w-full border-t border-zinc-200">
-      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-10 sm:px-8 sm:py-12">
+      <div className={`flex flex-col gap-6 py-10 sm:py-12 ${contentClassName}`}>
         {/* コンセプト */}
         <div className="flex flex-col gap-1.5">
           <p className="text-sm font-medium tracking-tight text-zinc-800">

@@ -17,7 +17,7 @@ export default function LegalDocument({ doc }: LegalDocumentProps) {
   const { t } = useI18n();
 
   return (
-    <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-12 sm:px-8 sm:py-16">
+    <main className="w-full flex-1 py-12 sm:py-16">
       <Link
         href="/"
         className="inline-flex text-sm text-zinc-500 transition-colors hover:text-zinc-900"
