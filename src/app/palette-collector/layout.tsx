@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import RegisterSW from "./RegisterSW";
+import PwaRuntime from "@/components/PwaRuntime";
 import { PALETTE_COLLECTOR_MANIFEST_PATH } from "./manifest";
 
 export const metadata: Metadata = {
@@ -33,7 +33,7 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-/** Palette Collector: 独立 PWA 向けメタ・SW 登録 */
+/** Palette Collector: 独立 PWA 向けメタ・SW・standalone 時の操作ロック */
 export default function PaletteCollectorLayout({
   children,
 }: {
@@ -41,7 +41,7 @@ export default function PaletteCollectorLayout({
 }) {
   return (
     <>
-      <RegisterSW />
+      <PwaRuntime basePath="/palette-collector" classPrefix="palette" />
       {children}
     </>
   );

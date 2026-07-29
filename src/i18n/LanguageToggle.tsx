@@ -19,7 +19,7 @@ export default function LanguageToggle() {
     <div
       role="group"
       aria-label={t.header.langToggleAria}
-      className="lang-toggle items-center rounded-full border border-zinc-200/90 bg-white/80 shadow-[0_1px_2px_rgba(0,0,0,0.04)] backdrop-blur-sm"
+      className="lang-toggle rounded-full border border-zinc-200/90 bg-white/80 shadow-[0_1px_2px_rgba(0,0,0,0.04)] backdrop-blur-sm"
     >
       <span
         aria-hidden

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import AppShell from "@/components/AppShell";
-import { fmt, LanguageToggle, useI18n } from "@/i18n";
+import { fmt, useI18n } from "@/i18n";
 import { useLocalStorageState } from "@/lib/localData";
 import AutoExtractPanel from "./AutoExtractPanel";
 import {
@@ -31,13 +31,10 @@ import {
   type ColorPickSource,
   type SavedProject,
 } from "./types";
-import { usePwaInstall } from "./usePwaInstall";
 
 export default function PaletteCollectorPage() {
   const { t, locale } = useI18n();
   const copy = t.apps.paletteCollector;
-  const { isStandalone } = usePwaInstall();
-
   const [data, setData, { hydrated }] =
     useLocalStorageState<PaletteCollectorData>(STORAGE_KEY, emptyData());
   const [projects, setProjects, { hydrated: projectsHydrated }] =
@@ -236,9 +233,26 @@ export default function PaletteCollectorPage() {
       <AppShell
         title={copy.shell.title}
         description={copy.shell.description}
-        hidePortalLink={isStandalone}
+        isPwa
         afterDataManager={<InstallAppButton copy={copy.install} />}
-        actions={isStandalone ? <LanguageToggle /> : undefined}
+        dataManager={{
+          appId: "palette-collector",
+          fileNamePrefix: "palette-collector",
+          getData: () => ({ palette: data, projects }),
+          onImport: (raw) => {
+            const source = raw as {
+              palette?: unknown;
+              projects?: unknown;
+            } | null;
+            if (!source || typeof source !== "object") return false;
+            setData(normalizePaletteData(source.palette));
+            setProjects(normalizeProjects(source.projects));
+            setImage(null);
+            setSelectedPaletteId(null);
+            setContrastBgId(null);
+            return true;
+          },
+        }}
       >
         <p className="mb-4 rounded-md border border-zinc-200/80 bg-zinc-100/70 px-3.5 py-2.5 text-xs leading-relaxed text-zinc-600">
           {copy.privacyBanner}

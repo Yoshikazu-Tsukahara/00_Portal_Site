@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import AppShell from "@/components/AppShell";
-import { LanguageToggle, useI18n } from "@/i18n";
+import { useI18n } from "@/i18n";
 import { useLocalStorageState } from "@/lib/localData";
 import {
   evaluateAntiBingoBadges,
@@ -49,7 +49,6 @@ import {
   type SlotSettings,
   type SlotStats,
 } from "./types";
-import { usePwaInstall } from "./usePwaInstall";
 import { useAntiCheat } from "./useAntiCheat";
 import { useSlotEngine } from "./useSlotEngine";
 
@@ -65,7 +64,6 @@ function waitNextPaint(): Promise<void> {
 export default function UltimateProbabilitySlotPage() {
   const { t } = useI18n();
   const copy = t.apps.ultimateProbabilitySlot;
-  const { isStandalone } = usePwaInstall();
   const {
     locked: cheatLocked,
     remainingSec: cheatRemainingSec,
@@ -387,8 +385,7 @@ export default function UltimateProbabilitySlotPage() {
       <AppShell
         title={copy.shell.title}
         description={copy.shell.description}
-        hidePortalLink={isStandalone}
-        actions={isStandalone ? <LanguageToggle /> : undefined}
+        isPwa
       >
         <p className="text-sm text-zinc-400">{t.common.loading}</p>
       </AppShell>
@@ -398,10 +395,10 @@ export default function UltimateProbabilitySlotPage() {
   return (
     <AppShell
       title={copy.shell.title}
+      description={copy.shell.description}
       wide
       fillViewport
-      hidePortalLink={isStandalone}
-      actions={isStandalone ? <LanguageToggle /> : undefined}
+      isPwa
       afterDataManager={<InstallAppButton copy={copy.install} />}
       dataManager={{
         appId: "ultimate-probability-slot",

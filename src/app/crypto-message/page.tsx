@@ -2,11 +2,10 @@
 
 import { useState } from "react";
 import AppShell from "@/components/AppShell";
-import { LanguageToggle, useI18n } from "@/i18n";
+import { useI18n } from "@/i18n";
 import CreatePanel from "./CreatePanel";
 import DecodePanel from "./DecodePanel";
 import InstallAppButton from "./InstallAppButton";
-import { usePwaInstall } from "./usePwaInstall";
 import type { TopMode } from "./types";
 
 /**
@@ -16,7 +15,6 @@ import type { TopMode } from "./types";
 export default function CryptoMessagePage() {
   const { t } = useI18n();
   const copy = t.apps.cryptoMessage;
-  const { isStandalone } = usePwaInstall();
   const [mode, setMode] = useState<TopMode>("create");
 
   return (
@@ -25,8 +23,7 @@ export default function CryptoMessagePage() {
       description={copy.shell.description}
       wide
       fillViewport
-      hidePortalLink={isStandalone}
-      actions={isStandalone ? <LanguageToggle /> : undefined}
+      isPwa
       afterDataManager={<InstallAppButton copy={copy.install} />}
     >
       <div className="cm-root">

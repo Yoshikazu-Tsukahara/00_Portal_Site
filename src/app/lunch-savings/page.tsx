@@ -3,14 +3,13 @@
 import { useEffect, useMemo, useState } from "react";
 
 import AppShell from "@/components/AppShell";
-import { LanguageToggle, useI18n } from "@/i18n";
+import { useI18n } from "@/i18n";
 import { useLocalStorageState } from "@/lib/localData";
 import { calcPeriodStats, parseLunchData } from "./calc";
 import Dashboard from "./Dashboard";
 import InstallAppButton from "./InstallAppButton";
 import NumpadModal from "./NumpadModal";
 import SetupModal from "./SetupModal";
-import { usePwaInstall } from "./usePwaInstall";
 import {
   STORAGE_KEY,
   KNOWN_GOAL_DEFAULTS,
@@ -29,7 +28,6 @@ const EMPTY: LunchAppData = { settings: null, entries: [] };
 export default function LunchSavingsPage() {
   const { t, locale } = useI18n();
   const copy = t.apps.lunchSavings;
-  const { isStandalone } = usePwaInstall();
   const [data, setData, { hydrated }] = useLocalStorageState<LunchAppData>(
     STORAGE_KEY,
     EMPTY,
@@ -178,8 +176,7 @@ export default function LunchSavingsPage() {
       <AppShell
         title={copy.shell.title}
         description={copy.shell.description}
-        hidePortalLink={isStandalone}
-        actions={isStandalone ? <LanguageToggle /> : undefined}
+        isPwa
       >
         <p className="text-sm text-zinc-400">{t.common.loading}</p>
       </AppShell>
@@ -197,8 +194,7 @@ export default function LunchSavingsPage() {
     <AppShell
       title={copy.shell.title}
       description={copy.shell.description}
-      hidePortalLink={isStandalone}
-      actions={isStandalone ? <LanguageToggle /> : undefined}
+      isPwa
       afterDataManager={<InstallAppButton copy={copy.install} />}
       dataManager={{
         appId: "lunch-savings",

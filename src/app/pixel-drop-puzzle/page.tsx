@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import AppShell from "@/components/AppShell";
-import { LanguageToggle, useI18n } from "@/i18n";
+import { useI18n } from "@/i18n";
 import { useLocalStorageState } from "@/lib/localData";
 import { useStandaloneDisplay } from "@/lib/useStandaloneDisplay";
 import { readImageSize, type LoadedGameImage } from "./imageUtil";
@@ -24,13 +24,11 @@ import {
   type JudgeResult,
   type PixelDropAppData,
 } from "./types";
-import { usePwaInstall } from "./usePwaInstall";
 import UploadGate from "./UploadGate";
 
 export default function PixelDropPuzzlePage() {
   const { t } = useI18n();
   const copy = t.apps.pixelDropPuzzle;
-  const { isStandalone } = usePwaInstall();
   const { ready: displayReady } = useStandaloneDisplay();
   const [data, setData, { hydrated }] = useLocalStorageState<PixelDropAppData>(
     STORAGE_KEY,
@@ -295,8 +293,7 @@ export default function PixelDropPuzzlePage() {
       title={copy.shell.title}
       description={copy.shell.description}
       wide
-      hidePortalLink={isStandalone}
-      actions={isStandalone ? <LanguageToggle /> : undefined}
+      isPwa
       afterDataManager={<InstallAppButton copy={copy.install} />}
       dataManager={{
         appId: "pixel-drop-puzzle",

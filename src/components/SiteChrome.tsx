@@ -7,7 +7,12 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { useStandaloneDisplay } from "@/lib/useStandaloneDisplay";
 
-/** 単体 PWA として独立させているアプリのルートパス一覧 */
+/**
+ * Type C（独立 PWA）のルートパス一覧。
+ * ここに載っているアプリは「standalone 起動中だけ」Header / Footer を外す。
+ * ブラウザで開いている間は Type B と同じくポータル枠のまま。
+ * （page.tsx 側は `<AppShell isPwa>`、layout.tsx 側は `<PwaRuntime />` を使う）
+ */
 const STANDALONE_APP_PATHS = [
   "/lunch-savings",
   "/ultimate-probability-slot",
@@ -18,8 +23,9 @@ const STANDALONE_APP_PATHS = [
 ];
 
 /**
- * ブラウザでもポータル枠を外し、没入型フルスクリーンで出すアプリ。
- * （一人称ミニゲームなど）
+ * Type D（没入型）のルートパス一覧。
+ * ブラウザでも常にポータル枠を外し、フルスクリーンで出す（一人称ミニゲームなど）。
+ * AppShell は使わず、各ページが独自ヘッダー + iframe を持つ。
  */
 const ALWAYS_ISOLATE_PATHS = ["/monster-driver", "/robot-freethrow"];
 
@@ -32,8 +38,13 @@ function matchesAppPath(pathname: string | null, bases: string[]): boolean {
 
 /**
  * サイト共通ヘッダー／フッター。
- * 独立 PWA 対応アプリを standalone で起動中、または没入型アプリではポータル枠を非表示。
- * 通常ブラウザでは全ページ共通のヘッダー配置を維持する。
+ *
+ * - Type B（通常ツール）: Header と Footer を必ず出す。
+ *   1画面完結（AppShell の fillViewport）でも Footer は隠さない。
+ * - Type C（独立 PWA）: standalone 起動中のみポータル枠を外す。
+ * - Type D（没入型）: 常にポータル枠を外す。
+ *
+ * タイプの定義そのものは AppShell の JSDoc を参照。
  */
 export default function SiteChrome({ children }: { children: ReactNode }) {
   const pathname = usePathname();

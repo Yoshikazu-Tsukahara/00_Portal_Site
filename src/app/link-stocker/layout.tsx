@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import LinkStockerPwaEffects from "./LinkStockerPwaEffects";
-import RegisterSW from "./RegisterSW";
+import PwaRuntime from "@/components/PwaRuntime";
 import { LINK_STOCKER_MANIFEST_PATH } from "./manifest";
 
 export const metadata: Metadata = {
@@ -42,8 +41,7 @@ export default function LinkStockerLayout({
 }) {
   return (
     <>
-      <RegisterSW />
-      <LinkStockerPwaEffects />
+      <PwaRuntime basePath="/link-stocker" classPrefix="link-stocker" />
       {children}
     </>
   );

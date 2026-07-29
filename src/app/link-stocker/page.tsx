@@ -3,13 +3,12 @@
 import { BookmarkPlus, LoaderCircle } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AppShell from "@/components/AppShell";
-import { LanguageToggle, useI18n } from "@/i18n";
+import { useI18n } from "@/i18n";
 import { loadLocalJson, removeLocalJson, useLocalStorageState } from "@/lib/localData";
 import InstallAppButton from "./InstallAppButton";
 import LinkCard from "./LinkCard";
 import ShortcutHelpModal from "./ShortcutHelpModal";
 import TagManager from "./TagManager";
-import { usePwaInstall } from "./usePwaInstall";
 import {
   LINK_STOCKER_CHANNEL,
   LINK_STOCKER_WINDOW_NAME,
@@ -45,7 +44,6 @@ type OgpResponse = {
 export default function LinkStockerPage() {
   const { t } = useI18n();
   const copy = t.apps.linkStocker;
-  const { isStandalone } = usePwaInstall();
   const [data, setData, { hydrated }] = useLocalStorageState<LinkStockerData>(
     STORAGE_KEY,
     emptyData(),
@@ -403,10 +401,10 @@ export default function LinkStockerPage() {
   return (
     <AppShell
       title={copy.shell.title}
+      description={copy.shell.description}
       wide
-      hidePortalLink={isStandalone}
+      isPwa
       afterDataManager={<InstallAppButton copy={copy.install} />}
-      actions={isStandalone ? <LanguageToggle /> : undefined}
       dataManager={{
         appId: "link-stocker",
         fileNamePrefix: "link-stocker",

@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import LunchPwaEffects from "./LunchPwaEffects";
-import RegisterSW from "./RegisterSW";
+import PwaRuntime from "@/components/PwaRuntime";
 
 export const metadata: Metadata = {
   title: "ランチ貯金",
@@ -46,8 +45,7 @@ export default function LunchSavingsLayout({
 }) {
   return (
     <>
-      <RegisterSW />
-      <LunchPwaEffects />
+      <PwaRuntime basePath="/lunch-savings" classPrefix="lunch" />
       {children}
     </>
   );

@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import PixelDropPwaEffects from "./PixelDropPwaEffects";
-import RegisterSW from "./RegisterSW";
+import PwaRuntime from "@/components/PwaRuntime";
 import { PIXEL_DROP_PUZZLE_MANIFEST_PATH } from "./manifest";
 
 export const metadata: Metadata = {
@@ -45,8 +44,11 @@ export default function PixelDropPuzzleLayout({
 }) {
   return (
     <>
-      <RegisterSW />
-      <PixelDropPwaEffects />
+      <PwaRuntime
+        basePath="/pixel-drop-puzzle"
+        classPrefix="pxd"
+        scrollLock="hard"
+      />
       {children}
     </>
   );

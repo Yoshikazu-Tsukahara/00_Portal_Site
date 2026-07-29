@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import CryptoPwaEffects from "./CryptoPwaEffects";
-import RegisterSW from "./RegisterSW";
+import PwaRuntime from "@/components/PwaRuntime";
 import { CRYPTO_MESSAGE_MANIFEST_PATH } from "./manifest";
 
 export const metadata: Metadata = {
@@ -43,8 +42,7 @@ export default function CryptoMessageLayout({
 }) {
   return (
     <>
-      <RegisterSW />
-      <CryptoPwaEffects />
+      <PwaRuntime basePath="/crypto-message" classPrefix="cm" />
       {children}
     </>
   );

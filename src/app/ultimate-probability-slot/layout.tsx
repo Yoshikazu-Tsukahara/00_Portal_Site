@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import RegisterSW from "./RegisterSW";
-import SlotPwaEffects from "./SlotPwaEffects";
+import PwaRuntime from "@/components/PwaRuntime";
 import { SLOT_PWA_MANIFEST_PATH } from "./manifest";
 
 export const metadata: Metadata = {
@@ -56,8 +55,11 @@ export default function UltimateProbabilitySlotLayout({
 }) {
   return (
     <>
-      <RegisterSW />
-      <SlotPwaEffects />
+      <PwaRuntime
+        basePath="/ultimate-probability-slot"
+        classPrefix="slot"
+        scrollLock="hard"
+      />
       {children}
     </>
   );

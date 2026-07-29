@@ -277,22 +277,24 @@ body {
     @apply inline-flex items-center justify-center;
   }
 
-  /* 言語トグル：スライドする選択インジケータ */
+  /* 言語トグル：スライドする選択インジケータ
+   * padding 0.5(2px) と幅 calc(50%-2px) の組み合わせでは、
+   * EN 側は translateX(100%) だけで左右対称になる（+α を足すと右下にずれる） */
   .lang-toggle {
-    @apply relative inline-grid grid-cols-2 p-0.5;
+    @apply relative inline-grid grid-cols-2 items-center p-0.5;
   }
 
   .lang-toggle__indicator {
-    @apply pointer-events-none absolute top-0.5 bottom-0.5 left-0.5 w-[calc(50%-2px)] rounded-full bg-zinc-900 shadow-sm;
+    @apply pointer-events-none absolute inset-y-0.5 left-0.5 w-[calc(50%-2px)] rounded-full bg-zinc-900 shadow-sm;
     transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .lang-toggle__indicator--en {
-    transform: translateX(calc(100% + 4px));
+    transform: translateX(100%);
   }
 
   .lang-toggle__btn {
-    @apply relative z-10 rounded-full px-2.5 py-1 text-[11px] font-medium tracking-wide transition-colors duration-200 sm:px-3 sm:text-xs;
+    @apply relative z-10 inline-flex items-center justify-center rounded-full px-2.5 py-1 text-[11px] font-medium leading-none tracking-wide transition-colors duration-200 sm:px-3 sm:text-xs;
   }
 
   .lang-toggle__btn--active {
@@ -1237,31 +1239,29 @@ body {
   }
 }
 
-/* ランチ貯金：過度なバウンスだけ抑え、通常スクロールは阻害しない */
-html.lunch-app-active,
-body.lunch-app-active {
+/* ============================================================
+   独立 PWA（AppShell の Type C）共通の操作感
+   クラスは PwaRuntime が付ける。アプリ固有クラス（lunch- など）は
+   個別の見た目調整だけに使い、共通挙動はここへ集約する。
+   ============================================================ */
+
+/* PWA 対応アプリ表示中：過度なバウンスだけ抑え、通常スクロールは阻害しない */
+html.pwa-app-active,
+body.pwa-app-active {
   overscroll-behavior-y: contain;
 }
 
-/* ランチ貯金 PWA standalone: 端スワイプ戻り抑制 */
-html.lunch-pwa-standalone,
-body.lunch-pwa-standalone {
-  overscroll-behavior-x: none;
-  touch-action: pan-y;
-}
-
-/* 究極確率スロット：バウンススクロールを無効化（ネイティブ感） */
-html.slot-app-active,
-body.slot-app-active {
+/* ゲーム系（scrollLock: "hard"）：バウンススクロールを無効化（ネイティブ感） */
+html.pwa-app-active--hard,
+body.pwa-app-active--hard {
   overscroll-behavior-y: none;
   overscroll-behavior-x: none;
   touch-action: pan-y;
 }
 
-/* 究極確率スロット PWA standalone: 端スワイプ戻り抑制 */
-html.slot-pwa-standalone,
-body.slot-pwa-standalone {
-  overscroll-behavior-y: none;
+/* standalone 起動中：端スワイプでの戻りを抑制 */
+html.pwa-standalone,
+body.pwa-standalone {
   overscroll-behavior-x: none;
   touch-action: pan-y;
 }
@@ -1478,22 +1478,6 @@ body.slot-pwa-standalone {
 /* ============================================================
    極小ピクセル隙間落としパズル：NASAコンソール／ハッカー端末風の無機質UI
    ============================================================ */
-
-/* パズル：バウンススクロールを無効化（ネイティブ感） */
-html.pxd-app-active,
-body.pxd-app-active {
-  overscroll-behavior-y: none;
-  overscroll-behavior-x: none;
-  touch-action: pan-y;
-}
-
-/* パズル PWA standalone: 端スワイプ戻り抑制 */
-html.pxd-pwa-standalone,
-body.pxd-pwa-standalone {
-  overscroll-behavior-y: none;
-  overscroll-behavior-x: none;
-  touch-action: pan-y;
-}
 
 /* ゲーム本体の暗色コンソール枠 */
 .pxd-theme-root {
@@ -3102,18 +3086,6 @@ html.pxd-pwa-standalone .pxd-block-guide {
 
 .cm-install-modal {
   animation: lunch-install-modal-in 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-/* ひみつメッセージ：バウンススクロール抑制 */
-html.cm-app-active,
-body.cm-app-active {
-  overscroll-behavior-y: contain;
-}
-
-html.cm-pwa-standalone,
-body.cm-pwa-standalone {
-  overscroll-behavior-x: none;
-  touch-action: pan-y;
 }
 
 /* ---------- 暗号テーマ選択 ---------- */
