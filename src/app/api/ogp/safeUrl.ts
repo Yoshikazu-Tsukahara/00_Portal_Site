@@ -43,6 +43,46 @@ export function parsePublicHttpUrl(raw: string): URL | null {
   }
 }
 
+export type FetchProfileName = "facebook" | "twitter" | "slack" | "browser";
+
+/**
+ * 本番（データセンター IP）ではブラウザ UA が弾かれやすい。
+ * SNS クローラー向け UA の方が og:title / og:image を返しやすいサイトが多い。
+ */
+export function headersForProfile(
+  profile: FetchProfileName,
+  target: URL,
+): HeadersInit {
+  switch (profile) {
+    case "facebook":
+      return {
+        "User-Agent":
+          "facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)",
+        Accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "ja,en-US;q=0.9,en;q=0.8",
+        // 一部サイトは Referer なしの方が通しやすい
+      };
+    case "twitter":
+      return {
+        "User-Agent": "Twitterbot/1.0",
+        Accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "ja,en-US;q=0.9,en;q=0.8",
+      };
+    case "slack":
+      return {
+        "User-Agent": "Slackbot-LinkExpanding 1.0 (+https://api.slack.com/robots)",
+        Accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "ja,en-US;q=0.9,en;q=0.8",
+      };
+    case "browser":
+    default:
+      return browserLikeHeaders(target);
+  }
+}
+
 /** ブラウザに近いリクエストヘッダー（データセンターからの取得成功率を上げる） */
 export function browserLikeHeaders(target: URL): HeadersInit {
   return {
@@ -63,15 +103,41 @@ export function browserLikeHeaders(target: URL): HeadersInit {
   };
 }
 
+/** 画像取得用ヘッダー（複数パターンを順に試す） */
+export function imageFetchHeaderAttempts(target: URL): HeadersInit[] {
+  const ua =
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
+  return [
+    {
+      "User-Agent": ua,
+      Accept: "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
+      "Accept-Language": "ja,en-US;q=0.9,en;q=0.8",
+      Referer: `${target.origin}/`,
+      "Sec-Fetch-Dest": "image",
+      "Sec-Fetch-Mode": "no-cors",
+      "Sec-Fetch-Site": "cross-site",
+    },
+    // Referer 付きで拒否される CDN 向け
+    {
+      "User-Agent": ua,
+      Accept: "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
+      "Accept-Language": "ja,en-US;q=0.9,en;q=0.8",
+    },
+    // SNS クローラーとして再試行
+    {
+      "User-Agent":
+        "facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)",
+      Accept: "image/*,*/*;q=0.8",
+    },
+  ];
+}
+
+/** @deprecated imageFetchHeaderAttempts を使う */
 export function imageFetchHeaders(target: URL): HeadersInit {
-  return {
-    "User-Agent":
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
-    Accept: "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
-    "Accept-Language": "ja,en-US;q=0.9,en;q=0.8",
-    Referer: `${target.origin}/`,
-    "Sec-Fetch-Dest": "image",
-    "Sec-Fetch-Mode": "no-cors",
-    "Sec-Fetch-Site": "cross-site",
-  };
+  return imageFetchHeaderAttempts(target)[0];
+}
+
+/** ドメインからファビコン URL（スクレイプ失敗時の見た目用） */
+export function faviconFallbackUrl(hostname: string): string {
+  return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(hostname)}&sz=128`;
 }

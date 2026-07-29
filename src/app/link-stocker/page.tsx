@@ -38,6 +38,8 @@ type OgpResponse = {
   favicon: string | null;
   error?: string;
   message?: string;
+  /** キープは成功したがタイトル／画像が取れなかったとき */
+  warning?: string;
 };
 
 export default function LinkStockerPage() {
@@ -125,9 +127,9 @@ export default function LinkStockerPage() {
     hydrated ? String(links.length) : "—",
   );
 
-  function flash(message: string) {
+  function flash(message: string, ms = 1600) {
     setToast(message);
-    window.setTimeout(() => setToast(null), 1600);
+    window.setTimeout(() => setToast(null), ms);
   }
 
   const keepUrl = useCallback(
@@ -193,7 +195,12 @@ export default function LinkStockerPage() {
           links: [item, ...prev.links],
         }));
         setUrlInput("");
-        flash(copy.toast.kept);
+        // 本番でボット対策に弾かれた場合は、キープ成功＋注意を長めに表示
+        if (json.warning === "partial") {
+          flash(json.message || copy.toast.keptPartial, 4200);
+        } else {
+          flash(copy.toast.kept);
+        }
         return true;
       } catch {
         setError(copy.errors.fetchFailed);
@@ -203,7 +210,7 @@ export default function LinkStockerPage() {
         setLoading(false);
       }
     },
-    [copy.errors, copy.toast.kept, setData],
+    [copy.errors, copy.toast.kept, copy.toast.keptPartial, setData],
   );
 
   keepUrlRef.current = keepUrl;

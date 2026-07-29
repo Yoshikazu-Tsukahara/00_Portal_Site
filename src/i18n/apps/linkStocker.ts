@@ -39,6 +39,8 @@ export type LinkStockerDict = {
   };
   toast: {
     kept: string;
+    /** タイトル／画像が取れずドメイン名だけ登録したとき */
+    keptPartial: string;
     deleted: string;
   };
   stats: {
@@ -121,6 +123,8 @@ export const linkStockerJa: LinkStockerDict = {
   },
   toast: {
     kept: "キープしました",
+    keptPartial:
+      "キープしました（タイトル／画像は取得できませんでした。ブックマークレットからの登録がおすすめです）",
     deleted: "削除しました",
   },
   stats: {
@@ -202,6 +206,8 @@ export const linkStockerEn: LinkStockerDict = {
   },
   toast: {
     kept: "Kept",
+    keptPartial:
+      "Kept (title/image unavailable — try the bookmarklet for better results)",
     deleted: "Deleted",
   },
   stats: {
