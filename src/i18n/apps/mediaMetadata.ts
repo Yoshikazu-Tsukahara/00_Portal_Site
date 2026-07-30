@@ -2,253 +2,204 @@ import type { AppShellCopy } from "./otherApps";
 
 export type MediaMetadataDict = {
   shell: AppShellCopy;
-  loading: string;
   privacyBanner: string;
   dropHint: string;
   dropSub: string;
-  fileList: string;
-  listEmpty: string;
-  selectPrompt: string;
-  kindAudio: string;
-  kindImage: string;
-  kindVideo: string;
-  kindOther: string;
-  writableBadge: string;
-  readError: string;
-  removeFile: string;
-  fileInfo: string;
-  infoName: string;
-  infoType: string;
-  infoModified: string;
-  infoDimensions: string;
-  writeMp3Note: string;
-  writeImageNote: string;
-  writeLimitedNote: string;
-  properties: string;
-  propertiesHint: string;
-  imagePreview: string;
-  imageProperties: string;
-  imagePropertiesHint: string;
-  imageFields: {
-    title: string;
-    description: string;
-    comment: string;
-    copyright: string;
-    datetime: string;
+  addFiles: string;
+  unsupported: string;
+  unsupportedSome: string;
+  loadError: string;
+  modeAudio: string;
+  modeVideo: string;
+  fileList: {
+    heading: string;
+    empty: string;
+    remove: string;
+    audio: string;
+    video: string;
   };
-  stripExifLabel: string;
-  stripExifHint: string;
-  gpsDetected: string;
-  dirtyBadge: string;
-  fields: {
+  stage: {
+    artworkTitle: string;
+    artworkHint: string;
+    artworkDrop: string;
+    artworkDropSub: string;
+    noArtwork: string;
+    clearArtwork: string;
+    videoTitle: string;
+    videoHint: string;
+    captureFrame: string;
+    capturing: string;
+    captureError: string;
+    thumbPreview: string;
+  };
+  form: {
+    heading: string;
+    hint: string;
+    fileName: string;
+    fileNameHint: string;
     title: string;
     artist: string;
-    album: string;
-    albumArtist: string;
-    genre: string;
     year: string;
+    album: string;
     track: string;
     comment: string;
+    removeHistory: string;
+    removeHistoryAria: string;
   };
-  artwork: string;
-  artworkHint: string;
-  artworkDrop: string;
-  artworkDropSub: string;
-  noArtwork: string;
-  changeArtwork: string;
-  clearArtwork: string;
-  presetsHeading: string;
-  presetsEmpty: string;
-  savePreset: string;
-  presetNamePrompt: string;
-  deletePreset: string;
-  presetApplied: string;
-  applyDownload: string;
-  applyDownloadHint: string;
-  downloadOne: string;
-  downloadAll: string;
-  downloading: string;
-  downloadOk: string;
-  downloadFail: string;
+  export: {
+    button: string;
+    buttonAll: string;
+    hint: string;
+    videoSoon: string;
+    videoSkipped: string;
+    downloading: string;
+    ok: string;
+    okZip: string;
+    fail: string;
+  };
   clearAll: string;
-  statusEmpty: string;
-  statusCount: string;
+  selectPrompt: string;
 };
 
 export const mediaMetadataJa: MediaMetadataDict = {
   shell: {
     title: "メディア・メタデータ エディター",
     description:
-      "MP3 のタグ／ジャケットと、JPEG の Exif をブラウザ内で編集して書き出し。",
+      "音楽・動画のタグとカバー／サムネを、ブラウザ内だけで編集するクリエイター向けツール。",
   },
-  loading: "読込中…",
   privacyBanner:
-    "🔒 アップロードしたファイルと編集内容は、すべてお使いのブラウザ内でのみ処理されます。サーバーへ送信されることは一切ありません。",
-  dropHint: "ファイルをドロップ、または選択",
+    "ファイルと編集内容はすべてブラウザ内で処理します。サーバーへ送信しません。",
+  dropHint: "音楽・動画ファイルをドロップ（複数可）",
   dropSub:
-    "MP3・JPEG・PNG などに対応。音声タグと画像 Exif の書き換えはブラウザ内で完結します。",
-  fileList: "ファイル一覧",
-  listEmpty: "まだファイルがありません",
-  selectPrompt: "左の一覧からファイルを選択して編集を開始してください",
-  kindAudio: "音声",
-  kindImage: "画像",
-  kindVideo: "動画",
-  kindOther: "その他",
-  writableBadge: "編集・再生成可",
-  readError: "読込失敗",
-  removeFile: "ファイルを削除",
-  fileInfo: "ファイル情報",
-  infoName: "名前",
-  infoType: "種類",
-  infoModified: "更新日時",
-  infoDimensions: "サイズ",
-  writeMp3Note:
-    "フォームの変更はリアルタイムに反映されます。「変更を適用してダウンロード」で、タグとジャケットを埋め込んだ新しい MP3 をブラウザ内で生成します。",
-  writeImageNote:
-    "JPEG は Exif（撮影日時・説明・著作権など）を書き換えて保存できます。PNG はメタデータ削除（ストリップ）に対応しています。処理はすべてブラウザ内です。",
-  writeLimitedNote:
-    "この形式は内容の確認が中心です。タグ／Exif の再書き込みは MP3・JPEG（および PNG のストリップ）向けです。",
-  properties: "メタデータ編集",
-  propertiesHint:
-    "入力内容はそのまま反映され、ダウンロード時にファイルへ書き込まれます。",
-  imagePreview: "画像プレビュー",
-  imageProperties: "画像メタデータ（Exif）編集",
-  imagePropertiesHint:
-    "撮影日時・説明・著作権などを編集できます。プライバシー保護のため、保存時は GPS を除去します。",
-  imageFields: {
-    title: "タイトル",
-    description: "説明（Image Description）",
-    comment: "コメント",
-    copyright: "著作権（Copyright）",
-    datetime: "撮影日時",
+    "またはクリックして選択（MP3 / MP4 / WebM など）。複数ファイルをまとめて編集できます。処理は完全ローカルです。",
+  addFiles: "ファイルを追加",
+  unsupported: "対応していない形式です。音楽または動画ファイルを選んでください。",
+  unsupportedSome:
+    "一部のファイルは非対応のためスキップしました。",
+  loadError: "ファイルの読み込みに失敗しました。",
+  modeAudio: "Music mode",
+  modeVideo: "Video mode",
+  fileList: {
+    heading: "ファイル",
+    empty: "まだありません",
+    remove: "このファイルを削除",
+    audio: "音楽",
+    video: "動画",
   },
-  stripExifLabel: "位置情報（GPS）や不要な Exif を完全削除する",
-  stripExifHint:
-    "オンにすると、画像を再エンコードしてメタデータをすべて取り除きます（プライバシー保護向け）。",
-  gpsDetected: "GPS 情報あり",
-  dirtyBadge: "未保存の変更あり",
-  fields: {
+  stage: {
+    artworkTitle: "カバーアート",
+    artworkHint: "JPG / PNG をドロップすると新しいジャケットとして使えます。",
+    artworkDrop: "新しいカバー画像をドロップ",
+    artworkDropSub: "またはクリックして JPG / PNG を選択",
+    noArtwork: "アートワークなし",
+    clearArtwork: "カバーをクリア",
+    videoTitle: "プレビュー",
+    videoHint:
+      "シークバーでシーンを選び、「このシーンをサムネイルにする」でフレームをキャプチャします。",
+    captureFrame: "このシーンをサムネイルにする",
+    capturing: "キャプチャ中…",
+    captureError:
+      "フレームのキャプチャに失敗しました。再生可能な位置で再試行してください。",
+    thumbPreview: "サムネイル プレビュー",
+  },
+  form: {
+    heading: "メタデータ",
+    hint: "選択中のファイルだけを編集します。直近の入力は履歴として残り、フォーカス時に候補が出ます。",
+    fileName: "ファイル名",
+    fileNameHint:
+      "ダウンロード時の名前になります。拡張子を消しても元の形式で補完します。",
     title: "タイトル",
     artist: "アーティスト",
-    album: "アルバム",
-    albumArtist: "アルバムアーティスト",
-    genre: "ジャンル",
-    year: "年（リリース年）",
+    year: "制作年（Year）",
+    album: "アルバム名",
     track: "トラック番号",
-    comment: "コメント",
+    comment: "コメント（Description）",
+    removeHistory: "履歴から削除",
+    removeHistoryAria: "「{value}」を履歴から削除",
   },
-  artwork: "ジャケット写真（アルバムアート）",
-  artworkHint:
-    "JPEG / PNG をドロップまたは選択すると、プレビューが即反映され、ダウンロード時に MP3 へ埋め込まれます。",
-  artworkDrop: "ジャケット画像をドロップ",
-  artworkDropSub: "またはクリックして JPEG / PNG を選択",
-  noArtwork: "アートワークなし",
-  changeArtwork: "画像を選ぶ",
-  clearArtwork: "クリア",
-  presetsHeading: "お気に入りプリセット",
-  presetsEmpty: "保存されたプリセットはまだありません",
-  savePreset: "＋ 現在の値を保存",
-  presetNamePrompt: "プリセット名を入力",
-  deletePreset: "プリセットを削除",
-  presetApplied: "プリセットを適用しました",
-  applyDownload: "変更を適用してダウンロード",
-  applyDownloadHint:
-    "サーバーを使わず、このブラウザ内でタグ／Exif を書き込んだファイルを生成して保存します。",
-  downloadOne: "選択をダウンロード",
-  downloadAll: "すべてに適用してダウンロード",
-  downloading: "ファイルを生成中…",
-  downloadOk: "書き込み済みファイルのダウンロードを開始しました",
-  downloadFail: "ファイルの生成に失敗しました",
+  export: {
+    button: "選択をダウンロード",
+    buttonAll: "すべてダウンロード",
+    hint: "編集内容を埋め込んだファイルを、このブラウザから保存します。複数時は ZIP になります。",
+    videoSoon:
+      "動画へのメタデータ／サムネ書き込みは次フェーズ（ffmpeg.wasm）で接続します。いまはプレビューまで利用できます。",
+    videoSkipped: "動画ファイルは書き込み未対応のためスキップしました。",
+    downloading: "ファイルを生成中…",
+    ok: "ダウンロードを開始しました",
+    okZip: "ZIP のダウンロードを開始しました",
+    fail: "ファイルの生成に失敗しました",
+  },
   clearAll: "すべてクリア",
-  statusEmpty: "ファイルを追加して編集を開始してください",
-  statusCount: "{ready} / {total} 件準備完了",
+  selectPrompt: "左の一覧からファイルを選んで編集を開始してください",
 };
 
 export const mediaMetadataEn: MediaMetadataDict = {
   shell: {
     title: "Media Metadata Editor",
     description:
-      "Edit MP3 tags/artwork and JPEG Exif in the browser, then export rewritten files.",
+      "A local-first creator tool to edit audio/video tags and cover/thumbnail art in the browser.",
   },
-  loading: "Loading…",
   privacyBanner:
-    "🔒 Uploaded files and edits stay entirely in your browser. Nothing is sent to a server.",
-  dropHint: "Drop files, or choose",
+    "Files and edits stay in your browser. Nothing is sent to a server.",
+  dropHint: "Drop audio or video files (multiple OK)",
   dropSub:
-    "Supports MP3, JPEG, PNG, and more. Audio tags and image Exif are rewritten locally in your browser.",
-  fileList: "Files",
-  listEmpty: "No files yet",
-  selectPrompt: "Select a file from the list to start editing",
-  kindAudio: "Audio",
-  kindImage: "Image",
-  kindVideo: "Video",
-  kindOther: "Other",
-  writableBadge: "Editable",
-  readError: "Read failed",
-  removeFile: "Remove file",
-  fileInfo: "File info",
-  infoName: "Name",
-  infoType: "Type",
-  infoModified: "Modified",
-  infoDimensions: "Dimensions",
-  writeMp3Note:
-    "Edits update instantly. “Apply changes & download” regenerates an MP3 with tags and artwork—entirely in your browser.",
-  writeImageNote:
-    "JPEG supports Exif rewrite (datetime, description, copyright, etc.). PNG supports metadata stripping. All processing stays in your browser.",
-  writeLimitedNote:
-    "This format is mainly for inspection. Tag/Exif rewrite targets MP3, JPEG, and PNG stripping.",
-  properties: "Edit metadata",
-  propertiesHint:
-    "Your input is live; values are written into the file when you download.",
-  imagePreview: "Image preview",
-  imageProperties: "Image metadata (Exif)",
-  imagePropertiesHint:
-    "Edit datetime, description, copyright, and more. GPS is removed on save for privacy.",
-  imageFields: {
-    title: "Title",
-    description: "Description (Image Description)",
-    comment: "Comment",
-    copyright: "Copyright",
-    datetime: "Date taken",
+    "Or click to choose (MP3 / MP4 / WebM, etc.). Edit several files in one session—fully local.",
+  addFiles: "Add files",
+  unsupported: "Unsupported type. Choose an audio or video file.",
+  unsupportedSome: "Some unsupported files were skipped.",
+  loadError: "Failed to load the file.",
+  modeAudio: "Music mode",
+  modeVideo: "Video mode",
+  fileList: {
+    heading: "Files",
+    empty: "None yet",
+    remove: "Remove this file",
+    audio: "Audio",
+    video: "Video",
   },
-  stripExifLabel: "Strip GPS and all unnecessary Exif data",
-  stripExifHint:
-    "When on, the image is re-encoded with all metadata removed (privacy-focused).",
-  gpsDetected: "Contains GPS",
-  dirtyBadge: "Unsaved changes",
-  fields: {
+  stage: {
+    artworkTitle: "Cover art",
+    artworkHint: "Drop a JPG / PNG to set a new cover.",
+    artworkDrop: "Drop a new cover image",
+    artworkDropSub: "or click to choose JPG / PNG",
+    noArtwork: "No artwork",
+    clearArtwork: "Clear cover",
+    videoTitle: "Preview",
+    videoHint:
+      "Scrub to a frame, then click “Use this frame as thumbnail” to capture it.",
+    captureFrame: "Use this frame as thumbnail",
+    capturing: "Capturing…",
+    captureError:
+      "Could not capture the frame. Try again at a playable position.",
+    thumbPreview: "Thumbnail preview",
+  },
+  form: {
+    heading: "Metadata",
+    hint: "Edits apply to the selected file only. Recent values are saved for suggestions on focus.",
+    fileName: "File name",
+    fileNameHint:
+      "Used when downloading. If you remove the extension, the original one is restored.",
     title: "Title",
     artist: "Artist",
-    album: "Album",
-    albumArtist: "Album artist",
-    genre: "Genre",
     year: "Year",
-    track: "Track",
-    comment: "Comment",
+    album: "Album",
+    track: "Track number",
+    comment: "Comment (Description)",
+    removeHistory: "Remove from history",
+    removeHistoryAria: "Remove “{value}” from history",
   },
-  artwork: "Cover artwork",
-  artworkHint:
-    "Drop or choose a JPEG / PNG. The preview updates immediately and is embedded on download.",
-  artworkDrop: "Drop cover image",
-  artworkDropSub: "or click to choose JPEG / PNG",
-  noArtwork: "No artwork",
-  changeArtwork: "Choose image",
-  clearArtwork: "Clear",
-  presetsHeading: "Favorite presets",
-  presetsEmpty: "No saved presets yet",
-  savePreset: "+ Save current values",
-  presetNamePrompt: "Enter a preset name",
-  deletePreset: "Delete preset",
-  presetApplied: "Preset applied",
-  applyDownload: "Apply changes & download",
-  applyDownloadHint:
-    "No server involved—your browser rewrites tags/Exif and saves the new file locally.",
-  downloadOne: "Download selected",
-  downloadAll: "Apply all & download",
-  downloading: "Generating file…",
-  downloadOk: "Download of the rewritten file started",
-  downloadFail: "Failed to generate the file",
+  export: {
+    button: "Download selected",
+    buttonAll: "Download all",
+    hint: "Saves rewritten files from this browser. Multiple files become a ZIP.",
+    videoSoon:
+      "Writing metadata/thumbnails into video lands in the next phase (ffmpeg.wasm). Preview works now.",
+    videoSkipped: "Video files were skipped (write support coming next).",
+    downloading: "Generating file…",
+    ok: "Download started",
+    okZip: "ZIP download started",
+    fail: "Failed to generate the file",
+  },
   clearAll: "Clear all",
-  statusEmpty: "Add files to start editing",
-  statusCount: "{ready} / {total} ready",
+  selectPrompt: "Select a file from the list to start editing",
 };

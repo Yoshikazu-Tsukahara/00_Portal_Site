@@ -150,16 +150,6 @@ export function parseId3FromBuffer(buffer: ArrayBuffer): Id3ReadResult {
       case "TALB":
         setText("album");
         break;
-      case "TPE2":
-        setText("albumArtist");
-        break;
-      case "TCON": {
-        let g = decodeText(encoding, frameData.subarray(1)).trim();
-        // "(17)Rock" 形式を簡易正規化
-        g = g.replace(/^\(\d+\)/, "").trim();
-        if (g) fields.genre = g;
-        break;
-      }
       case "TYER":
       case "TDRC": {
         const y = decodeText(encoding, frameData.subarray(1)).trim();
