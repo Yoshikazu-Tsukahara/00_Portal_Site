@@ -1,0 +1,78 @@
+/* 投射フリースロー専用 Service Worker（scope: /robot-freethrow） */
+const CACHE_NAME = "robot-freethrow-v14";
+const PRECACHE = [
+  "/robot-freethrow",
+  "/robot-freethrow/manifest.webmanifest",
+  "/robot-freethrow/game.html",
+  "/robot-freethrow/matter.min.js",
+  "/icons/robot-freethrow.svg",
+];
+
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches
+      .open(CACHE_NAME)
+      .then((cache) => cache.addAll(PRECACHE))
+      .then(() => self.skipWaiting()),
+  );
+});
+
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches
+      .keys()
+      .then((keys) =>
+        Promise.all(
+          keys
+            .filter((key) => key !== CACHE_NAME)
+            .map((key) => caches.delete(key)),
+        ),
+      )
+      .then(() => self.clients.claim()),
+  );
+});
+
+self.addEventListener("fetch", (event) => {
+  const { request } = event;
+  if (request.method !== "GET") return;
+
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
+
+  const path = url.pathname;
+  const inScope =
+    path === "/robot-freethrow" ||
+    path.startsWith("/robot-freethrow/") ||
+    path.startsWith("/icons/robot-freethrow");
+  if (!inScope) return;
+
+  if (request.mode === "navigate") {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          const copy = response.clone();
+          void caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+          return response;
+        })
+        .catch(() =>
+          caches
+            .match(request)
+            .then((cached) => cached || caches.match("/robot-freethrow")),
+        ),
+    );
+    return;
+  }
+
+  event.respondWith(
+    caches.match(request).then((cached) => {
+      if (cached) return cached;
+      return fetch(request).then((response) => {
+        if (response.ok) {
+          const copy = response.clone();
+          void caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+        }
+        return response;
+      });
+    }),
+  );
+});

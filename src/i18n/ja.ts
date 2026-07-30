@@ -104,8 +104,8 @@ export const ja: Dictionary = {
       description: "写真を隙間に落とすだけ。小数点以下ピクセル判定の精度パズル。",
     },
     "robot-freethrow": {
-      title: "手書きノート風 投射フリースロー",
-      description: "角度・初速・スピンでリングを狙う、ノート風ミニゲーム。",
+      title: "投射フリースロー",
+      description: "角度・推力・スピンでリングを狙う投射運動ミニゲーム。",
     },
     "crypto-message": {
       title: "ひみつメッセージ",

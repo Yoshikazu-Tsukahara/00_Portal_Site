@@ -105,8 +105,8 @@ export const en: Dictionary = {
       description: "Drop a photo into the gap—judged to a fraction of a pixel.",
     },
     "robot-freethrow": {
-      title: "Notebook Projectile Freethrow",
-      description: "Aim with angle, speed, and spin in a notebook freethrow game.",
+      title: "Projectile Freethrow",
+      description: "Aim with angle, thrust, and spin in a projectile freethrow game.",
     },
     "crypto-message": {
       title: "Secret Message",

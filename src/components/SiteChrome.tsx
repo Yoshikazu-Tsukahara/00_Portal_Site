@@ -20,6 +20,7 @@ const STANDALONE_APP_PATHS = [
   "/link-stocker",
   "/palette-collector",
   "/crypto-message",
+  "/robot-freethrow",
 ];
 
 /**
@@ -27,7 +28,7 @@ const STANDALONE_APP_PATHS = [
  * ブラウザでも常にポータル枠を外し、フルスクリーンで出す（一人称ミニゲームなど）。
  * AppShell は使わず、各ページが独自ヘッダー + iframe を持つ。
  */
-const ALWAYS_ISOLATE_PATHS = ["/monster-driver", "/robot-freethrow"];
+const ALWAYS_ISOLATE_PATHS = ["/monster-driver"];
 
 function matchesAppPath(pathname: string | null, bases: string[]): boolean {
   if (!pathname) return false;

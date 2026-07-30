@@ -1,0 +1,36 @@
+/**
+ * 投射フリースロー専用 Web App Manifest。
+ */
+export const ROBOT_FREETHROW_MANIFEST = {
+  name: "投射フリースロー",
+  short_name: "フリースロー",
+  description:
+    "角度・推力・スピンを指定してリングを狙う、投射運動のミニゲーム。",
+  id: "/robot-freethrow",
+  start_url: "/robot-freethrow",
+  scope: "/robot-freethrow",
+  display: "standalone",
+  orientation: "any",
+  background_color: "#f3e6c8",
+  theme_color: "#f3e6c8",
+  lang: "ja",
+  dir: "ltr",
+  categories: ["games", "entertainment"],
+  icons: [
+    {
+      src: "/icons/robot-freethrow.svg",
+      sizes: "any",
+      type: "image/svg+xml",
+      purpose: "any",
+    },
+    {
+      src: "/icons/robot-freethrow.svg",
+      sizes: "any",
+      type: "image/svg+xml",
+      purpose: "maskable",
+    },
+  ],
+} as const;
+
+export const ROBOT_FREETHROW_MANIFEST_PATH =
+  "/robot-freethrow/manifest.webmanifest";

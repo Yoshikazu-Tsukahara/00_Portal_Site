@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport"
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>力学演習 — 投射運動（フリースロー）</title>
+  <title>投射フリースロー</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -153,8 +153,8 @@
       display: flex;
       flex-direction: column;
       width: 100%;
-      max-width: 960px;
-      height: 100dvh;
+      max-width: none;
+      height: 100%;
       margin: 0 auto;
       position: relative;
       background-color: var(--paper);
@@ -234,14 +234,14 @@
       touch-action: none;
     }
 
-    /* 右上：[問] 与えられた条件（ANALYZE同系の付箋） */
+    /* 右上：[問] 条件付箋（読みやすい箇条書き） */
     .hud {
       position: absolute;
       right: 12px;
       top: 10px;
       z-index: 7;
-      font-family: var(--font-exam);
-      font-size: 15px;
+      font-family: var(--font-jp), var(--font-exam), sans-serif;
+      font-size: 14px;
       line-height: 1.45;
       color: var(--pencil);
       pointer-events: none;
@@ -253,17 +253,16 @@
       box-shadow:
         2px 3px 0 rgba(60, 40, 20, 0.1),
         0 1px 0 rgba(255, 255, 255, 0.55) inset;
-      max-width: min(320px, 56vw);
+      max-width: min(240px, 48vw);
       text-align: left;
       opacity: 1;
-      transform: rotate(1.2deg);
+      transform: rotate(1.1deg);
       transform-origin: top right;
     }
 
     .hud .given-title {
-      font-family: var(--font-jp);
       font-weight: 700;
-      font-size: 13px;
+      font-size: 15px;
       margin-bottom: 6px;
       border-bottom: 1px dashed rgba(60, 40, 20, 0.35);
       padding-bottom: 4px;
@@ -271,28 +270,37 @@
       color: var(--pencil);
     }
 
-    .hud .given-line {
-      display: block;
-      font-size: 13px;
+    .hud .given-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .hud .given-list li {
       margin: 2px 0;
+      padding-left: 0.9em;
+      position: relative;
       white-space: nowrap;
+      font-size: 14px;
       color: var(--pencil);
     }
 
-    /* 長い注釈は折り返し可 */
-    .hud .given-line.given-wrap {
-      white-space: normal;
-      line-height: 1.35;
-      margin-top: 6px;
+    .hud .given-list li::before {
+      content: "・";
+      position: absolute;
+      left: 0;
+      font-weight: 700;
     }
 
     .hud .given-sym {
+      font-family: var(--font-exam), cursive;
       font-style: italic;
       font-weight: 700;
     }
 
     .hud .given-note {
-      opacity: 0.72;
+      opacity: 0.75;
+      font-size: 13px;
     }
 
     /* 左上：未知数（答え欄） */
@@ -319,7 +327,7 @@
 
     .margin-memo .memo-head {
       display: flex;
-      align-items: baseline;
+      align-items: flex-start;
       gap: 10px;
       margin-bottom: 4px;
       font-family: var(--font-jp);
@@ -330,6 +338,10 @@
     }
 
     .margin-memo .memo-head .memo-title {
+      flex: 1;
+      min-width: 0;
+      line-height: 1.45;
+      white-space: pre-line;
       border-bottom: 1px dotted var(--pencil-soft);
       padding-bottom: 1px;
     }
@@ -774,7 +786,7 @@
 <body>
   <div class="app">
     <div class="topbar">
-      <div class="title">力学演習Ⅱ　／　投射運動（図解問題）</div>
+      <div class="title">投射フリースロー</div>
       <div class="status">
         <span id="lvLabel">問.1</span>
         <span id="lifeLabel">試行 3</span>
@@ -788,7 +800,8 @@
       <!-- 答案：未知数（求める変数） -->
       <div class="margin-memo" id="marginMemo">
         <div class="memo-head">
-          <span class="memo-title">[解] θ・F・Δy を求め、図で検証せよ</span>
+          <span class="memo-title" id="memoSolveTitle">[解] θ・F・Δy を求め、
+図で検証せよ</span>
           <span class="memo-tools">
             <button type="button" class="memo-icon analyze-btn" id="btnHint" title="地球標準での模範解答" aria-label="ANALYZE">💡
               ANALYZE</button>
@@ -809,7 +822,7 @@
             <span class="memo-sym">F</span> (Thrust)
             <span class="memo-eq">=</span>
           </label>
-          <input id="power" type="number" min="10" max="20000" step="5" value="100" inputmode="numeric"
+          <input id="power" type="number" min="10" max="20000" step="5" value="280" inputmode="numeric"
             aria-label="F Thrust" />
           <span class="memo-unit">N</span>
         </div>
@@ -841,31 +854,31 @@
 
       <div class="overlay" id="startOverlay">
         <div class="panel">
-          <h2>力学試験：投射運動</h2>
+          <h2>投射フリースロー</h2>
           <p>
-            右上の [問] に示された条件のもと、<br />
-            左上に θ・F・Δy を記入し、図の射手がたをタップして検証せよ。<br />
-            各問につき試行は 3 回まで。
+            右上の条件を見て、左上に θ・F・Δy を入力。<br />
+            射手がたをタップしてシュートし、リングを狙おう。<br />
+            各ステージの試行は 3 回まで。
           </p>
-          <button type="button" id="btnStart">試験開始</button>
+          <button type="button" id="btnStart">スタート</button>
         </div>
       </div>
 
       <div class="overlay" id="gameOverOverlay">
         <div class="panel">
-          <h2>試験終了</h2>
-          <p id="gameOverText">答案用紙の余白が尽きた…</p>
-          <button type="button" id="btnRetry">再受験</button>
+          <h2>ゲームオーバー</h2>
+          <p id="gameOverText">試行回数を使い切った…</p>
+          <button type="button" id="btnRetry">もう一度</button>
         </div>
       </div>
     </div>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+  <script src="/robot-freethrow/matter.min.js"></script>
   <script>
     /**
-     * 手書きノート風 投射フリースロー（力学演習）
-     * Matter.js による 2D 物理プロトタイプ
+     * 投射フリースロー
+     * Matter.js による 2D 投射物理ミニゲーム
      */
     (() => {
       const Matter = window.Matter;
@@ -897,6 +910,94 @@
       const lifeLabel = document.getElementById("lifeLabel");
       const scoreLabel = document.getElementById("scoreLabel");
       const marginMemo = document.getElementById("marginMemo");
+      const memoSolveTitle = document.getElementById("memoSolveTitle");
+
+      /**
+       * iframe 内 UI の言語（親ページの locale と同期）。
+       * 問付箋・ステータス・デバッグ凡例などで使用。
+       */
+      let uiLocale = "ja";
+      const UI_COPY = {
+        ja: {
+          qTitle: (n) => `[問 ${n}]`,
+          tries: (n) => `試行 ${n}`,
+          clears: (n) => `正答 ${n}`,
+          stage: (n) => `問.${n}`,
+          // 「求め、」のあとで改行してバランスを取る
+          solveTitle: "[解] θ・F・Δy を求め、\n図で検証せよ",
+          windTail: "追い風",
+          windHead: "向かい風",
+          windCalm: "無風",
+          hudEnv: "環境",
+          hudBall: "球",
+          hudGoal: "ゴール",
+          debugTitle: "HITBOX DEBUG (H)",
+          debugBody: "赤=物理 緑=ネット 橙=開口 水色=抜け",
+          debugSolveOk: (a, F, dy, ax) =>
+            `SOLVE θ=${a} F=${F} Δy=${dy} ax=${ax} sim=OK`,
+          debugSolveFail: (ax) => `SOLVE impossible ax=${ax}`,
+          debugSolveNone: "SOLVE (計算中…)",
+          debugOn: "デバッグ ON",
+          debugOff: "デバッグ OFF",
+          startFlash: (n) => `問.${n} 開始`,
+          correct: "正答！",
+          livesLeft: (n) => `残り試行 ${n}`,
+        },
+        en: {
+          qTitle: (n) => `[Q${n}]`,
+          tries: (n) => `Tries ${n}`,
+          clears: (n) => `Clears ${n}`,
+          stage: (n) => `Q.${n}`,
+          solveTitle: "[Ans] Find θ, F, Δy,\nthen verify on the diagram",
+          windTail: "tailwind",
+          windHead: "headwind",
+          windCalm: "calm",
+          hudEnv: "env",
+          hudBall: "ball",
+          hudGoal: "goal",
+          debugTitle: "HITBOX DEBUG (H)",
+          debugBody: "red=body green=net orange=rim cyan=clear",
+          debugSolveOk: (a, F, dy, ax) =>
+            `SOLVE θ=${a} F=${F} Δy=${dy} ax=${ax} sim=OK`,
+          debugSolveFail: (ax) => `SOLVE impossible ax=${ax}`,
+          debugSolveNone: "SOLVE (computing…)",
+          debugOn: "Debug ON",
+          debugOff: "Debug OFF",
+          startFlash: (n) => `Q.${n} start`,
+          correct: "Score!",
+          livesLeft: (n) => `${n} tries left`,
+        },
+      };
+      function ui() {
+        return UI_COPY[uiLocale] || UI_COPY.ja;
+      }
+      function readInitialLocale() {
+        try {
+          const q = new URLSearchParams(location.search).get("lang");
+          if (q === "en" || q === "ja") return q;
+        } catch {
+          /* ignore */
+        }
+        try {
+          const s = localStorage.getItem("my-tool-box-locale");
+          if (s === "en" || s === "ja") return s;
+        } catch {
+          /* ignore */
+        }
+        return "ja";
+      }
+      function setUiLocale(locale) {
+        uiLocale = locale === "en" ? "en" : "ja";
+        document.documentElement.lang = uiLocale;
+        updateLabels();
+        updateEnvHud();
+      }
+
+      /** H デバッグ用：現ステージ条件での理論クリア解 */
+      let debugSolveResult = null;
+      let debugSolveBusy = false;
+      /** 理論値行のクリック判定（画面座標・CSS px） */
+      let debugSolveHitScreen = null;
 
       const INK = "#3a342c";
       const PAPER_FILL = "#fffaf0";
@@ -936,7 +1037,8 @@
        */
       const F_MIN = 10;
       const F_MAX = 20000; // Steel 15kg でも 10m 級の放物線が取れるよう解放
-      const F_DEFAULT = 100; // Basketball で旧 v₀≈2.7 m/s 相当の目安
+      /** Basketball で典型距離（約 5–8m）を狙える目安（v₀≈7.8 m/s） */
+      const F_DEFAULT = 280;
       /** シュート時の推力が作用する時間 [s]（1フレーム分） */
       const THRUST_CONTACT_S = 1 / 60;
       /** Δy：ボール中心からの鉛直オフセット（＋＝下側を打つ → バックスピン気味） */
@@ -976,14 +1078,83 @@
       };
       const BALL_TYPE_KEYS = Object.keys(BALL_TYPES);
 
-      function pickBallType() {
-        return BALL_TYPE_KEYS[
-          Math.floor(Math.random() * BALL_TYPE_KEYS.length)
-        ];
-      }
-
       function getBallType(stage) {
         return BALL_TYPES[stage && stage.ballType] || BALL_TYPES.basketball;
+      }
+
+      /**
+       * ステージ数 → 解禁ティア（3ステージごと）。
+       * tier = floor((stageNum-1)/3)+1
+       */
+      function stageTier(stageNum) {
+        const n = Math.max(1, Math.floor(stageNum) || 1);
+        return Math.floor((n - 1) / 3) + 1;
+      }
+
+      /**
+       * アンロックテーブル：ティアごとの出題範囲。
+       * 距離は右上ゴール表示と同じ cm（方眼）。px = cm / CM_PER_PX。
+       * （仕様文の 500m 等は本ゲームの cm スケールに合わせて 500/1000/3000 cm）
+       */
+      function getStageUnlockRules(stageNum) {
+        const tier = stageTier(stageNum);
+        /** @type {{ maxDistCm: number, wind: "off" | "on", balls: string[], envs: string[] }} */
+        const rules = {
+          maxDistCm: 1000,
+          wind: "on",
+          balls: ["basketball"],
+          envs: ["earth"],
+        };
+
+        if (tier <= 1) {
+          rules.maxDistCm = 500;
+          rules.wind = "off";
+          rules.balls = ["basketball"];
+          rules.envs = ["earth"];
+        } else if (tier === 2) {
+          rules.maxDistCm = 1000;
+          rules.wind = "on";
+          rules.balls = ["basketball"];
+          rules.envs = ["earth"];
+        } else if (tier === 3) {
+          rules.maxDistCm = 1000;
+          rules.wind = "on";
+          rules.balls = ["basketball", "bowling"];
+          rules.envs = ["earth"];
+        } else if (tier === 4) {
+          rules.maxDistCm = 1000;
+          rules.wind = "on";
+          rules.balls = ["basketball", "bowling", "beach"];
+          rules.envs = ["earth"];
+        } else if (tier === 5 || tier === 6) {
+          rules.maxDistCm = 1000;
+          rules.wind = "on";
+          rules.balls = ["basketball", "bowling", "beach", "steel"];
+          rules.envs = ["earth"];
+        } else if (tier === 7) {
+          rules.maxDistCm = 1000;
+          rules.wind = "on";
+          rules.balls = ["basketball", "bowling", "beach", "steel"];
+          rules.envs = ["earth", "moon"];
+        } else if (tier === 8) {
+          rules.maxDistCm = 1000;
+          rules.wind = "on";
+          rules.balls = ["basketball", "bowling", "beach", "steel"];
+          rules.envs = ["earth", "moon", "jupiter"];
+        } else {
+          // Tier 9+：完全解放
+          rules.maxDistCm = 3000;
+          rules.wind = "on";
+          rules.balls = ["basketball", "bowling", "beach", "steel"];
+          rules.envs = ["earth", "moon", "jupiter"];
+        }
+        return { tier, ...rules };
+      }
+
+      /** 配列から一様ランダムに1つ（空なら null） */
+      function pickFromList(list) {
+        if (!list || !list.length) return null;
+        return list[Math.floor(Math.random() * list.length)];
       }
 
       /**
@@ -1016,9 +1187,13 @@
        * - リム（金属管）：反発高め・摩擦低め → Matter の通常衝突だけで弾かれる
        * - ボード（アクリル板）：反発 0.6〜0.7・摩擦少なめ
        */
-      const RIM_REST = 0.78; // 金属リングらしい弾み
-      /** スピンが効くようリム摩擦を高めに（つるつるだと Δy トルクが消える） */
-      const RIM_FRICTION = 0.65;
+      /**
+       * リム物性：反発を抑えめにして、外側からのカスリが
+       * 「内側へすくわれて入る」不自然な挙動になりにくくする。
+       */
+      const RIM_REST = 0.42;
+      /** スピンが効くようリム摩擦は高め */
+      const RIM_FRICTION = 0.78;
       const BOARD_REST = 0.65;
       const BOARD_FRICTION = 0.7;
       /** ボード物理ボディの最小厚み（奥側へだけ足す。打面はイラストに一致） */
@@ -1030,7 +1205,7 @@
       const PHYS_SUBSTEPS = 6;
       /**
        * ネットの減衰係数はサブステップごとに掛かるため、
-       * 「1フレームあたりの値」から1ステップ分へ換算する（4回掛けて設計値になる）。
+       * 「1フレームあたりの値」から1ステップ分へ換算する（PHYS_SUBSTEPS 回掛けて設計値）。
        */
       const subStepDamp = (perFrame) => Math.pow(perFrame, 1 / PHYS_SUBSTEPS);
       /**
@@ -1049,7 +1224,7 @@
       const NET_DRAG_UP = 0.82; // 上向き速度の減衰（網が受け止める感）
       const NET_DRAG_DOWN = 0.97; // 下向きもわずかに減速（クッション）
       const NET_EXIT_BOOST = 1.2; // すぼまりで噛んだときの下方向押し出し
-      /** 手書き風景のシームレス背景（環境ごとに切替） */
+      /** シームレス背景（環境ごとに切替） */
       const LANDSCAPE_SRCS = {
         earth: "/robot-freethrow/bg-landscape.png",
         moon: "/robot-freethrow/bg-moon.png",
@@ -1201,26 +1376,25 @@
        * 飛行中速度上限（軽い球＋大推力でも発散しないよう余裕を持たせる）。
        * 単位は setVelocity と同じ「ベースフレーム換算」の速度。
        */
-      const BALL_SPEED_CAP = matterSpeedFromV0(18);
+      /** 月＋向かい風でも到達できるよう余裕を持たせる（m/s 換算） */
+      const BALL_SPEED_CAP = matterSpeedFromV0(28);
 
       /**
-       * サブステップ更新直後の body.velocity は「その Δt 分の位置増分」。
-       * ベース単位に戻してから BALL_SPEED_CAP と比較し、setVelocity へはベース単位で渡す
-       * （Matter が内部で timeScale = Δt/Δt₀ を掛けるため）。
+       * Engine.update 後の body.velocity は updateVelocities 済み
+       * （ベースフレーム換算の速度）。その単位のまま上限と比較・setVelocity する。
+       * ※サブステップの位置増分だと誤認して 6 倍換算すると、
+       *   中〜大推力がすべて同じ初速に潰れて入力と挙動が噛み合わなくなる。
        */
       function clampBallSpeed(body) {
         if (!body || body.isStatic) return;
-        const step = ENGINE_FRAME_MS / PHYS_SUBSTEPS;
-        const timeScale = step / ENGINE_FRAME_MS; // = 1/PHYS_SUBSTEPS
-        if (!(timeScale > 0)) return;
-        const vxBase = body.velocity.x / timeScale;
-        const vyBase = body.velocity.y / timeScale;
-        const sp = Math.hypot(vxBase, vyBase);
+        const vx = body.velocity.x;
+        const vy = body.velocity.y;
+        const sp = Math.hypot(vx, vy);
         if (sp <= BALL_SPEED_CAP) return;
         const s = BALL_SPEED_CAP / sp;
         Body.setVelocity(body, {
-          x: vxBase * s,
-          y: vyBase * s,
+          x: vx * s,
+          y: vy * s,
         });
       }
 
@@ -1703,29 +1877,73 @@
         return a + Math.random() * (b - a);
       }
 
-      /** レベルが進むほど月・木星が出やすくなる */
-      function pickStageEnv(level) {
-        const d = Math.min(level, 24);
-        const spaceChance = Math.min(0.58, 0.1 + Math.max(0, d - 1) * 0.045);
-        if (Math.random() >= spaceChance) return "earth";
-        return Math.random() < 0.5 ? "moon" : "jupiter";
+      /**
+       * 出題してよいか（プレイヤーと同じ θ 0〜90 / F 範囲で解があるか）。
+       * 公平性チェックは粗い角度刻み（重いので）。デバッグ SOLVE は細かく探す。
+       */
+      function stageIsFairToAsk(stage) {
+        if (!stage) return false;
+        const sol = searchIdealShot(
+          stage.dist,
+          stage.height,
+          {
+            wind: stage.wind,
+            gravityY: stage.gravityY,
+            restitution: stage.restitution,
+            mass: getBallType(stage).mass,
+          },
+          { angleMin: 0, angleMax: 90, angleStep: 5, boardSweep: false },
+        );
+        return Boolean(sol && sol.found && sol.verified);
       }
 
-      function generateStage(level) {
-        const d = Math.min(level, 24);
-        const ballType = pickBallType();
-        /**
-         * ゴールポイント＝リング直径の中心（前端〜後端フチの中点 @ リム高さ）。
-         * 必ず方眼の交差点に配置する。
-         */
-        let ringX = snapToGrid(
-          origin.x + rand(800 + d * 50, 2200 + d * 80),
+      /**
+       * アンロック表＋指定の env/球種で候補を振る。
+       * 球種・環境は呼び出し側が一様ランダムに決める（ここでは変えない）。
+       * attempt では距離・風・高さだけを調整する。
+       */
+      function rollStageCandidate(stageNum, attempt, fixed) {
+        const unlock = getStageUnlockRules(stageNum);
+        const ease = Math.min(1, attempt / 8);
+
+        const env = fixed && fixed.env ? fixed.env : pickFromList(unlock.envs);
+        const ballType =
+          fixed && fixed.ballType
+            ? fixed.ballType
+            : pickFromList(unlock.balls);
+        if (!env || !ballType || !BALL_TYPES[ballType]) {
+          return null;
+        }
+
+        // 風：Tier1 は無風固定。解禁後は Matter 重力 x を一様ランダム
+        let wind = 0;
+        if (unlock.wind === "on") {
+          const windAmpBase =
+            env === "moon"
+              ? 0.035 + Math.min(stageNum, 24) * 0.005
+              : env === "jupiter"
+                ? 0.05 + Math.min(stageNum, 24) * 0.006
+                : 0.06 + Math.min(stageNum, 24) * 0.008;
+          const windAmp = windAmpBase * (1 - ease * 0.5);
+          wind = (Math.random() - 0.5) * 2 * windAmp;
+        }
+
+        // 距離：cm → px（方眼）。上下限内で一様
+        const maxDistPx = unlock.maxDistCm / CM_PER_PX;
+        const minDistPx = Math.max(
+          GRID_CELL_PX * 8,
+          maxDistPx * (0.45 + ease * 0.08),
         );
-        let ringY = snapToGrid(
-          origin.y - rand(-110 - d * 2, 35 + d * 3),
+        const distHi = Math.max(
+          minDistPx + GRID_CELL_PX,
+          maxDistPx * (1 - ease * 0.12),
         );
 
-        // 縦方向だけ画面内に収めて再スナップ（交差点を崩さない）
+        let ringX = snapToGrid(origin.x + rand(minDistPx, distHi));
+        let ringY = snapToGrid(
+          origin.y - rand(-70 - unlock.tier * 4, 24 + unlock.tier * 3),
+        );
+
         const marginTop = snapToGrid(40);
         const marginBot = snapToGrid(Math.min(H * 0.72, H - 40));
         if (ringY < marginTop) ringY = marginTop;
@@ -1733,26 +1951,157 @@
         ringX = snapToGrid(ringX);
         ringY = snapToGrid(ringY);
 
-        const dist = ringX - origin.x;
-        const height = origin.y - ringY;
+        const maxRingX = snapToGrid(origin.x + maxDistPx);
+        if (ringX > maxRingX) ringX = maxRingX;
 
-        const env = pickStageEnv(level);
-        const wind = (Math.random() - 0.5) * (0.15 + d * 0.04);
-        const gravityY = gravityForEnv(env);
-        // 反発係数は球種ごとの実測値をそのまま採用（ランダム幅は持たせない）
-        const restitution = BALL_TYPES[ballType].restitution;
         return {
-          env, // "earth" | "moon" | "jupiter"
-          ballType, // "basketball" | "bowling" | "beach" | "steel"
-          dist,
-          height,
+          env,
+          ballType,
+          dist: ringX - origin.x,
+          height: origin.y - ringY,
           wind,
-          gravityY,
-          restitution,
-          /** リング直径の中心（ワールド px・方眼交差） */
+          gravityY: gravityForEnv(env),
+          restitution: BALL_TYPES[ballType].restitution,
           ringX,
           ringY,
+          tier: unlock.tier,
         };
+      }
+
+      /**
+       * アンロック範囲内の安全フォールバック。
+       * 球種・環境も解禁リストから一様ランダム（先頭固定にしない）。
+       */
+      function rollSafeStage(stageNum) {
+        const unlock = getStageUnlockRules(stageNum);
+        const env = pickFromList(unlock.envs) || "earth";
+        const ballType = pickFromList(unlock.balls) || "basketball";
+        const wind = unlock.wind === "off" ? 0 : rand(-0.025, 0.025);
+
+        const maxDistPx = unlock.maxDistCm / CM_PER_PX;
+        const minDistPx = Math.max(GRID_CELL_PX * 8, maxDistPx * 0.5);
+        let ringX = snapToGrid(
+          origin.x + rand(minDistPx, Math.min(maxDistPx, minDistPx * 1.35)),
+        );
+        let ringY = snapToGrid(origin.y - rand(-36, 36));
+        const marginTop = snapToGrid(40);
+        const marginBot = snapToGrid(Math.min(H * 0.72, H - 40));
+        if (ringY < marginTop) ringY = marginTop;
+        else if (ringY > marginBot) ringY = marginBot;
+        ringX = snapToGrid(ringX);
+        ringY = snapToGrid(ringY);
+        const maxRingX = snapToGrid(origin.x + maxDistPx);
+        if (ringX > maxRingX) ringX = maxRingX;
+
+        return {
+          env,
+          ballType,
+          dist: ringX - origin.x,
+          height: origin.y - ringY,
+          wind,
+          gravityY: gravityForEnv(env),
+          restitution: BALL_TYPES[ballType].restitution,
+          ringX,
+          ringY,
+          tier: unlock.tier,
+        };
+      }
+
+      /**
+       * 選ばれた env×球種を変えず、距離・風・高さを易しくしてプレイ可能にする。
+       * （球種のすり替わり＝ボウリング偏りを防ぐ）
+       */
+      function forcePlayableForCombo(stageNum, env, ballType) {
+        const unlock = getStageUnlockRules(stageNum);
+        const maxDistPx = unlock.maxDistCm / CM_PER_PX;
+        // 軽い球・低重力ほど短距離・弱風に寄せる
+        const mass = (BALL_TYPES[ballType] && BALL_TYPES[ballType].mass) || 0.6;
+        const distScale =
+          mass <= 0.15 ? 0.55 : mass >= 10 ? 0.7 : env === "moon" ? 0.65 : 0.75;
+        const distPx = Math.max(
+          GRID_CELL_PX * 8,
+          Math.min(maxDistPx, maxDistPx * distScale),
+        );
+        let wind = 0;
+        if (unlock.wind === "on") {
+          // ビーチ等でも通りやすいよう弱風に抑える（球種は変えない）
+          const amp = mass <= 0.15 || env === "moon" ? 0.02 : 0.04;
+          wind = (Math.random() - 0.5) * 2 * amp;
+        }
+
+        let ringX = snapToGrid(origin.x + distPx);
+        let ringY = snapToGrid(origin.y - rand(-28, 28));
+        const marginTop = snapToGrid(40);
+        const marginBot = snapToGrid(Math.min(H * 0.72, H - 40));
+        if (ringY < marginTop) ringY = marginTop;
+        else if (ringY > marginBot) ringY = marginBot;
+        ringX = snapToGrid(ringX);
+        ringY = snapToGrid(ringY);
+
+        const stage = {
+          env,
+          ballType,
+          dist: ringX - origin.x,
+          height: origin.y - ringY,
+          wind,
+          gravityY: gravityForEnv(env),
+          restitution: BALL_TYPES[ballType].restitution,
+          ringX,
+          ringY,
+          tier: unlock.tier,
+        };
+
+        // まだ厳しければ無風＋さらに短距離
+        if (!stageIsFairToAsk(stage)) {
+          stage.wind = 0;
+          const shortPx = Math.max(GRID_CELL_PX * 8, maxDistPx * 0.48);
+          stage.ringX = snapToGrid(origin.x + shortPx);
+          stage.ringY = snapToGrid(origin.y);
+          stage.dist = stage.ringX - origin.x;
+          stage.height = origin.y - stage.ringY;
+        }
+        return stage;
+      }
+
+      /**
+       * ステージ生成。
+       *
+       * 球種・環境は最初に一様ランダムで確定し、以後すり替えない。
+       * 公平性チェックに落ちても「通りやすい球」へ逃げず、
+       * 同じ球種のまま距離・風だけを緩めて成立させる。
+       * → ボウリング偏り／ビーチ不出を防ぐ。
+       */
+      function generateStage(stageNum) {
+        const n = Math.max(1, Math.floor(stageNum) || 1);
+        const unlock = getStageUnlockRules(n);
+
+        // ① 解禁範囲から一様に選ぶ（ここで比率が決まる）
+        const env = pickFromList(unlock.envs) || "earth";
+        const ballType = pickFromList(unlock.balls) || "basketball";
+        const combo = { env, ballType };
+
+        // ② 同じ組合せのまま幾何・風だけ再抽選
+        for (let attempt = 0; attempt < 18; attempt++) {
+          const cand = rollStageCandidate(n, attempt, combo);
+          if (!cand) continue;
+          try {
+            if (stageIsFairToAsk(cand)) return cand;
+          } catch {
+            /* 同じ球種で次の幾何へ */
+          }
+        }
+
+        // ③ それでもダメなら同じ球種・環境で強制的に易しい配置
+        try {
+          const forced = forcePlayableForCombo(n, env, ballType);
+          if (forced && stageIsFairToAsk(forced)) return forced;
+          if (forced) return forced; // 球種は維持（極稀に幅が狭くてもすり替えない）
+        } catch {
+          /* fallthrough */
+        }
+
+        // ④ 最後の手段も解禁リストから一様（特定球種固定にしない）
+        return rollSafeStage(n);
       }
 
       /** 画面座標 → ワールド座標（カメラオフセット込み） */
@@ -1977,9 +2326,11 @@
       }
 
       function updateLabels() {
-        lvLabel.textContent = `問.${state.level}`;
-        lifeLabel.textContent = `試行 ${state.lives}`;
-        scoreLabel.textContent = `正答 ${state.clears}`;
+        const c = ui();
+        lvLabel.textContent = c.stage(state.level);
+        lifeLabel.textContent = c.tries(state.lives);
+        scoreLabel.textContent = c.clears(state.clears);
+        if (memoSolveTitle) memoSolveTitle.textContent = c.solveTitle;
       }
 
       function updateEnvHud() {
@@ -1988,35 +2339,29 @@
           envHud.textContent = "";
           return;
         }
-        // 方眼スケールに合わせた実加速度（環境ごと固定の g）
+        const c = ui();
         const gMs2 = gravityMs2ForEnv(s.env).toFixed(2);
-        const windAx = accelUnitToMs2(s.wind).toFixed(2);
+        const ax = accelUnitToMs2(s.wind);
+        const windAx = (ax >= 0 ? "+" : "") + ax.toFixed(2);
         const windLabel =
-          s.wind > 0.02 ? "追い風相当" : s.wind < -0.02 ? "向かい風相当" : "ほぼ無風";
-        // ゴール＝リング直径の中心（前端〜後端フチの中点）
+          s.wind > 0.02 ? c.windTail : s.wind < -0.02 ? c.windHead : c.windCalm;
         const gp = getGoalPoint(s);
         const goalPhys = screenToPhys(gp.x, gp.y);
         const gx = Math.round(goalPhys.x);
         const gy = Math.round(goalPhys.y);
-        const gNote = describeGravityEnv(s);
         const bt = getBallType(s);
+        // 環境名＝重力条件なので同一行。あとは球・風・ゴール・e
         envHud.innerHTML =
-          `<div class="given-title">[ 問 ${state.level} ] 次の条件でシュート軌道を予測せよ。</div>` +
-          `<span class="given-line">・環境 <span class="given-sym">${stageEnvLabel(s)}</span></span>` +
-          `<span class="given-line">・原点 O(0,0)＝発射点／1マス=${GRID_CM_PER_CELL}cm</span>` +
-          `<span class="given-line">・重力 <span class="given-sym">g</span> = ${gMs2} m/s²` +
-          ` <span class="given-note">(${gNote})</span></span>` +
-          `<span class="given-line">・水平加速度 <span class="given-sym">a<sub>x</sub></span> = ${windAx} m/s²` +
-          ` <span class="given-note">(${windLabel})</span></span>` +
-          `<span class="given-line">・ボール質量 <span class="given-sym">m</span> = ${bt.mass.toFixed(1)} kg` +
-          ` <span class="given-note">(球種: ${bt.label}／a=F/m)</span></span>` +
-          `<span class="given-line">・ゴール <span class="given-sym">(x,y)</span> = (${gx}, ${gy}) cm` +
-          ` <span class="given-note">(リング直径の中心)</span></span>` +
-          `<span class="given-line">・空気抵抗 <span class="given-sym">なし</span>` +
-          ` <span class="given-note">(飛行中)</span></span>` +
-          `<span class="given-line given-note">・反発係数 e = ${s.restitution.toFixed(2)}（衝突）</span>` +
-          `<span class="given-line given-note">・未知数：θ・F・Δy（打点オフセットでスピン）</span>` +
-          `<span class="given-line given-note given-wrap">※推力 F は接触時間 τ(約1/60s) の平均力とする。風 W<sub>x</sub> は一定の水平加速度 a<sub>x</sub> として働く。</span>`;
+          `<div class="given-title">${c.qTitle(state.level)}</div>` +
+          `<ul class="given-list">` +
+          `<li><span class="given-sym">${stageEnvLabel(s)}</span>` +
+          `　g=${gMs2} m/s²</li>` +
+          `<li>${c.hudBall} <span class="given-sym">${bt.label}</span> / m=${bt.mass.toFixed(1)} kg</li>` +
+          `<li><span class="given-sym">a<sub>x</sub></span> = ${windAx} m/s²` +
+          ` <span class="given-note">(${windLabel})</span></li>` +
+          `<li>${c.hudGoal} (${gx}, ${gy}) cm</li>` +
+          `<li><span class="given-sym">e</span> = ${s.restitution.toFixed(2)}</li>` +
+          `</ul>`;
       }
 
       function showHint() {
@@ -2036,10 +2381,7 @@
             `  θ  = ${ideal.angle} °\n` +
             `  F  = ${ideal.F}\n` +
             `  Δy = ${ideal.dyCm} cm\n`
-            : `概算：\n` +
-            `  θ  ≈ ${ideal.angle} °\n` +
-            `  F  ≈ ${ideal.F}\n` +
-            `  Δy ≈ ${ideal.dyCm} cm\n`) +
+            : `解なし（この参考条件では到達困難）\n`) +
           `\n` +
           `※ F は約 1/60 秒だけ加わる推力 [N]。Δv≈F/m·τ。\n` +
           `  同じ F でも重い球ほど初速が小さい。Δy でスピン。\n` +
@@ -2205,7 +2547,7 @@
           label: "rim",
           restitution: RIM_REST,
           friction: RIM_FRICTION,
-          frictionStatic: 0.05,
+          frictionStatic: RIM_FRICTION,
           slop: 0.01,
           render: { fillStyle: DEBUG_BODY_FILL },
         });
@@ -2275,18 +2617,21 @@
         const ry = m.rimY;
         const tube = m.tubeR;
 
-        // —— リムのフチ＝円ボディ2つのみ（矩形キャップは廃止）——
-        // 円に当たると接点の法線方向へ弾かれるため「リングに嫌われる」動きが出る。
-        // 細すぎるとカスリが検出されず「弾かれない」ので、下限を確保する。
-        const RIM_NODE_MIN_R = 3.2;
-        let rimNodeR = Math.max(RIM_NODE_MIN_R, tube * 1.35);
+        // —— リムのフチ＝円ボディ2つ ——
+        // 旧: tube×1.35 で円が大きすぎ、外側からの当たりが内側肩に当たって
+        // 「ゴール内へはじかれる」不自然なすくいが起きやすかった。
+        // 今: 管径に近い半径＋開口の外側へわずかにオフセットして拒絶感を出す。
+        const RIM_NODE_MIN_R = 2.4;
+        let rimNodeR = Math.max(RIM_NODE_MIN_R, tube * 0.92);
         // フチ間の素通り幅はボール直径＋余裕を維持（スポッと通る）
-        const needClear = BALL_R * 2 + Math.max(3, BALL_R * 0.2);
+        const needClear = BALL_R * 2 + Math.max(3, BALL_R * 0.25);
         if (bx - fx - rimNodeR * 2 < needClear) {
           rimNodeR = Math.max(RIM_NODE_MIN_R, (bx - fx - needClear) / 2);
         }
-        rimFront = makeRimNode(fx, ry, rimNodeR);
-        rimMount = makeRimNode(bx, ry, rimNodeR);
+        // 前フチは左（外側）へ、後フチは右（ボード側）へずらす
+        const rimOutBias = Math.max(1.0, rimNodeR * 0.4);
+        rimFront = makeRimNode(fx - rimOutBias, ry, rimNodeR);
+        rimMount = makeRimNode(bx + rimOutBias, ry, rimNodeR);
         rimBodies.push(rimFront, rimMount);
 
         // ネット：イラスト外郭ポリラインに沿った細かい線分（直線テーパー禁止）
@@ -2419,6 +2764,9 @@
         applyEnvironment(state.stage);
         makeBall();
         updateLabels();
+        // ステージが変わったらデバッグ理論解を取り直す
+        debugSolveResult = null;
+        if (debugHitboxOn) refreshDebugSolve();
       }
 
       function flash(text, ms = 1100) {
@@ -2569,10 +2917,16 @@
       }
 
       function onPointerDownCanvas(e) {
-        if (!canManualPan()) return;
         if (e.type === "mousedown" && e.button !== 0) return;
-        const isTouch = e.type.startsWith("touch");
         const p = canvasPointFromEvent(e);
+        // デバッグ理論値（赤文字）クリック → 入力欄へ自動反映
+        if (hitTestDebugSolve(p.x, p.y)) {
+          applyDebugSolveToInputs();
+          if (e.cancelable) e.preventDefault();
+          return;
+        }
+        if (!canManualPan()) return;
+        const isTouch = e.type.startsWith("touch");
         pointerGesture.active = true;
         pointerGesture.id =
           e.changedTouches && e.changedTouches[0]
@@ -2591,9 +2945,15 @@
       function onPointerMoveCanvas(e) {
         if (!pointerGesture.active || !canManualPan()) {
           // カーソル見た目のみ（マウス）
-          if (e.type === "mousemove" && state.playing && !state.ballInFlight) {
+          if (e.type === "mousemove") {
             const p = canvasPointFromEvent(e);
-            canvas.style.cursor = hitTestShooter(p.x, p.y) ? "pointer" : "default";
+            if (hitTestDebugSolve(p.x, p.y)) {
+              canvas.style.cursor = "pointer";
+            } else if (state.playing && !state.ballInFlight) {
+              canvas.style.cursor = hitTestShooter(p.x, p.y) ? "pointer" : "default";
+            } else {
+              canvas.style.cursor = "default";
+            }
           }
           return;
         }
@@ -2734,13 +3094,13 @@
         if (state.scoredThisShot) return;
         state.scoredThisShot = true;
         state.clears += 1;
-        flash("正答！", 1000);
+        flash(ui().correct, 1000);
         setTimeout(() => {
           state.level += 1;
           state.lives = 3;
           state.ballInFlight = false;
           rebuildWorld(true);
-          flash(`問.${state.level}`, 800);
+          flash(ui().stage(state.level), 800);
         }, 900);
       }
 
@@ -2755,61 +3115,415 @@
           resetCamera(false);
           return;
         }
-        flash(`残り試行 ${state.lives}`, 900);
+        flash(ui().livesLeft(state.lives), 900);
         makeBall(); // 内部で原点へカメラ復帰
       }
 
-      /** 無風・地球相当での基準解（F・Δy 探索）。stage を渡すと球種 m/e を反映 */
+      /** 無風・地球相当での基準解（ANALYZE 用）。stage を渡すと球種 m/e を反映 */
       function computeIdealEarthParams(dist, height, stage) {
+        return searchIdealShot(dist, height, {
+          wind: 0,
+          gravityY: DEFAULT_G,
+          restitution: stage ? stage.restitution : DEFAULT_REST,
+          mass: getBallType(stage).mass,
+        });
+      }
+
+      /**
+       * 現ステージ条件（重力・風・球種）でクリアになる理論値を探索。
+       * H デバッグの検証用（シミュレーションでゴール判定が通る組を探す）。
+       */
+      function computeIdealStageParams(stage) {
+        if (!stage) return null;
+        // プレイヤー入力と同じ範囲（θ 0〜90 / F_MIN〜F_MAX）。人工的な角度制限なし。
+        return searchIdealShot(
+          stage.dist,
+          stage.height,
+          {
+            wind: stage.wind,
+            gravityY: stage.gravityY,
+            restitution: stage.restitution,
+            mass: getBallType(stage).mass,
+          },
+          { angleMin: 0, angleMax: 90, angleStep: 2, boardSweep: true },
+        );
+      }
+
+      /**
+       * リム高さを上→下に横切る X を返す（風・重力込み）。
+       * 開口判定用。ボード無しの軌道計測（F の当たりを狭く探すため）。
+       * 横切らない場合は null。
+       */
+      function measureRimCrossX(dist, height, angleDeg, F, env) {
+        const mass = env.mass > 0 ? env.mass : 0.6;
+        const eng = Engine.create({
+          gravity: {
+            x: env.wind ?? 0,
+            y: env.gravityY || DEFAULT_G,
+            scale: DEFAULT_SCALE,
+          },
+          positionIterations: 12,
+          velocityIterations: 10,
+        });
+        const o = { x: 200, y: 280 };
+        const rimX = o.x + dist;
+        const rimY = o.y - height;
+        const b = Bodies.circle(o.x, o.y, BALL_R, {
+          restitution: 0,
+          friction: 0,
+          frictionAir: BALL_FRICTION_AIR,
+          density: ballDensityForSize(),
+        });
+        applyBallMass(b, mass);
+        Composite.add(eng.world, [b]);
+        Body.setPosition(b, { x: o.x, y: o.y });
+        applyShotForce(b, (angleDeg * Math.PI) / 180, F, 0);
+
+        let prevX = o.x;
+        let prevY = o.y;
+        let crossX = null;
+        const limitY = o.y + 900;
+        for (let i = 0; i < 1200; i++) {
+          for (let s = 0; s < PHYS_SUBSTEPS; s++) {
+            Engine.update(eng, ENGINE_FRAME_MS / PHYS_SUBSTEPS);
+            clampBallSpeed(b);
+          }
+          const cx = b.position.x;
+          const cy = b.position.y;
+          if (crossX == null && prevY < rimY && cy >= rimY) {
+            const dy = cy - prevY;
+            const t = dy > 1e-6 ? (rimY - prevY) / dy : 1;
+            crossX = prevX + (cx - prevX) * Math.min(1, Math.max(0, t));
+            break;
+          }
+          prevX = cx;
+          prevY = cy;
+          // 上昇中に遠くまで行っても、落下して横切るまで待つ
+          if (cy > limitY || cx < o.x - 500) break;
+          if (cy > rimY + 120 && cx > rimX + 1200) break;
+        }
+        Engine.clear(eng);
+        return crossX;
+      }
+
+      /** 風込みの必要 F の粗い見積もり（探索範囲の中心用） */
+      function estimateThrustWithWind(dist, height, angleDeg, env, mass) {
+        const theta = (angleDeg * Math.PI) / 180;
+        const distM = (dist * CM_PER_PX) / 100;
+        const heightM = (height * CM_PER_PX) / 100;
+        const g = Math.max(0.2, accelUnitToMs2(env.gravityY || DEFAULT_G));
+        const ax = accelUnitToMs2(env.wind ?? 0);
+        const cos = Math.max(0.08, Math.cos(theta));
+        const sin = Math.sin(theta);
+        const denom =
+          distM * Math.sin(2 * theta) - 2 * heightM * Math.pow(cos, 2);
+        let v = 3;
+        if (denom > 0) {
+          v = Math.sqrt((g * distM * distM) / Math.max(denom, 1e-6));
+        }
+        for (let i = 0; i < 6; i++) {
+          const vy = v * sin;
+          const disc = vy * vy - 2 * g * heightM;
+          if (disc < 0) {
+            v *= 1.25;
+            continue;
+          }
+          const t = (vy + Math.sqrt(disc)) / g;
+          if (!(t > 0.05)) {
+            v *= 1.2;
+            continue;
+          }
+          const vxNeed = (distM - 0.5 * ax * t * t) / t;
+          if (vxNeed <= 0) {
+            v *= 1.4;
+            continue;
+          }
+          v = clamp(v * 0.3 + (vxNeed / cos) * 0.7, 0.5, 40);
+        }
+        return clamp(Math.round((mass * v) / THRUST_CONTACT_S), F_MIN, F_MAX);
+      }
+
+      /**
+       * 1角度について、開口に載る F を探す（風込み）。
+       * F 範囲はプレイヤー入力と同じ F_MIN〜F_MAX（6000/8000 などの人工上限なし）。
+       */
+      function findThrustForAngle(dist, height, angleDeg, env, openL, openR) {
+        const targetX = (openL + openR) / 2;
+        const mass = env.mass > 0 ? env.mass : 0.6;
+        const fest = estimateThrustWithWind(
+          dist,
+          height,
+          angleDeg,
+          env,
+          mass,
+        );
+        const fMinSearch = Math.max(F_MIN, Math.floor(fest * 0.12));
+        let fMaxSearch = Math.min(F_MAX, Math.max(Math.ceil(fest * 5), fest + 250));
+
+        function evalF(F) {
+          return measureRimCrossX(dist, height, angleDeg, F, env);
+        }
+
+        let bestF = null;
+        let bestErr = Infinity;
+        let lo = fMinSearch;
+        let hi = fMaxSearch;
+        let sawShort = false;
+        let sawLong = false;
+
+        const coarseStep = Math.max(5, Math.round((fMaxSearch - fMinSearch) / 50));
+        for (let F = fMinSearch; F <= fMaxSearch; F += coarseStep) {
+          const x = evalF(F);
+          if (x == null) continue;
+          if (x >= openL && x <= openR) return F;
+          if (x < openL) {
+            sawShort = true;
+            lo = F;
+          } else {
+            sawLong = true;
+            hi = F;
+            break;
+          }
+          const err = Math.abs(x - targetX);
+          if (err < bestErr) {
+            bestErr = err;
+            bestF = F;
+          }
+        }
+
+        // まだ長すぎ側が無い → F_MAX まで追加スキャン
+        if (sawShort && !sawLong) {
+          const extHi = F_MAX;
+          const extStep = Math.max(8, Math.round((extHi - fMaxSearch) / 40));
+          for (let F = fMaxSearch; F <= extHi; F += extStep) {
+            const x = evalF(F);
+            if (x == null) continue;
+            if (x >= openL && x <= openR) return F;
+            if (x > openR) {
+              sawLong = true;
+              hi = F;
+              break;
+            }
+            lo = F;
+            bestF = F;
+          }
+        }
+
+        // 短すぎ側も無い（全部長い）→ 下限側も探る
+        if (!sawShort && sawLong) {
+          for (let F = fMinSearch; F >= F_MIN; F -= coarseStep) {
+            const x = evalF(F);
+            if (x == null) continue;
+            if (x >= openL && x <= openR) return F;
+            if (x < openL) {
+              sawShort = true;
+              lo = F;
+              break;
+            }
+            hi = Math.min(hi, F);
+            bestF = F;
+          }
+        }
+
+        if (sawShort && sawLong && hi > lo) {
+          let a = lo;
+          let b = hi;
+          for (let iter = 0; iter < 18; iter++) {
+            const mid = Math.round((a + b) / 2);
+            const x = evalF(mid);
+            if (x == null) {
+              b = mid;
+              continue;
+            }
+            if (x >= openL && x <= openR) return mid;
+            if (x < openL) a = mid;
+            else b = mid;
+            if (b - a <= 1) break;
+          }
+          bestF = Math.round((a + b) / 2);
+        }
+
+        if (bestF != null) {
+          const from = Math.max(F_MIN, bestF - 30);
+          const to = Math.min(F_MAX, bestF + 30);
+          for (let F = from; F <= to; F++) {
+            const x = evalF(F);
+            if (x != null && x >= openL && x <= openR) return F;
+          }
+        }
+        return null;
+      }
+
+      /**
+       * プレイヤー入力と同じ角度範囲（既定 0〜90°）で θ・F を探索。
+       * options.angleStep で粗さ、boardSweep でボード込み直接探索の有無を調整。
+       */
+      function searchIdealShot(dist, height, env, options) {
+        const mass = env.mass > 0 ? env.mass : 0.6;
+        const wind = env.wind ?? 0;
+        const gravityY = env.gravityY || DEFAULT_G;
+        const simEnv = {
+          wind,
+          gravityY,
+          restitution: env.restitution,
+          mass,
+        };
+        const angleMin =
+          options && options.angleMin != null ? options.angleMin : 0;
+        const angleMax =
+          options && options.angleMax != null ? options.angleMax : 90;
+        const angleStep =
+          options && options.angleStep != null ? options.angleStep : 2;
+        const boardSweep = !(options && options.boardSweep === false);
+
+        const o = { x: 200, y: 280 };
+        const fakeStage = { ringX: o.x + dist, ringY: o.y - height };
+        syncBallRadius(fakeStage);
+        const gm = getGoalMetrics(fakeStage);
+        const openL = gm.openL;
+        const openR = gm.openR;
+
         const angles = [];
-        for (let a = 25; a <= 70; a += 5) angles.push(a);
+        for (let a = angleMin; a <= angleMax; a += angleStep) angles.push(a);
 
-        const restitution = stage ? stage.restitution : DEFAULT_REST;
-        const bt = getBallType(stage);
-        // 質量に応じて探索する F レンジを広げる（重い球は大きな推力が必要）
-        const fLo = clamp(F_DEFAULT * (bt.mass / 0.6) * 0.35, F_MIN, F_MAX);
-        const fHi = clamp(F_DEFAULT * (bt.mass / 0.6) * 4.0, F_MIN, F_MAX);
-        const fStep = Math.max(5, (fHi - fLo) / 28);
-
-        let best = { angle: 45, F: F_DEFAULT, dyCm: 0, score: Infinity };
-
+        let best = null;
         for (const angle of angles) {
-          for (let F = fLo; F <= fHi; F += fStep) {
-            const Fr = Math.round(F);
-            const ok = simulateShot(dist, height, angle, Fr, 0, {
-              wind: 0,
-              gravityY: DEFAULT_G,
-              restitution,
-              mass: bt.mass,
-            });
-            if (ok) {
-              const score =
-                Math.abs(Fr - F_DEFAULT * (bt.mass / 0.6)) * 0.02 +
-                Math.abs(angle - 45) * 0.12;
-              if (score < best.score) {
+          const F = findThrustForAngle(
+            dist,
+            height,
+            angle,
+            simEnv,
+            openL,
+            openR,
+          );
+          if (F == null) continue;
+          if (!simulateShot(dist, height, angle, F, 0, simEnv)) {
+            let okF = null;
+            for (let dF = -12; dF <= 12 && !okF; dF++) {
+              const Fr = clamp(F + dF, F_MIN, F_MAX);
+              if (simulateShot(dist, height, angle, Fr, 0, simEnv)) okF = Fr;
+            }
+            if (okF == null) continue;
+            const score = Math.abs(angle - 40) * 0.1 + Math.abs(okF) * 0.001;
+            if (!best || score < best.score) {
+              best = { angle, F: okF, dyCm: 0, score };
+            }
+            continue;
+          }
+          const score = Math.abs(angle - 40) * 0.1 + Math.abs(F) * 0.001;
+          if (!best || score < best.score) {
+            best = { angle, F, dyCm: 0, score };
+          }
+        }
+
+        // 軌道計測だけでは拾えない解（ボードバンプ等）を本番シミュで直接探索
+        if (!best && boardSweep) {
+          const fest0 = estimateThrustWithWind(dist, height, 45, simEnv, mass);
+          for (const angle of angles) {
+            const fest = estimateThrustWithWind(
+              dist,
+              height,
+              angle,
+              simEnv,
+              mass,
+            );
+            const f0 = Math.max(F_MIN, Math.floor(fest * 0.2));
+            const f1 = Math.min(
+              F_MAX,
+              Math.ceil(Math.max(fest * 6, fest0 * 4)),
+            );
+            const step = Math.max(8, Math.round((f1 - f0) / 24));
+            for (let F = f0; F <= f1; F += step) {
+              const Fr = Math.round(F);
+              if (!simulateShot(dist, height, angle, Fr, 0, simEnv)) continue;
+              const score = Math.abs(angle - 40) * 0.1 + Math.abs(Fr) * 0.001;
+              if (!best || score < best.score) {
                 best = { angle, F: Fr, dyCm: 0, score };
               }
             }
           }
         }
 
-        if (best.score === Infinity) {
-          // 見つからないとき：必要初速を F = m·Δv/τ へ粗く換算
-          const theta = Math.PI / 4;
-          const distM = (dist * CM_PER_PX) / 100;
-          const heightM = (height * CM_PER_PX) / 100;
-          const g = accelUnitToMs2(DEFAULT_G);
-          const denom =
-            distM * Math.sin(2 * theta) - 2 * heightM * Math.pow(Math.cos(theta), 2);
-          let vMs = 2.7;
-          if (denom > 0) {
-            vMs = Math.sqrt((g * distM * distM) / Math.max(denom, 1e-6));
-          }
-          let Fguess = (bt.mass * vMs) / THRUST_CONTACT_S;
-          Fguess = clamp(Math.round(Fguess), F_MIN, F_MAX);
-          return { angle: 45, F: Fguess, dyCm: 0, found: false };
+        if (!best) {
+          return {
+            angle: null,
+            F: null,
+            dyCm: 0,
+            found: false,
+            verified: false,
+            wind,
+          };
         }
-        return { ...best, found: true };
+
+        const verified = simulateShot(
+          dist,
+          height,
+          best.angle,
+          best.F,
+          best.dyCm,
+          simEnv,
+        );
+        return {
+          angle: best.angle,
+          F: best.F,
+          dyCm: best.dyCm,
+          found: true,
+          verified: Boolean(verified),
+          wind,
+        };
+      }
+
+      /** デバッグ用理論解を現ステージで再計算（重いので H ON 時・ステージ変更時のみ） */
+      function refreshDebugSolve() {
+        if (!debugHitboxOn || !state.stage) {
+          debugSolveResult = null;
+          return;
+        }
+        if (debugSolveBusy) return;
+        debugSolveBusy = true;
+        // 探索が数フレーム分かかるので、描画を止めないよう次タスクで実行
+        setTimeout(() => {
+          try {
+            debugSolveResult = computeIdealStageParams(state.stage);
+          } catch {
+            debugSolveResult = null;
+          } finally {
+            debugSolveBusy = false;
+          }
+        }, 0);
+      }
+
+      /** 理論値を入力欄へ流し込み（sim=OK のときだけ） */
+      function applyDebugSolveToInputs() {
+        const sol = debugSolveResult;
+        if (!sol || !sol.found || !sol.verified) {
+          if (!sol) refreshDebugSolve();
+          return;
+        }
+        angleEl.value = String(sol.angle);
+        powerEl.value = String(sol.F);
+        dyEl.value = String(sol.dyCm);
+        syncFromMemo();
+      }
+
+      /** デバッグ理論値行（赤い文字）のヒットテスト。sx/sy はキャンバス画面座標 */
+      function hitTestDebugSolve(sx, sy) {
+        if (
+          !debugHitboxOn ||
+          !debugSolveResult ||
+          !debugSolveResult.found ||
+          !debugSolveResult.verified ||
+          !debugSolveHitScreen
+        ) {
+          return false;
+        }
+        const r = debugSolveHitScreen;
+        return (
+          sx >= r.x &&
+          sx <= r.x + r.w &&
+          sy >= r.y &&
+          sy <= r.y + r.h
+        );
       }
 
       function simulateShot(dist, height, angleDeg, F, dyCm, env) {
@@ -2846,12 +3560,15 @@
           gm.board.h,
           { isStatic: true, restitution: BOARD_REST, friction: BOARD_FRICTION },
         );
-        const lipF = Bodies.circle(gm.rimFront.x, gm.rimFront.y, gm.tubeR * 1.25, {
+        // 本番 makeRing と同じ：細めのフチ円＋外側バイアス
+        const simRimR = Math.max(2.4, gm.tubeR * 0.92);
+        const simOut = Math.max(1.0, simRimR * 0.4);
+        const lipF = Bodies.circle(gm.rimFront.x - simOut, gm.rimFront.y, simRimR, {
           isStatic: true,
           restitution: RIM_REST,
           friction: RIM_FRICTION,
         });
-        const lipB = Bodies.circle(gm.rimBack.x, gm.rimBack.y, gm.tubeR * 1.25, {
+        const lipB = Bodies.circle(gm.rimBack.x + simOut, gm.rimBack.y, simRimR, {
           isStatic: true,
           restitution: RIM_REST,
           friction: RIM_FRICTION,
@@ -2862,15 +3579,21 @@
         Body.setPosition(b, { x: o.x, y: o.y });
         applyShotForce(b, ang, F, dyCmToPx(dyCm));
 
+        // 遠い／低重力でも打ち切らない（月＋向かい風は飛行が長い）
+        const limitX = o.x + Math.max(dist, 0) + 1200;
+        const limitY = o.y + 900;
+        const maxFrames = 1200;
+
         let hit = false;
         let wasAbove = false;
         let pending = false;
         let prevX = o.x;
         let prevY = o.y;
-        for (let i = 0; i < 280; i++) {
-          // 本番と同じサブステップ幅で更新（挙動を一致させる）
+        for (let i = 0; i < maxFrames; i++) {
+          // 本番と同じサブステップ＋速度上限
           for (let s = 0; s < PHYS_SUBSTEPS; s++) {
-            Engine.update(eng, 1000 / 60 / PHYS_SUBSTEPS);
+            Engine.update(eng, ENGINE_FRAME_MS / PHYS_SUBSTEPS);
+            clampBallSpeed(b);
           }
           const cx = b.position.x;
           const cy = b.position.y;
@@ -2904,14 +3627,22 @@
             }
           }
 
-          if (pending && top >= gm.rimY + 0.5 && falling && cx >= gm.openL && cx <= gm.openR) {
+          if (
+            pending &&
+            top >= gm.rimY + 0.5 &&
+            falling &&
+            cx >= gm.openL &&
+            cx <= gm.openR
+          ) {
             hit = true;
             break;
           }
 
           prevX = cx;
           prevY = cy;
-          if (b.position.y > 560 || b.position.x < -80 || b.position.x > 980) break;
+          // 上昇中のオーバーシュートでは切らず、落下後に打ち切る
+          if (cy > limitY || cx < o.x - 500) break;
+          if (cy > gm.rimY + 100 && cx > limitX) break;
         }
         Engine.clear(eng);
         return hit;
@@ -3268,20 +3999,17 @@
       }
 
       /**
-       * 風の視覚：ノートに薄い鉛筆で描いた気流。
-       * 矢印付きの曲線が流れる方向＝風向き（右＝追い風、左＝向かい風）。
-       * 邪魔にならないよう淡く、画面固定（カメラ非追従）。
+       * 風の視覚：流れる曲線のみ（矢印・文言なし）。
+       * 移動方向で風向きが分かる。数値は右上の条件付箋を参照。
        */
       function drawWind(ctx) {
         if (!state.stage) return;
-        const wind = state.stage.wind;
-        const strength = Math.abs(wind);
+        const strength = Math.abs(state.stage.wind);
         if (strength <= 0.015 && !state.windLines.length) return;
         const th = getTheme();
 
         ctx.save();
 
-        // —— 流れる気流ストローク ——
         for (const w of state.windLines) {
           const dir = Math.sign(w.speed) || 1;
           const wy = w.y + Math.sin(w.wobble) * w.amp;
@@ -3296,7 +4024,6 @@
           ctx.lineCap = "round";
           ctx.lineJoin = "round";
 
-          // 本体：ゆるい S 字の気流
           ctx.beginPath();
           ctx.moveTo(x0, wy);
           ctx.bezierCurveTo(
@@ -3308,41 +4035,6 @@
             wy,
           );
           ctx.stroke();
-
-          // 先端の小さな矢印（方向が一目で分かる）
-          const tipAngle = Math.atan2(wy - midY, x1 - midX) * 0.35;
-          const head = 5.5 + strength * 6;
-          const ang = (dir > 0 ? 0 : Math.PI) + tipAngle;
-          ctx.beginPath();
-          ctx.moveTo(x1, wy);
-          ctx.lineTo(
-            x1 - Math.cos(ang - 0.45) * head,
-            wy - Math.sin(ang - 0.45) * head,
-          );
-          ctx.moveTo(x1, wy);
-          ctx.lineTo(
-            x1 - Math.cos(ang + 0.45) * head,
-            wy - Math.sin(ang + 0.45) * head,
-          );
-          ctx.stroke();
-        }
-
-        // —— 画面端の方向メモ（手書き風・控えめ）——
-        if (strength > 0.015) {
-          const toRight = wind > 0;
-          const label = toRight ? "風 →  追い風" : "← 風  向かい風";
-          const axLabel = accelUnitToMs2(wind).toFixed(2);
-          ctx.globalAlpha = 0.42 + Math.min(0.2, strength * 1.2);
-          ctx.font = "16px 'Caveat', 'Yomogi', cursive";
-          ctx.fillStyle = th.windLabel;
-          ctx.textBaseline = "middle";
-          if (toRight) {
-            ctx.textAlign = "right";
-            ctx.fillText(`${label}  (${axLabel} m/s²)`, W - 14, 36);
-          } else {
-            ctx.textAlign = "left";
-            ctx.fillText(`${label}  (${axLabel} m/s²)`, 14, 36);
-          }
         }
 
         ctx.restore();
@@ -3692,23 +4384,67 @@
         ctx.lineTo(origin.x, origin.y + 8);
         ctx.stroke();
 
-        // 凡例＋状態（カメラ変換内なので screen 固定のため cameraX を足す）
+        // 凡例＋理論クリア解（カメラ変換内なので screen 固定のため cameraX を足す）
+        const c = ui();
+        // 理論解はステージの風（ax）込み。表示でも ax を明示する
+        let axLabel = "0.00";
+        if (state.stage) {
+          const ax = accelUnitToMs2(state.stage.wind);
+          axLabel = (ax >= 0 ? "+" : "") + ax.toFixed(2);
+        }
+        let solveLine = c.debugSolveNone;
+        if (debugSolveResult) {
+          const sol = debugSolveResult;
+          const ok = sol.found && sol.verified;
+          solveLine = ok
+            ? c.debugSolveOk(sol.angle, sol.F, sol.dyCm, axLabel)
+            : c.debugSolveFail(axLabel);
+        } else if (debugSolveBusy) {
+          solveLine = c.debugSolveNone;
+        }
         const legend = [
-          "HITBOX DEBUG (HでON/OFF)",
-          "赤塗り = 物理ボディ（ボード/フチ円/センサー）",
-          "緑太線 = ネット外郭（曲線）",
-          "橙線 = 開口 / 水色破線 = 抜け切り",
+          c.debugTitle,
+          c.debugBody,
+          solveLine,
           `pending=${state.rimPassPending ? 1 : 0} above=${state.wasAboveRim ? 1 : 0} scored=${state.scoredThisShot ? 1 : 0}`,
           `camX=${Math.round(state.cameraX)}`,
         ];
+        const solveLineIndex = 2;
+        const lineH = 13;
         const legX = 8 + state.cameraX;
-        ctx.fillStyle = "rgba(255,255,240,0.82)";
-        ctx.fillRect(legX, H - 14 - legend.length * 13, 240, legend.length * 13 + 6);
-        ctx.fillStyle = "rgba(20,20,20,0.85)";
+        const boxW = 360;
+        const boxTop = H - 14 - legend.length * lineH;
+        ctx.fillStyle = "rgba(255,255,240,0.88)";
+        ctx.fillRect(legX, boxTop, boxW, legend.length * lineH + 6);
+        ctx.fillStyle = "rgba(20,20,20,0.9)";
         ctx.textAlign = "left";
         ctx.textBaseline = "bottom";
         for (let i = 0; i < legend.length; i++) {
-          ctx.fillText(legend[i], legX + 4, H - 10 - (legend.length - 1 - i) * 13);
+          // 理論解行は強調（クリックで入力反映）
+          if (i === solveLineIndex) ctx.fillStyle = "rgba(160,40,20,0.95)";
+          else ctx.fillStyle = "rgba(20,20,20,0.9)";
+          ctx.fillText(
+            legend[i],
+            legX + 4,
+            H - 10 - (legend.length - 1 - i) * lineH,
+          );
+        }
+        // 画面座標でヒット領域を保持（sim=OK のときだけクリック可）
+        if (
+          debugSolveResult &&
+          debugSolveResult.found &&
+          debugSolveResult.verified
+        ) {
+          const lineBottom =
+            H - 10 - (legend.length - 1 - solveLineIndex) * lineH;
+          debugSolveHitScreen = {
+            x: 8,
+            y: lineBottom - lineH,
+            w: boxW,
+            h: lineH + 2,
+          };
+        } else {
+          debugSolveHitScreen = null;
         }
 
         ctx.restore();
@@ -3831,7 +4567,7 @@
         gameOverOverlay.classList.remove("show");
         hintSticky.classList.remove("show");
         rebuildWorld(true);
-        flash("問.1 開始", 900);
+        flash(ui().startFlash(1), 900);
       }
 
       function initEngine() {
@@ -3922,14 +4658,34 @@
         syncFromMemo();
       });
 
-      // DEBUG_HITBOX：H キーで表示切替（不要ならこのリスナーも削除）
+      // DEBUG_HITBOX：H で表示切替、T で理論クリア値を入力欄へ適用
       window.addEventListener("keydown", (e) => {
+        if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return;
         if (e.key === "h" || e.key === "H") {
-          if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return;
           debugHitboxOn = !debugHitboxOn;
+          if (debugHitboxOn) {
+            debugSolveResult = null;
+            debugSolveHitScreen = null;
+            refreshDebugSolve();
+          } else {
+            debugSolveResult = null;
+            debugSolveHitScreen = null;
+          }
+        } else if ((e.key === "t" || e.key === "T") && debugHitboxOn) {
+          applyDebugSolveToInputs();
         }
       });
 
+      // 親ページ（ポータル）からの言語同期
+      window.addEventListener("message", (e) => {
+        const data = e.data;
+        if (!data || data.source !== "portal-rft" || data.type !== "setLocale") {
+          return;
+        }
+        setUiLocale(data.locale);
+      });
+
+      setUiLocale(readInitialLocale());
       initEngine();
       syncFromMemo();
     })();

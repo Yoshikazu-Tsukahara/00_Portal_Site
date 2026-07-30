@@ -29,6 +29,8 @@ import type { PdfEditorDict } from "./pdfEditor";
 import { pdfEditorEn, pdfEditorJa } from "./pdfEditor";
 import type { PixelDropPuzzleDict } from "./pixelDropPuzzle";
 import { pixelDropPuzzleEn, pixelDropPuzzleJa } from "./pixelDropPuzzle";
+import type { RobotFreethrowDict } from "./robotFreethrow";
+import { robotFreethrowEn, robotFreethrowJa } from "./robotFreethrow";
 import type { TextCleanerDict } from "./otherApps";
 import {
   textCleanerEn,
@@ -54,6 +56,7 @@ export type AppsDictionary = {
   ultimateProbabilitySlot: UltimateProbabilitySlotDict;
   pixelDropPuzzle: PixelDropPuzzleDict;
   cryptoMessage: CryptoMessageDict;
+  robotFreethrow: RobotFreethrowDict;
 };
 
 export const appsJa: AppsDictionary = {
@@ -70,6 +73,7 @@ export const appsJa: AppsDictionary = {
   ultimateProbabilitySlot: ultimateProbabilitySlotJa,
   pixelDropPuzzle: pixelDropPuzzleJa,
   cryptoMessage: cryptoMessageJa,
+  robotFreethrow: robotFreethrowJa,
 };
 
 export const appsEn: AppsDictionary = {
@@ -86,4 +90,5 @@ export const appsEn: AppsDictionary = {
   ultimateProbabilitySlot: ultimateProbabilitySlotEn,
   pixelDropPuzzle: pixelDropPuzzleEn,
   cryptoMessage: cryptoMessageEn,
+  robotFreethrow: robotFreethrowEn,
 };

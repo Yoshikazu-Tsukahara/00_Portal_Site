@@ -37,7 +37,7 @@ import { useStandaloneDisplay } from "@/lib/useStandaloneDisplay";
  * ## Type D: 没入型（フルスクリーンのゲームなど）
  * - **AppShell は使わない**。独自ヘッダー + iframe で完全に隔離する。
  * - `SiteChrome` の `ALWAYS_ISOLATE_PATHS` に登録し、常時 Header / Footer なし。
- * - 例: モンスタードライバー、投射フリースロー。
+ * - 例: モンスタードライバー。
  */
 type AppShellProps = {
   /** アプリ名（ヘッダー1行目に表示） */
