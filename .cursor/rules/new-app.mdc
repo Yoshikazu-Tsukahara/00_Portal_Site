@@ -1,0 +1,54 @@
+---
+description: 新規ツール・PWA 追加時のチェックリスト
+globs: src/app/**/*,src/data/tools.ts
+alwaysApply: false
+---
+
+# 新規アプリ追加
+
+## 1. タイプを決める
+
+- `/tools/<name>` → **Type B**（通常ツール）
+- 単体 PWA → **Type C**（`layout.tsx` + manifest + `PwaRuntime` + `isPwa`）
+- フルスクリーンゲーム → **Type D**（`SiteChrome.tsx` の `ALWAYS_ISOLATE_PATHS`）
+
+## 2. ポータル掲載（公開する場合）
+
+`src/data/tools.ts` に `{ id, icon, href }` を追加し、`src/i18n/ja.ts` / `en.ts` の `tools` に文言を追加。
+
+## 3. ディレクトリ構成（Type B の例）
+
+```
+src/app/tools/my-tool/
+├── page.tsx          # AppShell + useI18n
+├── types.ts          # 型・定数・STORAGE_KEY
+├── storage.ts        # load/save（必要なら）
+└── *.tsx             # UI 部品（機能ごとに分割）
+```
+
+## 4. LocalStorage 利用時
+
+- キー名はツール固有で衝突しないようにする
+- `dataManager` を渡す場合: `appId`, `fileNamePrefix`, `getData`, `onImport` を設定
+- インポート時は既存の `parseBackupPayload` パターンに合わせる
+
+## 5. PWA（Type C）追加物
+
+- `layout.tsx`: metadata, viewport, `<PwaRuntime basePath="..." classPrefix="..." />`
+- `public/*.webmanifest` または `manifest.webmanifest/route.ts`
+- `InstallAppButton` を `afterDataManager` に配置（既存アプリをコピー）
+- UI 配置の全体像 → **`ui-ux.mdc`**
+
+## 5b. 共通 UI（Type B/C 共通）
+
+- 言語: サイト Header のみ（AppShell `actions` に LanguageToggle を置かない）
+- バックアップ: `dataManager` prop
+- インストール: `afterDataManager` prop
+- 幅: `contentClassName`（`wide` prop は使わない）
+
+## 6. 完了確認
+
+- [ ] ja / en 両方の辞書
+- [ ] ポータルからリンク（掲載する場合）
+- [ ] `npm run lint` が通る
+- [ ] 未依頼の commit はしない

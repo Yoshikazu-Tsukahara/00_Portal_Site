@@ -1,11 +1,10 @@
 "use client";
 
-import JSZip from "jszip";
-import { Download, FolderOpen, Trash2 } from "lucide-react";
+import { Download, FolderOpen, Save, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import AppShell from "@/components/AppShell";
-import { LanguageToggle, useI18n } from "@/i18n";
+import { useI18n } from "@/i18n";
 import FileRail from "./FileRail";
 import MediaStage from "./MediaStage";
 import MetadataForm from "./MetadataForm";
@@ -13,8 +12,8 @@ import {
   artworkFromImageFile,
   captureVideoFrame,
   detectMediaMode,
+  fileLooksLikeMp3,
   formatBytes,
-  isMp3File,
   loadMediaSession,
   revokeArtwork,
   revokeSession,
@@ -28,7 +27,12 @@ import {
   type HistoryKey,
   type InputHistoryMap,
 } from "./inputHistory";
-import { downloadBlob, writeMediaFile } from "./metadataUtils";
+import {
+  downloadBlob,
+  normalizeArtworkToJpeg,
+  writeMediaFile,
+} from "./metadataUtils";
+import { canWriteVideoMetadata, writeVideoFile } from "./videoMetadata";
 import { EMPTY_ARTWORK, type MediaSession, type MetadataFields } from "./types";
 
 /** 音楽 / 動画メタデータ編集（複数ファイル・クライアント完結） */
@@ -116,15 +120,22 @@ export default function MediaMetadataEditorPage() {
     );
   }
 
+  function markDirty(updater: (item: MediaSession) => MediaSession) {
+    updateSelected((item) => {
+      const next = updater(item);
+      return { ...next, dirty: true };
+    });
+  }
+
   function updateFields(patch: Partial<MetadataFields>) {
-    updateSelected((item) => ({
+    markDirty((item) => ({
       ...item,
       fields: { ...item.fields, ...patch },
     }));
   }
 
   function updateFileName(name: string) {
-    updateSelected((item) => ({
+    markDirty((item) => ({
       ...item,
       displayName: name,
     }));
@@ -137,8 +148,18 @@ export default function MediaMetadataEditorPage() {
 
   async function handleArtworkFile(file: File) {
     try {
-      const art = await artworkFromImageFile(file);
-      updateSelected((item) => {
+      const raw = await artworkFromImageFile(file);
+      const jpeg = await normalizeArtworkToJpeg(raw.data!, raw.mime);
+      const art = {
+        previewUrl: URL.createObjectURL(
+          new Blob([new Uint8Array(jpeg)], { type: "image/jpeg" }),
+        ),
+        data: jpeg,
+        mime: "image/jpeg",
+        dirty: true,
+      };
+      revokeArtwork(raw);
+      markDirty((item) => {
         revokeArtwork(item.artwork);
         return { ...item, artwork: art };
       });
@@ -149,16 +170,16 @@ export default function MediaMetadataEditorPage() {
 
   async function handleCaptureFrame(video: HTMLVideoElement) {
     const art = await captureVideoFrame(video);
-    updateSelected((item) => {
+    markDirty((item) => {
       revokeArtwork(item.artwork);
       return { ...item, artwork: art };
     });
   }
 
   function clearArtwork() {
-    updateSelected((item) => {
+    markDirty((item) => {
       revokeArtwork(item.artwork);
-      return { ...item, artwork: { ...EMPTY_ARTWORK } };
+      return { ...item, artwork: { ...EMPTY_ARTWORK, dirty: true } };
     });
   }
 
@@ -187,113 +208,161 @@ export default function MediaMetadataEditorPage() {
     setMessage(null);
   }
 
-  async function exportSessions(targets: MediaSession[]) {
-    if (targets.length === 0 || busy) return;
+  async function handleSave() {
+    if (!selected || busy) return;
     setError(null);
     setMessage(null);
 
-    const writable = targets.filter(
-      (item) => item.mode === "audio" && isMp3File(item.file),
-    );
-    const hadVideo = targets.some((item) => item.mode === "video");
-
-    if (writable.length === 0) {
-      setMessage(hadVideo ? copy.export.videoSoon : copy.export.fail);
-      return;
-    }
-
+    const snapshot = selected;
     setBusy(true);
     try {
-      if (writable.length === 1) {
-        const item = writable[0];
-        const blob = await writeMediaFile(
-          item.file,
-          item.fields,
-          item.artwork.data
-            ? { data: item.artwork.data, mime: item.artwork.mime }
-            : null,
+      const fileName = resolveExportName(snapshot);
+
+      commitHistory("fileName", snapshot.displayName);
+      commitHistory("title", snapshot.fields.title);
+      commitHistory("artist", snapshot.fields.artist);
+      commitHistory("year", snapshot.fields.year);
+      commitHistory("album", snapshot.fields.album);
+      commitHistory("track", snapshot.fields.track);
+      commitHistory("comment", snapshot.fields.comment);
+
+      let blob: Blob;
+      let embedKind: "mp3" | "video" | "rename-only" = "rename-only";
+
+      const artworkPayload = snapshot.artwork.data
+        ? { data: snapshot.artwork.data, mime: snapshot.artwork.mime }
+        : null;
+
+      if (
+        snapshot.mode === "audio" &&
+        (await fileLooksLikeMp3(snapshot.file))
+      ) {
+        blob = await writeMediaFile(
+          snapshot.file,
+          snapshot.fields,
+          artworkPayload,
         );
-        downloadBlob(blob, resolveExportName(item));
-        setMessage(
-          hadVideo && targets.length > 1
-            ? `${copy.export.ok}（${copy.export.videoSkipped}）`
-            : copy.export.ok,
-        );
-      } else {
-        const zip = new JSZip();
-        const usedNames = new Set<string>();
-        for (const item of writable) {
-          const blob = await writeMediaFile(
-            item.file,
-            item.fields,
-            item.artwork.data
-              ? { data: item.artwork.data, mime: item.artwork.mime }
-              : null,
+        embedKind = "mp3";
+      } else if (
+        snapshot.mode === "video" &&
+        canWriteVideoMetadata(snapshot.file)
+      ) {
+        let videoArt = artworkPayload;
+        if (artworkPayload) {
+          const jpeg = await normalizeArtworkToJpeg(
+            artworkPayload.data,
+            artworkPayload.mime,
           );
-          let name = resolveExportName(item);
-          // ZIP 内の同名衝突を避ける
-          if (usedNames.has(name.toLowerCase())) {
-            const dot = name.lastIndexOf(".");
-            const stem = dot > 0 ? name.slice(0, dot) : name;
-            const ext = dot > 0 ? name.slice(dot) : "";
-            let n = 2;
-            while (usedNames.has(`${stem}-${n}${ext}`.toLowerCase())) n += 1;
-            name = `${stem}-${n}${ext}`;
-          }
-          usedNames.add(name.toLowerCase());
-          zip.file(name, blob);
+          videoArt = { data: jpeg, mime: "image/jpeg" };
         }
-        const out = await zip.generateAsync({ type: "blob" });
-        downloadBlob(out, "media-metadata-edited.zip");
-        setMessage(
-          hadVideo ? `${copy.export.okZip}（${copy.export.videoSkipped}）` : copy.export.okZip,
+        blob = await writeVideoFile(snapshot.file, snapshot.fields, videoArt);
+        embedKind = "video";
+      } else {
+        blob = snapshot.file.slice(
+          0,
+          snapshot.file.size,
+          snapshot.file.type || undefined,
         );
       }
-    } catch {
+
+      if (!blob || blob.size === 0) {
+        throw new Error("empty_output");
+      }
+
+      const savedOutput = { blob, fileName };
+      const targetId = snapshot.id;
+      setItems((prev) =>
+        prev.map((item) =>
+          item.id === targetId
+            ? {
+                ...item,
+                dirty: false,
+                savedOutput,
+                artwork: { ...item.artwork, dirty: false },
+              }
+            : item,
+        ),
+      );
+
+      if (embedKind === "rename-only") {
+        setMessage(
+          snapshot.mode === "video"
+            ? copy.export.saveOkUnsupportedVideo
+            : copy.export.saveOkNonMp3,
+        );
+      } else {
+        setMessage(copy.export.saveOk);
+      }
+    } catch (err) {
+      console.error(err);
       setError(copy.export.fail);
     } finally {
       setBusy(false);
     }
   }
 
+  function handleDownload() {
+    if (!selected || busy) return;
+    setError(null);
+    setMessage(null);
+
+    if (!selected.savedOutput) {
+      setMessage(copy.export.needSave);
+      return;
+    }
+    if (selected.dirty) {
+      setMessage(copy.export.dirtyNeedSave);
+      return;
+    }
+
+    try {
+      downloadBlob(selected.savedOutput.blob, selected.savedOutput.fileName);
+      setMessage(copy.export.ok);
+    } catch (err) {
+      console.error(err);
+      setError(copy.export.fail);
+    }
+  }
+
   const hasItems = items.length > 0;
+  const canDownload = Boolean(
+    selected?.savedOutput && !selected.dirty && !busy,
+  );
 
   return (
     <AppShell
       title={copy.shell.title}
       description={copy.shell.description}
-      wide
       fillViewport
-      actions={<LanguageToggle />}
+      actions={
+        hasItems ? (
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={busy}
+              className="btn-secondary !inline-flex !items-center gap-1.5 !px-3 !py-1.5 text-xs"
+            >
+              <FolderOpen className="h-3.5 w-3.5" aria-hidden />
+              {copy.addFiles}
+            </button>
+            <button
+              type="button"
+              onClick={clearAll}
+              disabled={busy}
+              className="btn-secondary !inline-flex !items-center gap-1.5 !px-3 !py-1.5 text-xs text-rose-600 hover:text-rose-700"
+            >
+              <Trash2 className="h-3.5 w-3.5" aria-hidden />
+              {copy.clearAll}
+            </button>
+          </div>
+        ) : undefined
+      }
     >
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 text-zinc-100 shadow-xl shadow-black/20">
-        <div className="flex flex-wrap items-center gap-3 border-b border-zinc-800/90 px-4 py-3 sm:px-5">
-          <p className="min-w-0 flex-1 text-xs leading-relaxed text-zinc-400">
-            {copy.privacyBanner}
-          </p>
-          {hasItems ? (
-            <div className="flex shrink-0 items-center gap-2">
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={busy}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-700 px-3 py-1.5 text-xs font-medium text-zinc-300 transition hover:border-zinc-500 hover:text-white disabled:opacity-50"
-              >
-                <FolderOpen className="h-3.5 w-3.5" aria-hidden />
-                {copy.addFiles}
-              </button>
-              <button
-                type="button"
-                onClick={clearAll}
-                disabled={busy}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-700 px-3 py-1.5 text-xs font-medium text-zinc-400 transition hover:border-rose-500/50 hover:text-rose-300 disabled:opacity-50"
-              >
-                <Trash2 className="h-3.5 w-3.5" aria-hidden />
-                {copy.clearAll}
-              </button>
-            </div>
-          ) : null}
-        </div>
+      <div className="flex min-h-0 flex-1 flex-col gap-3">
+        <p className="shrink-0 rounded-md border border-zinc-200/80 bg-zinc-100/70 px-3.5 py-2.5 text-xs leading-relaxed text-zinc-600">
+          {copy.privacyBanner}
+        </p>
 
         {!hasItems ? (
           <div
@@ -323,13 +392,13 @@ export default function MediaMetadataEditorPage() {
               setDragging(false);
               void addFiles(e.dataTransfer.files);
             }}
-            className={`m-4 flex min-h-0 flex-1 cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed px-6 py-16 text-center transition sm:m-6 ${
+            className={`flex min-h-0 flex-1 cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed px-6 py-16 text-center transition ${
               dragging
-                ? "border-amber-400 bg-amber-500/10"
-                : "border-zinc-700 bg-zinc-900/50 hover:border-zinc-500"
+                ? "border-zinc-900 bg-zinc-100"
+                : "border-zinc-300 bg-white hover:border-zinc-400"
             }`}
           >
-            <p className="text-base font-semibold text-zinc-100">
+            <p className="text-base font-semibold text-zinc-900">
               {busy ? "…" : copy.dropHint}
             </p>
             <p className="mt-2 max-w-md text-sm leading-relaxed text-zinc-500">
@@ -337,8 +406,8 @@ export default function MediaMetadataEditorPage() {
             </p>
           </div>
         ) : (
-          <div className="grid min-h-0 flex-1 grid-cols-1 gap-0 lg:grid-cols-[13.5rem_minmax(0,1.1fr)_minmax(17rem,0.9fr)]">
-            <div className="min-h-0 overflow-hidden border-b border-zinc-800 p-3 lg:border-b-0 lg:border-r">
+          <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 lg:grid-cols-[minmax(0,14rem)_minmax(0,1.1fr)_minmax(16rem,0.9fr)]">
+            <div className="min-h-0 max-h-[min(40vh,22rem)] lg:max-h-none">
               <FileRail
                 items={items}
                 selectedId={selectedId}
@@ -351,7 +420,7 @@ export default function MediaMetadataEditorPage() {
 
             {selected ? (
               <>
-                <div className="min-h-0 overflow-y-auto border-b border-zinc-800 p-4 sm:p-5 lg:border-b-0 lg:border-r">
+                <div className="min-h-0 overflow-y-auto rounded-md border border-zinc-200/80 bg-white p-4 shadow-sm sm:p-5">
                   <MediaStage
                     mode={selected.mode}
                     mediaUrl={selected.mediaUrl}
@@ -369,7 +438,7 @@ export default function MediaMetadataEditorPage() {
                   />
                 </div>
 
-                <div className="flex min-h-0 flex-col p-4 sm:p-5">
+                <div className="flex min-h-0 flex-col rounded-md border border-zinc-200/80 bg-white p-4 shadow-sm sm:p-5">
                   <MetadataForm
                     mode={selected.mode}
                     fields={selected.fields}
@@ -379,38 +448,36 @@ export default function MediaMetadataEditorPage() {
                     disabled={busy}
                     onChange={updateFields}
                     onFileNameChange={updateFileName}
-                    onCommitHistory={commitHistory}
                     onRemoveHistoryItem={removeHistoryItem}
                   />
 
-                  <div className="mt-auto shrink-0 space-y-2 border-t border-zinc-800 pt-4">
+                  <div className="mt-auto shrink-0 space-y-2 border-t border-zinc-100 pt-4">
                     <p className="text-[11px] leading-relaxed text-zinc-500">
                       {copy.export.hint}
                     </p>
                     <button
                       type="button"
-                      onClick={() => void exportSessions([selected])}
+                      onClick={() => void handleSave()}
                       disabled={busy}
-                      className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-zinc-100 px-4 py-3 text-sm font-semibold text-zinc-950 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
+                      className="btn-primary inline-flex w-full items-center justify-center gap-2"
+                    >
+                      <Save className="h-4 w-4" aria-hidden />
+                      {busy ? copy.export.saving : copy.export.save}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleDownload}
+                      disabled={!canDownload}
+                      className="btn-secondary inline-flex w-full items-center justify-center gap-2"
                     >
                       <Download className="h-4 w-4" aria-hidden />
-                      {busy ? copy.export.downloading : copy.export.button}
+                      {copy.export.download}
                     </button>
-                    {items.length > 1 ? (
-                      <button
-                        type="button"
-                        onClick={() => void exportSessions(items)}
-                        disabled={busy}
-                        className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-zinc-600 px-4 py-2.5 text-sm font-medium text-zinc-200 transition hover:border-zinc-400 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
-                      >
-                        {copy.export.buttonAll}
-                      </button>
-                    ) : null}
                   </div>
                 </div>
               </>
             ) : (
-              <div className="col-span-full flex items-center justify-center p-10 text-sm text-zinc-500 lg:col-span-2">
+              <div className="col-span-full flex items-center justify-center rounded-md border border-zinc-200/80 bg-white p-10 text-sm text-zinc-500 shadow-sm lg:col-span-2">
                 {copy.selectPrompt}
               </div>
             )}
@@ -419,10 +486,10 @@ export default function MediaMetadataEditorPage() {
 
         {(error || message) && (
           <div
-            className={`border-t px-4 py-2.5 text-xs sm:px-5 ${
+            className={`shrink-0 rounded-md border px-3.5 py-2.5 text-xs ${
               error
-                ? "border-rose-900/60 bg-rose-950/40 text-rose-300"
-                : "border-zinc-800 bg-zinc-900/80 text-zinc-300"
+                ? "border-rose-200 bg-rose-50 text-rose-700"
+                : "border-zinc-200 bg-zinc-50 text-zinc-600"
             }`}
             role="status"
           >

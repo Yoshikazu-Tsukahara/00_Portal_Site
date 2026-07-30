@@ -1,0 +1,110 @@
+---
+description: 共通 UI/UX・レイアウト・ヘッダー操作の統一ルール
+globs: src/app/**/*,src/components/**/*
+alwaysApply: false
+---
+
+# UI/UX 統一ルール
+
+参照: `src/app/globals.css`（デザインシステム）、`AppShell.tsx`、`Header.tsx`、`DataManager.tsx`
+
+## 基本デザイン（特別な演出意図がない限り）
+
+- **配色**: zinc ベース（背景 `zinc-50`、文字 `zinc-900` / `zinc-500`、境界 `zinc-200`）
+- **共通クラス**（`globals.css`）を優先:
+  - ボタン: `btn-primary` / `btn-secondary`
+  - 入力: `input-field`
+  - カード: `content-card`
+- **角丸・余白**: 既存ツールに合わせる（ボタン `rounded-md`、カード `rounded-lg`）
+- **例外**: ゲーム／端末風 UI（`slot-*`, `pxd-*`, `cm-*` 等）はアプリ固有テーマ可。作業領域だけ暗色にし、**サイト枠（Header/Footer/AppShell 行）は共通ルールを維持**
+
+## ページ構成（Type B / C）
+
+```
+[サイト Header]  ロゴ … 表示幅トグル(中央固定) … 言語 … 応援
+[AppShell 行1]   ←ポータル | タイトル | バッジ | 💾 | 📱 | (機能 actions)
+[AppShell 行2]   説明文（1行・text-xs text-zinc-500）
+[作業領域]       contentClassName 内。fillViewport 時は内側スクロール
+[サイト Footer]  Type B/C ブラウザ表示時は必ず表示（fillViewport でも隠さない）
+```
+
+## 表示幅・サイズ
+
+- テキスト列の幅は **`useLayout().contentClassName` のみ** で揃える
+- ページ root に独自 `max-w-*` を乱立させない
+- `AppShell` の `wide` は **deprecated（使わない）**
+- 表示幅切替は **サイト Header 中央の LayoutToggle のみ**（各ページに複製しない）
+- 1画面ツール: `fillViewport` + 子を `min-h-0 flex-1 overflow-hidden` で内側スクロール
+- 高さ計算: サイト Header 約 `4.5rem` を差し引く（`AppShell` 実装に合わせる）
+
+## 言語スイッチャー（LanguageToggle）
+
+**本文・サイドバー・モーダル内に置かない。** ヘッダー行のみ。
+
+| 状況 | 置き場所 |
+|------|----------|
+| ブラウザ（サイト Header あり） | `Header.tsx` のみ。**AppShell `actions` に置かない** |
+| PWA standalone（サイト Header なし） | `AppShell` が `isPwa` 時に **自動で** `actions` 右端へ表示 |
+| Type D（没入型・サイト Header なし） | ページ独自の **薄い header 行** 右端のみ可 |
+
+```tsx
+// ❌ サイト Header があるのに AppShell actions へ重複配置
+<AppShell actions={<LanguageToggle />}>
+
+// ✅ Type B/C ブラウザ表示 — 言語はサイト Header に任せる
+<AppShell title={...} description={...}>
+```
+
+## バックアップ（DataManager）
+
+- **必ず** `AppShell` の `dataManager` prop 経由（独自 💾 ボタン・モーダルを作らない）
+- **位置**: タイトル直後（`titleAddon` の後、`afterDataManager` の前）
+- **実装**: `DataManager` + `DataManagerConfig`（`appId`, `fileNamePrefix`, `getData`, `onImport`）
+- **見た目**: 共通のカプセルボタン（💾 + ラベル）。文言は `t.dataManager`
+
+```tsx
+<AppShell
+  title={copy.shell.title}
+  description={copy.shell.description}
+  dataManager={{
+    appId: "my-tool",
+    fileNamePrefix: "my-tool",
+    getData: () => data,
+    onImport: (raw) => { /* 検証して setState */ return true; },
+  }}
+>
+```
+
+## PWA インストール導線
+
+- **必ず** `AppShell` の `afterDataManager`（バックアップの右隣）
+- **コンポーネント**: 各アプリの `InstallAppButton`（内部ロジックは `usePwaInstall` 系を踏襲）
+- **ベース見た目**: カプセル + 📱。標準は `lunch-install-btn` クラス
+- **アクセント色の変更**は PWA ごとの意図的テーマのみ（例: `slot-install-btn`, `cm-install-btn`）
+- **ガイドモーダル**: `lunch-install-modal` アニメーションを共用可
+- インストールボタンを作業領域・Footer・Floating に置かない
+
+```tsx
+<AppShell
+  isPwa
+  afterDataManager={<InstallAppButton copy={copy.install} />}
+  dataManager={...}
+>
+```
+
+## AppShell actions の用途
+
+- **機能ボタンのみ**（ZIP 出力、一括処理など）
+- 言語・バックアップ・インストールは **ここに置かない**（上記スロットを使う）
+
+## ローディング・空状態
+
+- 初回 hydrate 前: AppShell 内に `t.common.loading`（`text-sm text-zinc-400`）
+- 説明文は shell 辞書の `description` を常時表示
+
+## チェックリスト（UI 変更時）
+
+- [ ] 言語トグルが Header と AppShell で二重になっていない
+- [ ] バックアップ／インストールの位置が title 行の定位置
+- [ ] `contentClassName` 外に主要 UI がはみ出していない
+- [ ] 共通ボタン／入力クラスを使い、独自色は意図がある場合のみ

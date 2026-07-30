@@ -38,7 +38,7 @@ import {
 } from "./types";
 
 export default function MailTemplatePage() {
-  const { t, ready } = useI18n();
+  const { t, ready, locale } = useI18n();
   const mt = t.apps.mailTemplate;
   const [templates, setTemplates] = useState<MailTemplate[]>([]);
   const [variables, setVariables] = useState<VariableMasterItem[]>([]);
@@ -58,15 +58,19 @@ export default function MailTemplatePage() {
 
   useEffect(() => {
     if (!ready) return;
-    const data = loadAppData(mt.defaults);
+    // 初期サンプルのままなら、表示言語に合わせて差し替える
+    const data = loadAppData(mt.defaults, locale);
     const sorted = filterTemplates(data.templates, "", null);
     setTemplates(data.templates);
     setVariables(data.variables);
     setTags(data.tags);
     setInputHistory(loadInputHistory());
     setSelectedId(sorted[0]?.id ?? null);
+    setValues({});
+    setFilterTagId(null);
+    setSearchQuery("");
     setHydrated(true);
-  }, [ready, mt.defaults]);
+  }, [ready, mt.defaults, locale]);
 
   const persistAll = useCallback(
     (
@@ -77,10 +81,12 @@ export default function MailTemplatePage() {
       setTemplates(nextTemplates);
       setVariables(nextVariables);
       setTags(nextTags);
+      // ユーザー編集済みとして記録（以降は言語切替で上書きしない）
       saveAppData({
         templates: nextTemplates,
         variables: nextVariables,
         tags: nextTags,
+        seedLocale: null,
       });
     },
     [],

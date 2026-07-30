@@ -1,6 +1,10 @@
 "use client";
 
-import { useMemo, useState, type InputHTMLAttributes } from "react";
+import {
+  useMemo,
+  useState,
+  type InputHTMLAttributes,
+} from "react";
 import {
   getSuggestions,
   type HistoryKey,
@@ -23,12 +27,9 @@ type Labels = {
   removeHistoryAria: string;
 };
 
-const inputClass =
-  "w-full rounded-lg border border-zinc-700 bg-zinc-900/80 px-3 py-2.5 text-sm text-zinc-100 outline-none transition placeholder:text-zinc-600 focus:border-amber-500/70 focus:ring-1 focus:ring-amber-500/40";
+const labelClass = "mb-1.5 block text-xs font-medium text-zinc-600";
 
-const labelClass = "mb-1.5 block text-xs font-medium tracking-wide text-zinc-400";
-
-/** 右カラム：モードに応じたメタデータ入力（履歴サジェスト付き） */
+/** 右カラム：モードに応じたメタデータ入力（履歴は入力欄直下のドロップダウン） */
 export default function MetadataForm({
   mode,
   fields,
@@ -38,7 +39,6 @@ export default function MetadataForm({
   disabled,
   onChange,
   onFileNameChange,
-  onCommitHistory,
   onRemoveHistoryItem,
 }: {
   mode: MediaMode;
@@ -49,19 +49,18 @@ export default function MetadataForm({
   disabled?: boolean;
   onChange: (patch: Partial<MetadataFields>) => void;
   onFileNameChange: (name: string) => void;
-  onCommitHistory: (key: HistoryKey, value: string) => void;
   onRemoveHistoryItem: (key: HistoryKey, value: string) => void;
 }) {
   return (
     <section className="flex h-full min-h-0 flex-col">
-      <header className="mb-4 shrink-0">
-        <h2 className="text-sm font-semibold text-zinc-100">{labels.heading}</h2>
+      <header className="mb-3 shrink-0">
+        <h2 className="text-sm font-semibold text-zinc-900">{labels.heading}</h2>
         <p className="mt-1 text-xs leading-relaxed text-zinc-500">
           {labels.hint}
         </p>
       </header>
 
-      <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pr-1">
+      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto pr-1">
         <div>
           <HistoryField
             id="meta-filename"
@@ -72,10 +71,9 @@ export default function MetadataForm({
             history={history}
             labels={labels}
             onChange={onFileNameChange}
-            onCommitHistory={onCommitHistory}
             onRemoveHistoryItem={onRemoveHistoryItem}
           />
-          <p className="mt-1.5 text-[11px] leading-relaxed text-zinc-600">
+          <p className="mt-1 text-[11px] leading-relaxed text-zinc-400">
             {labels.fileNameHint}
           </p>
         </div>
@@ -88,7 +86,6 @@ export default function MetadataForm({
           history={history}
           labels={labels}
           onChange={(v) => onChange({ title: v })}
-          onCommitHistory={onCommitHistory}
           onRemoveHistoryItem={onRemoveHistoryItem}
         />
         <HistoryField
@@ -100,7 +97,6 @@ export default function MetadataForm({
           history={history}
           labels={labels}
           onChange={(v) => onChange({ artist: v })}
-          onCommitHistory={onCommitHistory}
           onRemoveHistoryItem={onRemoveHistoryItem}
         />
         <HistoryField
@@ -116,7 +112,6 @@ export default function MetadataForm({
           onChange={(v) =>
             onChange({ year: v.replace(/[^\d]/g, "").slice(0, 4) })
           }
-          onCommitHistory={onCommitHistory}
           onRemoveHistoryItem={onRemoveHistoryItem}
         />
 
@@ -131,7 +126,6 @@ export default function MetadataForm({
               history={history}
               labels={labels}
               onChange={(v) => onChange({ album: v })}
-              onCommitHistory={onCommitHistory}
               onRemoveHistoryItem={onRemoveHistoryItem}
             />
             <HistoryField
@@ -144,12 +138,11 @@ export default function MetadataForm({
               labels={labels}
               placeholder="1"
               onChange={(v) => onChange({ track: v })}
-              onCommitHistory={onCommitHistory}
               onRemoveHistoryItem={onRemoveHistoryItem}
             />
           </>
         ) : (
-          <HistoryTextarea
+          <HistoryField
             id="meta-comment"
             historyKey="comment"
             label={labels.comment}
@@ -157,8 +150,8 @@ export default function MetadataForm({
             disabled={disabled}
             history={history}
             labels={labels}
+            multiline
             onChange={(v) => onChange({ comment: v })}
-            onCommitHistory={onCommitHistory}
             onRemoveHistoryItem={onRemoveHistoryItem}
           />
         )}
@@ -175,10 +168,10 @@ function HistoryField({
   disabled,
   placeholder,
   inputMode,
+  multiline,
   history,
   labels,
   onChange,
-  onCommitHistory,
   onRemoveHistoryItem,
 }: {
   id: string;
@@ -188,168 +181,94 @@ function HistoryField({
   disabled?: boolean;
   placeholder?: string;
   inputMode?: InputHTMLAttributes<HTMLInputElement>["inputMode"];
+  multiline?: boolean;
   history: InputHistoryMap;
   labels: Pick<Labels, "removeHistory" | "removeHistoryAria">;
   onChange: (v: string) => void;
-  onCommitHistory: (key: HistoryKey, value: string) => void;
   onRemoveHistoryItem: (key: HistoryKey, value: string) => void;
 }) {
-  const [focused, setFocused] = useState(false);
+  const [open, setOpen] = useState(false);
   const suggestions = useMemo(
-    () => getSuggestions(history, historyKey, value),
+    () => getSuggestions(history, historyKey, value, 8),
     [history, historyKey, value],
   );
-  const showSuggestions = focused && !disabled && suggestions.length > 0;
+  const show = open && !disabled && suggestions.length > 0;
 
   return (
-    <div>
+    <div className="relative">
       <label htmlFor={id} className={labelClass}>
         {label}
       </label>
-      <input
-        id={id}
-        type="text"
-        disabled={disabled}
-        value={value}
-        placeholder={placeholder}
-        inputMode={inputMode}
-        autoComplete="off"
-        onChange={(e) => onChange(e.target.value)}
-        onFocus={() => setFocused(true)}
-        onBlur={() => {
-          window.setTimeout(() => {
-            setFocused(false);
-            onCommitHistory(historyKey, value);
-          }, 120);
-        }}
-        className={inputClass}
-      />
-      {showSuggestions ? (
-        <SuggestionChips
-          suggestions={suggestions}
-          labels={labels}
-          onPick={(s) => {
-            onChange(s);
-            onCommitHistory(historyKey, s);
-            setFocused(false);
+      {multiline ? (
+        <textarea
+          id={id}
+          rows={4}
+          disabled={disabled}
+          value={value}
+          autoComplete="off"
+          onChange={(e) => onChange(e.target.value)}
+          onFocus={() => setOpen(true)}
+          onBlur={() => {
+            window.setTimeout(() => setOpen(false), 150);
           }}
-          onRemove={(s) => onRemoveHistoryItem(historyKey, s)}
+          className="input-field min-h-[6.5rem] w-full resize-y"
         />
-      ) : null}
-    </div>
-  );
-}
-
-function HistoryTextarea({
-  id,
-  historyKey,
-  label,
-  value,
-  disabled,
-  history,
-  labels,
-  onChange,
-  onCommitHistory,
-  onRemoveHistoryItem,
-}: {
-  id: string;
-  historyKey: HistoryKey;
-  label: string;
-  value: string;
-  disabled?: boolean;
-  history: InputHistoryMap;
-  labels: Pick<Labels, "removeHistory" | "removeHistoryAria">;
-  onChange: (v: string) => void;
-  onCommitHistory: (key: HistoryKey, value: string) => void;
-  onRemoveHistoryItem: (key: HistoryKey, value: string) => void;
-}) {
-  const [focused, setFocused] = useState(false);
-  const suggestions = useMemo(
-    () => getSuggestions(history, historyKey, value),
-    [history, historyKey, value],
-  );
-  const showSuggestions = focused && !disabled && suggestions.length > 0;
-
-  return (
-    <div>
-      <label htmlFor={id} className={labelClass}>
-        {label}
-      </label>
-      <textarea
-        id={id}
-        rows={5}
-        disabled={disabled}
-        value={value}
-        autoComplete="off"
-        onChange={(e) => onChange(e.target.value)}
-        onFocus={() => setFocused(true)}
-        onBlur={() => {
-          window.setTimeout(() => {
-            setFocused(false);
-            onCommitHistory(historyKey, value);
-          }, 120);
-        }}
-        className={`${inputClass} min-h-[7.5rem] resize-y`}
-      />
-      {showSuggestions ? (
-        <SuggestionChips
-          suggestions={suggestions}
-          labels={labels}
-          onPick={(s) => {
-            onChange(s);
-            onCommitHistory(historyKey, s);
-            setFocused(false);
+      ) : (
+        <input
+          id={id}
+          type="text"
+          disabled={disabled}
+          value={value}
+          placeholder={placeholder}
+          inputMode={inputMode}
+          autoComplete="off"
+          onChange={(e) => onChange(e.target.value)}
+          onFocus={() => setOpen(true)}
+          onBlur={() => {
+            window.setTimeout(() => setOpen(false), 150);
           }}
-          onRemove={(s) => onRemoveHistoryItem(historyKey, s)}
+          className="input-field w-full"
         />
-      ) : null}
-    </div>
-  );
-}
+      )}
 
-function SuggestionChips({
-  suggestions,
-  labels,
-  onPick,
-  onRemove,
-}: {
-  suggestions: string[];
-  labels: Pick<Labels, "removeHistory" | "removeHistoryAria">;
-  onPick: (value: string) => void;
-  onRemove: (value: string) => void;
-}) {
-  return (
-    <div className="mt-2 flex flex-wrap gap-1.5">
-      {suggestions.map((s) => (
-        <span
-          key={s}
-          className="inline-flex max-w-full items-center overflow-hidden rounded-md border border-zinc-700 bg-zinc-900 text-[11px] text-zinc-300"
+      {show ? (
+        <ul
+          className="absolute left-0 right-0 top-[calc(100%-0.15rem)] z-30 max-h-40 overflow-y-auto rounded-md border border-zinc-200 bg-white py-0.5 shadow-lg"
+          role="listbox"
         >
-          <button
-            type="button"
-            title={s}
-            onMouseDown={(e) => {
-              e.preventDefault();
-              onPick(s);
-            }}
-            className="max-w-[14rem] truncate px-2 py-1 transition-colors hover:bg-zinc-800 hover:text-zinc-50"
-          >
-            {s}
-          </button>
-          <button
-            type="button"
-            title={labels.removeHistory}
-            aria-label={labels.removeHistoryAria.replace("{value}", s)}
-            onMouseDown={(e) => {
-              e.preventDefault();
-              onRemove(s);
-            }}
-            className="shrink-0 border-l border-zinc-700 px-1.5 py-1 text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-rose-400"
-          >
-            ×
-          </button>
-        </span>
-      ))}
+          {suggestions.map((s) => (
+            <li
+              key={s}
+              className="flex items-stretch border-b border-zinc-100 last:border-b-0"
+            >
+              <button
+                type="button"
+                title={s}
+                className="min-w-0 flex-1 truncate px-2.5 py-1.5 text-left text-xs text-zinc-700 hover:bg-zinc-50"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  onChange(s);
+                  setOpen(false);
+                }}
+              >
+                {s}
+              </button>
+              <button
+                type="button"
+                title={labels.removeHistory}
+                aria-label={labels.removeHistoryAria.replace("{value}", s)}
+                className="shrink-0 px-2.5 text-sm leading-none text-zinc-400 hover:bg-zinc-50 hover:text-rose-600"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  onRemoveHistoryItem(historyKey, s);
+                }}
+              >
+                ×
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : null}
     </div>
   );
 }

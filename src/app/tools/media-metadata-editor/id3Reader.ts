@@ -189,7 +189,8 @@ export function parseId3FromBuffer(buffer: ArrayBuffer): Id3ReadResult {
           const copy = new Uint8Array(imageBytes.byteLength);
           copy.set(imageBytes);
           artwork = {
-            data: copy.buffer,
+            // copy.buffer はちょうど copy 分の独立バッファ
+            data: copy.buffer.slice(copy.byteOffset, copy.byteOffset + copy.byteLength),
             mime: mime || sniffImageMime(copy),
           };
         }

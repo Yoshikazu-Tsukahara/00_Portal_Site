@@ -1,0 +1,57 @@
+---
+description: Next.js 16 / React 19 の実装規約
+globs: src/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Next.js / React
+
+## 必読
+
+Next.js 16 は学習データと API が異なる。**コード変更前に** `node_modules/next/dist/docs/` の該当ガイドを確認する。
+
+## ページ構成
+
+```tsx
+"use client";
+
+import AppShell from "@/components/AppShell";
+import { useI18n } from "@/i18n";
+
+export default function SomePage() {
+  const { t, ready } = useI18n();
+  const copy = t.apps.someApp;
+
+  if (!ready) {
+    return (
+      <AppShell title={copy.shell.title} description={copy.shell.description}>
+        <p className="text-sm text-zinc-400">{t.common.loading}</p>
+      </AppShell>
+    );
+  }
+
+  return (
+    <AppShell title={copy.shell.title} description={copy.shell.description}>
+      {/* ... */}
+    </AppShell>
+  );
+}
+```
+
+## AppShell ルール
+
+- Type B/C ツールは `title` と `description` を **必須**
+- 1 画面レイアウトは `fillViewport`（Footer は隠さない）
+- Type C は `isPwa` + layout で `PwaRuntime` / manifest をセット
+- Type D は AppShell を使わない
+- 言語・バックアップ・PWA インストールの配置 → **`ui-ux.mdc` を参照**
+
+## スタイル
+
+- Tailwind CSS 4。既存の zinc 系パレット・角丸・余白に合わせる
+- レイアウト幅は `useLayout()` の `contentClassName` を使う（個別 max-width 乱立を避ける）
+
+## 状態管理
+
+- 永続データ: `useLocalStorageState` または `loadLocalJson` / `saveLocalJson`
+- 重いファイル処理: Web Worker や既存ユーティリティのパターンを踏襲

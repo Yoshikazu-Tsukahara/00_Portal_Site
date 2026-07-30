@@ -1,0 +1,38 @@
+---
+description: 多言語辞書の追加・更新ルール
+globs: src/i18n/**/*
+alwaysApply: false
+---
+
+# i18n
+
+## 原則
+
+- **日本語（`ja.ts` / `*Ja`）を正** とし、英語は同じキー構造で追従
+- 画面に出す文字列は辞書経由。コンポーネント内に日本語/英語を直書きしない
+- プレースホルダーは `fmt()` を使う（`src/i18n/fmt.ts`）
+
+## 新規ツールの辞書追加
+
+1. `src/i18n/apps/<camelCase>.ts` に型 + `*Ja` / `*En` を定義
+2. `src/i18n/apps/index.ts` の `AppsDictionary` と export に登録
+3. `src/i18n/ja.ts` / `en.ts` の `tools.<kebab-id>` にポータルカード用 title/description
+4. ページでは `t.apps.<camelCase>` を参照（例: `mail-template` → `mailTemplate`）
+
+## 命名対応
+
+| 用途 | 形式 | 例 |
+|------|------|-----|
+| ポータル tool id | kebab-case | `mail-template` |
+| 辞書キー（apps） | camelCase | `mailTemplate` |
+| 辞書ファイル名 | camelCase.ts | `mailTemplate.ts` |
+
+## shell 文案
+
+各アプリ辞書に必ず含める:
+
+```ts
+shell: { title: string; description: string };
+```
+
+AppShell の title / description はここから取る。

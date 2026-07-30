@@ -7,6 +7,7 @@ import {
   type MediaSession,
   type MetadataFields,
 } from "./types";
+import { readVideoMetadata } from "./videoMetadata";
 
 /** 音声として扱うか */
 export function isAudioFile(file: File): boolean {
@@ -20,12 +21,39 @@ export function isVideoFile(file: File): boolean {
   return /\.(mp4|webm|mov|mkv|avi|m4v)$/i.test(file.name);
 }
 
+/** MIME / 拡張子から MP3 と判定（同期・高速） */
 export function isMp3File(file: File): boolean {
+  const type = (file.type || "").toLowerCase();
   return (
-    file.type === "audio/mpeg" ||
-    file.type === "audio/mp3" ||
+    type === "audio/mpeg" ||
+    type === "audio/mp3" ||
+    type === "audio/x-mpeg" ||
+    type === "audio/mpeg3" ||
+    type === "audio/x-mp3" ||
     /\.mp3$/i.test(file.name)
   );
+}
+
+/** 拡張子・MIME が曖昧でも中身が MP3 っぽいか（ID3 / MPEG 同期語） */
+export async function fileLooksLikeMp3(file: File): Promise<boolean> {
+  if (isMp3File(file)) return true;
+  try {
+    const head = new Uint8Array(await file.slice(0, 3).arrayBuffer());
+    if (
+      head.length >= 3 &&
+      head[0] === 0x49 &&
+      head[1] === 0x44 &&
+      head[2] === 0x33
+    ) {
+      return true;
+    }
+    if (head.length >= 2 && head[0] === 0xff && (head[1] & 0xe0) === 0xe0) {
+      return true;
+    }
+  } catch {
+    // 判定不能なら false
+  }
+  return false;
 }
 
 /** MIME / 拡張子から音楽 or 動画モードを判定。対象外は null */
@@ -67,23 +95,37 @@ function artworkFromBuffer(
   mime: string,
   dirty: boolean,
 ): ArtworkState {
-  const blob = new Blob([data], { type: mime });
+  // TypedArray.buffer の共有を避けるため必ず独立バッファにする
+  const bytes = new Uint8Array(data.byteLength);
+  bytes.set(new Uint8Array(data));
+  // slice でプレビュー用 Blob と書き込み用 data を完全に分離
+  const standalone = bytes.buffer.slice(
+    bytes.byteOffset,
+    bytes.byteOffset + bytes.byteLength,
+  );
+  const previewBytes = new Uint8Array(standalone.byteLength);
+  previewBytes.set(new Uint8Array(standalone));
+  const blob = new Blob([previewBytes], { type: mime });
   return {
     previewUrl: URL.createObjectURL(blob),
-    data,
+    data: standalone,
     mime,
     dirty,
   };
 }
 
-/** カバー画像ファイル（JPG/PNG）から ArtworkState を作る */
+/** カバー画像ファイル（JPG/PNG 等）から ArtworkState を作る */
 export async function artworkFromImageFile(file: File): Promise<ArtworkState> {
   const mime =
-    file.type === "image/png" || file.type === "image/jpeg"
+    file.type === "image/png" ||
+    file.type === "image/jpeg" ||
+    file.type === "image/webp"
       ? file.type
       : /\.png$/i.test(file.name)
         ? "image/png"
-        : "image/jpeg";
+        : /\.webp$/i.test(file.name)
+          ? "image/webp"
+          : "image/jpeg";
   const data = await file.arrayBuffer();
   return artworkFromBuffer(data, mime, true);
 }
@@ -132,7 +174,7 @@ export async function loadMediaSession(file: File): Promise<MediaSession> {
   let fields: MetadataFields = { ...EMPTY_FIELDS };
   let artwork: ArtworkState = { ...EMPTY_ARTWORK };
 
-  if (mode === "audio" && isMp3File(file)) {
+  if (mode === "audio" && (await fileLooksLikeMp3(file))) {
     try {
       const tags = await readId3FromFile(file);
       fields = {
@@ -153,6 +195,20 @@ export async function loadMediaSession(file: File): Promise<MediaSession> {
     } catch {
       // タグが読めなくてもプレビューは続行
     }
+  } else if (mode === "video") {
+    try {
+      const tags = await readVideoMetadata(file);
+      fields = { ...EMPTY_FIELDS, ...tags.fields };
+      if (tags.artwork) {
+        artwork = artworkFromBuffer(
+          tags.artwork.data,
+          tags.artwork.mime,
+          false,
+        );
+      }
+    } catch {
+      // タグが読めなくてもプレビューは続行
+    }
   }
 
   return {
@@ -163,6 +219,8 @@ export async function loadMediaSession(file: File): Promise<MediaSession> {
     displayName: file.name,
     fields,
     artwork,
+    dirty: false,
+    savedOutput: null,
     status: "ready",
   };
 }

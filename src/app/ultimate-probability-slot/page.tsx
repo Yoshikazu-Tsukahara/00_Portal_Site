@@ -396,7 +396,6 @@ export default function UltimateProbabilitySlotPage() {
     <AppShell
       title={copy.shell.title}
       description={copy.shell.description}
-      wide
       fillViewport
       isPwa
       afterDataManager={<InstallAppButton copy={copy.install} />}

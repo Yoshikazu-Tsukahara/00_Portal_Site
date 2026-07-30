@@ -17,6 +17,7 @@ export type MediaMetadataDict = {
     remove: string;
     audio: string;
     video: string;
+    unsaved: string;
   };
   stage: {
     artworkTitle: string;
@@ -47,14 +48,17 @@ export type MediaMetadataDict = {
     removeHistoryAria: string;
   };
   export: {
-    button: string;
-    buttonAll: string;
+    save: string;
+    saving: string;
+    saveOk: string;
+    saveOkNonMp3: string;
+    saveOkUnsupportedVideo: string;
+    download: string;
     hint: string;
-    videoSoon: string;
-    videoSkipped: string;
+    needSave: string;
+    dirtyNeedSave: string;
     downloading: string;
     ok: string;
-    okZip: string;
     fail: string;
   };
   clearAll: string;
@@ -71,20 +75,21 @@ export const mediaMetadataJa: MediaMetadataDict = {
     "ファイルと編集内容はすべてブラウザ内で処理します。サーバーへ送信しません。",
   dropHint: "音楽・動画ファイルをドロップ（複数可）",
   dropSub:
-    "またはクリックして選択（MP3 / MP4 / WebM など）。複数ファイルをまとめて編集できます。処理は完全ローカルです。",
+    "またはクリックして選択。タグ埋め込みは MP3 と MP4 / MOV / WebM / MKV に対応。処理は完全ローカルです。",
   addFiles: "ファイルを追加",
   unsupported: "対応していない形式です。音楽または動画ファイルを選んでください。",
   unsupportedSome:
     "一部のファイルは非対応のためスキップしました。",
   loadError: "ファイルの読み込みに失敗しました。",
-  modeAudio: "Music mode",
-  modeVideo: "Video mode",
+  modeAudio: "音楽モード",
+  modeVideo: "動画モード",
   fileList: {
     heading: "ファイル",
     empty: "まだありません",
     remove: "このファイルを削除",
     audio: "音楽",
     video: "動画",
+    unsaved: "未保存",
   },
   stage: {
     artworkTitle: "カバーアート",
@@ -104,7 +109,7 @@ export const mediaMetadataJa: MediaMetadataDict = {
   },
   form: {
     heading: "メタデータ",
-    hint: "選択中のファイルだけを編集します。直近の入力は履歴として残り、フォーカス時に候補が出ます。",
+    hint: "選択中のファイルだけを編集します。「変更を保存」した内容が履歴に残り、フォーカスで候補が出ます（×で個別削除）。",
     fileName: "ファイル名",
     fileNameHint:
       "ダウンロード時の名前になります。拡張子を消しても元の形式で補完します。",
@@ -118,16 +123,20 @@ export const mediaMetadataJa: MediaMetadataDict = {
     removeHistoryAria: "「{value}」を履歴から削除",
   },
   export: {
-    button: "選択をダウンロード",
-    buttonAll: "すべてダウンロード",
-    hint: "編集内容を埋め込んだファイルを、このブラウザから保存します。複数時は ZIP になります。",
-    videoSoon:
-      "動画へのメタデータ／サムネ書き込みは次フェーズ（ffmpeg.wasm）で接続します。いまはプレビューまで利用できます。",
-    videoSkipped: "動画ファイルは書き込み未対応のためスキップしました。",
-    downloading: "ファイルを生成中…",
+    save: "変更を保存",
+    saving: "保存中…",
+    saveOk: "変更を保存しました。ダウンロードできます。",
+    saveOkNonMp3:
+      "保存しました（この形式はタグ埋め込み未対応のため、ファイル名のみ反映されます）。",
+    saveOkUnsupportedVideo:
+      "保存しました（この動画形式はタグ埋め込み未対応です。MP4 / MOV / WebM / MKV を使ってください。ファイル名のみ反映）。",
+    download: "ダウンロード",
+    hint: "先に「変更を保存」で内容を確定してから、下のボタンでダウンロードしてください。大きな動画は保存に時間がかかることがあります。",
+    needSave: "先に「変更を保存」を押してください。",
+    dirtyNeedSave: "未保存の変更があります。先に保存してください。",
+    downloading: "ダウンロード準備中…",
     ok: "ダウンロードを開始しました",
-    okZip: "ZIP のダウンロードを開始しました",
-    fail: "ファイルの生成に失敗しました",
+    fail: "保存に失敗しました。別のファイルで試すか、サムネイル／カバーを外して再試行してください。",
   },
   clearAll: "すべてクリア",
   selectPrompt: "左の一覧からファイルを選んで編集を開始してください",
@@ -143,7 +152,7 @@ export const mediaMetadataEn: MediaMetadataDict = {
     "Files and edits stay in your browser. Nothing is sent to a server.",
   dropHint: "Drop audio or video files (multiple OK)",
   dropSub:
-    "Or click to choose (MP3 / MP4 / WebM, etc.). Edit several files in one session—fully local.",
+    "Or click to choose. Tag embedding supports MP3 and MP4 / MOV / WebM / MKV—fully local.",
   addFiles: "Add files",
   unsupported: "Unsupported type. Choose an audio or video file.",
   unsupportedSome: "Some unsupported files were skipped.",
@@ -156,6 +165,7 @@ export const mediaMetadataEn: MediaMetadataDict = {
     remove: "Remove this file",
     audio: "Audio",
     video: "Video",
+    unsaved: "Unsaved",
   },
   stage: {
     artworkTitle: "Cover art",
@@ -175,7 +185,7 @@ export const mediaMetadataEn: MediaMetadataDict = {
   },
   form: {
     heading: "Metadata",
-    hint: "Edits apply to the selected file only. Recent values are saved for suggestions on focus.",
+    hint: "Edits apply to the selected file only. Values are saved to history when you press “Save changes”; focus a field for suggestions (× to delete one).",
     fileName: "File name",
     fileNameHint:
       "Used when downloading. If you remove the extension, the original one is restored.",
@@ -189,16 +199,20 @@ export const mediaMetadataEn: MediaMetadataDict = {
     removeHistoryAria: "Remove “{value}” from history",
   },
   export: {
-    button: "Download selected",
-    buttonAll: "Download all",
-    hint: "Saves rewritten files from this browser. Multiple files become a ZIP.",
-    videoSoon:
-      "Writing metadata/thumbnails into video lands in the next phase (ffmpeg.wasm). Preview works now.",
-    videoSkipped: "Video files were skipped (write support coming next).",
-    downloading: "Generating file…",
+    save: "Save changes",
+    saving: "Saving…",
+    saveOk: "Saved. You can download now.",
+    saveOkNonMp3:
+      "Saved (tag embedding isn’t supported for this format—filename only).",
+    saveOkUnsupportedVideo:
+      "Saved (tag embedding isn’t supported for this video type. Use MP4 / MOV / WebM / MKV—filename only).",
+    download: "Download",
+    hint: "Press “Save changes” to confirm, then download below. Large videos may take a while to save.",
+    needSave: "Save changes first.",
+    dirtyNeedSave: "You have unsaved changes. Save before downloading.",
+    downloading: "Preparing download…",
     ok: "Download started",
-    okZip: "ZIP download started",
-    fail: "Failed to generate the file",
+    fail: "Save failed. Try another file, or clear the thumbnail/cover and retry.",
   },
   clearAll: "Clear all",
   selectPrompt: "Select a file from the list to start editing",

@@ -292,7 +292,6 @@ export default function PixelDropPuzzlePage() {
     <AppShell
       title={copy.shell.title}
       description={copy.shell.description}
-      wide
       isPwa
       afterDataManager={<InstallAppButton copy={copy.install} />}
       dataManager={{

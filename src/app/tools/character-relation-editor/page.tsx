@@ -189,7 +189,6 @@ export default function CharacterRelationEditorPage() {
         title={copy.shell.title}
         description={copy.shell.description}
         fillViewport
-        wide
       >
         <p className="text-sm text-zinc-400">{copy.loading}</p>
       </AppShell>
@@ -201,7 +200,6 @@ export default function CharacterRelationEditorPage() {
       title={copy.shell.title}
       description={copy.shell.description}
       fillViewport
-      wide
       dataManager={{
         appId: APP_ID,
         fileNamePrefix: "character-relation-editor",

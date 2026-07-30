@@ -29,6 +29,12 @@ export type ArtworkState = {
   dirty: boolean;
 };
 
+/** 「変更を保存」で確定したダウンロード用成果物 */
+export type SavedOutput = {
+  blob: Blob;
+  fileName: string;
+};
+
 /** 読み込んだ1ファイルのセッション状態 */
 export type MediaSession = {
   id: string;
@@ -36,10 +42,14 @@ export type MediaSession = {
   mode: MediaMode;
   /** プレビュー再生用 Object URL（音声・動画） */
   mediaUrl: string;
-  /** ダウンロード時に使う編集可能な表示ファイル名（拡張子含む） */
+  /** 編集中の表示ファイル名（拡張子含む） */
   displayName: string;
   fields: MetadataFields;
   artwork: ArtworkState;
+  /** 未保存の変更があるか */
+  dirty: boolean;
+  /** 保存済み成果物（これがないとダウンロード不可） */
+  savedOutput: SavedOutput | null;
   status: "ready" | "error";
   error?: string;
 };

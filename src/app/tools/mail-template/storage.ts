@@ -1,4 +1,9 @@
-import type { MailTemplateDefaults } from "@/i18n/apps/mailTemplate";
+import type { Locale } from "@/i18n/types";
+import {
+  mailTemplateEn,
+  mailTemplateJa,
+  type MailTemplateDefaults,
+} from "@/i18n/apps/mailTemplate";
 import {
   createDefaultVariableMaster,
   extractVariables,
@@ -14,10 +19,19 @@ import { createSampleTemplates } from "./sampleTemplates";
 
 const STORAGE_KEY = "mail-template-app:v4";
 
+/** 初期サンプルを流し込んだときの言語。ユーザーが編集したら null */
+export type SeedLocale = "ja" | "en";
+
 export type AppData = {
   templates: MailTemplate[];
   variables: VariableMasterItem[];
   tags: TagMasterItem[];
+  /**
+   * 初期サンプルの言語。
+   * - ja / en: まだサンプルのまま → 言語切替で差し替え可能
+   * - null: ユーザーが編集済み → 言語切替でも上書きしない
+   */
+  seedLocale: SeedLocale | null;
 };
 
 function isVariableItem(value: unknown): value is VariableMasterItem {
@@ -116,7 +130,36 @@ function readJson(key: string): unknown {
   }
 }
 
-function createFreshData(defaults: MailTemplateDefaults): AppData {
+function readSeedLocale(value: unknown): SeedLocale | null | undefined {
+  if (value === null) return null;
+  if (value === "ja" || value === "en") return value;
+  return undefined;
+}
+
+/** 保存データが初期サンプルと一致するか（タイトル集合で判定） */
+function titlesMatchDefaults(
+  templates: MailTemplate[],
+  defaults: MailTemplateDefaults,
+): boolean {
+  if (templates.length !== defaults.templates.length) return false;
+  const saved = new Set(templates.map((t) => t.title));
+  return defaults.templates.every((d) => saved.has(d.title));
+}
+
+/**
+ * seedLocale 未保存の古いデータ向け。
+ * JA / EN いずれかの初期サンプルと一致すればその言語、違えば編集済み扱い。
+ */
+function inferSeedLocale(data: Omit<AppData, "seedLocale">): SeedLocale | null {
+  if (titlesMatchDefaults(data.templates, mailTemplateJa.defaults)) return "ja";
+  if (titlesMatchDefaults(data.templates, mailTemplateEn.defaults)) return "en";
+  return null;
+}
+
+function createFreshData(
+  defaults: MailTemplateDefaults,
+  locale: SeedLocale,
+): AppData {
   const variables = createDefaultVariableMaster(defaults.variables);
   const tags = createDefaultTagMaster(defaults.tags);
   const templates = createSampleTemplates(
@@ -124,13 +167,13 @@ function createFreshData(defaults: MailTemplateDefaults): AppData {
     tags,
     defaults.templates,
   );
-  return { templates, variables, tags };
+  return { templates, variables, tags, seedLocale: locale };
 }
 
 function migrateFromLegacy(
   parsed: unknown,
   defaults: MailTemplateDefaults,
-): AppData {
+): Omit<AppData, "seedLocale"> & { seedLocale?: SeedLocale | null } {
   const tags = createDefaultTagMaster(defaults.tags);
   const tagIdSet = new Set(tags.map((t) => t.id));
 
@@ -145,6 +188,7 @@ function migrateFromLegacy(
       templates: unknown[];
       variables?: unknown[];
       tags?: unknown[];
+      seedLocale?: unknown;
     };
     let variables = (raw.variables ?? []).filter(isVariableItem);
     if (variables.length === 0) {
@@ -159,6 +203,8 @@ function migrateFromLegacy(
       .map((t) => normalizeTemplate(t, variables, validTagIds))
       .filter((t): t is MailTemplate => t !== null);
 
+    const seedLocale = readSeedLocale(raw.seedLocale);
+
     return {
       variables,
       tags: loadedTags,
@@ -166,6 +212,7 @@ function migrateFromLegacy(
         templates.length > 0
           ? templates
           : createSampleTemplates(variables, loadedTags, defaults.templates),
+      ...(seedLocale !== undefined ? { seedLocale } : {}),
     };
   }
 
@@ -204,13 +251,21 @@ function migrateFromLegacy(
     };
   }
 
-  return createFreshData(defaults);
+  return createFreshData(defaults, "ja");
 }
 
-/** LocalStorage から読み込み */
-export function loadAppData(defaults: MailTemplateDefaults): AppData {
+/**
+ * LocalStorage から読み込み。
+ * 初期サンプルのままなら、表示言語に合わせて差し替える。
+ */
+export function loadAppData(
+  defaults: MailTemplateDefaults,
+  locale: Locale,
+): AppData {
+  const seedLocale = locale === "en" ? "en" : "ja";
+
   if (typeof window === "undefined") {
-    return { templates: [], variables: [], tags: [] };
+    return { templates: [], variables: [], tags: [], seedLocale };
   }
 
   try {
@@ -223,16 +278,34 @@ export function loadAppData(defaults: MailTemplateDefaults): AppData {
     }
 
     if (parsed === null) {
-      const fresh = createFreshData(defaults);
+      const fresh = createFreshData(defaults, seedLocale);
       saveAppData(fresh);
       return fresh;
     }
 
-    const data = migrateFromLegacy(parsed, defaults);
+    const migrated = migrateFromLegacy(parsed, defaults);
+    const resolvedSeed =
+      migrated.seedLocale !== undefined
+        ? migrated.seedLocale
+        : inferSeedLocale(migrated);
+
+    // サンプルのままで、今の表示言語と違う → 差し替え
+    if (resolvedSeed !== null && resolvedSeed !== seedLocale) {
+      const fresh = createFreshData(defaults, seedLocale);
+      saveAppData(fresh);
+      return fresh;
+    }
+
+    const data: AppData = {
+      templates: migrated.templates,
+      variables: migrated.variables,
+      tags: migrated.tags,
+      seedLocale: resolvedSeed,
+    };
     saveAppData(data);
     return data;
   } catch {
-    const fresh = createFreshData(defaults);
+    const fresh = createFreshData(defaults, seedLocale);
     saveAppData(fresh);
     return fresh;
   }
@@ -246,6 +319,7 @@ export function saveAppData(data: AppData): void {
 /**
  * バックアップ JSON の data 部を AppData に正規化。
  * `{ app, inputHistory? }` 形式と、AppData 直置きの両方に対応。
+ * 取り込みデータはユーザー編集扱い（seedLocale = null）。
  */
 export function parseImportedAppData(
   raw: unknown,
@@ -264,7 +338,12 @@ export function parseImportedAppData(
     }
     const data = migrateFromLegacy(payload, defaults);
     if (!data.templates || !data.variables || !data.tags) return null;
-    return data;
+    return {
+      templates: data.templates,
+      variables: data.variables,
+      tags: data.tags,
+      seedLocale: null,
+    };
   } catch {
     return null;
   }
