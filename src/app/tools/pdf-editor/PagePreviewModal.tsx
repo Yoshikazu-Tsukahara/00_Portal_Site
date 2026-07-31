@@ -182,7 +182,7 @@ export default function PagePreviewModal({
 
   return createPortal(
     <div
-      className={`fixed inset-0 z-[100] flex items-center justify-center p-4 transition-opacity duration-200 ${
+      className={`fixed inset-0 z-[100] flex items-end justify-center p-0 transition-opacity duration-200 sm:items-center sm:p-4 ${
         visible ? "opacity-100" : "opacity-0"
       }`}
       role="dialog"
@@ -197,7 +197,7 @@ export default function PagePreviewModal({
       />
 
       <div
-        className={`pointer-events-none relative flex w-full max-w-[min(96vw,820px)] items-center justify-center gap-2 transition-all duration-200 ${
+        className={`pointer-events-none relative flex w-full max-w-[min(100vw,820px)] flex-col items-stretch gap-2 transition-all duration-200 sm:max-w-[min(96vw,820px)] sm:flex-row sm:items-center sm:justify-center ${
           visible ? "scale-100 opacity-100" : "scale-[0.97] opacity-0"
         }`}
       >
@@ -206,12 +206,12 @@ export default function PagePreviewModal({
           onClick={goPrev}
           disabled={!canGoPrev}
           aria-label={preview.prev}
-          className="pointer-events-auto btn-secondary !p-2 disabled:pointer-events-none disabled:opacity-35"
+          className="pointer-events-auto btn-secondary hidden !p-2 disabled:pointer-events-none disabled:opacity-35 sm:block"
         >
           <ChevronIcon direction="left" />
         </button>
 
-        <div className="pointer-events-auto flex max-h-[min(90vh,880px)] w-full max-w-[min(92vw,680px)] flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-2xl">
+        <div className="pointer-events-auto flex max-h-[90dvh] w-full max-w-none flex-col overflow-hidden rounded-t-2xl border border-zinc-200 bg-white shadow-2xl sm:max-h-[min(90vh,880px)] sm:max-w-[min(92vw,680px)] sm:rounded-xl">
           <header className="flex shrink-0 items-center gap-3 border-b border-zinc-200/80 px-3 py-2">
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium text-zinc-900">
@@ -229,14 +229,14 @@ export default function PagePreviewModal({
             <button
               type="button"
               onClick={handleClose}
-              className="btn-secondary !p-1.5"
+              className="btn-secondary min-h-11 !px-3 !py-2 sm:min-h-0 sm:!p-1.5"
               aria-label={preview.close}
             >
               <CloseIcon />
             </button>
           </header>
 
-          <div className="flex min-h-[min(60vh,520px)] flex-1 items-center justify-center overflow-auto bg-zinc-50 p-4">
+          <div className="flex min-h-[min(50dvh,420px)] flex-1 items-center justify-center overflow-auto bg-zinc-50 p-3 sm:min-h-[min(60vh,520px)] sm:p-4">
             {loading ? (
               <p className="text-sm text-zinc-400">{labels.loading}</p>
             ) : error ? (
@@ -262,6 +262,27 @@ export default function PagePreviewModal({
               />
             ) : null}
           </div>
+
+          <footer className="flex shrink-0 gap-2 border-t border-zinc-200/80 px-3 py-2 sm:hidden">
+            <button
+              type="button"
+              onClick={goPrev}
+              disabled={!canGoPrev}
+              aria-label={preview.prev}
+              className="btn-secondary min-h-11 flex-1 disabled:opacity-35"
+            >
+              <ChevronIcon direction="left" />
+            </button>
+            <button
+              type="button"
+              onClick={goNext}
+              disabled={!canGoNext}
+              aria-label={preview.next}
+              className="btn-secondary min-h-11 flex-1 disabled:opacity-35"
+            >
+              <ChevronIcon direction="right" />
+            </button>
+          </footer>
         </div>
 
         <button
@@ -269,7 +290,7 @@ export default function PagePreviewModal({
           onClick={goNext}
           disabled={!canGoNext}
           aria-label={preview.next}
-          className="pointer-events-auto btn-secondary !p-2 disabled:pointer-events-none disabled:opacity-35"
+          className="pointer-events-auto btn-secondary hidden !p-2 disabled:pointer-events-none disabled:opacity-35 sm:block"
         >
           <ChevronIcon direction="right" />
         </button>

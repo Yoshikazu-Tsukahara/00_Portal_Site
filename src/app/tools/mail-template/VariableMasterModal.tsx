@@ -109,31 +109,34 @@ export default function VariableMasterModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-zinc-950/40 p-4 sm:items-center"
+      className="fixed inset-0 z-50 flex items-end justify-center overflow-x-hidden bg-zinc-950/40 p-2 sm:items-center sm:p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby={titleId}
       onClick={onClose}
     >
       <div
-        className="flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-xl"
+        className="flex max-h-[92dvh] w-full max-w-lg flex-col overflow-hidden rounded-t-lg border border-zinc-200 bg-white shadow-xl sm:max-h-[90vh] sm:rounded-lg"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-zinc-200/70 px-4 py-3">
-          <h2 id={titleId} className="text-sm font-semibold text-zinc-900">
+        <div className="flex items-center justify-between gap-2 border-b border-zinc-200/70 px-3 py-3 sm:px-4">
+          <h2
+            id={titleId}
+            className="min-w-0 break-words text-sm font-semibold text-zinc-900"
+          >
             {mt.variableMaster.title}
           </h2>
           <button
             type="button"
             onClick={onClose}
-            className="text-xs text-zinc-400 transition-colors hover:text-zinc-700"
+            className="flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-md text-xs text-zinc-400 transition-colors hover:text-zinc-700 active:bg-zinc-100 active:text-zinc-800 sm:min-h-0 sm:min-w-0 sm:px-2 sm:py-1"
           >
             {mt.variableMaster.close}
           </button>
         </div>
 
-        <div className="space-y-3 overflow-y-auto px-4 py-3">
-          <div className="rounded-md border border-zinc-200/80 bg-zinc-50/60 p-3">
+        <div className="space-y-3 overflow-x-hidden overflow-y-auto px-3 py-3 sm:px-4">
+          <div className="rounded-md border border-zinc-200/80 bg-zinc-50/60 p-2 sm:p-3">
             <p className="mb-2 text-[11px] font-medium text-zinc-600">
               {editingId
                 ? mt.variableMaster.editHeading
@@ -145,24 +148,26 @@ export default function VariableMasterModal({
                 value={draftKey}
                 onChange={(e) => setDraftKey(e.target.value)}
                 placeholder={mt.variableMaster.keyPlaceholder}
-                className="input-field flex-1 !py-1.5 !text-xs font-mono"
+                className="input-field min-h-11 w-full max-w-full flex-1 !py-2 !text-sm font-mono md:min-h-0 md:!py-1.5 md:!text-xs"
               />
               <input
                 type="text"
                 value={draftLabel}
                 onChange={(e) => setDraftLabel(e.target.value)}
                 placeholder={mt.variableMaster.labelPlaceholder}
-                className="input-field flex-1 !py-1.5 !text-xs"
+                className="input-field min-h-11 w-full max-w-full flex-1 !py-2 !text-sm md:min-h-0 md:!py-1.5 md:!text-xs"
               />
             </div>
             {error ? (
-              <p className="mt-1.5 text-[11px] text-red-600">{error}</p>
+              <p className="mt-1.5 break-words text-[11px] text-red-600">
+                {error}
+              </p>
             ) : null}
-            <div className="mt-2 flex gap-2">
+            <div className="mt-2 flex flex-col gap-2 sm:flex-row">
               <button
                 type="button"
                 onClick={handleSubmit}
-                className="btn-primary !px-3 !py-1.5 !text-xs"
+                className="btn-primary min-h-11 !px-3 !py-2 !text-xs active:scale-[0.98] active:bg-zinc-800 sm:min-h-0 sm:!py-1.5"
               >
                 {editingId ? mt.variableMaster.update : mt.variableMaster.add}
               </button>
@@ -170,7 +175,7 @@ export default function VariableMasterModal({
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="btn-secondary !px-3 !py-1.5 !text-xs"
+                  className="btn-secondary min-h-11 !px-3 !py-2 !text-xs active:scale-[0.98] active:bg-zinc-100 sm:min-h-0 sm:!py-1.5"
                 >
                   {mt.variableMaster.cancel}
                 </button>
@@ -178,39 +183,41 @@ export default function VariableMasterModal({
             </div>
           </div>
 
-          <ul className="divide-y divide-zinc-100 rounded-md border border-zinc-200/80">
+          <ul className="divide-y divide-zinc-100 overflow-hidden rounded-md border border-zinc-200/80">
             {variables.length === 0 ? (
-              <li className="px-3 py-4 text-center text-xs text-zinc-400">
+              <li className="break-words px-3 py-4 text-center text-xs text-zinc-400">
                 {mt.variableMaster.empty}
               </li>
             ) : (
               variables.map((v) => (
                 <li
                   key={v.id}
-                  className="flex items-center gap-2 px-3 py-2 text-sm"
+                  className="flex flex-col gap-2 px-3 py-2.5 text-sm sm:flex-row sm:items-center"
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium text-zinc-800">
+                    <p className="break-words font-medium text-zinc-800">
                       {v.label}
                     </p>
-                    <p className="font-mono text-[10px] text-zinc-400">
+                    <p className="break-all font-mono text-[10px] text-zinc-400">
                       {`{{${v.key}}}`}
                     </p>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => startEdit(v)}
-                    className="text-[11px] text-zinc-500 transition-colors hover:text-zinc-900"
-                  >
-                    {mt.variableMaster.edit}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleDelete(v.id)}
-                    className="text-[11px] text-zinc-400 transition-colors hover:text-red-600"
-                  >
-                    {mt.variableMaster.delete}
-                  </button>
+                  <div className="flex shrink-0 gap-1">
+                    <button
+                      type="button"
+                      onClick={() => startEdit(v)}
+                      className="flex min-h-11 min-w-11 items-center justify-center rounded-md px-2 text-[11px] text-zinc-500 transition-colors hover:text-zinc-900 active:bg-zinc-100 active:text-zinc-900 sm:min-h-0 sm:min-w-0"
+                    >
+                      {mt.variableMaster.edit}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(v.id)}
+                      className="flex min-h-11 min-w-11 items-center justify-center rounded-md px-2 text-[11px] text-zinc-400 transition-colors hover:text-red-600 active:bg-red-50 active:text-red-600 sm:min-h-0 sm:min-w-0"
+                    >
+                      {mt.variableMaster.delete}
+                    </button>
+                  </div>
                 </li>
               ))
             )}

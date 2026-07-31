@@ -120,6 +120,10 @@ export const ja: Dictionary = {
     open: "開く",
     comingSoon: "準備中",
     comingSoonHint: "近日公開予定",
+    mobileSupported: "スマホ対応",
+    mobileSupportedHint: "スマホ最適化済み",
+    pcRecommended: "PC推奨",
+    pcRecommendedHint: "PCでの利用を推奨",
   },
   footer: {
     tagline: "日々の面倒をラクにする個人開発ツール群",

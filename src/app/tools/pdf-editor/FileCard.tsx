@@ -156,13 +156,13 @@ export default function FileCard({
         </p>
       </div>
 
-      <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+      <div className="flex shrink-0 items-center gap-0.5 opacity-100 transition-opacity md:opacity-0 md:group-hover:opacity-100">
         <button
           type="button"
           title={copy.duplicate}
           aria-label={fmt(copy.duplicateAria, { name: group.name })}
           onClick={() => onDuplicate(group.sourceId)}
-          className="rounded p-1 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-800"
+          className="rounded p-2 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-800 active:bg-zinc-200 sm:p-1"
         >
           <CopyIcon />
         </button>
@@ -171,7 +171,7 @@ export default function FileCard({
           title={copy.delete}
           aria-label={fmt(copy.deleteAria, { name: group.name })}
           onClick={() => onRemove(group.sourceId)}
-          className="rounded p-1 text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-600"
+          className="rounded p-2 text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-600 active:bg-red-100 sm:p-1"
         >
           <TrashIcon />
         </button>

@@ -21,6 +21,9 @@ const STANDALONE_APP_PATHS = [
   "/palette-collector",
   "/crypto-message",
   "/robot-freethrow",
+  "/tools/mail-template",
+  "/tools/pdf-editor",
+  "/tools/image-compressor",
 ];
 
 /**

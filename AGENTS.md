@@ -36,14 +36,18 @@ src/
 - **言語スイッチ**: サイト Header のみ（PWA standalone 時は AppShell が代行）
 - **バックアップ**: `AppShell` の `dataManager`（タイトル横 💾）
 - **PWA インストール**: `AppShell` の `afterDataManager`（バックアップ右隣 📱）
+- **スマホ AppShell**: 1行目=タイトル+💾+📱／2行目=機能ボタン。「ポータルに戻る」はスマホ非表示
+- **スマホ対応完了アプリ**: `src/data/tools.ts` で `isMobileSupported: true`
 
-詳細 → `.cursor/rules/ui-ux.mdc`
+詳細 → `.cursor/rules/ui-ux.mdc`  
+既存アプリへの適用手順 → `.cursor/skills/mobile-responsive/SKILL.md`
 
 ## 作業時の優先参照
 
 1. 触っているファイルの近傍コード（既存パターンに合わせる）
 2. `.cursor/rules/` の該当ルール（UI 変更時は `ui-ux.mdc`）
 3. 新規ツール追加時 → `.cursor/skills/add-new-tool/SKILL.md`
+4. 既存アプリのスマホ対応 → `.cursor/skills/mobile-responsive/SKILL.md`
 
 ## やらないこと
 

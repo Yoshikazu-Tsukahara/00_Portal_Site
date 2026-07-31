@@ -25,14 +25,14 @@ export default function FileGroupList({
 
   if (groups.length === 0) {
     return (
-      <div className="flex h-[60vh] max-h-[650px] items-center justify-center rounded-lg border border-dashed border-zinc-200 bg-zinc-50/30">
+      <div className="flex min-h-[40dvh] flex-1 items-center justify-center rounded-lg border border-dashed border-zinc-200 bg-zinc-50/30 md:min-h-0 md:max-h-[650px] md:h-[60vh]">
         <p className="text-sm text-zinc-400">{copy.noFiles}</p>
       </div>
     );
   }
 
   return (
-    <div className="h-[60vh] max-h-[650px] overflow-y-auto rounded-lg border border-zinc-200/60 bg-zinc-50/30 p-3 [scrollbar-width:thin]">
+    <div className="min-h-[40dvh] flex-1 overflow-x-hidden overflow-y-auto rounded-lg border border-zinc-200/60 bg-zinc-50/30 p-2 [scrollbar-width:thin] sm:p-3 md:min-h-0 md:max-h-[650px] md:h-[60vh]">
       <SortableContext
         items={groups.map((g) => g.sourceId)}
         strategy={rectSortingStrategy}

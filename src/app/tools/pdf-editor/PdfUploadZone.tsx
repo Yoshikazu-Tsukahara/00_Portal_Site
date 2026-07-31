@@ -77,7 +77,7 @@ export default function PdfUploadZone({
           ? "cursor-not-allowed border-zinc-200 bg-zinc-50 opacity-60"
           : isDragging
             ? "border-zinc-950 bg-zinc-100"
-            : "border-zinc-200 bg-white hover:border-zinc-300 hover:bg-zinc-50"
+            : "border-zinc-200 bg-white hover:border-zinc-300 hover:bg-zinc-50 active:bg-zinc-100"
       }`}
     >
       <p

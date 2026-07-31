@@ -65,15 +65,49 @@ export default function SettingsPanel({
 
   return (
     <div className="space-y-2">
-      <div className="rounded-2xl border border-zinc-200/70 bg-zinc-100/90 p-1">
+      {/* 狭い画面: 1行セレクト（縦3行を避ける） */}
+      <div className="rounded-xl border border-zinc-200/70 bg-white px-3 py-2 sm:hidden">
+        <div className="flex min-w-0 items-center gap-2">
+          <label
+            htmlFor="compress-preset"
+            className="shrink-0 text-[11px] font-medium text-zinc-500"
+          >
+            {copy.presets.selectLabel}
+          </label>
+          <select
+            id="compress-preset"
+            value={settings.preset}
+            aria-label={copy.presets.aria}
+            onChange={(e) =>
+              onChange({
+                ...settings,
+                preset: e.target.value as CompressPreset,
+              })
+            }
+            className="input-field min-h-11 min-w-0 flex-1 !py-2 !text-xs"
+          >
+            {presets.map((preset) => (
+              <option key={preset.id} value={preset.id}>
+                {preset.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <p className="mt-1.5 break-words text-[10px] leading-snug text-zinc-400">
+          {active.hint}
+        </p>
+      </div>
+
+      {/* sm以上: 横並びセグメント */}
+      <div className="hidden rounded-2xl border border-zinc-200/70 bg-zinc-100/90 p-1 sm:block">
         <div
           role="radiogroup"
           aria-label={copy.presets.aria}
-          className="relative grid grid-cols-1 gap-1 sm:grid-cols-3 sm:gap-0"
+          className="relative grid grid-cols-3 gap-0"
         >
           <div
             aria-hidden
-            className={`pointer-events-none absolute inset-y-0 left-0 hidden rounded-xl shadow-sm transition-all duration-300 ease-out sm:block ${active.pill}`}
+            className={`pointer-events-none absolute inset-y-0 left-0 rounded-xl shadow-sm transition-all duration-300 ease-out ${active.pill}`}
             style={{
               width: `calc(100% / ${presets.length})`,
               transform: `translateX(${activeIndex * 100}%)`,
@@ -91,15 +125,15 @@ export default function SettingsPanel({
                 onClick={() => onChange({ ...settings, preset: preset.id })}
                 className={`relative z-10 rounded-xl px-3 py-2.5 text-center transition-colors duration-300 ${
                   selected
-                    ? `${preset.pill} ${preset.activeText} sm:bg-transparent`
-                    : "bg-transparent text-zinc-600 hover:bg-white/60 hover:text-zinc-900 sm:hover:bg-transparent"
+                    ? `${preset.activeText}`
+                    : "bg-transparent text-zinc-600 hover:text-zinc-900"
                 }`}
               >
                 <span className="block text-xs font-medium leading-tight">
                   {preset.label}
                 </span>
                 <span
-                  className={`mt-0.5 block text-[10px] leading-tight transition-colors duration-300 ${
+                  className={`mt-0.5 block break-words text-[10px] leading-tight transition-colors duration-300 ${
                     selected ? preset.activeHint : "text-zinc-400"
                   }`}
                 >
@@ -112,22 +146,24 @@ export default function SettingsPanel({
       </div>
 
       <div className="flex flex-col gap-2 rounded-xl border border-zinc-200/70 bg-white px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between">
-        <label className="flex cursor-pointer items-center gap-2 text-xs text-zinc-700">
+        <label className="flex min-h-11 cursor-pointer items-center gap-2 text-xs text-zinc-700 sm:min-h-0">
           <input
             type="checkbox"
             checked={settings.sequentialNames}
             onChange={(e) =>
               onChange({ ...settings, sequentialNames: e.target.checked })
             }
-            className="size-3.5 rounded border-zinc-300 text-zinc-900 accent-zinc-900"
+            className="size-4 shrink-0 rounded border-zinc-300 text-zinc-900 accent-zinc-900 sm:size-3.5"
           />
-          <span>
+          <span className="min-w-0 break-words">
             {copy.settings.sequentialNames}
-            <span className="ml-1 text-zinc-400">{copy.settings.sequentialHint}</span>
+            <span className="ml-1 text-zinc-400">
+              {copy.settings.sequentialHint}
+            </span>
           </span>
         </label>
 
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 items-center gap-2">
           <label
             htmlFor="output-format"
             className="shrink-0 text-[11px] font-medium text-zinc-500"
@@ -143,7 +179,7 @@ export default function SettingsPanel({
                 outputFormat: e.target.value as OutputFormat,
               })
             }
-            className="input-field !w-auto !min-w-[10.5rem] !py-1.5 !text-xs"
+            className="input-field min-h-11 min-w-0 flex-1 !py-2 !text-xs sm:min-h-0 sm:!w-auto sm:!min-w-[10.5rem] sm:flex-none sm:!py-1.5"
           >
             {formatOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>

@@ -1,5 +1,6 @@
 "use client";
 
+import { Monitor, Smartphone } from "lucide-react";
 import type { Tool } from "@/data/tools";
 import { useI18n } from "@/i18n";
 
@@ -15,7 +16,7 @@ const ACCENT_BY_GENRE: Record<string, CardAccent> = {
 
 /** カード共通：高さ固定（日英で文言量が違ってもカード高さが変わらない） */
 const CARD_BASE =
-  "portal-tool-card group relative flex h-[11.75rem] flex-col rounded-xl bg-white/95 p-5 shadow-md backdrop-blur-[2px] transition-all duration-300 ease-out sm:h-[12rem] sm:p-5";
+  "portal-tool-card group relative flex h-[12.25rem] min-w-0 flex-col overflow-hidden rounded-xl bg-white/95 p-3 shadow-md backdrop-blur-[2px] transition-all duration-300 ease-out sm:h-[12rem] sm:p-5";
 
 const ACCENT_CLASS: Record<CardAccent, string> = {
   blue: "portal-tool-card--blue",
@@ -39,25 +40,53 @@ function ComingSoonCard({
       className={`${CARD_BASE} ${ACCENT_CLASS[accent]} portal-tool-card--muted cursor-default border-dashed opacity-70`}
       aria-disabled="true"
     >
-      <span className="absolute right-4 top-4 shrink-0 whitespace-nowrap rounded-full border border-zinc-200/80 bg-white px-2.5 py-0.5 text-[10px] font-medium tracking-wide text-zinc-500 sm:text-[11px]">
+      <span className="absolute right-2.5 top-2.5 shrink-0 whitespace-nowrap rounded-full border border-zinc-200/80 bg-white px-2 py-0.5 text-[10px] font-medium tracking-wide text-zinc-500 sm:right-4 sm:top-4 sm:px-2.5 sm:text-[11px]">
         Coming Soon
       </span>
 
-      <div className="flex flex-1 flex-col items-center justify-center px-2 text-center">
+      <div className="flex flex-1 flex-col items-center justify-center px-1 text-center sm:px-2">
         <span
           aria-hidden
-          className="mb-2.5 flex h-11 w-11 items-center justify-center rounded-xl border border-zinc-200/60 bg-white/80 text-xl text-zinc-300 sm:h-12 sm:w-12 sm:text-2xl"
+          className="mb-2 flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-200/60 bg-white/80 text-lg text-zinc-300 sm:mb-2.5 sm:h-12 sm:w-12 sm:text-2xl"
         >
           ···
         </span>
         <p className="text-sm font-medium tracking-tight text-zinc-400">
           {label}
         </p>
-        <p className="mt-1 line-clamp-2 text-[12px] leading-snug text-zinc-400/90">
+        <p className="mt-1 line-clamp-2 break-words text-[11px] leading-snug text-zinc-400/90 sm:text-[12px]">
           {hint}
         </p>
       </div>
     </div>
+  );
+}
+
+/** デバイス対応バッジ（右下） */
+function DeviceBadge({
+  supported,
+  label,
+  hint,
+}: {
+  supported: boolean;
+  label: string;
+  hint: string;
+}) {
+  const Icon = supported ? Smartphone : Monitor;
+  return (
+    <span
+      title={hint}
+      aria-label={hint}
+      className={`absolute bottom-2.5 right-2.5 inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10px] font-medium tracking-tight shadow-sm sm:bottom-4 sm:right-4 ${
+        supported
+          ? "border-emerald-200/80 bg-emerald-50/90 text-emerald-700"
+          : "border-zinc-200/80 bg-zinc-100/80 text-zinc-500"
+      }`}
+    >
+      <Icon className="size-3 shrink-0" aria-hidden strokeWidth={2.25} />
+      {/* 狭いカード幅ではアイコンのみ（ビューポート幅ではなく sm 以上で文言） */}
+      <span className="hidden sm:inline">{label}</span>
+    </span>
   );
 }
 
@@ -70,7 +99,7 @@ export default function ToolCard({
   genreId: string;
 }) {
   const { t } = useI18n();
-  const { icon, href, comingSoon, id } = tool;
+  const { icon, href, comingSoon, id, isMobileSupported } = tool;
   const accent = ACCENT_BY_GENRE[genreId] ?? "blue";
 
   if (comingSoon) {
@@ -88,37 +117,56 @@ export default function ToolCard({
 
   const content = (
     <>
-      <div className="mb-2.5 flex min-w-0 items-center gap-3">
+      <div className="mb-1.5 flex min-w-0 items-start gap-2 sm:mb-2.5 sm:items-center sm:gap-3">
         <span
           aria-hidden
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-zinc-100 bg-gradient-to-b from-zinc-50 to-zinc-100/80 text-[1.25rem] leading-none shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_1px_2px_rgba(24,24,27,0.04)] transition-all duration-300 group-hover:border-zinc-200 group-hover:from-white group-hover:to-zinc-50 group-hover:shadow-[inset_0_1px_0_rgba(255,255,255,1),0_2px_6px_rgba(24,24,27,0.06)] sm:h-11 sm:w-11 sm:text-[1.35rem]"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-zinc-100 bg-gradient-to-b from-zinc-50 to-zinc-100/80 text-[1.05rem] leading-none shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_1px_2px_rgba(24,24,27,0.04)] transition-all duration-300 group-hover:border-zinc-200 group-hover:from-white group-hover:to-zinc-50 group-hover:shadow-[inset_0_1px_0_rgba(255,255,255,1),0_2px_6px_rgba(24,24,27,0.06)] sm:h-11 sm:w-11 sm:rounded-xl sm:text-[1.35rem]"
         >
           {icon}
         </span>
         <h3
           title={title}
-          className="min-w-0 flex-1 truncate text-[15px] font-semibold leading-tight tracking-tight text-zinc-900 transition-colors duration-300 group-hover:text-zinc-950 sm:text-base"
+          className="line-clamp-2 min-w-0 flex-1 break-words text-[13px] font-semibold leading-snug tracking-tight text-zinc-900 transition-colors duration-300 [overflow-wrap:anywhere] group-hover:text-zinc-950 sm:line-clamp-none sm:truncate sm:text-base sm:leading-tight"
         >
           {title}
         </h3>
       </div>
 
+      {/*
+        狭いカード: 3行＋単語途中の見切れを抑える。
+        バッジ用の大きな右余白（pr-14）は狭い幅では付けない。
+      */}
       <p
         title={description}
-        className="mb-3 line-clamp-2 flex-1 text-[13px] leading-snug text-zinc-500 transition-colors duration-300 group-hover:text-zinc-600 sm:text-sm sm:leading-snug"
+        className="mb-2 min-h-0 flex-1 overflow-hidden break-words text-[11px] leading-relaxed text-zinc-500 transition-colors duration-300 [overflow-wrap:anywhere] line-clamp-3 group-hover:text-zinc-600 sm:mb-3 sm:line-clamp-2 sm:pr-14 sm:text-sm sm:leading-snug"
       >
         {description}
       </p>
 
-      <span className="mt-auto inline-flex items-center text-[13px] font-medium text-zinc-600 transition-colors duration-300 group-hover:text-zinc-900 sm:text-sm">
+      <span className="mt-auto inline-flex max-w-[calc(100%-2.5rem)] items-center truncate text-[12px] font-medium text-zinc-600 transition-colors duration-300 group-hover:text-zinc-900 sm:max-w-none sm:pr-16 sm:text-sm">
         {t.card.open}
         <span
           aria-hidden
-          className="ml-1.5 transition-transform duration-300 group-hover:translate-x-0.5"
+          className="ml-1 transition-transform duration-300 group-hover:translate-x-0.5 sm:ml-1.5"
         >
           →
         </span>
       </span>
+
+      {isMobileSupported === true ? (
+        <DeviceBadge
+          supported
+          label={t.card.mobileSupported}
+          hint={t.card.mobileSupportedHint}
+        />
+      ) : null}
+      {isMobileSupported === false ? (
+        <DeviceBadge
+          supported={false}
+          label={t.card.pcRecommended}
+          hint={t.card.pcRecommendedHint}
+        />
+      ) : null}
     </>
   );
 

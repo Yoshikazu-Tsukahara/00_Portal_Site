@@ -1,6 +1,6 @@
 // ポータル掲載ツールの構造データ（表示文言は i18n 辞書側）
 // 新しいツールを追加する場合:
-// 1. ここに id / icon / href を追加
+// 1. ここに id / icon / href を追加（スマホ対応なら isMobileSupported: true）
 // 2. src/i18n/ja.ts と en.ts の tools / genres に文言を追加
 
 export type Tool = {
@@ -12,6 +12,11 @@ export type Tool = {
   href: string;
   /** 公開準備中のプレースホルダー（内容は ToolCard 側で共通表示） */
   comingSoon?: boolean;
+  /**
+   * スマホ／縦長画面向けレスポンシブ対応済みか。
+   * true → 「スマホ対応」バッジ、false → 「PC推奨」バッジ、未指定 → バッジなし
+   */
+  isMobileSupported?: boolean;
 };
 
 export type Genre = {
@@ -39,6 +44,7 @@ export const genres: Genre[] = [
         id: "mail-template",
         icon: "✉️",
         href: "/tools/mail-template",
+        isMobileSupported: true,
       },
       {
         id: "folder-generator",
@@ -49,11 +55,13 @@ export const genres: Genre[] = [
         id: "pdf-editor",
         icon: "📄",
         href: "/tools/pdf-editor",
+        isMobileSupported: true,
       },
       {
         id: "image-compressor",
         icon: "🖼️",
         href: "/tools/image-compressor",
+        isMobileSupported: true,
       },
       {
         id: "text-cleaner",
@@ -91,6 +99,7 @@ export const genres: Genre[] = [
         id: "lunch-savings",
         icon: "🍱",
         href: "/lunch-savings",
+        isMobileSupported: true,
       },
       {
         id: "link-stocker",
@@ -107,11 +116,13 @@ export const genres: Genre[] = [
         id: "ultimate-probability-slot",
         icon: "🎰",
         href: "/ultimate-probability-slot",
+        isMobileSupported: true,
       },
       {
         id: "pixel-drop-puzzle",
         icon: "🧩",
         href: "/pixel-drop-puzzle",
+        isMobileSupported: true,
       },
       {
         id: "robot-freethrow",
@@ -122,6 +133,7 @@ export const genres: Genre[] = [
         id: "crypto-message",
         icon: "🔐",
         href: "/crypto-message",
+        isMobileSupported: true,
       },
       // モンスタードライバーはポータル一覧非表示（ルート /monster-driver は残置）
     ],

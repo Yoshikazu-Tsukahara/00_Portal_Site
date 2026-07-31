@@ -147,7 +147,7 @@ export default function PageCard({
         {displayIndex}
       </span>
 
-      <div className="absolute right-1 top-1 z-10 flex gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+      <div className="absolute right-1 top-1 z-10 flex gap-0.5 opacity-100 transition-opacity md:opacity-0 md:group-hover:opacity-100">
         <button
           type="button"
           title={card.rotate}
@@ -157,7 +157,7 @@ export default function PageCard({
             e.stopPropagation();
             onRotate();
           }}
-          className="rounded bg-white/90 px-1 py-0.5 text-xs text-zinc-600 shadow-sm hover:bg-zinc-100 hover:text-zinc-900"
+          className="rounded bg-white/90 px-1.5 py-1 text-xs text-zinc-600 shadow-sm hover:bg-zinc-100 hover:text-zinc-900 active:bg-zinc-200 sm:px-1 sm:py-0.5"
         >
           ↻
         </button>
@@ -170,7 +170,7 @@ export default function PageCard({
             e.stopPropagation();
             onRemove();
           }}
-          className="rounded bg-white/90 p-1 text-zinc-500 shadow-sm hover:bg-red-50 hover:text-red-600"
+          className="rounded bg-white/90 p-1.5 text-zinc-500 shadow-sm hover:bg-red-50 hover:text-red-600 active:bg-red-100 sm:p-1"
         >
           <TrashIcon />
         </button>

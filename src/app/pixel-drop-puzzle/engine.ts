@@ -23,6 +23,9 @@ export const FALL_GRAVITY_PX_PER_MS2 = 0.001;
 /** 1 フレームあたりの dt 上限（ms）。タブ復帰時の跳びを抑える */
 export const FALL_MAX_DT_MS = 32;
 
+/** パトロール描画 rAF 向け dt 上限（ms）。タブ復帰時の位相ジャンプを抑える */
+export const PATROL_MAX_DT_MS = 64;
+
 /** 初速度 0 の等加速度落下を 1 ステップ進める */
 export function stepFallMotion(
   y: number,

@@ -3,6 +3,8 @@ import type { AppShellCopy } from "./otherApps";
 export type PdfEditorDict = {
   shell: AppShellCopy;
   exportPdf: string;
+  /** 狭い画面向け */
+  exportPdfShort: string;
   loading: string;
   addPdf: string;
   clearAll: string;
@@ -20,8 +22,29 @@ export type PdfEditorDict = {
     aria: string;
     page: string;
     file: string;
+    pageShort: string;
+    fileShort: string;
     fileLockedTitle: string;
     fileLockedHint: string;
+  };
+  install: {
+    button: string;
+    buttonShort: string;
+    buttonTiny: string;
+    buttonAria: string;
+    modalTitle: string;
+    modalLead: string;
+    step1Title: string;
+    step1Body: string;
+    step2Title: string;
+    step2Body: string;
+    desktopTitle: string;
+    desktopLead: string;
+    desktopStep1Title: string;
+    desktopStep1Body: string;
+    desktopStep2Title: string;
+    desktopStep2Body: string;
+    modalClose: string;
   };
   history: {
     aria: string;
@@ -35,6 +58,7 @@ export type PdfEditorDict = {
     selected: string;
     copy: string;
     extract: string;
+    extractShort: string;
     rotate: string;
     delete: string;
     clearSelection: string;
@@ -134,6 +158,7 @@ export const pdfEditorJa: PdfEditorDict = {
     description: "結合・並び替え・回転・白紙挿入。ブラウザ内で完結。",
   },
   exportPdf: "PDFを出力",
+  exportPdfShort: "出力",
   loading: "読込中…",
   addPdf: "PDFを追加",
   clearAll: "すべてクリア",
@@ -151,10 +176,35 @@ export const pdfEditorJa: PdfEditorDict = {
     aria: "表示モード",
     page: "ページ単位",
     file: "ファイル単位",
+    pageShort: "ページ",
+    fileShort: "ファイル",
     fileLockedTitle:
       "ページ構成が変更されたため、ファイル単位での編集はできません",
     fileLockedHint:
       "ページ構成が変更されたため、ファイル単位での編集はできません",
+  },
+  install: {
+    button: "このアプリをホーム画面に追加",
+    buttonShort: "ホームに追加",
+    buttonTiny: "追加",
+    buttonAria: "PDF編集をホーム画面に追加してアプリとして使う",
+    modalTitle: "ホーム画面に追加",
+    modalLead:
+      "Safari からホーム画面に追加すると、PDF編集だけを独立アプリとしてすぐ開けます。",
+    step1Title: "共有をタップ",
+    step1Body: "画面下（または上）の共有アイコン［↑］をタップします。",
+    step2Title: "「ホーム画面に追加」",
+    step2Body: "メニューを下にスクロールし、「ホーム画面に追加」を選びます。",
+    desktopTitle: "アプリとしてインストール",
+    desktopLead:
+      "Chrome / Edge なら、アドレスバーやメニューから PDF編集を独立アプリとして追加できます。",
+    desktopStep1Title: "ブラウザのメニューを開く",
+    desktopStep1Body:
+      "画面右上の「︙」またはアドレスバー横のインストールアイコンを探します。",
+    desktopStep2Title: "「アプリをインストール」",
+    desktopStep2Body:
+      "「PDF編集をインストール」や「アプリをインストール」を選ぶとホーム／デスクトップに追加されます。",
+    modalClose: "わかった",
   },
   history: {
     aria: "履歴操作",
@@ -168,6 +218,7 @@ export const pdfEditorJa: PdfEditorDict = {
     selected: "{count} 件選択",
     copy: "コピー",
     extract: "{count} ページを抽出",
+    extractShort: "抽出",
     rotate: "回転",
     delete: "削除",
     clearSelection: "選択解除",
@@ -267,6 +318,7 @@ export const pdfEditorEn: PdfEditorDict = {
     description: "Merge, reorder, rotate, insert blanks—all in the browser.",
   },
   exportPdf: "Export PDF",
+  exportPdfShort: "Export",
   loading: "Loading…",
   addPdf: "Add PDF",
   clearAll: "Clear all",
@@ -284,8 +336,33 @@ export const pdfEditorEn: PdfEditorDict = {
     aria: "View mode",
     page: "By page",
     file: "By file",
+    pageShort: "Pages",
+    fileShort: "Files",
     fileLockedTitle: "File view is unavailable after page structure changes",
     fileLockedHint: "File view is unavailable after page structure changes",
+  },
+  install: {
+    button: "Add this app to your Home Screen",
+    buttonShort: "Add to Home",
+    buttonTiny: "Add",
+    buttonAria: "Add PDF Editor to your Home Screen as an app",
+    modalTitle: "Add to Home Screen",
+    modalLead:
+      "From Safari, add to Home Screen to open PDF Editor as a standalone app.",
+    step1Title: "Tap Share",
+    step1Body: "Tap the Share icon [↑] at the bottom (or top) of the screen.",
+    step2Title: "“Add to Home Screen”",
+    step2Body: "Scroll the menu and choose “Add to Home Screen”.",
+    desktopTitle: "Install as an app",
+    desktopLead:
+      "In Chrome / Edge, you can install PDF Editor as a standalone app from the address bar or menu.",
+    desktopStep1Title: "Open the browser menu",
+    desktopStep1Body:
+      "Look for “︙” at the top right, or the install icon next to the address bar.",
+    desktopStep2Title: "“Install app”",
+    desktopStep2Body:
+      "Choose “Install PDF Editor” or “Install app” to add it to Home / desktop.",
+    modalClose: "Got it",
   },
   history: {
     aria: "History",
@@ -299,6 +376,7 @@ export const pdfEditorEn: PdfEditorDict = {
     selected: "{count} selected",
     copy: "Copy",
     extract: "Extract {count} pages",
+    extractShort: "Extract",
     rotate: "Rotate",
     delete: "Delete",
     clearSelection: "Clear selection",

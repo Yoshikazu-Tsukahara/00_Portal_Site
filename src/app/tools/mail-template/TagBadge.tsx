@@ -15,7 +15,7 @@ export default function TagBadge({
   const style = getTagColorStyle(tag.color);
   return (
     <span
-      className={`inline-flex max-w-full truncate rounded border px-1.5 py-px text-[10px] font-medium leading-tight ${
+      className={`inline-flex max-w-full truncate rounded border px-1.5 py-px text-[10px] font-medium leading-tight break-all ${
         onDark ? style.badgeOnDark : style.badge
       }`}
     >

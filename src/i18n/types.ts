@@ -85,6 +85,14 @@ export type Dictionary = {
     open: string;
     comingSoon: string;
     comingSoonHint: string;
+    /** スマホ対応バッジの短いラベル */
+    mobileSupported: string;
+    /** スマホ対応バッジの title / aria */
+    mobileSupportedHint: string;
+    /** PC推奨バッジの短いラベル */
+    pcRecommended: string;
+    /** PC推奨バッジの title / aria */
+    pcRecommendedHint: string;
   };
   footer: {
     tagline: string;

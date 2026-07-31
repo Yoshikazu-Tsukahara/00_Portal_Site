@@ -81,7 +81,7 @@ export default function CreatePanel() {
   }
 
   return (
-    <div className="cm-panel">
+    <div className="cm-panel min-w-0">
       <div className="cm-field">
         <label className="cm-field__label" htmlFor="cm-plaintext">
           {copy.messageLabel}
@@ -89,7 +89,7 @@ export default function CreatePanel() {
         <textarea
           id="cm-plaintext"
           className="cm-textarea"
-          rows={5}
+          rows={4}
           value={plaintext}
           onChange={(e) => {
             setPlaintext(e.target.value);
@@ -167,15 +167,21 @@ export default function CreatePanel() {
               type="button"
               className="cm-share-btn cm-share-btn--line"
               onClick={handleShareLine}
+              aria-label={copy.shareLine}
+              title={copy.shareLine}
             >
-              {copy.shareLine}
+              <span className="sm:hidden">{copy.shareLineShort}</span>
+              <span className="hidden sm:inline">{copy.shareLine}</span>
             </button>
             <button
               type="button"
               className="cm-share-btn cm-share-btn--x"
               onClick={handleShareX}
+              aria-label={copy.shareX}
+              title={copy.shareX}
             >
-              {copy.shareX}
+              <span className="sm:hidden">{copy.shareXShort}</span>
+              <span className="hidden sm:inline">{copy.shareX}</span>
             </button>
           </div>
         </div>

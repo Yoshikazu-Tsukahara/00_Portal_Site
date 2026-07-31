@@ -103,7 +103,7 @@ function InsertGap({
             : filmstrip.insertBlank
         }
         onClick={() => onInsert(insertIndex)}
-        className={`pointer-events-none flex h-6 w-6 scale-90 items-center justify-center rounded-full border text-sm font-medium opacity-0 shadow-sm transition-all duration-150 group-hover/gap:pointer-events-auto group-hover/gap:scale-100 group-hover/gap:opacity-100 ${
+        className={`pointer-events-auto flex h-7 w-7 scale-100 items-center justify-center rounded-full border text-sm font-medium opacity-100 shadow-sm transition-all duration-150 active:scale-95 md:pointer-events-none md:h-6 md:w-6 md:scale-90 md:opacity-0 md:group-hover/gap:pointer-events-auto md:group-hover/gap:scale-100 md:group-hover/gap:opacity-100 ${
           pasteMode
             ? "border-zinc-400 bg-zinc-100 text-zinc-900 hover:border-zinc-600 hover:bg-zinc-200"
             : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400 hover:bg-zinc-50"
@@ -281,7 +281,7 @@ export default function PageFilmstrip({
 
   if (pages.length === 0) {
     return (
-      <div className="flex h-[60vh] max-h-[650px] items-center justify-center rounded-lg border border-dashed border-zinc-200 bg-zinc-50/30">
+      <div className="flex min-h-[40dvh] flex-1 items-center justify-center rounded-lg border border-dashed border-zinc-200 bg-zinc-50/30 md:min-h-0 md:max-h-[650px] md:h-[60vh]">
         <p className="text-sm text-zinc-400">{filmstrip.noPages}</p>
       </div>
     );
@@ -290,7 +290,7 @@ export default function PageFilmstrip({
   return (
     <div
       ref={scrollRef}
-      className="h-[60vh] max-h-[650px] overflow-x-hidden overflow-y-auto rounded-lg border border-zinc-200/60 bg-zinc-50/30 [scrollbar-width:thin]"
+      className="min-h-[40dvh] flex-1 overflow-x-hidden overflow-y-auto rounded-lg border border-zinc-200/60 bg-zinc-50/30 [scrollbar-width:thin] md:min-h-0 md:max-h-[650px] md:h-[60vh]"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClearSelection();
       }}

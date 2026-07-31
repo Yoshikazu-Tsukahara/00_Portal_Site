@@ -107,15 +107,17 @@ export default function CopyMenu({
   }
 
   return (
-    <div ref={rootRef} className="relative">
+    <div ref={rootRef} className="relative w-full sm:w-auto">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         disabled={!canAny}
         aria-expanded={open}
         aria-haspopup="menu"
-        className={`btn-primary inline-flex items-center gap-1.5 !px-3 !py-1.5 text-xs transition-all duration-300 sm:text-sm ${
-          copied ? "!scale-[1.02] !bg-emerald-600 hover:!bg-emerald-600" : ""
+        className={`btn-primary inline-flex min-h-11 w-full items-center justify-center gap-1.5 !px-3 !py-2 text-xs transition-all duration-300 active:scale-[0.98] sm:min-h-0 sm:w-auto sm:!py-1.5 sm:text-sm ${
+          copied
+            ? "!scale-[1.02] !bg-emerald-600 hover:!bg-emerald-600 active:!bg-emerald-700"
+            : "active:bg-zinc-800"
         }`}
       >
         {copied ? mt.copy.done : mt.copy.button}
@@ -140,7 +142,7 @@ export default function CopyMenu({
       {open ? (
         <div
           role="menu"
-          className="absolute right-0 z-20 mt-1.5 w-64 overflow-hidden rounded-md border border-zinc-200 bg-white py-1 shadow-lg"
+          className="absolute right-0 z-20 mt-1.5 w-full max-w-[min(100vw-2rem,16rem)] overflow-hidden rounded-md border border-zinc-200 bg-white py-1 shadow-lg sm:w-64 sm:max-w-none"
         >
           {menuItems.map((item) => {
             const text = resolveText(item.mode);
@@ -152,12 +154,14 @@ export default function CopyMenu({
                 role="menuitem"
                 disabled={disabled}
                 onClick={() => handleCopy(item.mode)}
-                className="flex w-full flex-col items-start gap-0.5 px-3 py-2 text-left transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex min-h-11 w-full flex-col items-start justify-center gap-0.5 px-3 py-2 text-left transition-colors hover:bg-zinc-50 active:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-40 md:min-h-0"
               >
-                <span className="text-xs font-medium text-zinc-800">
+                <span className="break-words text-xs font-medium text-zinc-800">
                   {item.label}
                 </span>
-                <span className="text-[10px] text-zinc-400">{item.hint}</span>
+                <span className="break-words text-[10px] text-zinc-400">
+                  {item.hint}
+                </span>
               </button>
             );
           })}

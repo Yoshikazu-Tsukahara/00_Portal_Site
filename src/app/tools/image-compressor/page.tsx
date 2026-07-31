@@ -8,6 +8,7 @@ import { fmt, useI18n } from "@/i18n";
 import { useLocalStorageState } from "@/lib/localData";
 import ImageGrid from "./ImageGrid";
 import ImageUploadZone from "./ImageUploadZone";
+import InstallAppButton from "./InstallAppButton";
 import SettingsPanel from "./SettingsPanel";
 import TotalSummary from "./TotalSummary";
 import {
@@ -253,18 +254,6 @@ export default function ImageCompressorPage() {
     />
   );
 
-  const downloadButton = (
-    <button
-      type="button"
-      onClick={handleZipDownload}
-      disabled={!canDownload}
-      className="btn-primary !px-3 !py-1.5 text-xs sm:text-sm"
-      aria-disabled={!canDownload}
-    >
-      {isZipping ? copy.zipping : copy.downloadZip}
-    </button>
-  );
-
   const statusText =
     items.length === 0
       ? copy.addImages
@@ -276,6 +265,8 @@ export default function ImageCompressorPage() {
     <AppShell
       title={copy.shell.title}
       description={copy.shell.description}
+      isPwa
+      afterDataManager={<InstallAppButton copy={copy.install} />}
       dataManager={{
         appId: "image-compressor",
         fileNamePrefix: "image-compressor",
@@ -292,30 +283,53 @@ export default function ImageCompressorPage() {
         },
       }}
       actions={
-        <div className="flex items-center gap-2">
-          <div className="hidden sm:block">{totalSummary}</div>
-          {downloadButton}
+        <div className="flex h-8 w-full max-w-full flex-nowrap items-stretch justify-end gap-1.5 sm:gap-2 md:w-auto">
+          <div className="hidden min-w-0 sm:flex sm:items-center">
+            {totalSummary}
+          </div>
+          <button
+            type="button"
+            onClick={handleZipDownload}
+            disabled={!canDownload}
+            className="btn-primary h-full shrink-0 !px-3 !py-0 text-xs leading-none active:scale-[0.98] active:bg-zinc-800 disabled:active:scale-100 sm:text-sm"
+            aria-disabled={!canDownload}
+          >
+            <span className="sm:hidden">
+              {isZipping ? copy.zippingShort : copy.downloadZipShort}
+            </span>
+            <span className="hidden sm:inline">
+              {isZipping ? copy.zipping : copy.downloadZip}
+            </span>
+          </button>
         </div>
       }
     >
-      <div className="space-y-3">
+      <div className="w-full max-w-full min-w-0 space-y-3 overflow-x-hidden">
         {/* モバイルではヘッダー下に総削減率を表示 */}
         <div className="sm:hidden">{totalSummary}</div>
 
         <ImageUploadZone onFiles={handleFiles} disabled={isZipping} />
 
-        <SettingsPanel settings={resolvedSettings} onChange={handleSettingsChange} />
+        <SettingsPanel
+          settings={resolvedSettings}
+          onChange={handleSettingsChange}
+        />
 
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="text-xs text-zinc-500">{statusText}</p>
-          <div className="flex items-center gap-2">
+        <div className="flex min-w-0 flex-wrap items-center justify-between gap-2">
+          <p className="min-w-0 break-words text-xs text-zinc-500">
+            {statusText}
+          </p>
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
             {error ? (
-              <p className="text-xs text-red-600" role="alert">
+              <p className="break-words text-xs text-red-600" role="alert">
                 {error}
               </p>
             ) : null}
             {message ? (
-              <p className="text-xs text-emerald-600" role="status">
+              <p
+                className="break-words text-xs text-emerald-600"
+                role="status"
+              >
                 {message}
               </p>
             ) : null}
@@ -323,7 +337,7 @@ export default function ImageCompressorPage() {
               <button
                 type="button"
                 onClick={clearAll}
-                className="text-[11px] text-zinc-400 transition-colors hover:text-zinc-700"
+                className="min-h-11 px-1 text-[11px] text-zinc-400 transition-colors hover:text-zinc-700 active:text-zinc-800 sm:min-h-0"
               >
                 {copy.clearAll}
               </button>
@@ -338,7 +352,7 @@ export default function ImageCompressorPage() {
             type="button"
             onClick={handleZipDownload}
             disabled={!canDownload}
-            className="btn-primary"
+            className="btn-primary min-h-11 w-full active:scale-[0.98] sm:min-h-0 sm:w-auto"
             aria-disabled={!canDownload}
           >
             {isZipping ? copy.zipping : copy.downloadZip}

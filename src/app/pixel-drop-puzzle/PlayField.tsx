@@ -14,6 +14,7 @@ import {
   computeGeometry,
   fallSeatDurationMs,
   fallSeatEase,
+  PATROL_MAX_DT_MS,
   stepFallMotion,
   idealStopTimeDeltaMs,
   MAX_BOARD_WIDTH,
@@ -657,17 +658,16 @@ export default function PlayField({
       const clock = patrolClockRef.current;
       if (g && clock && blockRef.current && phaseRef.current === "patrolling") {
         const now = performance.now();
-        const rawDt = now - clock.lastNow;
-        // 描画はタブ復帰時の跳びを抑えるため dt を上限付きで進める。
-        // lastNow も適用した分だけ進め、STOP 判定時に残り時間をフル補間できるようにする。
-        const visualDt = Math.min(Math.max(0, rawDt), 64);
+        const dt = Math.min(Math.max(0, now - clock.lastNow), PATROL_MAX_DT_MS);
+        // 落下と同様、lastNow は壁時計にスナップする（タブ復帰時の追い込みを防ぐ）。
+        // STOP 判定の精度は samplePatrolAt が atNowMs - lastNow で担保する。
         advancePatrolSpeedState(
           clock,
-          visualDt,
+          dt,
           basePeriodMsRef.current,
           null,
         );
-        clock.lastNow += visualDt;
+        clock.lastNow = now;
 
         const x = triangleWave(clock.phaseMs, clock.periodMs, g.maxX);
         blockRef.current.style.left = `${x}px`;
@@ -676,8 +676,18 @@ export default function PlayField({
       }
       patrolRafRef.current = requestAnimationFrame(tick);
     }
+
+    /** タブ非表示／復帰時に時計基準をリセットし、隠れていた時間を位相に反映しない */
+    function onVisibilityChange() {
+      const clock = patrolClockRef.current;
+      if (!clock || phaseRef.current !== "patrolling") return;
+      clock.lastNow = performance.now();
+    }
+
+    document.addEventListener("visibilitychange", onVisibilityChange);
     patrolRafRef.current = requestAnimationFrame(tick);
     return () => {
+      document.removeEventListener("visibilitychange", onVisibilityChange);
       if (patrolRafRef.current !== null) {
         cancelAnimationFrame(patrolRafRef.current);
         patrolRafRef.current = null;

@@ -99,31 +99,34 @@ export default function TemplateEditorModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-zinc-950/40 p-4 sm:items-center"
+      className="fixed inset-0 z-50 flex items-end justify-center overflow-x-hidden bg-zinc-950/40 p-2 sm:items-center sm:p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby={titleId}
       onClick={onClose}
     >
       <div
-        className="flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-xl"
+        className="flex max-h-[92dvh] w-full max-w-2xl flex-col overflow-hidden rounded-t-lg border border-zinc-200 bg-white shadow-xl sm:max-h-[90vh] sm:rounded-lg"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-zinc-200/70 px-4 py-3">
-          <h2 id={titleId} className="text-sm font-semibold text-zinc-900">
+        <div className="flex items-center justify-between gap-2 border-b border-zinc-200/70 px-3 py-3 sm:px-4">
+          <h2
+            id={titleId}
+            className="min-w-0 break-words text-sm font-semibold text-zinc-900"
+          >
             {mode === "create" ? mt.editor.createTitle : mt.editor.editTitle}
           </h2>
           <button
             type="button"
             onClick={onClose}
-            className="text-xs text-zinc-400 transition-colors hover:text-zinc-700"
+            className="flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-md text-xs text-zinc-400 transition-colors hover:text-zinc-700 active:bg-zinc-100 active:text-zinc-800 sm:min-h-0 sm:min-w-0 sm:px-2 sm:py-1"
           >
             {mt.editor.close}
           </button>
         </div>
 
-        <div className="space-y-4 overflow-y-auto px-4 py-3">
-          <div>
+        <div className="space-y-4 overflow-x-hidden overflow-y-auto px-3 py-3 sm:px-4">
+          <div className="min-w-0">
             <label
               htmlFor="tpl-title"
               className="mb-1 block text-[11px] font-medium text-zinc-500"
@@ -132,7 +135,7 @@ export default function TemplateEditorModal({
             </label>
             <input
               id="tpl-title"
-              className="input-field w-full"
+              className="input-field min-h-11 w-full max-w-full md:min-h-0"
               value={draft.title}
               onChange={(e) =>
                 setDraft((d) => ({ ...d, title: e.target.value }))
@@ -140,7 +143,7 @@ export default function TemplateEditorModal({
               placeholder={mt.editor.titlePlaceholder}
             />
           </div>
-          <div>
+          <div className="min-w-0">
             <label
               htmlFor="tpl-subject"
               className="mb-1 block text-[11px] font-medium text-zinc-500"
@@ -149,7 +152,7 @@ export default function TemplateEditorModal({
             </label>
             <input
               id="tpl-subject"
-              className="input-field w-full"
+              className="input-field min-h-11 w-full max-w-full md:min-h-0"
               value={draft.subject}
               onChange={(e) =>
                 setDraft((d) => ({ ...d, subject: e.target.value }))
@@ -157,7 +160,7 @@ export default function TemplateEditorModal({
               placeholder={mt.editor.subjectPlaceholder}
             />
           </div>
-          <div>
+          <div className="min-w-0">
             <label
               htmlFor="tpl-body"
               className="mb-1 block text-[11px] font-medium text-zinc-500"
@@ -170,7 +173,7 @@ export default function TemplateEditorModal({
             <textarea
               id="tpl-body"
               rows={8}
-              className="input-field w-full resize-y font-sans !leading-relaxed"
+              className="input-field w-full max-w-full resize-y font-sans !leading-relaxed"
               value={draft.body}
               onChange={(e) =>
                 setDraft((d) => ({ ...d, body: e.target.value }))
@@ -180,34 +183,34 @@ export default function TemplateEditorModal({
           </div>
 
           {/* ラベル紐付け */}
-          <div className="rounded-md border border-zinc-200/80 bg-zinc-50/50 p-3">
-            <div className="mb-2 flex items-center justify-between gap-2">
-              <p className="text-[11px] font-medium text-zinc-600">
+          <div className="rounded-md border border-zinc-200/80 bg-zinc-50/50 p-2 sm:p-3">
+            <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+              <p className="min-w-0 break-words text-[11px] font-medium text-zinc-600">
                 {mt.editor.labels}
                 <span className="ml-1 font-normal text-zinc-400">
                   {mt.editor.labelsMulti}
                 </span>
               </p>
-              <span className="text-[10px] tabular-nums text-zinc-400">
+              <span className="shrink-0 text-[10px] tabular-nums text-zinc-400">
                 {draft.tagIds.length} / {tags.length}
               </span>
             </div>
             {tags.length === 0 ? (
-              <p className="text-[11px] text-zinc-400">
+              <p className="break-words text-[11px] text-zinc-400">
                 {mt.editor.labelsEmpty}
               </p>
             ) : (
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex max-w-full flex-wrap gap-1.5">
                 {tags.map((tag) => {
                   const checked = tagSet.has(tag.id);
                   const style = getTagColorStyle(tag.color);
                   return (
                     <label
                       key={tag.id}
-                      className={`inline-flex cursor-pointer items-center gap-1.5 rounded-md border px-2 py-1 text-xs transition-colors ${
+                      className={`inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs transition-colors active:scale-[0.98] md:min-h-0 md:px-2 md:py-1 ${
                         checked
                           ? style.filterActive
-                          : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300"
+                          : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300 active:bg-zinc-50"
                       }`}
                     >
                       <input
@@ -222,7 +225,7 @@ export default function TemplateEditorModal({
                         }`}
                         aria-hidden
                       />
-                      {tag.name}
+                      <span className="break-words">{tag.name}</span>
                     </label>
                   );
                 })}
@@ -231,21 +234,21 @@ export default function TemplateEditorModal({
           </div>
 
           {/* 変数選択 */}
-          <div className="rounded-md border border-zinc-200/80 bg-zinc-50/50 p-3">
-            <div className="mb-2 flex items-center justify-between gap-2">
-              <p className="text-[11px] font-medium text-zinc-600">
+          <div className="rounded-md border border-zinc-200/80 bg-zinc-50/50 p-2 sm:p-3">
+            <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+              <p className="min-w-0 break-words text-[11px] font-medium text-zinc-600">
                 {mt.editor.variables}
                 <span className="ml-1 font-normal text-zinc-400">
                   {mt.editor.variablesHint}
                 </span>
               </p>
-              <span className="text-[10px] tabular-nums text-zinc-400">
+              <span className="shrink-0 text-[10px] tabular-nums text-zinc-400">
                 {draft.enabledVariableIds.length} / {masterVariables.length}
               </span>
             </div>
 
             {masterVariables.length === 0 ? (
-              <p className="text-[11px] text-zinc-400">
+              <p className="break-words text-[11px] text-zinc-400">
                 {mt.editor.variablesEmpty}
               </p>
             ) : (
@@ -255,10 +258,10 @@ export default function TemplateEditorModal({
                   return (
                     <label
                       key={item.id}
-                      className={`flex cursor-pointer items-start gap-2 rounded-md border px-2.5 py-2 transition-colors ${
+                      className={`flex min-h-11 cursor-pointer items-start gap-2 rounded-md border px-2.5 py-2 transition-colors active:scale-[0.99] md:min-h-0 ${
                         checked
-                          ? "border-zinc-900 bg-white"
-                          : "border-zinc-200/80 bg-white/60 hover:border-zinc-300"
+                          ? "border-zinc-900 bg-white active:bg-zinc-50"
+                          : "border-zinc-200/80 bg-white/60 hover:border-zinc-300 active:bg-zinc-50"
                       }`}
                     >
                       <input
@@ -267,13 +270,13 @@ export default function TemplateEditorModal({
                         onChange={(e) =>
                           toggleVariable(item, e.target.checked)
                         }
-                        className="mt-0.5 size-3.5 accent-zinc-900"
+                        className="mt-0.5 size-4 accent-zinc-900 md:size-3.5"
                       />
                       <span className="min-w-0">
-                        <span className="block truncate text-xs font-medium text-zinc-800">
+                        <span className="block break-words text-xs font-medium text-zinc-800">
                           {item.label}
                         </span>
-                        <span className="block font-mono text-[10px] text-zinc-400">
+                        <span className="block break-all font-mono text-[10px] text-zinc-400">
                           {`{{${item.key}}}`}
                         </span>
                       </span>
@@ -285,14 +288,18 @@ export default function TemplateEditorModal({
           </div>
         </div>
 
-        <div className="flex justify-end gap-2 border-t border-zinc-200/70 px-4 py-3">
-          <button type="button" onClick={onClose} className="btn-secondary">
+        <div className="flex flex-col-reverse gap-2 border-t border-zinc-200/70 px-3 py-3 sm:flex-row sm:justify-end sm:px-4">
+          <button
+            type="button"
+            onClick={onClose}
+            className="btn-secondary min-h-11 w-full active:scale-[0.98] active:bg-zinc-100 sm:min-h-0 sm:w-auto"
+          >
             {mt.editor.cancel}
           </button>
           <button
             type="button"
             disabled={!canSave}
-            className="btn-primary"
+            className="btn-primary min-h-11 w-full active:scale-[0.98] active:bg-zinc-800 sm:min-h-0 sm:w-auto"
             onClick={() => {
               if (!canSave) return;
               onSave({

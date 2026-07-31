@@ -50,14 +50,15 @@ type AppShellProps = {
   /** タイトル直後のコンパクト表示（件数バッジなど） */
   titleAddon?: ReactNode;
   /**
-   * ヘッダー右端のアクション（例: ZIP生成ボタン）。
+   * 機能アクション（例: ラベル管理、ZIP生成）。
+   * スマホではタイトル行の下に折り返し、md 以上ではタイトル行右端に並ぶ。
    * `isPwa` の standalone 時は、ここに言語トグルが自動で並ぶ。
    */
   actions?: ReactNode;
   /**
    * データ管理（バックアップ）。タイトル右隣に共通配置。
    * - 設定オブジェクトを渡すと共通 DataManager を組み立てる（通常はこちら）
-   * - 独自 UI を差し込みたい場合は ReactNode をそのまま渡せる
+   * - 独自 UI を差し込みたい場合は ReactNode をそのまま渡える
    */
   dataManager?: DataManagerConfig | ReactNode;
   /**
@@ -98,9 +99,14 @@ function isDataManagerConfig(
 
 /**
  * Type B / Type C 共通のアプリシェル。
- * 「戻る」とタイトルを1行に収め、余白を最小化した高密度レイアウト。
  *
- * タイプごとの使い分けは上部の JSDoc を参照。
+ * スマホ:
+ * 1行目 = タイトル + バックアップ + インストール
+ * 2行目 = その他アクション（ある場合）
+ * 「ポータルに戻る」は出さない（サイト Header のロゴで戻れる）
+ *
+ * PC（md+）:
+ * 戻るリンク + タイトル行にアクションを横並び
  */
 export default function AppShell({
   title,
@@ -132,7 +138,7 @@ export default function AppShell({
   // 背景はフル幅のまま、中身の列だけ layoutMode の幅に揃える
   return (
     <main
-      className={`flex w-full flex-1 flex-col ${contentClassName} ${
+      className={`flex w-full flex-1 flex-col overflow-x-hidden ${contentClassName} ${
         fillViewport
           ? // 4.5rem = サイト共通 Header の高さ。作業領域を1画面分だけ確保し、
             // Footer は隠さずその下に続かせる
@@ -145,20 +151,24 @@ export default function AppShell({
           fillViewport ? "mb-2 pb-2" : "mb-4 pb-3"
         }`}
       >
-        <div className="flex min-h-8 items-center gap-3">
+        {/* 1行目: タイトル + バックアップ + インストール（＋ PC 時は戻る／actions） */}
+        <div className="flex min-h-8 min-w-0 items-center gap-2 sm:gap-3">
           {!isStandaloneApp ? (
             <>
               <Link
                 href="/"
-                className="shrink-0 text-sm text-zinc-500 transition-colors hover:text-zinc-900"
+                className="hidden shrink-0 text-sm text-zinc-500 transition-colors hover:text-zinc-900 md:inline"
               >
                 {t.common.backToPortal}
               </Link>
-              <span aria-hidden className="h-4 w-px shrink-0 bg-zinc-200" />
+              <span
+                aria-hidden
+                className="hidden h-4 w-px shrink-0 bg-zinc-200 md:block"
+              />
             </>
           ) : null}
-          <div className="flex min-w-0 flex-1 items-center gap-2">
-            <h1 className="min-w-0 truncate text-base font-semibold tracking-tight text-zinc-900">
+          <div className="flex min-w-0 flex-1 items-center gap-1.5 sm:gap-2">
+            <h1 className="min-w-0 flex-1 truncate text-base font-semibold tracking-tight text-zinc-900">
               {title}
             </h1>
             {titleAddon ? <div className="shrink-0">{titleAddon}</div> : null}
@@ -169,14 +179,27 @@ export default function AppShell({
               <div className="shrink-0">{afterDataManager}</div>
             ) : null}
           </div>
-          {actions || isStandaloneApp ? (
-            <div className="ml-auto flex shrink-0 items-center gap-2">
+          {/* PC: 機能ボタンはタイトル行の右端 */}
+          {actions ? (
+            <div className="ml-auto hidden min-w-0 shrink-0 items-center gap-2 md:flex">
               {actions}
-              {isStandaloneApp ? <LanguageToggle /> : null}
+            </div>
+          ) : null}
+          {isStandaloneApp ? (
+            <div className="ml-auto flex shrink-0 items-center gap-2 md:ml-2">
+              <LanguageToggle />
             </div>
           ) : null}
         </div>
-        <p className="mt-1 text-xs leading-relaxed text-zinc-500">
+
+        {/* 2行目（スマホのみ）: ラベル管理など機能アクション */}
+        {actions ? (
+          <div className="mt-2 flex min-w-0 flex-wrap items-center gap-1.5 md:hidden">
+            {actions}
+          </div>
+        ) : null}
+
+        <p className="mt-1 break-words text-xs leading-relaxed text-zinc-500">
           {description}
         </p>
       </header>

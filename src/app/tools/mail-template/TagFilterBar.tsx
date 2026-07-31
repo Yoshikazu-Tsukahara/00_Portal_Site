@@ -23,15 +23,15 @@ export default function TagFilterBar({
     <div
       role="group"
       aria-label={mt.tags.filterAria}
-      className="flex flex-wrap gap-1"
+      className="flex max-w-full flex-wrap gap-1.5"
     >
       <button
         type="button"
         onClick={() => onChange(null)}
-        className={`rounded-md border px-2 py-0.5 text-[10px] font-medium transition-colors ${
+        className={`min-h-11 rounded-md border px-3 py-1.5 text-[11px] font-medium transition-colors active:scale-[0.98] md:min-h-0 md:px-2 md:py-0.5 md:text-[10px] ${
           selectedTagId === null
-            ? "border-zinc-900 bg-zinc-900 text-white"
-            : "border-zinc-200 bg-white text-zinc-600 hover:border-zinc-300 hover:bg-zinc-50"
+            ? "border-zinc-900 bg-zinc-900 text-white active:bg-zinc-800"
+            : "border-zinc-200 bg-white text-zinc-600 hover:border-zinc-300 hover:bg-zinc-50 active:bg-zinc-100"
         }`}
       >
         {mt.tags.all}
@@ -44,7 +44,7 @@ export default function TagFilterBar({
             key={tag.id}
             type="button"
             onClick={() => onChange(active ? null : tag.id)}
-            className={`rounded-md border px-2 py-0.5 text-[10px] font-medium transition-colors ${
+            className={`min-h-11 max-w-full break-words rounded-md border px-3 py-1.5 text-[11px] font-medium transition-colors active:scale-[0.98] md:min-h-0 md:px-2 md:py-0.5 md:text-[10px] ${
               active ? style.filterActive : style.filter
             }`}
           >

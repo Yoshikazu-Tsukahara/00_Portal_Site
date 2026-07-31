@@ -57,7 +57,7 @@ export default function HistoryToolbar({
 
   return (
     <div
-      className="inline-flex items-center gap-0.5 rounded-md border border-zinc-200 bg-white p-0.5"
+      className="inline-flex h-full items-stretch gap-0.5 rounded-md border border-zinc-200 bg-white p-0.5"
       role="group"
       aria-label={copy.aria}
     >
@@ -67,7 +67,7 @@ export default function HistoryToolbar({
         aria-label={copy.undo}
         disabled={!canUndo}
         onClick={onUndo}
-        className="rounded p-1.5 text-zinc-700 transition-colors hover:bg-zinc-100 disabled:cursor-not-allowed disabled:text-zinc-300 disabled:hover:bg-transparent"
+        className="inline-flex items-center justify-center rounded px-2 text-zinc-700 transition-colors hover:bg-zinc-100 active:bg-zinc-200 disabled:cursor-not-allowed disabled:text-zinc-300 disabled:hover:bg-transparent sm:px-1.5"
       >
         <UndoIcon />
       </button>
@@ -77,7 +77,7 @@ export default function HistoryToolbar({
         aria-label={copy.redo}
         disabled={!canRedo}
         onClick={onRedo}
-        className="rounded p-1.5 text-zinc-700 transition-colors hover:bg-zinc-100 disabled:cursor-not-allowed disabled:text-zinc-300 disabled:hover:bg-transparent"
+        className="inline-flex items-center justify-center rounded px-2 text-zinc-700 transition-colors hover:bg-zinc-100 active:bg-zinc-200 disabled:cursor-not-allowed disabled:text-zinc-300 disabled:hover:bg-transparent sm:px-1.5"
       >
         <RedoIcon />
       </button>

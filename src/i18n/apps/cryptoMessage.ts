@@ -6,24 +6,23 @@ export type CryptoMessageDict = {
   privacyNote: string;
   modes: {
     create: string;
+    /** 狭い画面向け */
+    createShort: string;
     decode: string;
+    /** 狭い画面向け */
+    decodeShort: string;
   };
   decodeSubs: {
     password: string;
+    passwordShort: string;
     caesar: string;
+    caesarShort: string;
   };
   themes: {
     aria: string;
     cyber: { description: string };
     fantasy: { description: string };
     spy: { description: string };
-  };
-  speed: {
-    label: string;
-    aria: string;
-    slow: string;
-    normal: string;
-    fast: string;
   };
   create: {
     messageLabel: string;
@@ -42,7 +41,9 @@ export type CryptoMessageDict = {
     copied: string;
     copyFail: string;
     shareLine: string;
+    shareLineShort: string;
     shareX: string;
+    shareXShort: string;
     shareIntro: string;
     shareOutro: string;
   };
@@ -54,8 +55,6 @@ export type CryptoMessageDict = {
     start: string;
     analyzing: string;
     skip: string;
-    replay: string;
-    reset: string;
     muteOn: string;
     muteOff: string;
     formatError: string;
@@ -85,11 +84,14 @@ export type CryptoMessageDict = {
     copied: string;
     copyFail: string;
     shareLine: string;
+    shareLineShort: string;
     shareX: string;
+    shareXShort: string;
   };
   install: {
     button: string;
     buttonShort: string;
+    buttonTiny: string;
     buttonAria: string;
     modalTitle: string;
     modalLead: string;
@@ -117,11 +119,15 @@ export const cryptoMessageJa: CryptoMessageDict = {
     "🔒 入力内容・合言葉はすべてこの端末（ブラウザ）内のみで処理されます。サーバーへ送信されることは一切ありません。",
   modes: {
     create: "🔏 ひみつ作成",
+    createShort: "🔏 作成",
     decode: "🕵️ 解読・チャレンジ",
+    decodeShort: "🕵️ 解読",
   },
   decodeSubs: {
     password: "🔑 合言葉で解読",
+    passwordShort: "🔑 合言葉",
     caesar: "🧩 シーザー暗号チャレンジ",
+    caesarShort: "🧩 シーザー",
   },
   themes: {
     aria: "暗号テーマ",
@@ -130,13 +136,6 @@ export const cryptoMessageJa: CryptoMessageDict = {
       description: "ルーン文字にマッピングしたファンタジー風の見た目",
     },
     spy: { description: "モールス信号で表示するスパイ風の見た目" },
-  },
-  speed: {
-    label: "解読スピード",
-    aria: "解読スピード",
-    slow: "じっくり",
-    normal: "標準",
-    fast: "爆速",
   },
   create: {
     messageLabel: "メッセージ",
@@ -157,7 +156,9 @@ export const cryptoMessageJa: CryptoMessageDict = {
     copied: "✓ コピー済み",
     copyFail: "コピーに失敗しました。手動で選択してコピーしてください。",
     shareLine: "LINEでシェア",
+    shareLineShort: "LINE",
     shareX: "Xでシェア",
+    shareXShort: "X",
     shareIntro: "🔐 ひみつメッセージが届いたよ！",
     shareOutro:
       "合言葉を知ってる人だけ「My Tool Box」の暗号アプリで解読してね👇",
@@ -170,8 +171,6 @@ export const cryptoMessageJa: CryptoMessageDict = {
     start: "🔓 解読を開始",
     analyzing: "解析中…",
     skip: "スキップ",
-    replay: "もう一度演出",
-    reset: "やり直す",
     muteOn: "音あり",
     muteOff: "ミュート",
     formatError:
@@ -204,11 +203,14 @@ export const cryptoMessageJa: CryptoMessageDict = {
     copied: "✓ コピー済み",
     copyFail: "コピーに失敗しました。手動で選択してコピーしてください。",
     shareLine: "LINEでシェア",
+    shareLineShort: "LINE",
     shareX: "Xでシェア",
+    shareXShort: "X",
   },
   install: {
     button: "このアプリをホーム画面に追加",
     buttonShort: "ホームに追加",
+    buttonTiny: "追加",
     buttonAria: "ひみつメッセージをホーム画面に追加してアプリとして使う",
     modalTitle: "ホーム画面に追加",
     modalLead:
@@ -240,24 +242,21 @@ export const cryptoMessageEn: CryptoMessageDict = {
     "🔒 Everything you type stays on this device. Nothing is sent to a server.",
   modes: {
     create: "🔏 Create secret",
+    createShort: "🔏 Create",
     decode: "🕵️ Decode / Challenge",
+    decodeShort: "🕵️ Decode",
   },
   decodeSubs: {
     password: "🔑 Decode with passphrase",
+    passwordShort: "🔑 Passphrase",
     caesar: "🧩 Caesar cipher challenge",
+    caesarShort: "🧩 Caesar",
   },
   themes: {
     aria: "Cipher theme",
     cyber: { description: "Hacker-style hex (HEX) display" },
     fantasy: { description: "Fantasy look mapped to rune characters" },
     spy: { description: "Spy-style Morse code display" },
-  },
-  speed: {
-    label: "Reveal speed",
-    aria: "Reveal speed",
-    slow: "Slow",
-    normal: "Normal",
-    fast: "Turbo",
   },
   create: {
     messageLabel: "Message",
@@ -278,7 +277,9 @@ export const cryptoMessageEn: CryptoMessageDict = {
     copied: "✓ Copied",
     copyFail: "Couldn’t copy. Select and copy manually.",
     shareLine: "Share on LINE",
+    shareLineShort: "LINE",
     shareX: "Share on X",
+    shareXShort: "X",
     shareIntro: "🔐 You’ve got a secret message!",
     shareOutro:
       "Only people with the passphrase can decode it in My Tool Box’s cipher app 👇",
@@ -291,8 +292,6 @@ export const cryptoMessageEn: CryptoMessageDict = {
     start: "🔓 Start decrypt",
     analyzing: "Analyzing…",
     skip: "Skip",
-    replay: "Replay reveal",
-    reset: "Start over",
     muteOn: "Sound on",
     muteOff: "Muted",
     formatError:
@@ -324,11 +323,14 @@ export const cryptoMessageEn: CryptoMessageDict = {
     copied: "✓ Copied",
     copyFail: "Couldn’t copy. Select and copy manually.",
     shareLine: "Share on LINE",
+    shareLineShort: "LINE",
     shareX: "Share on X",
+    shareXShort: "X",
   },
   install: {
     button: "Add this app to Home Screen",
     buttonShort: "Add to Home",
+    buttonTiny: "Add",
     buttonAria: "Add Secret Message to your home screen as a standalone app",
     modalTitle: "Add to Home Screen",
     modalLead:

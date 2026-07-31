@@ -1,8 +1,17 @@
 "use client";
 
-import type { Genre } from "@/data/tools";
+import type { Genre, Tool } from "@/data/tools";
 import ToolCard from "@/components/ToolCard";
 import { useI18n } from "@/i18n";
+
+/** 横スクロール用にカードを2枚ずつペアにする */
+function chunkTools(tools: Tool[], size: number): Tool[][] {
+  const chunks: Tool[][] = [];
+  for (let i = 0; i < tools.length; i += size) {
+    chunks.push(tools.slice(i, i + size));
+  }
+  return chunks;
+}
 
 export default function GenreSection({
   genre,
@@ -17,6 +26,7 @@ export default function GenreSection({
     name: genre.label,
     description: "",
   };
+  const mobilePages = chunkTools(genre.tools, 2);
 
   return (
     <section
@@ -37,16 +47,47 @@ export default function GenreSection({
       </p>
 
       {/*
-        カード幅を固定（やや横長）。余白が広がってもカードは伸びず、列数だけ増える。
+        狭い画面: 2枚ずつ見える横スクロール（カード増でも縦に伸びない）
+        ・先頭ページ左余白はジャンル見出しと揃える（内側 flex に padding）
+        sm以上: 従来どおり固定幅カードの折り返しグリッド
       */}
-      <div className="grid grid-cols-1 justify-items-stretch gap-4 sm:grid-cols-[repeat(auto-fill,17.5rem)] sm:justify-start sm:gap-5">
-        {genre.tools.map((tool) => (
-          <ToolCard
-            key={tool.comingSoon ? `${genre.id}-coming-soon` : tool.id}
-            tool={tool}
-            genreId={genre.id}
-          />
-        ))}
+      <div
+        className="overflow-x-auto overscroll-x-contain pb-1 [scrollbar-width:thin] snap-x snap-mandatory sm:overflow-visible sm:pb-0 sm:snap-none"
+        role="region"
+        aria-label={copy.name}
+      >
+        {/* モバイル: ページ単位（各ページ＝2カード）。pl/pr で端の余白を確保 */}
+        <div className="flex w-full gap-3 sm:hidden">
+          {mobilePages.map((page, pageIndex) => (
+            <div
+              key={`${genre.id}-page-${pageIndex}`}
+              className="grid w-full min-w-full shrink-0 snap-start snap-always grid-cols-2 gap-2.5"
+            >
+              {page.map((tool) => (
+                <ToolCard
+                  key={
+                    tool.comingSoon
+                      ? `${genre.id}-coming-soon-${pageIndex}`
+                      : tool.id
+                  }
+                  tool={tool}
+                  genreId={genre.id}
+                />
+              ))}
+            </div>
+          ))}
+        </div>
+
+        {/* PC: カード幅固定。余白が広がってもカードは伸びず、列数だけ増える */}
+        <div className="hidden grid-cols-[repeat(auto-fill,17.5rem)] justify-start gap-5 sm:grid">
+          {genre.tools.map((tool) => (
+            <ToolCard
+              key={tool.comingSoon ? `${genre.id}-coming-soon` : tool.id}
+              tool={tool}
+              genreId={genre.id}
+            />
+          ))}
+        </div>
       </div>
     </section>
   );

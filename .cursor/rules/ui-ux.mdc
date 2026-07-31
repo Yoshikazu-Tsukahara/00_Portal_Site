@@ -1,110 +1,100 @@
 ---
-description: 共通 UI/UX・レイアウト・ヘッダー操作の統一ルール
+description: 共通 UI/UX・レイアウト・スマホ対応・ヘッダー操作の統一ルール
 globs: src/app/**/*,src/components/**/*
 alwaysApply: false
 ---
 
 # UI/UX 統一ルール
 
-参照: `src/app/globals.css`（デザインシステム）、`AppShell.tsx`、`Header.tsx`、`DataManager.tsx`
+参照: `src/app/globals.css`、`AppShell.tsx`、`Header.tsx`、`DataManager.tsx`  
+スマホ対応の適用手順 → `.cursor/skills/mobile-responsive/SKILL.md`  
+完成例 → `src/app/tools/mail-template/`
 
 ## 基本デザイン（特別な演出意図がない限り）
 
 - **配色**: zinc ベース（背景 `zinc-50`、文字 `zinc-900` / `zinc-500`、境界 `zinc-200`）
-- **共通クラス**（`globals.css`）を優先:
-  - ボタン: `btn-primary` / `btn-secondary`
-  - 入力: `input-field`
-  - カード: `content-card`
-- **角丸・余白**: 既存ツールに合わせる（ボタン `rounded-md`、カード `rounded-lg`）
-- **例外**: ゲーム／端末風 UI（`slot-*`, `pxd-*`, `cm-*` 等）はアプリ固有テーマ可。作業領域だけ暗色にし、**サイト枠（Header/Footer/AppShell 行）は共通ルールを維持**
+- **共通クラス**: `btn-primary` / `btn-secondary` / `input-field` / `content-card`
+- **例外**: ゲーム／端末風 UI（`slot-*`, `pxd-*`, `cm-*`）は作業領域のみ独自可。**サイト枠は共通維持**
 
-## ページ構成（Type B / C）
+## ページ構成（Type B / C）— AppShell
 
 ```
-[サイト Header]  ロゴ … 表示幅トグル(中央固定) … 言語 … 応援
-[AppShell 行1]   ←ポータル | タイトル | バッジ | 💾 | 📱 | (機能 actions)
-[AppShell 行2]   説明文（1行・text-xs text-zinc-500）
-[作業領域]       contentClassName 内。fillViewport 時は内側スクロール
-[サイト Footer]  Type B/C ブラウザ表示時は必ず表示（fillViewport でも隠さない）
+[サイト Header]  ロゴ … 表示幅トグル … 言語 … 応援
+
+スマホ（〜md 未満）:
+  行1  タイトル | titleAddon | 💾 | 📱
+  行2  機能 actions（ある場合のみ・1行に収める）
+  行3  説明文
+
+PC（md+）:
+  行1  ←ポータル | タイトル | 💾 | 📱 | 機能 actions
+  行2  説明文
+
+[作業領域]
+[サイト Footer]  ※ fillViewport でも隠さない
 ```
 
-## 表示幅・サイズ
+- スマホでは「ポータルに戻る」を出さない（Header ロゴで戻る）— **AppShell が実装済み**
+- 言語・バックアップ・インストールは `actions` に置かない
 
-- テキスト列の幅は **`useLayout().contentClassName` のみ** で揃える
-- ページ root に独自 `max-w-*` を乱立させない
-- `AppShell` の `wide` は **deprecated（使わない）**
-- 表示幅切替は **サイト Header 中央の LayoutToggle のみ**（各ページに複製しない）
-- 1画面ツール: `fillViewport` + 子を `min-h-0 flex-1 overflow-hidden` で内側スクロール
-- 高さ計算: サイト Header 約 `4.5rem` を差し引く（`AppShell` 実装に合わせる）
+## スマホ対応（モバイルファースト）— 全アプリ共通
 
-## 言語スイッチャー（LanguageToggle）
+### レイアウト
 
-**本文・サイドバー・モーダル内に置かない。** ヘッダー行のみ。
+- 複数カラムは **デフォルト縦並び** → `md:` / `lg:` で横並び
+- 余白: スマホ `p-2`〜`p-4`、PC `md:p-4`〜`md:p-8`
+- コンテナ: `w-full max-w-full min-w-0 overflow-x-hidden`
+- テキスト: `break-words`（長い件名・パスは `break-all`）
+- 画像: `object-contain`、親は `overflow-hidden`
+
+### タップ領域とフィードバック
+
+- 主要操作はおおむね **44px**（`min-h-11`）を目安。ただし **ヘッダーの 💾／📱 はコンパクトのまま揃える**（`min-h-11` を付けない）
+- `hover:` に加え `active:scale-[0.98]` / `active:bg-*` を付ける
+- ホバー依存の操作（一覧の編集アイコンなど）はスマホでは常時表示
+
+### AppShell actions（機能ボタン）
+
+- 狭い画面でも **折り返さず1行**（`flex-nowrap`）
+- 長いラベルは辞書に Short を用意し、`sm:hidden` / `hidden sm:inline` で切替
+- 例: 「ラベル管理」→「ラベル」、「＋ 新規テンプレート追加」→「＋ 新規」
+- コンパクト時: `!px-2 !py-1.5 text-[11px]`、`sm:` 以上で通常サイズ
+
+### インストールボタン（📱）
+
+- `afterDataManager` のみ。見た目はバックアップと同系カプセル（`lunch-install-btn`）
+- **高さ・パディングを DataManager に合わせる**（`min-h-11` 禁止）
+- 狭い画面は短いラベル（例: `buttonTiny: "追加"`）
+
+### ポータルカードのスマホバッジ
+
+- `src/data/tools.ts` の `isMobileSupported: true`
+- スマホ最適化が終わったアプリだけ付与（`ToolCard` がバッジ表示）
+
+## 表示幅
+
+- `useLayout().contentClassName` のみ。`AppShell` の `wide` は使わない
+- LayoutToggle は Header 中央のみ
+
+## 言語スイッチャー
 
 | 状況 | 置き場所 |
 |------|----------|
-| ブラウザ（サイト Header あり） | `Header.tsx` のみ。**AppShell `actions` に置かない** |
-| PWA standalone（サイト Header なし） | `AppShell` が `isPwa` 時に **自動で** `actions` 右端へ表示 |
-| Type D（没入型・サイト Header なし） | ページ独自の **薄い header 行** 右端のみ可 |
+| ブラウザ | `Header.tsx` のみ |
+| PWA standalone | AppShell が自動表示 |
+| Type D | 独自薄い header 右端のみ |
 
-```tsx
-// ❌ サイト Header があるのに AppShell actions へ重複配置
-<AppShell actions={<LanguageToggle />}>
+## バックアップ / PWA
 
-// ✅ Type B/C ブラウザ表示 — 言語はサイト Header に任せる
-<AppShell title={...} description={...}>
-```
+- バックアップ → `dataManager`
+- インストール → `afterDataManager` + `isPwa`（Type C のお作法は `AppShell` 先頭コメント）
+- Manifest 定義ファイル名は **`pwaManifest.ts`**（`manifest.ts` は Next 特殊ファイルと衝突）
 
-## バックアップ（DataManager）
+## チェックリスト
 
-- **必ず** `AppShell` の `dataManager` prop 経由（独自 💾 ボタン・モーダルを作らない）
-- **位置**: タイトル直後（`titleAddon` の後、`afterDataManager` の前）
-- **実装**: `DataManager` + `DataManagerConfig`（`appId`, `fileNamePrefix`, `getData`, `onImport`）
-- **見た目**: 共通のカプセルボタン（💾 + ラベル）。文言は `t.dataManager`
-
-```tsx
-<AppShell
-  title={copy.shell.title}
-  description={copy.shell.description}
-  dataManager={{
-    appId: "my-tool",
-    fileNamePrefix: "my-tool",
-    getData: () => data,
-    onImport: (raw) => { /* 検証して setState */ return true; },
-  }}
->
-```
-
-## PWA インストール導線
-
-- **必ず** `AppShell` の `afterDataManager`（バックアップの右隣）
-- **コンポーネント**: 各アプリの `InstallAppButton`（内部ロジックは `usePwaInstall` 系を踏襲）
-- **ベース見た目**: カプセル + 📱。標準は `lunch-install-btn` クラス
-- **アクセント色の変更**は PWA ごとの意図的テーマのみ（例: `slot-install-btn`, `cm-install-btn`）
-- **ガイドモーダル**: `lunch-install-modal` アニメーションを共用可
-- インストールボタンを作業領域・Footer・Floating に置かない
-
-```tsx
-<AppShell
-  isPwa
-  afterDataManager={<InstallAppButton copy={copy.install} />}
-  dataManager={...}
->
-```
-
-## AppShell actions の用途
-
-- **機能ボタンのみ**（ZIP 出力、一括処理など）
-- 言語・バックアップ・インストールは **ここに置かない**（上記スロットを使う）
-
-## ローディング・空状態
-
-- 初回 hydrate 前: AppShell 内に `t.common.loading`（`text-sm text-zinc-400`）
-- 説明文は shell 辞書の `description` を常時表示
-
-## チェックリスト（UI 変更時）
-
-- [ ] 言語トグルが Header と AppShell で二重になっていない
-- [ ] バックアップ／インストールの位置が title 行の定位置
-- [ ] `contentClassName` 外に主要 UI がはみ出していない
-- [ ] 共通ボタン／入力クラスを使い、独自色は意図がある場合のみ
+- [ ] スマホでタイトル行が 💾／📱 と並び、戻るリンクがない
+- [ ] 機能ボタンが1行に収まる（必要なら Short ラベル）
+- [ ] 💾 と 📱 の高さが揃っている
+- [ ] 横スクロールが発生しない
+- [ ] 言語トグルが二重でない
+- [ ] 対応完了後 `isMobileSupported: true` を付与

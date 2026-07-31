@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import AppShell from "@/components/AppShell";
 import { fmt, useI18n } from "@/i18n";
+import InstallAppButton from "./InstallAppButton";
 import PreviewPane from "./PreviewPane";
 import TagFilterBar from "./TagFilterBar";
 import TagMasterModal from "./TagMasterModal";
@@ -287,6 +288,8 @@ export default function MailTemplatePage() {
       title={mt.shell.title}
       description={mt.shell.description}
       fillViewport
+      isPwa
+      afterDataManager={<InstallAppButton copy={mt.install} />}
       dataManager={{
         appId: "mail-template",
         fileNamePrefix: "mail-template",
@@ -312,27 +315,30 @@ export default function MailTemplatePage() {
         },
       }}
       actions={
-        <div className="flex flex-wrap items-center justify-end gap-2">
+        <div className="flex w-full max-w-full flex-nowrap items-center gap-1 sm:gap-2 md:w-auto md:justify-end">
           <button
             type="button"
             onClick={() => setTagMasterOpen(true)}
-            className="btn-secondary !px-3 !py-1.5 text-xs sm:text-sm"
+            className="btn-secondary min-w-0 flex-1 !px-2 !py-1.5 text-[11px] leading-tight active:scale-[0.98] active:bg-zinc-100 sm:flex-none sm:!px-3 sm:!py-1.5 sm:text-sm"
           >
-            {mt.actions.tagMaster}
+            <span className="sm:hidden">{mt.actions.tagMasterShort}</span>
+            <span className="hidden sm:inline">{mt.actions.tagMaster}</span>
           </button>
           <button
             type="button"
             onClick={() => setMasterOpen(true)}
-            className="btn-secondary !px-3 !py-1.5 text-xs sm:text-sm"
+            className="btn-secondary min-w-0 flex-1 !px-2 !py-1.5 text-[11px] leading-tight active:scale-[0.98] active:bg-zinc-100 sm:flex-none sm:!px-3 sm:!py-1.5 sm:text-sm"
           >
-            {mt.actions.variableMaster}
+            <span className="sm:hidden">{mt.actions.variableMasterShort}</span>
+            <span className="hidden sm:inline">{mt.actions.variableMaster}</span>
           </button>
           <button
             type="button"
             onClick={openCreate}
-            className="btn-primary !px-3 !py-1.5 text-xs sm:text-sm"
+            className="btn-primary min-w-0 flex-1 !px-2 !py-1.5 text-[11px] leading-tight active:scale-[0.98] active:bg-zinc-800 sm:flex-none sm:!px-3 sm:!py-1.5 sm:text-sm"
           >
-            {mt.actions.newTemplate}
+            <span className="sm:hidden">{mt.actions.newTemplateShort}</span>
+            <span className="hidden sm:inline">{mt.actions.newTemplate}</span>
           </button>
         </div>
       }
@@ -340,9 +346,9 @@ export default function MailTemplatePage() {
       {!hydrated ? (
         <p className="text-sm text-zinc-400">{mt.loading}</p>
       ) : (
-        <div className="grid min-h-0 flex-1 gap-3 md:grid-cols-[minmax(0,17rem)_minmax(0,1fr)] lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)]">
-          <aside className="flex min-h-0 flex-col rounded-md border border-zinc-200/80 bg-white p-2 shadow-sm">
-            <div className="mb-2 shrink-0 space-y-2 px-1">
+        <div className="grid min-h-0 w-full max-w-full flex-1 grid-cols-1 gap-2 overflow-x-hidden overflow-y-auto md:grid-cols-[minmax(0,17rem)_minmax(0,1fr)] md:gap-3 md:overflow-hidden lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)]">
+          <aside className="flex max-h-[min(42dvh,20rem)] min-h-0 min-w-0 flex-col overflow-hidden rounded-md border border-zinc-200/80 bg-white p-2 shadow-sm md:max-h-none md:p-3">
+            <div className="mb-2 shrink-0 space-y-2 px-0.5 md:px-1">
               <p className="text-[11px] font-medium text-zinc-500">
                 {mt.list.heading}
                 <span className="ml-1 tabular-nums text-zinc-400">
@@ -361,7 +367,7 @@ export default function MailTemplatePage() {
                 onChange={setFilterTagId}
               />
             </div>
-            <div className="min-h-0 flex-1 overflow-hidden">
+            <div className="min-h-0 min-w-0 flex-1 overflow-hidden">
               <TemplateList
                 templates={filteredTemplates}
                 tags={tags}
@@ -375,15 +381,15 @@ export default function MailTemplatePage() {
             </div>
           </aside>
 
-          <section className="flex min-h-0 flex-col gap-3 rounded-md border border-zinc-200/80 bg-white p-3 shadow-sm">
+          <section className="flex min-h-[min(50dvh,24rem)] min-w-0 flex-col gap-2 overflow-hidden rounded-md border border-zinc-200/80 bg-white p-2 shadow-sm md:min-h-0 md:gap-3 md:p-4 lg:p-6">
             {selected ? (
               <>
-                <div>
-                  <h2 className="truncate text-sm font-semibold text-zinc-900">
+                <div className="min-w-0 shrink-0">
+                  <h2 className="break-words text-sm font-semibold text-zinc-900 md:truncate">
                     {selected.title}
                   </h2>
                 </div>
-                <div className="max-h-[42%] shrink-0 overflow-y-auto border-b border-zinc-100 pb-3">
+                <div className="max-h-[min(38%,14rem)] shrink-0 overflow-x-hidden overflow-y-auto border-b border-zinc-100 pb-2 md:max-h-[42%] md:pb-3">
                   <VariableForm
                     variables={enabledVariables}
                     values={values}
@@ -402,8 +408,8 @@ export default function MailTemplatePage() {
                 />
               </>
             ) : (
-              <div className="flex flex-1 items-center justify-center">
-                <p className="text-sm text-zinc-400">
+              <div className="flex flex-1 items-center justify-center px-2">
+                <p className="break-words text-center text-sm text-zinc-400">
                   {mt.list.selectPrompt}
                 </p>
               </div>

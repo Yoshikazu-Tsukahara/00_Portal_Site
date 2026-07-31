@@ -64,18 +64,18 @@ export default function ImageUploadZone({
         if (disabled) return;
         handleFiles(e.dataTransfer.files);
       }}
-      className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed px-3 py-4 text-center transition-colors ${
+      className={`flex min-h-11 cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed px-3 py-4 text-center transition-colors sm:min-h-0 ${
         disabled
           ? "cursor-not-allowed border-zinc-200 bg-zinc-50 opacity-60"
           : isDragging
             ? "border-zinc-950 bg-zinc-100"
-            : "border-zinc-200 bg-white hover:border-zinc-300 hover:bg-zinc-50"
+            : "border-zinc-200 bg-white hover:border-zinc-300 hover:bg-zinc-50 active:bg-zinc-100"
       }`}
     >
-      <p className="text-sm font-medium text-zinc-800">
+      <p className="break-words text-sm font-medium text-zinc-800">
         {copy.dropHint}
       </p>
-      <p className="mt-0.5 text-[11px] text-zinc-400">
+      <p className="mt-0.5 break-words text-[11px] text-zinc-400">
         {copy.dropSub}
       </p>
       <input

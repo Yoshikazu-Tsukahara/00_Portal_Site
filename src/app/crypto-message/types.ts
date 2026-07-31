@@ -3,9 +3,6 @@
 /** 暗号文の見た目テーマ（3種類から選択） */
 export type CipherTheme = "cyber" | "fantasy" | "spy";
 
-/** 解読スクランブル演出の速度（じっくり / 標準 / 爆速） */
-export type RevealSpeed = "slow" | "normal" | "fast";
-
 /** 上部タブ：ひみつ作成 / 解読・チャレンジ */
 export type TopMode = "create" | "decode";
 
@@ -22,9 +19,8 @@ export const THEME_META: Record<
   spy: { label: "Spy", icon: "📡" },
 };
 
-/** スクランブル演出：1文字あたりの確定間隔（ミリ秒） */
-export const REVEAL_SPEED_MS: Record<RevealSpeed, number> = {
-  slow: 110,
-  normal: 55,
-  fast: 18,
-};
+/**
+ * スクランブル演出：1文字あたりの確定間隔（ミリ秒・固定）。
+ * 旧「じっくり」(110ms) より少し遅め。
+ */
+export const FIXED_REVEAL_SPEED_MS = 150;

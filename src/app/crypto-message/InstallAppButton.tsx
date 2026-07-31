@@ -49,14 +49,15 @@ export default function InstallAppButton({
         type="button"
         onClick={() => void handleClick()}
         disabled={busy}
-        className="cm-install-btn"
+        className="cm-install-btn active:scale-[0.98]"
         aria-label={copy.buttonAria}
         title={copy.button}
       >
         <span aria-hidden className="text-[12px] leading-none sm:text-[13px]">
           📱
         </span>
-        <span>{copy.buttonShort}</span>
+        <span className="hidden sm:inline">{copy.buttonShort}</span>
+        <span className="sm:hidden">{copy.buttonTiny}</span>
       </button>
 
       <InstallGuideModal

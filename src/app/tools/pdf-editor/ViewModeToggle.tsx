@@ -28,13 +28,14 @@ export default function ViewModeToggle({
         role="tab"
         aria-selected={mode === "page"}
         onClick={() => onChange("page")}
-        className={`rounded-[5px] px-2.5 py-1 text-xs font-medium transition-colors ${
+        className={`rounded-[5px] px-2 py-1.5 text-xs font-medium transition-colors active:scale-[0.98] sm:px-2.5 sm:py-1 ${
           mode === "page"
             ? "bg-white text-zinc-900 shadow-sm"
-            : "text-zinc-500 hover:text-zinc-800"
+            : "text-zinc-500 hover:text-zinc-800 active:bg-zinc-200/60"
         }`}
       >
-        {copy.page}
+        <span className="sm:hidden">{copy.pageShort}</span>
+        <span className="hidden sm:inline">{copy.page}</span>
       </button>
 
       <span className="group/filetab relative inline-flex">
@@ -48,20 +49,21 @@ export default function ViewModeToggle({
           onClick={() => {
             if (!fileModeLocked) onChange("file");
           }}
-          className={`rounded-[5px] px-2.5 py-1 text-xs font-medium transition-colors ${
+          className={`rounded-[5px] px-2 py-1.5 text-xs font-medium transition-colors active:scale-[0.98] sm:px-2.5 sm:py-1 ${
             fileModeLocked
               ? "cursor-not-allowed text-zinc-300"
               : mode === "file"
                 ? "bg-white text-zinc-900 shadow-sm"
-                : "text-zinc-500 hover:text-zinc-800"
+                : "text-zinc-500 hover:text-zinc-800 active:bg-zinc-200/60"
           }`}
         >
-          {copy.file}
+          <span className="sm:hidden">{copy.fileShort}</span>
+          <span className="hidden sm:inline">{copy.file}</span>
         </button>
         {fileModeLocked ? (
           <span
             role="tooltip"
-            className="pointer-events-none absolute left-1/2 top-full z-30 mt-1.5 w-max max-w-[220px] -translate-x-1/2 rounded-md border border-zinc-200 bg-white px-2 py-1.5 text-[10px] leading-snug text-zinc-600 opacity-0 shadow-sm transition-opacity group-hover/filetab:opacity-100"
+            className="pointer-events-none absolute left-1/2 top-full z-30 mt-1.5 w-max max-w-[min(220px,70vw)] -translate-x-1/2 rounded-md border border-zinc-200 bg-white px-2 py-1.5 text-[10px] leading-snug text-zinc-600 opacity-100 shadow-sm sm:opacity-0 sm:transition-opacity sm:group-hover/filetab:opacity-100"
           >
             {copy.fileLockedHint}
           </span>

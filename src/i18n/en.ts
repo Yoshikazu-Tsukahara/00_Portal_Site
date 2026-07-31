@@ -121,6 +121,10 @@ export const en: Dictionary = {
     open: "Open",
     comingSoon: "Coming soon",
     comingSoonHint: "Available shortly",
+    mobileSupported: "Mobile",
+    mobileSupportedHint: "Optimized for smartphones",
+    pcRecommended: "PC",
+    pcRecommendedHint: "Best experienced on a computer",
   },
   footer: {
     tagline: "Indie tools that ease everyday hassle",

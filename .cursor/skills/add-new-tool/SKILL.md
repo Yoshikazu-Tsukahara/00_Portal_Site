@@ -46,6 +46,8 @@ description: My Tool Box Portal に新規ツールまたは独立 PWA を追加�
 - バックアップ: `dataManager`（タイトル横）
 - PWA インストール: `afterDataManager`（バックアップ右）
 - 幅: `useLayout().contentClassName` / `fillViewport`
+- スマホ対応: skill `mobile-responsive`（完成例は `mail-template`）
+- 対応済みなら `tools.ts` に `isMobileSupported: true`
 
 ### Step 6: PWA（Type C のみ）
 

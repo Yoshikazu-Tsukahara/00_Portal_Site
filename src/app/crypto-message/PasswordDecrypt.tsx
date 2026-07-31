@@ -7,8 +7,6 @@ import { useCryptoAudio, vibrateCharLock, vibrateComplete } from "./lib/audio";
 import { detectThemeAndDecode } from "./lib/cipherThemeCodec";
 import ProgressLog from "./ProgressLog";
 import ScrambleText from "./ScrambleText";
-import SpeedSelector from "./SpeedSelector";
-import { type RevealSpeed } from "./types";
 import { useScrambleReveal } from "./useScrambleReveal";
 
 /** ①「ひみつメッセージ」モード：受信側（合言葉で解読 ＋ スクランブル演出） */
@@ -18,14 +16,12 @@ export default function PasswordDecrypt() {
 
   const [cipherInput, setCipherInput] = useState("");
   const [password, setPassword] = useState("");
-  const [speed, setSpeed] = useState<RevealSpeed>("normal");
   const [muted, setMuted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [runId, setRunId] = useState(0);
   const [done, setDone] = useState(false);
   const [shake, setShake] = useState(false);
-  const [lastPlaintext, setLastPlaintext] = useState<string | null>(null);
 
   const audio = useCryptoAudio(muted);
   const { playShuffleTick, playLockTick, playUnlockChime, playErrorBuzz, primeAudio } =
@@ -63,12 +59,11 @@ export default function PasswordDecrypt() {
 
   function beginReveal(plaintext: string) {
     completedOnceRef.current = false;
-    setLastPlaintext(plaintext);
     setDone(false);
     setError(null);
     setShake(false);
     setRunId((v) => v + 1);
-    reveal.start(plaintext, speed);
+    reveal.start(plaintext);
   }
 
   async function handleDecrypt() {
@@ -79,7 +74,6 @@ export default function PasswordDecrypt() {
     setDone(false);
     setShake(false);
     reveal.reset();
-    setLastPlaintext(null);
     completedOnceRef.current = false;
 
     const bytes = detectThemeAndDecode(cipherInput);
@@ -111,28 +105,13 @@ export default function PasswordDecrypt() {
     reveal.skip();
   }
 
-  function handleReplay() {
-    if (!lastPlaintext || reveal.isRunning) return;
-    primeAudio();
-    beginReveal(lastPlaintext);
-  }
-
-  function handleReset() {
-    reveal.reset();
-    setLastPlaintext(null);
-    completedOnceRef.current = false;
-    setDone(false);
-    setError(null);
-    setRunId((v) => v + 1);
-  }
-
   function triggerShake() {
     setShake(true);
     window.setTimeout(() => setShake(false), 420);
   }
 
   return (
-    <div className="cm-subpanel">
+    <div className="cm-subpanel min-w-0">
       <div className="cm-field">
         <label className="cm-field__label" htmlFor="cm-cipher-input">
           {copy.cipherLabel}
@@ -140,7 +119,7 @@ export default function PasswordDecrypt() {
         <textarea
           id="cm-cipher-input"
           className="cm-textarea cm-textarea--mono"
-          rows={4}
+          rows={3}
           value={cipherInput}
           onChange={(e) => setCipherInput(e.target.value)}
           placeholder={copy.cipherPlaceholder}
@@ -161,8 +140,6 @@ export default function PasswordDecrypt() {
           autoComplete="off"
         />
       </div>
-
-      <SpeedSelector value={speed} onChange={setSpeed} />
 
       <div className="cm-decrypt-actions">
         <button
@@ -189,24 +166,6 @@ export default function PasswordDecrypt() {
           <button type="button" className="cm-ghost-btn" onClick={handleSkip}>
             {copy.skip}
           </button>
-        ) : null}
-        {!reveal.isRunning && lastPlaintext ? (
-          <>
-            <button
-              type="button"
-              className="cm-ghost-btn"
-              onClick={handleReplay}
-            >
-              {copy.replay}
-            </button>
-            <button
-              type="button"
-              className="cm-ghost-btn"
-              onClick={handleReset}
-            >
-              {copy.reset}
-            </button>
-          </>
         ) : null}
       </div>
 

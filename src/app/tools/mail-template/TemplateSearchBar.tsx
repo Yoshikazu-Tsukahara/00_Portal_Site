@@ -34,7 +34,7 @@ export default function TemplateSearchBar({
   const mt = t.apps.mailTemplate;
 
   return (
-    <div className="relative">
+    <div className="relative w-full max-w-full">
       <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2">
         <SearchIcon />
       </span>
@@ -44,7 +44,7 @@ export default function TemplateSearchBar({
         onChange={(e) => onChange(e.target.value)}
         placeholder={mt.search.placeholder}
         aria-label={mt.search.aria}
-        className="input-field w-full !py-1.5 !pl-8 !pr-2 !text-xs"
+        className="input-field min-h-11 w-full max-w-full !py-2 !pl-8 !pr-2 !text-sm md:min-h-0 md:!py-1.5 md:!text-xs"
         autoComplete="off"
       />
     </div>

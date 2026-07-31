@@ -98,31 +98,34 @@ export default function TagMasterModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-zinc-950/40 p-4 sm:items-center"
+      className="fixed inset-0 z-50 flex items-end justify-center overflow-x-hidden bg-zinc-950/40 p-2 sm:items-center sm:p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby={titleId}
       onClick={onClose}
     >
       <div
-        className="flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-xl"
+        className="flex max-h-[92dvh] w-full max-w-lg flex-col overflow-hidden rounded-t-lg border border-zinc-200 bg-white shadow-xl sm:max-h-[90vh] sm:rounded-lg"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-zinc-200/70 px-4 py-3">
-          <h2 id={titleId} className="text-sm font-semibold text-zinc-900">
+        <div className="flex items-center justify-between gap-2 border-b border-zinc-200/70 px-3 py-3 sm:px-4">
+          <h2
+            id={titleId}
+            className="min-w-0 break-words text-sm font-semibold text-zinc-900"
+          >
             {mt.tagMaster.title}
           </h2>
           <button
             type="button"
             onClick={onClose}
-            className="text-xs text-zinc-400 transition-colors hover:text-zinc-700"
+            className="flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-md text-xs text-zinc-400 transition-colors hover:text-zinc-700 active:bg-zinc-100 active:text-zinc-800 sm:min-h-0 sm:min-w-0 sm:px-2 sm:py-1"
           >
             {mt.tagMaster.close}
           </button>
         </div>
 
-        <div className="space-y-3 overflow-y-auto px-4 py-3">
-          <div className="rounded-md border border-zinc-200/80 bg-zinc-50/60 p-3">
+        <div className="space-y-3 overflow-x-hidden overflow-y-auto px-3 py-3 sm:px-4">
+          <div className="rounded-md border border-zinc-200/80 bg-zinc-50/60 p-2 sm:p-3">
             <p className="mb-2 text-[11px] font-medium text-zinc-600">
               {editingId
                 ? mt.tagMaster.editHeading
@@ -133,12 +136,12 @@ export default function TagMasterModal({
               value={draftName}
               onChange={(e) => setDraftName(e.target.value)}
               placeholder={mt.tagMaster.namePlaceholder}
-              className="input-field mb-2 w-full !py-1.5 !text-xs"
+              className="input-field mb-2 min-h-11 w-full max-w-full !py-2 !text-sm md:min-h-0 md:!py-1.5 md:!text-xs"
             />
             <p className="mb-1.5 text-[10px] font-medium text-zinc-500">
               {mt.tagMaster.colorLabel}
             </p>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex max-w-full flex-wrap gap-1.5">
               {TAG_COLORS.map((c) => {
                 const selected = draftColor === c.id;
                 const colorLabel = mt.colorLabels[c.id];
@@ -150,10 +153,10 @@ export default function TagMasterModal({
                     aria-label={colorLabel}
                     aria-pressed={selected}
                     onClick={() => setDraftColor(c.id)}
-                    className={`flex size-7 items-center justify-center rounded-md border transition-all ${
+                    className={`flex size-11 items-center justify-center rounded-md border transition-all active:scale-95 md:size-7 ${
                       selected
                         ? "border-zinc-900 ring-1 ring-zinc-900"
-                        : "border-zinc-200 hover:border-zinc-400"
+                        : "border-zinc-200 hover:border-zinc-400 active:bg-zinc-50"
                     }`}
                   >
                     <span
@@ -165,13 +168,15 @@ export default function TagMasterModal({
               })}
             </div>
             {error ? (
-              <p className="mt-1.5 text-[11px] text-red-600">{error}</p>
+              <p className="mt-1.5 break-words text-[11px] text-red-600">
+                {error}
+              </p>
             ) : null}
-            <div className="mt-2 flex gap-2">
+            <div className="mt-2 flex flex-col gap-2 sm:flex-row">
               <button
                 type="button"
                 onClick={handleSubmit}
-                className="btn-primary !px-3 !py-1.5 !text-xs"
+                className="btn-primary min-h-11 !px-3 !py-2 !text-xs active:scale-[0.98] active:bg-zinc-800 sm:min-h-0 sm:!py-1.5"
               >
                 {editingId ? mt.tagMaster.update : mt.tagMaster.add}
               </button>
@@ -179,7 +184,7 @@ export default function TagMasterModal({
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="btn-secondary !px-3 !py-1.5 !text-xs"
+                  className="btn-secondary min-h-11 !px-3 !py-2 !text-xs active:scale-[0.98] active:bg-zinc-100 sm:min-h-0 sm:!py-1.5"
                 >
                   {mt.tagMaster.cancel}
                 </button>
@@ -187,9 +192,9 @@ export default function TagMasterModal({
             </div>
           </div>
 
-          <ul className="divide-y divide-zinc-100 rounded-md border border-zinc-200/80">
+          <ul className="divide-y divide-zinc-100 overflow-hidden rounded-md border border-zinc-200/80">
             {tags.length === 0 ? (
-              <li className="px-3 py-4 text-center text-xs text-zinc-400">
+              <li className="break-words px-3 py-4 text-center text-xs text-zinc-400">
                 {mt.tagMaster.empty}
               </li>
             ) : (
@@ -198,34 +203,38 @@ export default function TagMasterModal({
                 return (
                   <li
                     key={tag.id}
-                    className="flex items-center gap-2 px-3 py-2 text-sm"
+                    className="flex flex-col gap-2 px-3 py-2.5 text-sm sm:flex-row sm:items-center"
                   >
-                    <span
-                      className={`size-2.5 shrink-0 rounded-full ${color?.swatch ?? "bg-zinc-400"}`}
-                      aria-hidden
-                    />
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate font-medium text-zinc-800">
-                        {tag.name}
-                      </p>
-                      <p className="text-[10px] text-zinc-400">
-                        {mt.colorLabels[tag.color] ?? tag.color}
-                      </p>
+                    <div className="flex min-w-0 flex-1 items-start gap-2">
+                      <span
+                        className={`mt-1.5 size-2.5 shrink-0 rounded-full ${color?.swatch ?? "bg-zinc-400"}`}
+                        aria-hidden
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="break-words font-medium text-zinc-800">
+                          {tag.name}
+                        </p>
+                        <p className="text-[10px] text-zinc-400">
+                          {mt.colorLabels[tag.color] ?? tag.color}
+                        </p>
+                      </div>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => startEdit(tag)}
-                      className="text-[11px] text-zinc-500 transition-colors hover:text-zinc-900"
-                    >
-                      {mt.tagMaster.edit}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(tag.id)}
-                      className="text-[11px] text-zinc-400 transition-colors hover:text-red-600"
-                    >
-                      {mt.tagMaster.delete}
-                    </button>
+                    <div className="flex shrink-0 gap-1">
+                      <button
+                        type="button"
+                        onClick={() => startEdit(tag)}
+                        className="flex min-h-11 min-w-11 items-center justify-center rounded-md px-2 text-[11px] text-zinc-500 transition-colors hover:text-zinc-900 active:bg-zinc-100 active:text-zinc-900 sm:min-h-0 sm:min-w-0"
+                      >
+                        {mt.tagMaster.edit}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(tag.id)}
+                        className="flex min-h-11 min-w-11 items-center justify-center rounded-md px-2 text-[11px] text-zinc-400 transition-colors hover:text-red-600 active:bg-red-50 active:text-red-600 sm:min-h-0 sm:min-w-0"
+                      >
+                        {mt.tagMaster.delete}
+                      </button>
+                    </div>
                   </li>
                 );
               })

@@ -3,13 +3,19 @@ import type { AppShellCopy } from "./otherApps";
 export type ImageCompressorDict = {
   shell: AppShellCopy;
   zipping: string;
+  /** 狭い画面向け */
+  zippingShort: string;
   downloadZip: string;
+  /** 狭い画面向け */
+  downloadZipShort: string;
   addImages: string;
   clearAll: string;
   dropHint: string;
   dropSub: string;
   presets: {
     aria: string;
+    /** 狭い画面のセレクト用ラベル */
+    selectLabel: string;
     high: { label: string; hint: string };
     standard: { label: string; hint: string };
     light: { label: string; hint: string };
@@ -45,6 +51,25 @@ export type ImageCompressorDict = {
     loadFailed: string;
     zipFailed: string;
   };
+  install: {
+    button: string;
+    buttonShort: string;
+    buttonTiny: string;
+    buttonAria: string;
+    modalTitle: string;
+    modalLead: string;
+    step1Title: string;
+    step1Body: string;
+    step2Title: string;
+    step2Body: string;
+    desktopTitle: string;
+    desktopLead: string;
+    desktopStep1Title: string;
+    desktopStep1Body: string;
+    desktopStep2Title: string;
+    desktopStep2Body: string;
+    modalClose: string;
+  };
 };
 
 export const imageCompressorJa: ImageCompressorDict = {
@@ -53,13 +78,16 @@ export const imageCompressorJa: ImageCompressorDict = {
     description: "リサイズ・圧縮をブラウザ内で一括処理。ZIPで保存。",
   },
   zipping: "ZIP生成中…",
+  zippingShort: "生成中…",
   downloadZip: "一括ダウンロード（ZIP）",
+  downloadZipShort: "ZIP保存",
   addImages: "画像を追加",
   clearAll: "すべてクリア",
   dropHint: "画像をドロップ、または選択",
   dropSub: "JPEG / PNG / WebP · 複数可 · ブラウザ内処理",
   presets: {
     aria: "圧縮プリセット",
+    selectLabel: "プリセット",
     high: { label: "オリジナル重視", hint: "品質90% · リサイズなし" },
     standard: { label: "標準バランス", hint: "おすすめ · 品質70%" },
     light: { label: "最高圧縮", hint: "ファイル最小化 · 品質40%" },
@@ -95,6 +123,29 @@ export const imageCompressorJa: ImageCompressorDict = {
     loadFailed: "画像読込に失敗",
     zipFailed: "ZIP生成に失敗",
   },
+  install: {
+    button: "このアプリをホーム画面に追加",
+    buttonShort: "ホームに追加",
+    buttonTiny: "追加",
+    buttonAria: "画像一括軽量化をホーム画面に追加してアプリとして使う",
+    modalTitle: "ホーム画面に追加",
+    modalLead:
+      "Safari からホーム画面に追加すると、画像一括軽量化だけを独立アプリとしてすぐ開けます。",
+    step1Title: "共有をタップ",
+    step1Body: "画面下（または上）の共有アイコン［↑］をタップします。",
+    step2Title: "「ホーム画面に追加」",
+    step2Body: "メニューを下にスクロールし、「ホーム画面に追加」を選びます。",
+    desktopTitle: "アプリとしてインストール",
+    desktopLead:
+      "Chrome / Edge なら、アドレスバーやメニューから画像一括軽量化を独立アプリとして追加できます。",
+    desktopStep1Title: "ブラウザのメニューを開く",
+    desktopStep1Body:
+      "画面右上の「︙」またはアドレスバー横のインストールアイコンを探します。",
+    desktopStep2Title: "「アプリをインストール」",
+    desktopStep2Body:
+      "「画像一括軽量化をインストール」や「アプリをインストール」を選ぶとホーム／デスクトップに追加されます。",
+    modalClose: "わかった",
+  },
 };
 
 export const imageCompressorEn: ImageCompressorDict = {
@@ -103,13 +154,16 @@ export const imageCompressorEn: ImageCompressorDict = {
     description: "Resize and compress in the browser. Save as a ZIP.",
   },
   zipping: "Creating ZIP…",
+  zippingShort: "Zipping…",
   downloadZip: "Download all (ZIP)",
+  downloadZipShort: "ZIP",
   addImages: "Add images",
   clearAll: "Clear all",
   dropHint: "Drop images, or choose files",
   dropSub: "JPEG / PNG / WebP · multiple · processed in-browser",
   presets: {
     aria: "Compression preset",
+    selectLabel: "Preset",
     high: { label: "Preserve quality", hint: "90% quality · no resize" },
     standard: { label: "Balanced", hint: "Recommended · 70% quality" },
     light: { label: "Max compression", hint: "Smallest files · 40% quality" },
@@ -144,5 +198,28 @@ export const imageCompressorEn: ImageCompressorDict = {
   errors: {
     loadFailed: "Could not load image",
     zipFailed: "ZIP creation failed",
+  },
+  install: {
+    button: "Add this app to your Home Screen",
+    buttonShort: "Add to Home",
+    buttonTiny: "Add",
+    buttonAria: "Add Batch Image Compressor to your Home Screen as an app",
+    modalTitle: "Add to Home Screen",
+    modalLead:
+      "From Safari, add to Home Screen to open Batch Image Compressor as a standalone app.",
+    step1Title: "Tap Share",
+    step1Body: "Tap the Share icon [↑] at the bottom (or top) of the screen.",
+    step2Title: "“Add to Home Screen”",
+    step2Body: "Scroll the menu and choose “Add to Home Screen”.",
+    desktopTitle: "Install as an app",
+    desktopLead:
+      "In Chrome / Edge, you can install Batch Image Compressor as a standalone app from the address bar or menu.",
+    desktopStep1Title: "Open the browser menu",
+    desktopStep1Body:
+      "Look for “︙” at the top right, or the install icon next to the address bar.",
+    desktopStep2Title: "“Install app”",
+    desktopStep2Body:
+      "Choose “Install Batch Image Compressor” or “Install app” to add it to Home / desktop.",
+    modalClose: "Got it",
   },
 };

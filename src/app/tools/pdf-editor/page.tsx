@@ -21,6 +21,7 @@ import ExportDialog, {
 } from "./ExportDialog";
 import FileGroupList from "./FileGroupList";
 import HistoryToolbar from "./HistoryToolbar";
+import InstallAppButton from "./InstallAppButton";
 import PageDragOverlay from "./PageDragOverlay";
 import PageFilmstrip from "./PageFilmstrip";
 import PagePreviewModal from "./PagePreviewModal";
@@ -525,7 +526,7 @@ export default function PdfEditorPage() {
     exportMode === "extract" ? selectedIds.size : pages.length;
 
   const headerActions = (
-    <div className="flex items-center gap-1.5">
+    <div className="flex h-8 w-full max-w-full flex-nowrap items-stretch justify-end gap-1.5 sm:gap-2 md:w-auto">
       <HistoryToolbar
         canUndo={canUndo}
         canRedo={canRedo}
@@ -536,10 +537,11 @@ export default function PdfEditorPage() {
         type="button"
         onClick={openFullExport}
         disabled={!canExport}
-        className="btn-primary !px-3 !py-1.5 text-xs sm:text-sm"
+        className="btn-primary h-full shrink-0 !px-3 !py-0 text-xs leading-none active:scale-[0.98] active:bg-zinc-800 disabled:active:scale-100 sm:text-sm"
         aria-disabled={!canExport}
       >
-        {copy.exportPdf}
+        <span className="sm:hidden">{copy.exportPdfShort}</span>
+        <span className="hidden sm:inline">{copy.exportPdf}</span>
       </button>
     </div>
   );
@@ -575,37 +577,44 @@ export default function PdfEditorPage() {
       description={copy.shell.description}
       actions={headerActions}
       fillViewport
+      isPwa
+      afterDataManager={<InstallAppButton copy={copy.install} />}
       dataManager={{
         appId: "pdf-editor",
         fileNamePrefix: "pdf-editor",
         // セッション完結のため永続データなし（安心メッセージのみ表示）
       }}
     >
-      <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-hidden">
-        <div className="shrink-0 space-y-1.5">
+      <div className="flex min-h-0 w-full max-w-full flex-1 flex-col gap-2 overflow-x-hidden overflow-y-auto md:overflow-hidden">
+        <div className="min-w-0 shrink-0 space-y-1.5">
           <PdfUploadZone
             onFiles={handleFiles}
             disabled={isLoading}
             compact
           />
 
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div className="flex flex-wrap items-center gap-2">
+          <div className="flex min-w-0 flex-wrap items-center justify-between gap-2">
+            <div className="flex min-w-0 flex-wrap items-center gap-2">
               <ViewModeToggle
                 mode={viewMode}
                 onChange={setViewMode}
                 fileModeLocked={fileModeLocked}
               />
-              <p className="text-xs text-zinc-500">{pageStatusText}</p>
+              <p className="min-w-0 break-words text-xs text-zinc-500">
+                {pageStatusText}
+              </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex min-w-0 flex-wrap items-center gap-2">
               {error ? (
-                <p className="text-xs text-red-600" role="alert">
+                <p className="break-words text-xs text-red-600" role="alert">
                   {error}
                 </p>
               ) : null}
               {message ? (
-                <p className="text-xs text-emerald-600" role="status">
+                <p
+                  className="break-words text-xs text-emerald-600"
+                  role="status"
+                >
                   {message}
                 </p>
               ) : null}
@@ -613,7 +622,7 @@ export default function PdfEditorPage() {
                 <button
                   type="button"
                   onClick={clearAll}
-                  className="text-[11px] text-zinc-400 transition-colors hover:text-zinc-700"
+                  className="min-h-11 px-1 text-[11px] text-zinc-400 transition-colors hover:text-zinc-700 active:text-zinc-800 sm:min-h-0"
                 >
                   {copy.clearAll}
                 </button>
@@ -658,7 +667,7 @@ export default function PdfEditorPage() {
             skipClickAfterDragRef.current = false;
           }}
         >
-          <div className="min-h-0 shrink-0">
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col">
             {viewMode === "page" ? (
               <PageFilmstrip
                 pages={pages}

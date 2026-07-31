@@ -90,7 +90,7 @@ export default function TemplateList({
   if (templates.length === 0) {
     return (
       <div className="flex h-full min-h-[120px] items-center justify-center rounded-md border border-dashed border-zinc-200 bg-zinc-50/50 px-3">
-        <p className="text-center text-xs text-zinc-400">
+        <p className="break-words text-center text-xs text-zinc-400">
           {isFilterActive
             ? mt.list.emptyFilter
             : mt.list.empty}
@@ -100,13 +100,13 @@ export default function TemplateList({
   }
 
   return (
-    <ul className="space-y-1.5 overflow-y-auto pr-0.5">
+    <ul className="h-full space-y-1.5 overflow-x-hidden overflow-y-auto overscroll-contain pr-0.5">
       {templates.map((tpl) => {
         const selected = tpl.id === selectedId;
         const tplTags = resolveTags(tags, tpl.tagIds ?? []);
         const pinned = Boolean(tpl.pinned);
         return (
-          <li key={tpl.id}>
+          <li key={tpl.id} className="min-w-0">
             <div
               role="button"
               tabIndex={0}
@@ -117,15 +117,15 @@ export default function TemplateList({
                   onSelect(tpl.id);
                 }
               }}
-              className={`group relative cursor-pointer rounded-md border px-3 py-2.5 transition-colors ${
+              className={`group relative min-h-11 cursor-pointer rounded-md border px-3 py-2.5 transition-colors active:scale-[0.99] ${
                 selected
-                  ? "border-zinc-900 bg-zinc-900 text-white"
+                  ? "border-zinc-900 bg-zinc-900 text-white active:bg-zinc-800"
                   : pinned
-                    ? "border-amber-200/80 bg-amber-50/40 text-zinc-800 hover:border-amber-300 hover:bg-amber-50/70"
-                    : "border-zinc-200/80 bg-white text-zinc-800 hover:border-zinc-300 hover:bg-zinc-50"
+                    ? "border-amber-200/80 bg-amber-50/40 text-zinc-800 hover:border-amber-300 hover:bg-amber-50/70 active:bg-amber-100/80"
+                    : "border-zinc-200/80 bg-white text-zinc-800 hover:border-zinc-300 hover:bg-zinc-50 active:bg-zinc-100"
               }`}
             >
-              <p className="pr-16 text-sm font-medium leading-snug">
+              <p className="break-words pr-20 text-sm font-medium leading-snug md:pr-16">
                 {pinned ? (
                   <span
                     className={`mr-1 inline-block align-middle ${
@@ -146,7 +146,7 @@ export default function TemplateList({
                 {tpl.subject || mt.list.noSubject}
               </p>
               {tplTags.length > 0 ? (
-                <div className="mt-1.5 flex flex-wrap gap-1 pr-12">
+                <div className="mt-1.5 flex max-w-full flex-wrap gap-1 pr-12">
                   {tplTags.map((tag) => (
                     <TagBadge key={tag.id} tag={tag} onDark={selected} />
                   ))}
@@ -154,10 +154,10 @@ export default function TemplateList({
               ) : null}
 
               <div
-                className={`absolute right-1.5 top-1.5 flex gap-0.5 transition-opacity ${
+                className={`absolute right-1 top-1 flex gap-0.5 transition-opacity md:right-1.5 md:top-1.5 ${
                   pinned
                     ? "opacity-100"
-                    : "opacity-0 group-hover:opacity-100 group-focus-within:opacity-100"
+                    : "opacity-100 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100"
                 }`}
               >
                 <button
@@ -173,14 +173,14 @@ export default function TemplateList({
                     e.stopPropagation();
                     onTogglePin(tpl.id);
                   }}
-                  className={`rounded p-1.5 transition-colors ${
+                  className={`flex size-11 items-center justify-center rounded-md transition-colors active:scale-95 md:size-8 ${
                     selected
                       ? pinned
-                        ? "text-amber-300 hover:bg-white/10"
-                        : "text-zinc-300 hover:bg-white/10 hover:text-white"
+                        ? "text-amber-300 hover:bg-white/10 active:bg-white/20"
+                        : "text-zinc-300 hover:bg-white/10 hover:text-white active:bg-white/20"
                       : pinned
-                        ? "text-amber-600 hover:bg-amber-100"
-                        : "text-zinc-400 hover:bg-zinc-100 hover:text-zinc-800"
+                        ? "text-amber-600 hover:bg-amber-100 active:bg-amber-200"
+                        : "text-zinc-400 hover:bg-zinc-100 hover:text-zinc-800 active:bg-zinc-200"
                   }`}
                 >
                   <PinIcon filled={pinned} />
@@ -193,10 +193,10 @@ export default function TemplateList({
                     e.stopPropagation();
                     onEdit(tpl.id);
                   }}
-                  className={`rounded p-1.5 transition-colors ${
+                  className={`flex size-11 items-center justify-center rounded-md transition-colors active:scale-95 md:size-8 ${
                     selected
-                      ? "text-zinc-300 hover:bg-white/10 hover:text-white"
-                      : "text-zinc-400 hover:bg-zinc-100 hover:text-zinc-800"
+                      ? "text-zinc-300 hover:bg-white/10 hover:text-white active:bg-white/20"
+                      : "text-zinc-400 hover:bg-zinc-100 hover:text-zinc-800 active:bg-zinc-200"
                   }`}
                 >
                   <PencilIcon />
@@ -209,10 +209,10 @@ export default function TemplateList({
                     e.stopPropagation();
                     onDelete(tpl.id);
                   }}
-                  className={`rounded p-1.5 transition-colors ${
+                  className={`flex size-11 items-center justify-center rounded-md transition-colors active:scale-95 md:size-8 ${
                     selected
-                      ? "text-zinc-300 hover:bg-red-500/20 hover:text-red-300"
-                      : "text-zinc-400 hover:bg-red-50 hover:text-red-600"
+                      ? "text-zinc-300 hover:bg-red-500/20 hover:text-red-300 active:bg-red-500/30"
+                      : "text-zinc-400 hover:bg-red-50 hover:text-red-600 active:bg-red-100"
                   }`}
                 >
                   <TrashIcon />

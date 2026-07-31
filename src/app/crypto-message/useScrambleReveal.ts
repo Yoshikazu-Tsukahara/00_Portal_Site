@@ -10,7 +10,7 @@
 //   即座に確定済み扱いにしてリズムを損なわないようにする
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { REVEAL_SPEED_MS, type RevealSpeed } from "./types";
+import { FIXED_REVEAL_SPEED_MS } from "./types";
 
 const SCRAMBLE_POOL = "$%&#@!?*";
 
@@ -81,9 +81,9 @@ export function useScrambleReveal({
     pointerRef.current = 0;
   }, [stopTimers]);
 
-  /** 指定テキストの解読アニメーションを開始する */
+  /** 指定テキストの解読アニメーションを開始する（速度は固定） */
   const start = useCallback(
-    (target: string, speed: RevealSpeed) => {
+    (target: string) => {
       stopTimers();
       targetRef.current = target;
 
@@ -115,7 +115,7 @@ export function useScrambleReveal({
         );
       }, 30);
 
-      const speedMs = REVEAL_SPEED_MS[speed];
+      const speedMs = FIXED_REVEAL_SPEED_MS;
 
       const lockNext = () => {
         const idxList = revealIndicesRef.current;

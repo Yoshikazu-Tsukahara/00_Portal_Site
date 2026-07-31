@@ -123,16 +123,24 @@ export default function CaesarChallenge() {
                   type="button"
                   className="cm-share-btn cm-share-btn--line"
                   onClick={handleShareLine}
+                  aria-label={copy.shareLine}
+                  title={copy.shareLine}
                 >
-                  {copy.shareLine}
+                  <span className="sm:hidden">{copy.shareLineShort}</span>
+                  <span className="hidden sm:inline">{copy.shareLine}</span>
                 </button>
                 <button
                   type="button"
                   className="cm-share-btn cm-share-btn--x"
                   onClick={handleShareX}
+                  aria-label={copy.shareX}
+                  title={copy.shareX}
                 >
-                  {copy.shareX}
+                  <span className="sm:hidden">{copy.shareXShort}</span>
+                  <span className="hidden sm:inline">{copy.shareX}</span>
                 </button>
+              </div>
+              <div className="cm-share-followup">
                 <button
                   type="button"
                   className="cm-ghost-btn"

@@ -13,7 +13,7 @@ export default function DecodePanel() {
   const [sub, setSub] = useState<DecodeSubMode>("password");
 
   return (
-    <div className="cm-panel">
+    <div className="cm-panel min-w-0">
       <div className="cm-subtabs" role="tablist">
         <button
           type="button"
@@ -22,7 +22,8 @@ export default function DecodePanel() {
           className={`cm-subtab${sub === "password" ? " cm-subtab--active" : ""}`}
           onClick={() => setSub("password")}
         >
-          {copy.password}
+          <span className="sm:hidden">{copy.passwordShort}</span>
+          <span className="hidden sm:inline">{copy.password}</span>
         </button>
         <button
           type="button"
@@ -31,7 +32,8 @@ export default function DecodePanel() {
           className={`cm-subtab${sub === "caesar" ? " cm-subtab--active" : ""}`}
           onClick={() => setSub("caesar")}
         >
-          {copy.caesar}
+          <span className="sm:hidden">{copy.caesarShort}</span>
+          <span className="hidden sm:inline">{copy.caesar}</span>
         </button>
       </div>
 

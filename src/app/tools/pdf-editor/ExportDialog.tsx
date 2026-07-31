@@ -75,7 +75,7 @@ export default function ExportDialog({
 
   return createPortal(
     <div
-      className={`fixed inset-0 z-[100] flex items-center justify-center p-4 transition-opacity duration-200 ${
+      className={`fixed inset-0 z-[100] flex items-end justify-center p-0 transition-opacity duration-200 sm:items-center sm:p-4 ${
         visible ? "opacity-100" : "opacity-0"
       }`}
       role="dialog"
@@ -93,8 +93,10 @@ export default function ExportDialog({
       />
 
       <div
-        className={`relative w-full max-w-sm rounded-xl border border-zinc-200 bg-white shadow-2xl transition-all duration-200 ${
-          visible ? "scale-100 opacity-100" : "scale-[0.97] opacity-0"
+        className={`relative max-h-[90dvh] w-full max-w-sm overflow-y-auto rounded-t-2xl border border-zinc-200 bg-white shadow-2xl transition-all duration-200 sm:rounded-xl ${
+          visible
+            ? "translate-y-0 scale-100 opacity-100"
+            : "translate-y-2 scale-[0.97] opacity-0 sm:translate-y-0"
         }`}
       >
         <header className="flex items-center justify-between border-b border-zinc-200/80 px-4 py-3">
@@ -108,7 +110,7 @@ export default function ExportDialog({
             type="button"
             onClick={onClose}
             disabled={isExporting}
-            className="btn-secondary !px-2 !py-1 text-xs disabled:opacity-40"
+            className="btn-secondary min-h-11 !px-3 !py-2 text-xs active:scale-[0.98] disabled:opacity-40 sm:min-h-0 sm:!px-2 sm:!py-1"
           >
             {copy.close}
           </button>
@@ -164,7 +166,7 @@ export default function ExportDialog({
             type="button"
             onClick={onClose}
             disabled={isExporting}
-            className="btn-secondary !px-3 !py-1.5 text-xs disabled:opacity-40"
+            className="btn-secondary min-h-11 flex-1 !px-3 !py-2 text-xs active:scale-[0.98] disabled:opacity-40 sm:min-h-0 sm:flex-none sm:!py-1.5"
           >
             {copy.cancel}
           </button>
@@ -177,7 +179,7 @@ export default function ExportDialog({
                 userPassword,
               })
             }
-            className="btn-primary !px-3 !py-1.5 text-xs disabled:opacity-40"
+            className="btn-primary min-h-11 flex-1 !px-3 !py-2 text-xs active:scale-[0.98] disabled:opacity-40 sm:min-h-0 sm:flex-none sm:!py-1.5"
           >
             {confirmLabel}
           </button>

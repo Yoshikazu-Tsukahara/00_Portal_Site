@@ -49,7 +49,7 @@ export default function ImageGrid({
   }
 
   return (
-    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
+    <div className="grid min-w-0 grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
       {items.map((item) => {
         const reduction =
           item.estimatedSize !== null && item.status === "ready"
@@ -59,9 +59,9 @@ export default function ImageGrid({
         return (
           <div
             key={item.id}
-            className="group relative overflow-hidden rounded-lg border border-zinc-200/80 bg-white shadow-sm"
+            className="group relative min-w-0 overflow-hidden rounded-lg border border-zinc-200/80 bg-white shadow-sm"
           >
-            <div className="relative aspect-[4/3] bg-zinc-50">
+            <div className="relative aspect-[4/3] overflow-hidden bg-zinc-50">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={item.previewUrl}
@@ -74,12 +74,12 @@ export default function ImageGrid({
                 title={copy.delete}
                 aria-label={fmt(copy.deleteAria, { name: item.name })}
                 onClick={() => onRemove(item.id)}
-                className="absolute right-1 top-1 rounded bg-white/90 p-1 text-zinc-400 opacity-0 shadow-sm transition-opacity hover:bg-red-50 hover:text-red-600 group-hover:opacity-100"
+                className="absolute right-1 top-1 rounded bg-white/90 p-1.5 text-zinc-400 opacity-100 shadow-sm transition-opacity hover:bg-red-50 hover:text-red-600 active:bg-red-100 md:p-1 md:opacity-0 md:group-hover:opacity-100"
               >
                 <TrashIcon />
               </button>
             </div>
-            <div className="space-y-0.5 px-2 py-1.5">
+            <div className="min-w-0 space-y-0.5 px-2 py-1.5">
               <p className="truncate text-[11px] font-medium text-zinc-800">
                 {item.name}
               </p>

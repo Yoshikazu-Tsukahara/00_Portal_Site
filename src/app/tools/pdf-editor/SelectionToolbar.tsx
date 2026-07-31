@@ -29,7 +29,7 @@ export default function SelectionToolbar({
 
   return (
     <div
-      className="flex flex-wrap items-center gap-2 rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5"
+      className="flex min-w-0 flex-wrap items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2 py-1.5 sm:gap-2 sm:px-2.5"
       role="toolbar"
       aria-label={copy.aria}
     >
@@ -42,7 +42,7 @@ export default function SelectionToolbar({
           <button
             type="button"
             onClick={onCopy}
-            className="btn-secondary !px-2 !py-1 text-xs"
+            className="btn-secondary !px-2 !py-1.5 text-xs active:scale-[0.98] active:bg-zinc-100 sm:!py-1"
           >
             {copy.copy}
           </button>
@@ -50,9 +50,12 @@ export default function SelectionToolbar({
             <button
               type="button"
               onClick={onExtract}
-              className="btn-secondary !px-2 !py-1 text-xs"
+              className="btn-secondary !px-2 !py-1.5 text-xs active:scale-[0.98] active:bg-zinc-100 sm:!py-1"
             >
-              {fmt(copy.extract, { count: selectedCount })}
+              <span className="sm:hidden">{copy.extractShort}</span>
+              <span className="hidden sm:inline">
+                {fmt(copy.extract, { count: selectedCount })}
+              </span>
             </button>
           ) : null}
           {selectedCount >= 2 ? (
@@ -60,21 +63,21 @@ export default function SelectionToolbar({
               <button
                 type="button"
                 onClick={onRotate}
-                className="btn-secondary !px-2 !py-1 text-xs"
+                className="btn-secondary !px-2 !py-1.5 text-xs active:scale-[0.98] active:bg-zinc-100 sm:!py-1"
               >
                 {copy.rotate}
               </button>
               <button
                 type="button"
                 onClick={onDelete}
-                className="inline-flex items-center justify-center rounded-md border border-red-200 bg-white px-2 py-1 text-xs font-medium text-red-600 transition-colors hover:bg-red-50"
+                className="inline-flex items-center justify-center rounded-md border border-red-200 bg-white px-2 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-50 active:bg-red-100 sm:py-1"
               >
                 {copy.delete}
               </button>
               <button
                 type="button"
                 onClick={onClearSelection}
-                className="text-[11px] text-zinc-400 transition-colors hover:text-zinc-700"
+                className="min-h-11 px-1 text-[11px] text-zinc-400 transition-colors hover:text-zinc-700 active:text-zinc-800 sm:min-h-0"
               >
                 {copy.clearSelection}
               </button>
@@ -95,7 +98,7 @@ export default function SelectionToolbar({
           <button
             type="button"
             onClick={onClearClipboard}
-            className="ml-auto text-[11px] text-zinc-400 transition-colors hover:text-zinc-700"
+            className="ml-auto min-h-11 px-1 text-[11px] text-zinc-400 transition-colors hover:text-zinc-700 active:text-zinc-800 sm:min-h-0"
           >
             {copy.clearCopy}
           </button>

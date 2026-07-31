@@ -38,10 +38,10 @@ function VariableInputField({
   const showSuggestions = focused && suggestions.length > 0;
 
   return (
-    <div className="min-w-0">
+    <div className="min-w-0 max-w-full">
       <label
         htmlFor={`var-${item.key}`}
-        className="mb-1 flex items-baseline gap-1.5 text-[11px] text-zinc-500"
+        className="mb-1 flex min-w-0 items-baseline gap-1.5 text-[11px] text-zinc-500"
       >
         <span className="truncate font-medium text-zinc-600">{item.label}</span>
         <span className="shrink-0 font-mono text-[10px] text-zinc-300">
@@ -61,15 +61,15 @@ function VariableInputField({
           }, 120);
         }}
         placeholder={item.label}
-        className="input-field w-full !py-1.5 !text-sm"
+        className="input-field min-h-11 w-full max-w-full !py-2 !text-sm md:min-h-0 md:!py-1.5"
         autoComplete="off"
       />
       {showSuggestions ? (
-        <div className="mt-1.5 flex flex-wrap gap-1">
+        <div className="mt-1.5 flex max-w-full flex-wrap gap-1">
           {suggestions.map((s) => (
             <span
               key={s}
-              className="inline-flex max-w-full items-center overflow-hidden rounded-md border border-zinc-200 bg-zinc-50 text-[10px] text-zinc-600"
+              className="inline-flex max-w-full items-stretch overflow-hidden rounded-md border border-zinc-200 bg-zinc-50 text-[10px] text-zinc-600"
             >
               <button
                 type="button"
@@ -80,7 +80,7 @@ function VariableInputField({
                   onCommitHistory(item.key, s);
                   setFocused(false);
                 }}
-                className="max-w-[12rem] truncate px-2 py-0.5 transition-colors hover:bg-white hover:text-zinc-900"
+                className="min-h-11 max-w-[12rem] truncate px-2.5 py-1 transition-colors hover:bg-white hover:text-zinc-900 active:bg-zinc-100 md:min-h-0 md:py-0.5"
               >
                 {s}
               </button>
@@ -92,7 +92,7 @@ function VariableInputField({
                   e.preventDefault();
                   onRemoveHistoryItem(item.key, s);
                 }}
-                className="shrink-0 border-l border-zinc-200 px-1.5 py-0.5 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-red-600"
+                className="flex min-h-11 min-w-11 shrink-0 items-center justify-center border-l border-zinc-200 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-red-600 active:bg-red-50 active:text-red-600 md:min-h-0 md:min-w-0 md:px-1.5 md:py-0.5"
               >
                 ×
               </button>
@@ -104,7 +104,7 @@ function VariableInputField({
   );
 }
 
-/** 有効変数のみ・2列グリッド入力（履歴サジェスト付き） */
+/** 有効変数のみ・モバイルは1列、sm以上で2列グリッド入力（履歴サジェスト付き） */
 export default function VariableForm({
   variables,
   values,
@@ -123,7 +123,7 @@ export default function VariableForm({
 
   if (variables.length === 0) {
     return (
-      <p className="text-xs text-zinc-400">
+      <p className="break-words text-xs text-zinc-400">
         {mt.variables.empty}
       </p>
     );
@@ -138,7 +138,7 @@ export default function VariableForm({
   }
 
   return (
-    <div className="space-y-2">
+    <div className="w-full max-w-full space-y-2">
       <p className="text-[11px] font-medium text-zinc-500">
         {mt.variables.heading}
       </p>

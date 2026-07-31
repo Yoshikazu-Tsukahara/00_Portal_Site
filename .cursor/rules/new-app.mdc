@@ -45,6 +45,8 @@ src/app/tools/my-tool/
 - バックアップ: `dataManager` prop
 - インストール: `afterDataManager` prop
 - 幅: `contentClassName`（`wide` prop は使わない）
+- スマホ: モバイルファースト（`.cursor/rules/ui-ux.mdc` / skill `mobile-responsive`）
+- 対応完了後: `tools.ts` に `isMobileSupported: true`
 
 ## 6. 完了確認
 

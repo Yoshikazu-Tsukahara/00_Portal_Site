@@ -25,8 +25,8 @@ export default function CryptoMessagePage() {
       isPwa
       afterDataManager={<InstallAppButton copy={copy.install} />}
     >
-      <div className="cm-root">
-        <div className="cm-console">
+      <div className="cm-root min-w-0 w-full max-w-full overflow-x-hidden">
+        <div className="cm-console min-w-0">
           <div className="cm-mode-tabs" role="tablist">
             <button
               type="button"
@@ -37,7 +37,8 @@ export default function CryptoMessagePage() {
               }`}
               onClick={() => setMode("create")}
             >
-              {copy.modes.create}
+              <span className="sm:hidden">{copy.modes.createShort}</span>
+              <span className="hidden sm:inline">{copy.modes.create}</span>
             </button>
             <button
               type="button"
@@ -48,16 +49,17 @@ export default function CryptoMessagePage() {
               }`}
               onClick={() => setMode("decode")}
             >
-              {copy.modes.decode}
+              <span className="sm:hidden">{copy.modes.decodeShort}</span>
+              <span className="hidden sm:inline">{copy.modes.decode}</span>
             </button>
           </div>
 
-          <div className="cm-console__body">
+          <div className="cm-console__body min-w-0">
             {mode === "create" ? <CreatePanel /> : <DecodePanel />}
           </div>
         </div>
 
-        <p className="cm-privacy-note">{copy.privacyNote}</p>
+        <p className="cm-privacy-note break-words px-1">{copy.privacyNote}</p>
       </div>
     </AppShell>
   );
