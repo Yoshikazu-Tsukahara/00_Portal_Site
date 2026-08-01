@@ -19,6 +19,7 @@ import {
   clampMultiline,
   clampNonNegative,
   clampText,
+  documentTypeShowsDueDate,
   type CurrencyCode,
   type DocLocale,
   type DocumentType,
@@ -115,7 +116,7 @@ function Section({
   );
 }
 
-/** 発行者／請求先の共通入力 */
+/** 発行者／宛先の共通入力 */
 function PartyFields({
   party,
   which,
@@ -256,6 +257,16 @@ export default function InvoiceForm({
     { value: "receipt", label: copy.settings.typeReceipt },
   ];
   const totals = computeTotals(data);
+  const numberLabel = copy.basics.byDocumentType.number[data.documentType];
+  const dueDateLabel = copy.basics.byDocumentType.dueDate[data.documentType];
+  const issueDateLabel = copy.basics.byDocumentType.issueDate[data.documentType];
+  const showDueDate = documentTypeShowsDueDate(data.documentType);
+  const paymentHeading = copy.payment.headingByType[data.documentType];
+  const paymentHint = copy.payment.hintByType[data.documentType];
+  const paymentPlaceholder = copy.payment.placeholderByType[data.documentType];
+  const toHeading = copy.to.headingByType[data.documentType];
+  const toNamePlaceholder = copy.to.namePlaceholderByType[data.documentType];
+  const fromHeading = copy.from.headingByType[data.documentType];
 
   return (
     <div className="inv-panel">
@@ -264,7 +275,7 @@ export default function InvoiceForm({
         <div className="min-w-0 space-y-0">
           <Section title={copy.basics.heading}>
             <div className="space-y-2.5">
-              <Field label={copy.basics.invoiceNumber}>
+              <Field label={numberLabel}>
                 <input
                   type="text"
                   value={data.invoiceNumber}
@@ -281,8 +292,14 @@ export default function InvoiceForm({
                   className="inv-input"
                 />
               </Field>
-              <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-                <Field label={copy.basics.issueDate}>
+              <div
+                className={
+                  showDueDate
+                    ? "grid grid-cols-1 gap-2.5 sm:grid-cols-2"
+                    : "grid grid-cols-1 gap-2.5"
+                }
+              >
+                <Field label={issueDateLabel}>
                   <input
                     type="date"
                     value={data.issueDate}
@@ -290,19 +307,21 @@ export default function InvoiceForm({
                     className="inv-input"
                   />
                 </Field>
-                <Field label={copy.basics.dueDate}>
-                  <input
-                    type="date"
-                    value={data.dueDate}
-                    onChange={(e) => onPatch({ dueDate: e.target.value })}
-                    className="inv-input"
-                  />
-                </Field>
+                {showDueDate && dueDateLabel ? (
+                  <Field label={dueDateLabel}>
+                    <input
+                      type="date"
+                      value={data.dueDate}
+                      onChange={(e) => onPatch({ dueDate: e.target.value })}
+                      className="inv-input"
+                    />
+                  </Field>
+                ) : null}
               </div>
             </div>
           </Section>
 
-          <Section title={copy.from.heading} hint={copy.from.hint}>
+          <Section title={fromHeading} hint={copy.from.hint}>
             <PartyFields
               party={data.from}
               which="from"
@@ -313,12 +332,17 @@ export default function InvoiceForm({
             />
           </Section>
 
-          <Section title={copy.to.heading}>
+          <Section title={toHeading}>
             <PartyFields
               party={data.to}
               which="to"
               copy={copy}
-              placeholders={copy.to}
+              placeholders={{
+                namePlaceholder: toNamePlaceholder,
+                addressPlaceholder: copy.to.addressPlaceholder,
+                emailPlaceholder: copy.to.emailPlaceholder,
+                extraPlaceholder: copy.to.extraPlaceholder,
+              }}
               onPatchParty={onPatchParty}
             />
           </Section>
@@ -652,7 +676,7 @@ export default function InvoiceForm({
             </div>
           </Section>
 
-          <Section title={copy.payment.heading} hint={copy.payment.hint}>
+          <Section title={paymentHeading} hint={paymentHint}>
             <textarea
               value={data.paymentMethod}
               onChange={(e) =>
@@ -665,7 +689,7 @@ export default function InvoiceForm({
                 })
               }
               maxLength={FIELD_LIMITS.paymentMethod}
-              placeholder={copy.payment.placeholder}
+              placeholder={paymentPlaceholder}
               rows={3}
               className="inv-input resize-y"
             />

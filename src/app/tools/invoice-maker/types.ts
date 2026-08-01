@@ -15,6 +15,11 @@ export const DOCUMENT_TYPES: readonly DocumentType[] = [
   "receipt",
 ] as const;
 
+/** 支払期日／有効期限欄を出す書類タイプか（納品書・領収書は不要） */
+export function documentTypeShowsDueDate(type: DocumentType): boolean {
+  return type === "invoice" || type === "estimate";
+}
+
 export type CurrencyCode = "JPY" | "USD" | "EUR";
 
 /** 発行者・請求先の共通項目 */

@@ -1,6 +1,29 @@
-import type { Locale } from "../types";
+import type { DocumentType } from "@/app/tools/invoice-maker/types";
 import type { PwaInstallCopy } from "@/lib/pwa/installCopy";
+import type { Locale } from "../types";
 import type { AppShellCopy } from "./otherApps";
+
+/** 書類タイプに応じて切り替わる UI／帳票ラベル */
+export type DocumentTypeFieldLabels = {
+  /** 番号欄（請求書番号・見積書番号など） */
+  number: Record<DocumentType, string>;
+  /**
+   * 期日欄。納品書・領収書は null（フォーム／プレビューとも非表示）
+   */
+  dueDate: Record<DocumentType, string | null>;
+  /** 発行日／納品日／領収日 */
+  issueDate: Record<DocumentType, string>;
+  /** 宛先（請求先・見積先・納品先・宛名） */
+  to: Record<DocumentType, string>;
+  /** 発行者／領収者 */
+  from: Record<DocumentType, string>;
+  /** 強調金額ラベル（ご請求金額・お見積金額など） */
+  amountDue: Record<DocumentType, string>;
+  /** 支払方法／支払条件／受領方法の見出し */
+  paymentMethod: Record<DocumentType, string>;
+  /** フッターの定型お礼文 */
+  thanks: Record<DocumentType, string>;
+};
 
 /** アプリ側 UI の文言 */
 export type InvoiceMakerDict = {
@@ -72,13 +95,16 @@ export type InvoiceMakerDict = {
   };
   basics: {
     heading: string;
-    invoiceNumber: string;
     invoiceNumberPlaceholder: string;
-    issueDate: string;
-    dueDate: string;
+    /** 書類タイプごとの番号・期日・発行日ラベル */
+    byDocumentType: Pick<
+      DocumentTypeFieldLabels,
+      "number" | "dueDate" | "issueDate"
+    >;
   };
   from: {
-    heading: string;
+    /** 書類タイプごとの発行者見出し */
+    headingByType: Record<DocumentType, string>;
     hint: string;
     namePlaceholder: string;
     addressPlaceholder: string;
@@ -86,8 +112,9 @@ export type InvoiceMakerDict = {
     extraPlaceholder: string;
   };
   to: {
-    heading: string;
-    namePlaceholder: string;
+    /** 書類タイプごとの宛先見出し */
+    headingByType: DocumentTypeFieldLabels["to"];
+    namePlaceholderByType: Record<DocumentType, string>;
     addressPlaceholder: string;
     emailPlaceholder: string;
     extraPlaceholder: string;
@@ -116,9 +143,10 @@ export type InvoiceMakerDict = {
     subtotalLabel: string;
   };
   payment: {
-    heading: string;
-    hint: string;
-    placeholder: string;
+    /** 書類タイプごとの見出し（支払方法／支払条件／受領方法） */
+    headingByType: DocumentTypeFieldLabels["paymentMethod"];
+    hintByType: Record<DocumentType, string>;
+    placeholderByType: Record<DocumentType, string>;
   };
   notes: {
     heading: string;
@@ -142,15 +170,15 @@ export const invoiceMakerJa: InvoiceMakerDict = {
   },
   loading: "読込中…",
   actions: {
-    newInvoice: "新しい請求書",
+    newInvoice: "新しい帳票",
     newInvoiceShort: "新規",
     newInvoiceConfirm:
-      "請求先・品目・請求書番号をリセットします（あなたの情報と支払方法は残ります）。よろしいですか？",
+      "宛先・品目・番号をリセットします（あなたの情報と支払／受領方法は残ります）。よろしいですか？",
   },
   toolbar: {
-    save: "💾 現在の請求書を保存",
+    save: "💾 現在の帳票を保存",
     saveShort: "💾 保存",
-    load: "📂 過去の請求書を呼び出す",
+    load: "📂 過去の帳票を呼び出す",
     loadShort: "📂 呼出",
     preview: "プレビュー確認",
     previewShort: "確認",
@@ -158,15 +186,15 @@ export const invoiceMakerJa: InvoiceMakerDict = {
     printShort: "📄 PDF",
   },
   history: {
-    saveTitle: "請求書を保存",
+    saveTitle: "帳票を保存",
     saveLead: "登録名を付けてブラウザ内に保存します（サーバーには送りません）。",
     nameLabel: "登録名",
     namePlaceholder: "2026年8月度_株式会社〇〇様",
     confirmSave: "保存する",
     savedToast: "保存しました",
-    loadTitle: "過去の請求書",
+    loadTitle: "過去の帳票",
     loadLead: "選ぶと現在の入力内容に上書きされます。",
-    empty: "保存済みの請求書はまだありません。",
+    empty: "保存済みの帳票はまだありません。",
     sampleName: "📄 【サンプル】Webサイト制作費請求書（デモ）",
     sampleBadge: "デモ",
     loadAction: "呼び出す",
@@ -179,12 +207,12 @@ export const invoiceMakerJa: InvoiceMakerDict = {
   settings: {
     heading: "書類の設定",
     documentType: "書類の種類",
-    documentTypeHint: "プレビューのタイトルが切り替わります",
+    documentTypeHint: "タイトルや宛先・金額などの見出しが切り替わります",
     typeInvoice: "請求書",
     typeEstimate: "見積書",
     typeDeliveryNote: "納品書",
     typeReceipt: "領収書",
-    docLanguage: "請求書の言語",
+    docLanguage: "書類の言語",
     docLanguageHint: "プレビューに印字される見出しの言語です",
     localeJa: "日本語",
     localeEn: "English",
@@ -206,13 +234,35 @@ export const invoiceMakerJa: InvoiceMakerDict = {
   },
   basics: {
     heading: "基本情報",
-    invoiceNumber: "請求書番号",
     invoiceNumberPlaceholder: "INV-20260801-01",
-    issueDate: "発行日",
-    dueDate: "支払期日",
+    byDocumentType: {
+      number: {
+        invoice: "請求書番号",
+        estimate: "見積書番号",
+        deliveryNote: "納品書番号",
+        receipt: "領収書番号",
+      },
+      dueDate: {
+        invoice: "支払期日",
+        estimate: "有効期限",
+        deliveryNote: null,
+        receipt: null,
+      },
+      issueDate: {
+        invoice: "発行日",
+        estimate: "発行日",
+        deliveryNote: "納品日",
+        receipt: "領収日",
+      },
+    },
   },
   from: {
-    heading: "あなたの情報（発行者）",
+    headingByType: {
+      invoice: "あなたの情報（発行者）",
+      estimate: "あなたの情報（発行者）",
+      deliveryNote: "あなたの情報（発行者）",
+      receipt: "あなたの情報（領収者）",
+    },
     hint: "この内容は自動でブラウザに保存され、次回そのまま使えます。",
     namePlaceholder: "山田 太郎 / 屋号・社名",
     addressPlaceholder: "〒000-0000\n東京都◯◯区◯◯ 1-2-3",
@@ -220,8 +270,18 @@ export const invoiceMakerJa: InvoiceMakerDict = {
     extraPlaceholder: "TEL 090-0000-0000",
   },
   to: {
-    heading: "請求先",
-    namePlaceholder: "株式会社◯◯ 御中",
+    headingByType: {
+      invoice: "請求先",
+      estimate: "見積先",
+      deliveryNote: "納品先",
+      receipt: "宛名",
+    },
+    namePlaceholderByType: {
+      invoice: "株式会社◯◯ 御中",
+      estimate: "株式会社◯◯ 御中",
+      deliveryNote: "株式会社◯◯ 御中",
+      receipt: "株式会社◯◯ 様",
+    },
     addressPlaceholder: "〒000-0000\n東京都◯◯区◯◯ 4-5-6",
     emailPlaceholder: "billing@example.com",
     extraPlaceholder: "担当者名・部署など",
@@ -249,15 +309,31 @@ export const invoiceMakerJa: InvoiceMakerDict = {
     subtotalLabel: "小計（税抜）",
   },
   payment: {
-    heading: "支払方法",
-    hint: "銀行口座や Stripe / PayPal の決済URLをそのまま書けます。",
-    placeholder:
-      "◯◯銀行 ◯◯支店 普通 1234567（ヤマダ タロウ）\nまたは https://buy.stripe.com/xxxx",
+    headingByType: {
+      invoice: "支払方法",
+      estimate: "支払条件",
+      deliveryNote: "支払条件",
+      receipt: "受領方法",
+    },
+    hintByType: {
+      invoice:
+        "銀行口座や Stripe / PayPal の決済URLをそのまま書けます。",
+      estimate: "振込・月末締めなど、見積時点の支払条件を書けます。",
+      deliveryNote: "支払条件があれば任意で書けます（未入力なら帳票に出ません）。",
+      receipt: "現金・クレジットカード・振込など、受け取った方法を書けます。",
+    },
+    placeholderByType: {
+      invoice:
+        "◯◯銀行 ◯◯支店 普通 1234567（ヤマダ タロウ）\nまたは https://buy.stripe.com/xxxx",
+      estimate: "お振込：納品後◯日以内\nクレジットカード可",
+      deliveryNote: "請求書に記載のお支払条件に準じます",
+      receipt: "現金\nクレジットカード（一括）\n銀行振込",
+    },
   },
   notes: {
     heading: "備考 / 特記事項",
     placeholder:
-      "Thank you for your business!\n※振込手数料はお客様にてご負担をお願いいたします。",
+      "ご不明点があればお気軽にご連絡ください。\n※振込手数料はお客様にてご負担をお願いいたします。",
   },
   preview: {
     modalTitle: "プレビュー確認",
@@ -300,15 +376,15 @@ export const invoiceMakerEn: InvoiceMakerDict = {
   },
   loading: "Loading…",
   actions: {
-    newInvoice: "New invoice",
+    newInvoice: "New document",
     newInvoiceShort: "New",
     newInvoiceConfirm:
-      "This resets the recipient, items, and invoice number (your own details and payment info stay). Continue?",
+      "This resets the recipient, items, and document number (your own details and payment info stay). Continue?",
   },
   toolbar: {
-    save: "💾 Save current invoice",
+    save: "💾 Save current document",
     saveShort: "💾 Save",
-    load: "📂 Load past invoice",
+    load: "📂 Load past document",
     loadShort: "📂 Load",
     preview: "Preview",
     previewShort: "Preview",
@@ -316,15 +392,15 @@ export const invoiceMakerEn: InvoiceMakerDict = {
     printShort: "📄 PDF",
   },
   history: {
-    saveTitle: "Save invoice",
+    saveTitle: "Save document",
     saveLead: "Name it and store it in your browser (nothing is sent to a server).",
     nameLabel: "Name",
     namePlaceholder: "Aug 2026 — Acme Inc.",
     confirmSave: "Save",
     savedToast: "Saved",
-    loadTitle: "Past invoices",
+    loadTitle: "Past documents",
     loadLead: "Selecting one replaces the current form.",
-    empty: "No saved invoices yet.",
+    empty: "No saved documents yet.",
     sampleName: "📄 [Sample] Website design invoice (demo)",
     sampleBadge: "Demo",
     loadAction: "Load",
@@ -337,12 +413,12 @@ export const invoiceMakerEn: InvoiceMakerDict = {
   settings: {
     heading: "Document settings",
     documentType: "Document Type",
-    documentTypeHint: "The preview title will change accordingly",
+    documentTypeHint: "Title, recipient, amount labels, and more will update",
     typeInvoice: "Invoice",
     typeEstimate: "Estimate",
     typeDeliveryNote: "Delivery Note",
     typeReceipt: "Receipt",
-    docLanguage: "Invoice language",
+    docLanguage: "Document language",
     docLanguageHint: "Language printed on the preview headings",
     localeJa: "日本語",
     localeEn: "English",
@@ -364,13 +440,35 @@ export const invoiceMakerEn: InvoiceMakerDict = {
   },
   basics: {
     heading: "Basics",
-    invoiceNumber: "Invoice number",
     invoiceNumberPlaceholder: "INV-20260801-01",
-    issueDate: "Issue date",
-    dueDate: "Due date",
+    byDocumentType: {
+      number: {
+        invoice: "Invoice #",
+        estimate: "Estimate #",
+        deliveryNote: "Delivery #",
+        receipt: "Receipt #",
+      },
+      dueDate: {
+        invoice: "Due Date",
+        estimate: "Valid Until",
+        deliveryNote: null,
+        receipt: null,
+      },
+      issueDate: {
+        invoice: "Issue Date",
+        estimate: "Issue Date",
+        deliveryNote: "Delivery Date",
+        receipt: "Receipt Date",
+      },
+    },
   },
   from: {
-    heading: "Your details (From)",
+    headingByType: {
+      invoice: "Your details (From)",
+      estimate: "Your details (From)",
+      deliveryNote: "Your details (From)",
+      receipt: "Your details (Issued by)",
+    },
     hint: "Saved in your browser automatically, ready for next time.",
     namePlaceholder: "Taro Yamada / Studio name",
     addressPlaceholder: "1-2-3 Somewhere\nTokyo 000-0000, Japan",
@@ -378,8 +476,18 @@ export const invoiceMakerEn: InvoiceMakerDict = {
     extraPlaceholder: "Tel +81 90-0000-0000",
   },
   to: {
-    heading: "Billed to",
-    namePlaceholder: "Acme Inc.",
+    headingByType: {
+      invoice: "Billed to",
+      estimate: "Estimate for",
+      deliveryNote: "Deliver to",
+      receipt: "Received from",
+    },
+    namePlaceholderByType: {
+      invoice: "Acme Inc.",
+      estimate: "Acme Inc.",
+      deliveryNote: "Acme Inc.",
+      receipt: "Acme Inc.",
+    },
     addressPlaceholder: "4-5-6 Elsewhere\nTokyo 000-0000, Japan",
     emailPlaceholder: "billing@example.com",
     extraPlaceholder: "Contact person, department, etc.",
@@ -407,15 +515,30 @@ export const invoiceMakerEn: InvoiceMakerDict = {
     subtotalLabel: "Subtotal (ex. tax)",
   },
   payment: {
-    heading: "Payment method",
-    hint: "Bank details, or a Stripe / PayPal checkout URL.",
-    placeholder:
-      "Bank of Example, Main Branch, 1234567 (TARO YAMADA)\nor https://buy.stripe.com/xxxx",
+    headingByType: {
+      invoice: "Payment Method",
+      estimate: "Payment Terms",
+      deliveryNote: "Payment Terms",
+      receipt: "Received via",
+    },
+    hintByType: {
+      invoice: "Bank details, or a Stripe / PayPal checkout URL.",
+      estimate: "Note payment terms at quote time (net 30, card, etc.).",
+      deliveryNote: "Optional payment terms (left blank if not needed).",
+      receipt: "How you received payment — cash, card, bank transfer, etc.",
+    },
+    placeholderByType: {
+      invoice:
+        "Bank of Example, Main Branch, 1234567 (TARO YAMADA)\nor https://buy.stripe.com/xxxx",
+      estimate: "Bank transfer within 14 days of delivery\nCards accepted",
+      deliveryNote: "Per terms stated on the invoice",
+      receipt: "Cash\nCredit card (one-time)\nBank transfer",
+    },
   },
   notes: {
     heading: "Notes / Terms",
     placeholder:
-      "Thank you for your business!\nPlease cover any bank transfer fees on your side.",
+      "Questions welcome — feel free to get in touch.\nPlease cover any bank transfer fees on your side.",
   },
   preview: {
     modalTitle: "Preview",
@@ -451,8 +574,8 @@ export const invoiceMakerEn: InvoiceMakerDict = {
 };
 
 /**
- * 請求書そのものに印字するラベル。
- * サイトの表示言語ではなく、ユーザーが選んだ「請求書の言語」で切り替える。
+ * 帳票そのものに印字するラベル。
+ * サイトの表示言語ではなく、ユーザーが選んだ「書類の言語」で切り替える。
  */
 export type InvoiceSheetLabels = {
   /** 書類タイプごとのタイトル */
@@ -464,11 +587,8 @@ export type InvoiceSheetLabels = {
   };
   /** 後方互換性のため title も残す（invoice と同じ） */
   title: string;
-  invoiceNumber: string;
-  issueDate: string;
-  dueDate: string;
-  from: string;
-  billedTo: string;
+  /** 書類タイプに応じて切り替わる印字ラベル一式 */
+  byDocumentType: DocumentTypeFieldLabels;
   /** 印字用：登録番号: T... */
   registrationNumber: string;
   itemName: string;
@@ -480,10 +600,7 @@ export type InvoiceSheetLabels = {
   /** 源泉徴収税ラベル */
   withholdingTax: string;
   total: string;
-  amountDue: string;
-  paymentMethod: string;
   notes: string;
-  thanks: string;
   /** 未入力時にプレビューへ薄く出すダミー文言 */
   placeholders: {
     partyName: string;
@@ -500,11 +617,56 @@ export const invoiceSheetLabels: Record<Locale, InvoiceSheetLabels> = {
       receipt: "領収書",
     },
     title: "請求書",
-    invoiceNumber: "請求書番号",
-    issueDate: "発行日",
-    dueDate: "支払期日",
-    from: "発行者",
-    billedTo: "請求先",
+    byDocumentType: {
+      number: {
+        invoice: "請求書番号",
+        estimate: "見積書番号",
+        deliveryNote: "納品書番号",
+        receipt: "領収書番号",
+      },
+      dueDate: {
+        invoice: "支払期日",
+        estimate: "有効期限",
+        deliveryNote: null,
+        receipt: null,
+      },
+      issueDate: {
+        invoice: "発行日",
+        estimate: "発行日",
+        deliveryNote: "納品日",
+        receipt: "領収日",
+      },
+      to: {
+        invoice: "請求先",
+        estimate: "見積先",
+        deliveryNote: "納品先",
+        receipt: "宛名",
+      },
+      from: {
+        invoice: "発行者",
+        estimate: "発行者",
+        deliveryNote: "発行者",
+        receipt: "領収者",
+      },
+      amountDue: {
+        invoice: "ご請求金額",
+        estimate: "お見積金額",
+        deliveryNote: "合計金額",
+        receipt: "領収金額",
+      },
+      paymentMethod: {
+        invoice: "支払方法",
+        estimate: "支払条件",
+        deliveryNote: "支払条件",
+        receipt: "受領方法",
+      },
+      thanks: {
+        invoice: "お取引いただきありがとうございます。",
+        estimate: "ご検討のほどよろしくお願いいたします。",
+        deliveryNote: "納品いたしました。ご確認のほどよろしくお願いいたします。",
+        receipt: "上記正に領収いたしました。",
+      },
+    },
     registrationNumber: "登録番号",
     itemName: "品目",
     unitPrice: "単価",
@@ -514,10 +676,7 @@ export const invoiceSheetLabels: Record<Locale, InvoiceSheetLabels> = {
     tax: "消費税",
     withholdingTax: "源泉徴収税",
     total: "合計",
-    amountDue: "ご請求金額",
-    paymentMethod: "お支払い方法",
     notes: "備考 / 特記事項",
-    thanks: "お取引いただきありがとうございます。",
     placeholders: {
       partyName: "（未入力）",
       itemName: "（品名未入力）",
@@ -531,11 +690,56 @@ export const invoiceSheetLabels: Record<Locale, InvoiceSheetLabels> = {
       receipt: "RECEIPT",
     },
     title: "INVOICE",
-    invoiceNumber: "Invoice No.",
-    issueDate: "Issue Date",
-    dueDate: "Due Date",
-    from: "From",
-    billedTo: "Billed To",
+    byDocumentType: {
+      number: {
+        invoice: "Invoice #",
+        estimate: "Estimate #",
+        deliveryNote: "Delivery #",
+        receipt: "Receipt #",
+      },
+      dueDate: {
+        invoice: "Due Date",
+        estimate: "Valid Until",
+        deliveryNote: null,
+        receipt: null,
+      },
+      issueDate: {
+        invoice: "Issue Date",
+        estimate: "Issue Date",
+        deliveryNote: "Delivery Date",
+        receipt: "Receipt Date",
+      },
+      to: {
+        invoice: "Billed To",
+        estimate: "Estimate For",
+        deliveryNote: "Deliver To",
+        receipt: "Received From",
+      },
+      from: {
+        invoice: "From",
+        estimate: "From",
+        deliveryNote: "From",
+        receipt: "Issued By",
+      },
+      amountDue: {
+        invoice: "Amount Due",
+        estimate: "Estimated Total",
+        deliveryNote: "Total Amount",
+        receipt: "Amount Received",
+      },
+      paymentMethod: {
+        invoice: "Payment Method",
+        estimate: "Payment Terms",
+        deliveryNote: "Payment Terms",
+        receipt: "Received via",
+      },
+      thanks: {
+        invoice: "Thank you for your business.",
+        estimate: "Thank you for considering this estimate.",
+        deliveryNote: "Delivered. Please confirm receipt.",
+        receipt: "Payment received with thanks.",
+      },
+    },
     registrationNumber: "Registration No.",
     itemName: "Description",
     unitPrice: "Unit Price",
@@ -545,10 +749,7 @@ export const invoiceSheetLabels: Record<Locale, InvoiceSheetLabels> = {
     tax: "Tax",
     withholdingTax: "Withholding Tax",
     total: "Total",
-    amountDue: "Amount Due",
-    paymentMethod: "Payment Method",
     notes: "Notes / Terms",
-    thanks: "Thank you for your business.",
     placeholders: {
       partyName: "(not set)",
       itemName: "(no description)",

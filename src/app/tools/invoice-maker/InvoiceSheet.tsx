@@ -10,7 +10,7 @@ import {
   itemAmount,
   printableItems,
 } from "./calc";
-import type { InvoiceData } from "./types";
+import { documentTypeShowsDueDate, type InvoiceData } from "./types";
 
 type InvoiceSheetProps = {
   data: InvoiceData;
@@ -44,14 +44,31 @@ export default function InvoiceSheet({ data, labels }: InvoiceSheetProps) {
   const notesText = data.notes.trim();
   const accentColor = data.accentColor || "#18181b";
   const documentTitle = labels.titles[data.documentType] || labels.title;
+  const fieldLabels = labels.byDocumentType;
+  const numberLabel = fieldLabels.number[data.documentType];
+  const dueDateLabel = fieldLabels.dueDate[data.documentType];
+  const issueDateLabel = fieldLabels.issueDate[data.documentType];
+  const toLabel = fieldLabels.to[data.documentType];
+  const fromLabel = fieldLabels.from[data.documentType];
+  const amountDueLabel = fieldLabels.amountDue[data.documentType];
+  const paymentMethodLabel = fieldLabels.paymentMethod[data.documentType];
+  const thanksLabel = fieldLabels.thanks[data.documentType];
+  const showDueDate = documentTypeShowsDueDate(data.documentType);
 
   const metaRows: { label: string; value: string }[] = [
-    { label: labels.invoiceNumber, value: data.invoiceNumber.trim() },
+    { label: numberLabel, value: data.invoiceNumber.trim() },
     {
-      label: labels.issueDate,
+      label: issueDateLabel,
       value: formatDocDate(data.issueDate, data.docLocale),
     },
-    { label: labels.dueDate, value: formatDocDate(data.dueDate, data.docLocale) },
+    ...(showDueDate && dueDateLabel
+      ? [
+          {
+            label: dueDateLabel,
+            value: formatDocDate(data.dueDate, data.docLocale),
+          },
+        ]
+      : []),
   ].filter((row) => row.value !== "");
 
   return (
@@ -102,7 +119,7 @@ export default function InvoiceSheet({ data, labels }: InvoiceSheetProps) {
         {/* 宛先と発行者 */}
         <section className="mt-10 grid grid-cols-2 gap-8">
           <div>
-            <p className="inv-sheet__caption">{labels.billedTo}</p>
+            <p className="inv-sheet__caption">{toLabel}</p>
             <p className="mt-1.5 break-words text-[15px] font-semibold text-zinc-900">
               {data.to.name.trim() || (
                 <span className="font-normal text-zinc-300 print:invisible">
@@ -119,7 +136,7 @@ export default function InvoiceSheet({ data, labels }: InvoiceSheetProps) {
             </div>
           </div>
           <div className="relative">
-            <p className="inv-sheet__caption">{labels.from}</p>
+            <p className="inv-sheet__caption">{fromLabel}</p>
             <div className="relative">
               <p className="mt-1.5 break-words text-[13px] font-semibold text-zinc-900">
                 {data.from.name.trim() || (
@@ -154,7 +171,7 @@ export default function InvoiceSheet({ data, labels }: InvoiceSheetProps) {
 
         {/* 請求金額（唯一の強調ブロック） */}
         <section className="inv-sheet__due">
-          <span className="inv-sheet__due-label">{labels.amountDue}</span>
+          <span className="inv-sheet__due-label">{amountDueLabel}</span>
           <span className="inv-sheet__due-value">{money(totals.total)}</span>
         </section>
 
@@ -233,7 +250,7 @@ export default function InvoiceSheet({ data, labels }: InvoiceSheetProps) {
           <section className="inv-sheet__footer-blocks">
             {paymentText ? (
               <div className="inv-sheet__pay-box">
-                <p className="inv-sheet__caption">{labels.paymentMethod}</p>
+                <p className="inv-sheet__caption">{paymentMethodLabel}</p>
                 <p className="inv-sheet__pay-box-body">{paymentText}</p>
               </div>
             ) : null}
@@ -247,7 +264,7 @@ export default function InvoiceSheet({ data, labels }: InvoiceSheetProps) {
         ) : null}
 
         <footer className="mt-auto pt-10 text-center text-[10px] text-zinc-400">
-          {labels.thanks}
+          {thanksLabel}
         </footer>
       </div>
     </article>
