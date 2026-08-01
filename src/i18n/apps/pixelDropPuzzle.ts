@@ -5,6 +5,7 @@ export type PixelDropPuzzleDict = {
   install: {
     button: string;
     buttonShort: string;
+    buttonTiny: string;
     buttonAria: string;
     modalTitle: string;
     modalLead: string;
@@ -141,7 +142,8 @@ export const pixelDropPuzzleJa: PixelDropPuzzleDict = {
   },
   install: {
     button: "📱 ホーム画面に追加",
-    buttonShort: "追加",
+    buttonShort: "ホームに追加",
+    buttonTiny: "追加",
     buttonAria: "ホーム画面に追加",
     modalTitle: "ホーム画面に追加",
     modalLead: "アプリのように独立した画面で、隙間に人生を捧げましょう。",
@@ -269,7 +271,8 @@ export const pixelDropPuzzleEn: PixelDropPuzzleDict = {
   },
   install: {
     button: "📱 Add to Home Screen",
-    buttonShort: "Add",
+    buttonShort: "Add to Home",
+    buttonTiny: "Add",
     buttonAria: "Add to Home Screen",
     modalTitle: "Add to Home Screen",
     modalLead: "Devote your life to the gap in its own dedicated window.",

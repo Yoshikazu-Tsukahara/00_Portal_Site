@@ -1,9 +1,10 @@
 /* ひみつメッセージ専用 Service Worker（scope: /crypto-message） */
-const CACHE_NAME = "crypto-message-v1";
+const CACHE_NAME = "crypto-message-v2";
 const PRECACHE = [
   "/crypto-message",
   "/crypto-message/manifest.webmanifest",
-  "/icons/crypto-message.svg",
+  "/icons/crypto-message-192.png",
+  "/icons/crypto-message-512.png",
 ];
 
 self.addEventListener("install", (event) => {

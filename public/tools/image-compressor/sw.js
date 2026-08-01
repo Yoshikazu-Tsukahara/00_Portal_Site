@@ -1,9 +1,10 @@
 /* 画像一括軽量化専用 Service Worker（scope: /tools/image-compressor） */
-const CACHE_NAME = "image-compressor-v1";
+const CACHE_NAME = "image-compressor-v2";
 const PRECACHE = [
   "/tools/image-compressor",
   "/tools/image-compressor/manifest.webmanifest",
-  "/icons/image-compressor.svg",
+  "/icons/image-compressor-192.png",
+  "/icons/image-compressor-512.png",
 ];
 
 self.addEventListener("install", (event) => {

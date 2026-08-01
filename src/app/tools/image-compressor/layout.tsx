@@ -17,8 +17,25 @@ export const metadata: Metadata = {
   },
   manifest: IMAGE_COMPRESSOR_MANIFEST_PATH,
   icons: {
-    icon: [{ url: "/icons/image-compressor.svg", type: "image/svg+xml" }],
-    apple: [{ url: "/icons/image-compressor.svg" }],
+    icon: [
+      {
+        url: "/icons/image-compressor-192.png",
+        sizes: "192x192",
+        type: "image/png",
+      },
+      {
+        url: "/icons/image-compressor-512.png",
+        sizes: "512x512",
+        type: "image/png",
+      },
+    ],
+    apple: [
+      {
+        url: "/icons/image-compressor-192.png",
+        sizes: "192x192",
+        type: "image/png",
+      },
+    ],
   },
   other: {
     "mobile-web-app-capable": "yes",

@@ -1,11 +1,15 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import LayoutToggle from "@/components/LayoutToggle";
 import { LanguageToggle, useI18n } from "@/i18n";
 import { useLayout } from "@/lib/layout";
 
 /** Stripe Checkout（開発者支援） */
 const SUPPORT_URL = "https://buy.stripe.com/bJebIU2u3gi6gQP22bgbm01";
+
+/** fillViewport 用。実測したサイト Header 高さを CSS 変数へ反映する */
+const SITE_HEADER_HEIGHT_VAR = "--site-header-height";
 
 /**
  * サイト共通ヘッダー。
@@ -16,9 +20,35 @@ const SUPPORT_URL = "https://buy.stripe.com/bJebIU2u3gi6gQP22bgbm01";
 export default function Header() {
   const { t, locale } = useI18n();
   const { contentClassName } = useLayout();
+  const headerRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+
+    const syncHeight = () => {
+      const h = el.getBoundingClientRect().height;
+      document.documentElement.style.setProperty(
+        SITE_HEADER_HEIGHT_VAR,
+        `${Math.ceil(h)}px`,
+      );
+    };
+
+    syncHeight();
+    const ro = new ResizeObserver(syncHeight);
+    ro.observe(el);
+    window.addEventListener("resize", syncHeight);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", syncHeight);
+    };
+  }, []);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-zinc-200/80 bg-zinc-50/80 backdrop-blur-md">
+    <header
+      ref={headerRef}
+      className="sticky top-0 z-50 w-full border-b border-zinc-200/80 bg-zinc-50/80 backdrop-blur-md"
+    >
       <div className="relative">
         {/* ロゴと右端操作：Main / Footer と同じコンテンツ幅で動く */}
         <div

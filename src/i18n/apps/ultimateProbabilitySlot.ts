@@ -5,6 +5,7 @@ export type UltimateProbabilitySlotDict = {
   install: {
     button: string;
     buttonShort: string;
+    buttonTiny: string;
     buttonAria: string;
     modalTitle: string;
     modalLead: string;
@@ -152,6 +153,7 @@ export const ultimateProbabilitySlotJa: UltimateProbabilitySlotDict = {
   install: {
     button: "📱 アプリをホーム画面に追加",
     buttonShort: "ホームに追加",
+    buttonTiny: "追加",
     buttonAria: "アプリをホーム画面に追加",
     modalTitle: "ホーム画面に追加",
     modalLead: "共有メニューからホーム画面に追加できます。",
@@ -346,6 +348,7 @@ export const ultimateProbabilitySlotEn: UltimateProbabilitySlotDict = {
   install: {
     button: "📱 Add to Home Screen",
     buttonShort: "Add to Home",
+    buttonTiny: "Add",
     buttonAria: "Add this app to your home screen",
     modalTitle: "Add to Home Screen",
     modalLead: "Add this app from the share menu.",

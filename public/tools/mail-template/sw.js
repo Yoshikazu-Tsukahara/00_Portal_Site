@@ -1,9 +1,10 @@
 /* メールテンプレ専用 Service Worker（scope: /tools/mail-template） */
-const CACHE_NAME = "mail-template-v1";
+const CACHE_NAME = "mail-template-v2";
 const PRECACHE = [
   "/tools/mail-template",
   "/tools/mail-template/manifest.webmanifest",
-  "/icons/mail-template.svg",
+  "/icons/mail-template-192.png",
+  "/icons/mail-template-512.png",
 ];
 
 self.addEventListener("install", (event) => {

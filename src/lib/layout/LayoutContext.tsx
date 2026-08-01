@@ -11,6 +11,7 @@ import {
 } from "react";
 import {
   DEFAULT_LAYOUT_MODE,
+  LAYOUT_MODE_DATASET_ATTR,
   LAYOUT_MODE_STORAGE_KEY,
   isLayoutMode,
   layoutContentClass,
@@ -25,36 +26,58 @@ type LayoutContextValue = {
    * 外側の背景はフル幅のままにし、コンテンツ幅だけ揃える。
    */
   contentClassName: string;
-  /** localStorage から読み込み済みか（SSR 直後のちらつき対策） */
+  /** localStorage / DOM と同期済みか（トグルのスライド演出抑制用） */
   ready: boolean;
 };
 
 const LayoutContext = createContext<LayoutContextValue | null>(null);
 
+/** Provider が再マウントされても、直前の選択を useEffect 待ちで失わない */
+let memoryLayoutMode: LayoutMode | null = null;
+
+function readLayoutMode(): LayoutMode {
+  if (typeof window === "undefined") return DEFAULT_LAYOUT_MODE;
+  try {
+    const fromDom = document.documentElement.dataset[LAYOUT_MODE_DATASET_ATTR];
+    if (isLayoutMode(fromDom)) return fromDom;
+    const raw = window.localStorage.getItem(LAYOUT_MODE_STORAGE_KEY);
+    if (isLayoutMode(raw)) return raw;
+  } catch {
+    // private mode など
+  }
+  return DEFAULT_LAYOUT_MODE;
+}
+
+function applyLayoutModeToDom(mode: LayoutMode) {
+  if (typeof document === "undefined") return;
+  document.documentElement.dataset[LAYOUT_MODE_DATASET_ATTR] = mode;
+}
+
 /**
  * サイト全体の表示幅（default / wide / full）を共有する。
- * 選択値は localStorage に保存し、リロード後も維持する。
+ * 選択値は localStorage と html[data-layout-mode] に保存し、リロード・遷移後も維持する。
  */
 export function LayoutProvider({ children }: { children: ReactNode }) {
-  const [layoutMode, setLayoutModeState] = useState<LayoutMode>(
-    DEFAULT_LAYOUT_MODE,
-  );
+  const [layoutMode, setLayoutModeState] = useState<LayoutMode>(() => {
+    if (memoryLayoutMode) return memoryLayoutMode;
+    const mode = readLayoutMode();
+    memoryLayoutMode = mode;
+    return mode;
+  });
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    try {
-      const raw = window.localStorage.getItem(LAYOUT_MODE_STORAGE_KEY);
-      if (isLayoutMode(raw)) {
-        setLayoutModeState(raw);
-      }
-    } catch {
-      // private mode などでは保存できないだけなので無視
-    }
+    const mode = readLayoutMode();
+    memoryLayoutMode = mode;
+    setLayoutModeState(mode);
+    applyLayoutModeToDom(mode);
     setReady(true);
   }, []);
 
   const setLayoutMode = useCallback((mode: LayoutMode) => {
+    memoryLayoutMode = mode;
     setLayoutModeState(mode);
+    applyLayoutModeToDom(mode);
     try {
       window.localStorage.setItem(LAYOUT_MODE_STORAGE_KEY, mode);
     } catch {

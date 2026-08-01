@@ -49,15 +49,15 @@ export default function InstallAppButton({
         type="button"
         onClick={() => void handleClick()}
         disabled={busy}
-        className="inline-flex items-center gap-1 rounded-full border border-zinc-300 px-2.5 py-1 text-[11px] font-medium text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-800 disabled:opacity-50"
+        className="lunch-install-btn !px-2.5 !py-1 !text-[11px] active:scale-[0.98] sm:!px-3 sm:!py-1 sm:!text-xs"
         aria-label={copy.buttonAria}
         title={copy.button}
       >
         <span aria-hidden className="text-[12px] leading-none sm:text-[13px]">
           📱
         </span>
-        <span className="sm:hidden">{copy.buttonShort}</span>
-        <span className="hidden sm:inline">{copy.button.replace(/^📱\s*/, "")}</span>
+        <span className="hidden sm:inline">{copy.buttonShort}</span>
+        <span className="sm:hidden">{copy.buttonTiny}</span>
       </button>
 
       <InstallGuideModal

@@ -96,6 +96,7 @@ export type LunchSavingsDict = {
   install: {
     button: string;
     buttonShort: string;
+    buttonTiny: string;
     buttonAria: string;
     modalTitle: string;
     modalLead: string;
@@ -207,6 +208,7 @@ export const lunchSavingsJa: LunchSavingsDict = {
   install: {
     button: "このアプリをホーム画面に追加",
     buttonShort: "ホームに追加",
+    buttonTiny: "追加",
     buttonAria: "ランチ貯金をホーム画面に追加してアプリとして使う",
     modalTitle: "ホーム画面に追加",
     modalLead:
@@ -322,6 +324,7 @@ export const lunchSavingsEn: LunchSavingsDict = {
   install: {
     button: "Add this app to Home Screen",
     buttonShort: "Add to Home",
+    buttonTiny: "Add",
     buttonAria: "Add Lunch Savings to your home screen as a standalone app",
     modalTitle: "Add to Home Screen",
     modalLead:

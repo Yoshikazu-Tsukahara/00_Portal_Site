@@ -18,8 +18,25 @@ export const metadata: Metadata = {
   /** 共通ポータル manifest ではなく、本アプリ専用を明示参照 */
   manifest: PIXEL_DROP_PUZZLE_MANIFEST_PATH,
   icons: {
-    icon: [{ url: "/icons/pixel-drop-puzzle.svg", type: "image/svg+xml" }],
-    apple: [{ url: "/icons/pixel-drop-puzzle.svg" }],
+    icon: [
+      {
+        url: "/icons/pixel-drop-puzzle-192.png",
+        sizes: "192x192",
+        type: "image/png",
+      },
+      {
+        url: "/icons/pixel-drop-puzzle-512.png",
+        sizes: "512x512",
+        type: "image/png",
+      },
+    ],
+    apple: [
+      {
+        url: "/icons/pixel-drop-puzzle-192.png",
+        sizes: "192x192",
+        type: "image/png",
+      },
+    ],
   },
   other: {
     "mobile-web-app-capable": "yes",

@@ -13,6 +13,8 @@
   --card: #ffffff;
   --primary: #09090b; /* zinc-950 */
   --primary-foreground: #fafafa; /* zinc-50 */
+  /* AppShell fillViewport 用。Header が実測値で上書きする */
+  --site-header-height: 4.5rem;
 }
 
 @theme inline {
@@ -30,6 +32,22 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/*
+ * 表示幅（標準 / 広め / 全幅）
+ * React の class 切替ではなく html[data-layout-mode] で決める。
+ * ページ遷移時に RSC が標準幅で描画しても、既に付いている data 属性で幅が維持される。
+ * （max-w-5xl = 64rem / max-w-7xl = 80rem と同等）
+ */
+.layout-content {
+  max-width: 64rem;
+}
+html[data-layout-mode="wide"] .layout-content {
+  max-width: 80rem;
+}
+html[data-layout-mode="full"] .layout-content {
+  max-width: none;
 }
 
 /* ---------- 共通コンポーネント（全アプリ共通ルール） ---------- */

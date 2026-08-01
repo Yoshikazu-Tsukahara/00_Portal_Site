@@ -1,9 +1,10 @@
 /* PDF編集専用 Service Worker（scope: /tools/pdf-editor） */
-const CACHE_NAME = "pdf-editor-v1";
+const CACHE_NAME = "pdf-editor-v2";
 const PRECACHE = [
   "/tools/pdf-editor",
   "/tools/pdf-editor/manifest.webmanifest",
-  "/icons/pdf-editor.svg",
+  "/icons/pdf-editor-192.png",
+  "/icons/pdf-editor-512.png",
 ];
 
 self.addEventListener("install", (event) => {

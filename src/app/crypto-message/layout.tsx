@@ -17,8 +17,25 @@ export const metadata: Metadata = {
   },
   manifest: CRYPTO_MESSAGE_MANIFEST_PATH,
   icons: {
-    icon: [{ url: "/icons/crypto-message.svg", type: "image/svg+xml" }],
-    apple: [{ url: "/icons/crypto-message.svg" }],
+    icon: [
+      {
+        url: "/icons/crypto-message-192.png",
+        sizes: "192x192",
+        type: "image/png",
+      },
+      {
+        url: "/icons/crypto-message-512.png",
+        sizes: "512x512",
+        type: "image/png",
+      },
+    ],
+    apple: [
+      {
+        url: "/icons/crypto-message-192.png",
+        sizes: "192x192",
+        type: "image/png",
+      },
+    ],
   },
   other: {
     "mobile-web-app-capable": "yes",

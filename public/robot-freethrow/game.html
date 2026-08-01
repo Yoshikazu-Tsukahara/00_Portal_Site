@@ -4658,6 +4658,15 @@
         syncFromMemo();
       });
 
+      // 親 iframe の高さ変化（ポータル側 fillViewport）でもキャンバスを追従
+      if (typeof ResizeObserver !== "undefined") {
+        const ro = new ResizeObserver(() => {
+          resize();
+          syncFromMemo();
+        });
+        ro.observe(wrap);
+      }
+
       // DEBUG_HITBOX：H で表示切替、T で理論クリア値を入力欄へ適用
       window.addEventListener("keydown", (e) => {
         if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return;

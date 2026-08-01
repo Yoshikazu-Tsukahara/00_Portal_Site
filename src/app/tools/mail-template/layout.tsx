@@ -17,8 +17,11 @@ export const metadata: Metadata = {
   },
   manifest: MAIL_TEMPLATE_MANIFEST_PATH,
   icons: {
-    icon: [{ url: "/icons/mail-template.svg", type: "image/svg+xml" }],
-    apple: [{ url: "/icons/mail-template.svg" }],
+    icon: [
+      { url: "/icons/mail-template-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/mail-template-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: "/icons/mail-template-192.png", sizes: "192x192", type: "image/png" }],
   },
   other: {
     "mobile-web-app-capable": "yes",

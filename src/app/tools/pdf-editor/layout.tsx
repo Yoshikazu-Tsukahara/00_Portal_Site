@@ -17,8 +17,11 @@ export const metadata: Metadata = {
   },
   manifest: PDF_EDITOR_MANIFEST_PATH,
   icons: {
-    icon: [{ url: "/icons/pdf-editor.svg", type: "image/svg+xml" }],
-    apple: [{ url: "/icons/pdf-editor.svg" }],
+    icon: [
+      { url: "/icons/pdf-editor-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/pdf-editor-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: "/icons/pdf-editor-192.png", sizes: "192x192", type: "image/png" }],
   },
   other: {
     "mobile-web-app-capable": "yes",

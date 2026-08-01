@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useI18n } from "@/i18n";
 import { LAYOUT_MODES, useLayout, type LayoutMode } from "@/lib/layout";
 
@@ -17,6 +18,8 @@ export default function LayoutToggle() {
   const { t } = useI18n();
   const { layoutMode, setLayoutMode } = useLayout();
   const copy = t.header.layoutToggle;
+  /** ユーザー操作後だけインジケータをスライドさせる（復元時は動かさない） */
+  const [animate, setAnimate] = useState(false);
 
   const labels: Record<LayoutMode, string> = {
     default: copy.defaultShort,
@@ -35,16 +38,13 @@ export default function LayoutToggle() {
       <span className="text-[9px] font-medium uppercase tracking-[0.18em] text-zinc-400">
         {copy.caption}
       </span>
-      <div
-        role="group"
-        aria-label={copy.aria}
-        className="layout-toggle"
-      >
+      <div role="group" aria-label={copy.aria} className="layout-toggle">
         <span
           aria-hidden
           className="layout-toggle__indicator"
           style={{
             transform: `translateX(${MODE_INDEX[layoutMode] * 100}%)`,
+            transition: animate ? undefined : "none",
           }}
         />
         {LAYOUT_MODES.map((mode) => {
@@ -53,7 +53,10 @@ export default function LayoutToggle() {
             <button
               key={mode}
               type="button"
-              onClick={() => setLayoutMode(mode)}
+              onClick={() => {
+                setAnimate(true);
+                setLayoutMode(mode);
+              }}
               aria-pressed={active}
               title={titles[mode]}
               aria-label={titles[mode]}

@@ -16,7 +16,7 @@ import {
 } from "./savingsQuips";
 import type { LunchEntry, LunchMode, LunchSettings } from "./types";
 
-/** メインのダッシュボード（ヘッダー固定＋中央スクロール＋下部CTA固定） */
+/** メインのダッシュボード（最近の記録の下に設定／記録ボタンを置く） */
 export default function Dashboard({
   settings,
   stats,
@@ -85,7 +85,7 @@ export default function Dashboard({
   const heroPositive = heroValue >= 0;
 
   return (
-    <div className="mx-auto flex w-full max-w-lg flex-col gap-4 pb-28">
+    <div className="mx-auto flex w-full max-w-lg flex-col gap-4">
       {/* モード切替 */}
       <div className="shrink-0">
         <ModeSegment
@@ -300,24 +300,22 @@ export default function Dashboard({
         )}
       </section>
 
-      {/* 親指ゾーン：画面下固定CTA */}
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-zinc-200/80 bg-zinc-50/95 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-md">
-        <div className="mx-auto flex w-full max-w-lg gap-2">
-          <button
-            type="button"
-            onClick={onOpenSettings}
-            className="btn-secondary shrink-0 !px-4 !py-3.5 !text-sm active:scale-[0.97]"
-          >
-            {copy.openSettings}
-          </button>
-          <button
-            type="button"
-            onClick={todayEntry ? onEditToday : onRecord}
-            className="lunch-confirm-btn min-w-0 flex-1 !py-3.5 !text-base"
-          >
-            {todayEntry ? copy.editToday : copy.recordToday}
-          </button>
-        </div>
+      {/* 最近の記録の直下に、通常フローで置く */}
+      <div className="flex gap-2">
+        <button
+          type="button"
+          onClick={onOpenSettings}
+          className="btn-secondary shrink-0 !px-4 !py-3.5 !text-sm active:scale-[0.97]"
+        >
+          {copy.openSettings}
+        </button>
+        <button
+          type="button"
+          onClick={todayEntry ? onEditToday : onRecord}
+          className="lunch-confirm-btn min-w-0 flex-1 !py-3.5 !text-base"
+        >
+          {todayEntry ? copy.editToday : copy.recordToday}
+        </button>
       </div>
     </div>
   );

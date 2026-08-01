@@ -17,7 +17,7 @@ import { useStandaloneDisplay } from "@/lib/useStandaloneDisplay";
  * ## Type B: 通常ツール（`/tools/*` など）
  * - AppShell を使う。
  * - サイト共通の Header と **Footer は必ず表示する**。
- * - 1 画面に収めたい場合も `fillViewport` を使うだけで、Footer は隠さない。
+ * - 1 画面に収めたい場合も `fillViewport` を使う（Footer は画面外のすぐ下に続く）。
  * - LocalStorage を使うなら `dataManager` を渡す。
  * - 例: メールテンプレ管理、PDF編集、テキスト整形。
  *
@@ -67,9 +67,9 @@ type AppShellProps = {
    */
   afterDataManager?: ReactNode;
   /**
-   * true のとき、作業領域をほぼ1画面の高さに固定し、
-   * 内側のスクロールで完結させる（ページ全体は伸ばさない）。
-   * **Footer は隠さない**。画面下までスクロールすれば共通 Footer に到達できる。
+   * true のとき、作業領域の高さを「サイト Header 直下〜画面下端」に固定する。
+   * Footer はすぐ下に続くため、初期表示では見えず、少しスクロールすると到達できる。
+   * ヘッダー実高さは `--site-header-height`（Header が計測）を使う。
    */
   fillViewport?: boolean;
   /**
@@ -136,14 +136,15 @@ export default function AppShell({
   ) : null;
 
   // 背景はフル幅のまま、中身の列だけ layoutMode の幅に揃える
+  // fillViewport: サイト Header 直下〜画面下端ちょうど（Footer はすぐ下に続き、初期表示では見えない）
+  const fillViewportClass = isStandaloneApp
+    ? "h-dvh max-h-dvh overflow-hidden py-2"
+    : "h-[calc(100dvh-var(--site-header-height,4.5rem))] max-h-[calc(100dvh-var(--site-header-height,4.5rem))] overflow-hidden py-2";
+
   return (
     <main
       className={`flex w-full flex-1 flex-col overflow-x-hidden ${contentClassName} ${
-        fillViewport
-          ? // 4.5rem = サイト共通 Header の高さ。作業領域を1画面分だけ確保し、
-            // Footer は隠さずその下に続かせる
-            "overflow-hidden py-2 min-h-[calc(100dvh-4.5rem)]"
-          : "py-4"
+        fillViewport ? fillViewportClass : "py-4"
       }`}
     >
       <header
