@@ -77,12 +77,7 @@ export default function InvoiceSheet({ data, labels }: InvoiceSheetProps) {
               />
             )}
             <div>
-              <h2
-                className="inv-sheet__title"
-                style={{ color: accentColor }}
-              >
-                {documentTitle}
-              </h2>
+              <h2 className="inv-sheet__title">{documentTitle}</h2>
               <span
                 aria-hidden
                 className="inv-sheet__rule"
