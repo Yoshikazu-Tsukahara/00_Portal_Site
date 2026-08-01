@@ -11,6 +11,11 @@ import {
   createEmptyParty,
   createId,
   CURRENCY_CODES,
+  clampMultiline,
+  clampNonNegative,
+  clampText,
+  FIELD_LIMITS,
+  MAX_INVOICE_ITEMS,
   type CurrencyCode,
   type DocLocale,
   type InvoiceAppStore,
@@ -50,11 +55,22 @@ function normalizeParty(raw: unknown): InvoiceParty {
   }
   const o = raw as Record<string, unknown>;
   return {
-    name: asString(o.name),
-    address: asString(o.address),
-    email: asString(o.email),
-    extra: asString(o.extra),
-    registrationNumber: asString(o.registrationNumber),
+    name: clampText(asString(o.name), FIELD_LIMITS.partyName),
+    address: clampMultiline(
+      asString(o.address),
+      FIELD_LIMITS.partyAddress,
+      FIELD_LIMITS.partyAddressLines,
+    ),
+    email: clampText(asString(o.email), FIELD_LIMITS.partyEmail),
+    extra: clampMultiline(
+      asString(o.extra),
+      FIELD_LIMITS.partyExtra,
+      FIELD_LIMITS.partyExtraLines,
+    ),
+    registrationNumber: clampText(
+      asString(o.registrationNumber),
+      FIELD_LIMITS.registrationNumber,
+    ),
   };
 }
 
@@ -66,11 +82,19 @@ function normalizeItems(raw: unknown): InvoiceItem[] {
     )
     .map((item) => ({
       id: typeof item.id === "string" ? item.id : createId(),
-      name: asString(item.name),
-      unitPrice: asNumber(item.unitPrice, 0),
-      quantity: asNumber(item.quantity, 1),
+      name: clampText(asString(item.name), FIELD_LIMITS.itemName),
+      unitPrice: clampNonNegative(
+        asNumber(item.unitPrice, 0),
+        FIELD_LIMITS.unitPrice,
+      ),
+      quantity: clampNonNegative(
+        asNumber(item.quantity, 1),
+        FIELD_LIMITS.quantity,
+      ),
     }));
-  return items.length > 0 ? items : [createEmptyItem()];
+  return items.length > 0
+    ? items.slice(0, MAX_INVOICE_ITEMS)
+    : [createEmptyItem()];
 }
 
 /** 1件分の請求書データを正規化。読めない場合は null */
@@ -90,14 +114,25 @@ export function parseInvoiceData(raw: unknown): InvoiceData | null {
       100,
       Math.max(0, asNumber(o.taxRatePercent, base.taxRatePercent)),
     ),
-    invoiceNumber: asString(o.invoiceNumber, base.invoiceNumber),
+    invoiceNumber: clampText(
+      asString(o.invoiceNumber, base.invoiceNumber),
+      FIELD_LIMITS.invoiceNumber,
+    ),
     issueDate: asString(o.issueDate, base.issueDate),
     dueDate: asString(o.dueDate, base.dueDate),
     from: normalizeParty(o.from),
     to: normalizeParty(o.to),
     items: normalizeItems(o.items),
-    paymentMethod: asString(o.paymentMethod),
-    notes: asString(o.notes),
+    paymentMethod: clampMultiline(
+      asString(o.paymentMethod),
+      FIELD_LIMITS.paymentMethod,
+      FIELD_LIMITS.paymentMethodLines,
+    ),
+    notes: clampMultiline(
+      asString(o.notes),
+      FIELD_LIMITS.notes,
+      FIELD_LIMITS.notesLines,
+    ),
   };
 }
 

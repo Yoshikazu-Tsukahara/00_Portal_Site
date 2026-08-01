@@ -67,6 +67,52 @@ export const CURRENCY_CODES = ["JPY", "USD", "EUR"] as const;
 
 export const TAX_RATE_PRESETS = [0, 8, 10] as const;
 
+/** 品目行の上限 */
+export const MAX_INVOICE_ITEMS = 10;
+
+/**
+ * 1ページ（A4）に収めるための入力上限。
+ * 品目10行＋ヘッダー／支払／備考を想定した目安。
+ */
+export const FIELD_LIMITS = {
+  invoiceNumber: 40,
+  partyName: 60,
+  partyAddress: 120,
+  partyAddressLines: 4,
+  partyEmail: 80,
+  partyExtra: 80,
+  partyExtraLines: 3,
+  registrationNumber: 24,
+  itemName: 60,
+  unitPrice: 99_999_999,
+  quantity: 9_999,
+  paymentMethod: 220,
+  paymentMethodLines: 5,
+  notes: 220,
+  notesLines: 5,
+} as const;
+
+/** 文字数カット */
+export function clampText(value: string, max: number): string {
+  return value.length <= max ? value : value.slice(0, max);
+}
+
+/** 行数＋文字数でカット（住所・備考など） */
+export function clampMultiline(
+  value: string,
+  maxChars: number,
+  maxLines: number,
+): string {
+  const lines = value.replace(/\r\n/g, "\n").split("\n").slice(0, maxLines);
+  return clampText(lines.join("\n"), maxChars);
+}
+
+/** 金額・数量などの非負上限 */
+export function clampNonNegative(value: number, max: number): number {
+  if (!Number.isFinite(value) || value < 0) return 0;
+  return Math.min(max, value);
+}
+
 /** 支払期日の既定オフセット（発行日から何日後か） */
 const DEFAULT_DUE_DAYS = 30;
 

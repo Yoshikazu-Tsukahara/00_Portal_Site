@@ -13,7 +13,12 @@ import {
 } from "./calc";
 import {
   CURRENCY_CODES,
+  FIELD_LIMITS,
+  MAX_INVOICE_ITEMS,
   TAX_RATE_PRESETS,
+  clampMultiline,
+  clampNonNegative,
+  clampText,
   type CurrencyCode,
   type DocLocale,
   type InvoiceData,
@@ -40,11 +45,11 @@ function numberFieldValue(value: number): string {
   return value === 0 ? "" : String(value);
 }
 
-function parseNumberField(raw: string): number {
+function parseNumberField(raw: string, max: number): number {
   if (raw.trim() === "") return 0;
   const parsed = Number(raw);
   if (!Number.isFinite(parsed) || parsed < 0) return 0;
-  return parsed;
+  return clampNonNegative(parsed, max);
 }
 
 function Field({ label, children }: { label: string; children: ReactNode }) {
@@ -113,7 +118,12 @@ function PartyFields({
         <input
           type="text"
           value={party.name}
-          onChange={(e) => onPatchParty(which, { name: e.target.value })}
+          onChange={(e) =>
+            onPatchParty(which, {
+              name: clampText(e.target.value, FIELD_LIMITS.partyName),
+            })
+          }
+          maxLength={FIELD_LIMITS.partyName}
           placeholder={placeholders.namePlaceholder}
           className="inv-input"
         />
@@ -124,8 +134,14 @@ function PartyFields({
             type="text"
             value={party.registrationNumber}
             onChange={(e) =>
-              onPatchParty(which, { registrationNumber: e.target.value })
+              onPatchParty(which, {
+                registrationNumber: clampText(
+                  e.target.value,
+                  FIELD_LIMITS.registrationNumber,
+                ),
+              })
             }
+            maxLength={FIELD_LIMITS.registrationNumber}
             placeholder={copy.fields.registrationNumberPlaceholder}
             className="inv-input"
             autoComplete="off"
@@ -136,7 +152,16 @@ function PartyFields({
       <Field label={copy.fields.address}>
         <textarea
           value={party.address}
-          onChange={(e) => onPatchParty(which, { address: e.target.value })}
+          onChange={(e) =>
+            onPatchParty(which, {
+              address: clampMultiline(
+                e.target.value,
+                FIELD_LIMITS.partyAddress,
+                FIELD_LIMITS.partyAddressLines,
+              ),
+            })
+          }
+          maxLength={FIELD_LIMITS.partyAddress}
           placeholder={placeholders.addressPlaceholder}
           rows={2}
           className="inv-input resize-y"
@@ -147,7 +172,12 @@ function PartyFields({
           <input
             type="email"
             value={party.email}
-            onChange={(e) => onPatchParty(which, { email: e.target.value })}
+            onChange={(e) =>
+              onPatchParty(which, {
+                email: clampText(e.target.value, FIELD_LIMITS.partyEmail),
+              })
+            }
+            maxLength={FIELD_LIMITS.partyEmail}
             placeholder={placeholders.emailPlaceholder}
             className="inv-input"
           />
@@ -155,7 +185,16 @@ function PartyFields({
         <Field label={copy.fields.extra}>
           <textarea
             value={party.extra}
-            onChange={(e) => onPatchParty(which, { extra: e.target.value })}
+            onChange={(e) =>
+              onPatchParty(which, {
+                extra: clampMultiline(
+                  e.target.value,
+                  FIELD_LIMITS.partyExtra,
+                  FIELD_LIMITS.partyExtraLines,
+                ),
+              })
+            }
+            maxLength={FIELD_LIMITS.partyExtra}
             placeholder={placeholders.extraPlaceholder}
             rows={2}
             className="inv-input resize-y"
@@ -198,7 +237,15 @@ export default function InvoiceForm({
                 <input
                   type="text"
                   value={data.invoiceNumber}
-                  onChange={(e) => onPatch({ invoiceNumber: e.target.value })}
+                  onChange={(e) =>
+                    onPatch({
+                      invoiceNumber: clampText(
+                        e.target.value,
+                        FIELD_LIMITS.invoiceNumber,
+                      ),
+                    })
+                  }
+                  maxLength={FIELD_LIMITS.invoiceNumber}
                   placeholder={copy.basics.invoiceNumberPlaceholder}
                   className="inv-input"
                 />
@@ -316,10 +363,7 @@ export default function InvoiceForm({
                       value={numberFieldValue(data.taxRatePercent)}
                       onChange={(e) =>
                         onPatch({
-                          taxRatePercent: Math.min(
-                            100,
-                            parseNumberField(e.target.value),
-                          ),
+                          taxRatePercent: parseNumberField(e.target.value, 100),
                         })
                       }
                       aria-label={copy.settings.taxRateCustomAria}
@@ -339,7 +383,8 @@ export default function InvoiceForm({
               <button
                 type="button"
                 onClick={onAddItem}
-                className="inv-ghost-btn"
+                disabled={data.items.length >= MAX_INVOICE_ITEMS}
+                className="inv-ghost-btn disabled:cursor-not-allowed disabled:opacity-40"
               >
                 {copy.items.add}
               </button>
@@ -358,8 +403,14 @@ export default function InvoiceForm({
                         type="text"
                         value={item.name}
                         onChange={(e) =>
-                          onPatchItem(item.id, { name: e.target.value })
+                          onPatchItem(item.id, {
+                            name: clampText(
+                              e.target.value,
+                              FIELD_LIMITS.itemName,
+                            ),
+                          })
                         }
+                        maxLength={FIELD_LIMITS.itemName}
                         placeholder={copy.items.namePlaceholder}
                         aria-label={copy.items.name}
                         className="inv-input !py-1 min-w-0 flex-1"
@@ -378,11 +429,15 @@ export default function InvoiceForm({
                       <input
                         type="number"
                         min={0}
+                        max={FIELD_LIMITS.unitPrice}
                         step={currencyStep(data.currency)}
                         value={numberFieldValue(item.unitPrice)}
                         onChange={(e) =>
                           onPatchItem(item.id, {
-                            unitPrice: parseNumberField(e.target.value),
+                            unitPrice: parseNumberField(
+                              e.target.value,
+                              FIELD_LIMITS.unitPrice,
+                            ),
                           })
                         }
                         placeholder={copy.items.unitPrice}
@@ -392,11 +447,15 @@ export default function InvoiceForm({
                       <input
                         type="number"
                         min={0}
+                        max={FIELD_LIMITS.quantity}
                         step={1}
                         value={numberFieldValue(item.quantity)}
                         onChange={(e) =>
                           onPatchItem(item.id, {
-                            quantity: parseNumberField(e.target.value),
+                            quantity: parseNumberField(
+                              e.target.value,
+                              FIELD_LIMITS.quantity,
+                            ),
                           })
                         }
                         placeholder={copy.items.quantity}
@@ -440,7 +499,16 @@ export default function InvoiceForm({
           <Section title={copy.payment.heading} hint={copy.payment.hint}>
             <textarea
               value={data.paymentMethod}
-              onChange={(e) => onPatch({ paymentMethod: e.target.value })}
+              onChange={(e) =>
+                onPatch({
+                  paymentMethod: clampMultiline(
+                    e.target.value,
+                    FIELD_LIMITS.paymentMethod,
+                    FIELD_LIMITS.paymentMethodLines,
+                  ),
+                })
+              }
+              maxLength={FIELD_LIMITS.paymentMethod}
               placeholder={copy.payment.placeholder}
               rows={3}
               className="inv-input resize-y"
@@ -450,7 +518,16 @@ export default function InvoiceForm({
           <Section title={copy.notes.heading}>
             <textarea
               value={data.notes}
-              onChange={(e) => onPatch({ notes: e.target.value })}
+              onChange={(e) =>
+                onPatch({
+                  notes: clampMultiline(
+                    e.target.value,
+                    FIELD_LIMITS.notes,
+                    FIELD_LIMITS.notesLines,
+                  ),
+                })
+              }
+              maxLength={FIELD_LIMITS.notes}
               placeholder={copy.notes.placeholder}
               rows={2}
               className="inv-input resize-y"

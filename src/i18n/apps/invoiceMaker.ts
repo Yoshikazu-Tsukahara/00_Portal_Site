@@ -92,6 +92,7 @@ export type InvoiceMakerDict = {
     remove: string;
     removeAria: string;
     removeLastAlert: string;
+    maxItemsAlert: string;
     subtotalLabel: string;
   };
   payment: {
@@ -206,6 +207,7 @@ export const invoiceMakerJa: InvoiceMakerDict = {
     remove: "削除",
     removeAria: "この行を削除",
     removeLastAlert: "品目は1行以上必要です。",
+    maxItemsAlert: "品目は最大10行までです。",
     subtotalLabel: "小計（税抜）",
   },
   payment: {
@@ -322,6 +324,7 @@ export const invoiceMakerEn: InvoiceMakerDict = {
     remove: "Remove",
     removeAria: "Remove this row",
     removeLastAlert: "At least one item row is required.",
+    maxItemsAlert: "You can add up to 10 item rows.",
     subtotalLabel: "Subtotal (ex. tax)",
   },
   payment: {

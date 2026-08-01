@@ -24,6 +24,7 @@ import {
 import {
   createEmptyItem,
   createNextInvoice,
+  MAX_INVOICE_ITEMS,
   suggestSaveName,
   type InvoiceData,
   type InvoiceItem,
@@ -71,10 +72,15 @@ export default function InvoiceMakerPage() {
   );
 
   const addItem = useCallback(() => {
-    setData((prev) =>
-      prev ? { ...prev, items: [...prev.items, createEmptyItem()] } : prev,
-    );
-  }, []);
+    setData((prev) => {
+      if (!prev) return prev;
+      if (prev.items.length >= MAX_INVOICE_ITEMS) {
+        window.alert(copy.items.maxItemsAlert);
+        return prev;
+      }
+      return { ...prev, items: [...prev.items, createEmptyItem()] };
+    });
+  }, [copy.items.maxItemsAlert]);
 
   const patchItem = useCallback((id: string, next: Partial<InvoiceItem>) => {
     setData((prev) =>
@@ -131,7 +137,8 @@ export default function InvoiceMakerPage() {
   );
 
   const handleLoadSample = useCallback(() => {
-    setData((prev) => createSampleInvoice(prev?.docLocale ?? locale));
+    // デモだけはサイトの表示言語（Header の JA/EN）で内容を切り替える
+    setData(createSampleInvoice(locale));
     setLoadOpen(false);
   }, [locale]);
 
