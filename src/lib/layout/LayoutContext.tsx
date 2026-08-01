@@ -26,13 +26,16 @@ type LayoutContextValue = {
    * 外側の背景はフル幅のままにし、コンテンツ幅だけ揃える。
    */
   contentClassName: string;
-  /** localStorage / DOM と同期済みか（トグルのスライド演出抑制用） */
+  /** localStorage / メモリと同期済みか */
   ready: boolean;
 };
 
 const LayoutContext = createContext<LayoutContextValue | null>(null);
 
-/** Provider が再マウントされても、直前の選択を useEffect 待ちで失わない */
+/**
+ * モジュールスコープのキャッシュ。
+ * Provider がページ遷移で再マウントされても、DEFAULT に戻してチラつかせない。
+ */
 let memoryLayoutMode: LayoutMode | null = null;
 
 function readLayoutMode(): LayoutMode {
@@ -55,19 +58,19 @@ function applyLayoutModeToDom(mode: LayoutMode) {
 
 /**
  * サイト全体の表示幅（default / wide / full）を共有する。
- * 選択値は localStorage と html[data-layout-mode] に保存し、リロード・遷移後も維持する。
+ *
+ * - 初回 SSR / ハイドレーション: DEFAULT（サーバーと一致）
+ * - 一度復元したあとの再マウント: memoryLayoutMode を即使う（ページ遷移のチラつき防止）
+ * - コンテンツ幅自体は bootstrap の data-layout-mode + CSS が先に決める
  */
 export function LayoutProvider({ children }: { children: ReactNode }) {
-  const [layoutMode, setLayoutModeState] = useState<LayoutMode>(() => {
-    if (memoryLayoutMode) return memoryLayoutMode;
-    const mode = readLayoutMode();
-    memoryLayoutMode = mode;
-    return mode;
-  });
-  const [ready, setReady] = useState(false);
+  const [layoutMode, setLayoutModeState] = useState<LayoutMode>(
+    () => memoryLayoutMode ?? DEFAULT_LAYOUT_MODE,
+  );
+  const [ready, setReady] = useState(() => memoryLayoutMode !== null);
 
   useEffect(() => {
-    const mode = readLayoutMode();
+    const mode = memoryLayoutMode ?? readLayoutMode();
     memoryLayoutMode = mode;
     setLayoutModeState(mode);
     applyLayoutModeToDom(mode);

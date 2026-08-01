@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import SiteChrome from "@/components/SiteChrome";
 import { I18nProvider } from "@/i18n";
 import { LAYOUT_MODE_BOOTSTRAP_SCRIPT, LayoutProvider } from "@/lib/layout";
@@ -23,7 +24,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ja" className={`${inter.variable} h-full antialiased`}>
+    <html
+      lang="ja"
+      className={`${inter.variable} h-full antialiased`}
+      // bootstrap が data-layout-mode を付けるため、属性不一致を許容する
+      suppressHydrationWarning
+    >
       <head>
         {/* ペイント前に表示幅を復元（遷移・リロード時の「標準」フラッシュ防止） */}
         <script
@@ -36,6 +42,8 @@ export default function RootLayout({
             <SiteChrome>{children}</SiteChrome>
           </LayoutProvider>
         </I18nProvider>
+        {/* Cookie 不使用の匿名アクセス解析（Vercel Analytics） */}
+        <Analytics />
       </body>
     </html>
   );

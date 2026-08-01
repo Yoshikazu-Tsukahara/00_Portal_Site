@@ -27,6 +27,22 @@ const STANDALONE_APP_PATHS = [
 ];
 
 /**
+ * AppShell `fillViewport` を使うルート。
+ * Header + Main をちょうど 100dvh にし、Footer はその直下（初期表示では見えない）に置く。
+ */
+const FILL_VIEWPORT_PATHS = [
+  "/robot-freethrow",
+  "/ultimate-probability-slot",
+  "/crypto-message",
+  "/tools/mail-template",
+  "/tools/pdf-editor",
+  "/tools/image-compressor",
+  "/tools/text-cleaner",
+  "/tools/media-metadata-editor",
+  "/tools/character-relation-editor",
+];
+
+/**
  * Type D（没入型）のルートパス一覧。
  * ブラウザでも常にポータル枠を外し、フルスクリーンで出す（一人称ミニゲームなど）。
  * AppShell は使わず、各ページが独自ヘッダー + iframe を持つ。
@@ -46,6 +62,7 @@ function matchesAppPath(pathname: string | null, bases: string[]): boolean {
  * - Type B（通常ツール）: Header と Footer を必ず出す。
  * - Type C（独立 PWA）: standalone 起動中のみポータル枠を外す。
  * - Type D（没入型）: 常にポータル枠を外す。
+ * - fillViewport ルート: Header+Main を 100dvh に固定し、Footer は画面外すぐ下へ。
  *
  * ブラウザ表示時:
  * - Header / Main / Footer の「舞台」は常に画面いっぱい（背景の境目を出さない）
@@ -58,12 +75,31 @@ export default function SiteChrome({ children }: { children: ReactNode }) {
   const isolatePwa =
     ready && isStandalone && matchesAppPath(pathname, STANDALONE_APP_PATHS);
   const isolateFullscreen = matchesAppPath(pathname, ALWAYS_ISOLATE_PATHS);
+  const fillViewport = matchesAppPath(pathname, FILL_VIEWPORT_PATHS);
 
   if (isolatePwa || isolateFullscreen) {
     return (
       <>
         <KeepTabBridge />
-        <div className="flex min-h-dvh flex-1 flex-col">{children}</div>
+        <div className="flex h-dvh flex-1 flex-col overflow-hidden">
+          {children}
+        </div>
+      </>
+    );
+  }
+
+  // fillViewport: ビューポートは Header+Main だけ。Footer は直後に続けて初期表示では隠す
+  if (fillViewport) {
+    return (
+      <>
+        <KeepTabBridge />
+        <div className="flex h-dvh flex-col overflow-hidden">
+          <Header />
+          <div className="relative flex min-h-0 flex-1 flex-col">
+            {children}
+          </div>
+        </div>
+        <Footer />
       </>
     );
   }

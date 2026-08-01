@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import AppShell from "@/components/AppShell";
 import { useI18n } from "@/i18n";
+import { trackToolUsed } from "@/lib/analytics";
 import FileRail from "./FileRail";
 import MediaStage from "./MediaStage";
 import MetadataForm from "./MetadataForm";
@@ -293,6 +294,7 @@ export default function MediaMetadataEditorPage() {
       } else {
         setMessage(copy.export.saveOk);
       }
+      trackToolUsed("media_metadata_editor", "save");
     } catch (err) {
       console.error(err);
       setError(copy.export.fail);
@@ -318,6 +320,7 @@ export default function MediaMetadataEditorPage() {
     try {
       downloadBlob(selected.savedOutput.blob, selected.savedOutput.fileName);
       setMessage(copy.export.ok);
+      trackToolUsed("media_metadata_editor", "download");
     } catch (err) {
       console.error(err);
       setError(copy.export.fail);

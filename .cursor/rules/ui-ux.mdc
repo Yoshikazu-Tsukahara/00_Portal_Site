@@ -31,7 +31,7 @@ PC（md+）:
   行2  説明文
 
 [作業領域]
-[サイト Footer]  ※ fillViewport でも隠さない
+[サイト Footer]  ※ fillViewport では画面外のすぐ下（少しスクロールで到達）
 ```
 
 - スマホでは「ポータルに戻る」を出さない（Header ロゴで戻る）— **AppShell が実装済み**

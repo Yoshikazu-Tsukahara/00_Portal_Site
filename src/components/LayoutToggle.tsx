@@ -16,7 +16,7 @@ const MODE_INDEX: Record<LayoutMode, number> = {
  */
 export default function LayoutToggle() {
   const { t } = useI18n();
-  const { layoutMode, setLayoutMode } = useLayout();
+  const { layoutMode, setLayoutMode, ready } = useLayout();
   const copy = t.header.layoutToggle;
   /** ユーザー操作後だけインジケータをスライドさせる（復元時は動かさない） */
   const [animate, setAnimate] = useState(false);
@@ -34,7 +34,11 @@ export default function LayoutToggle() {
   };
 
   return (
-    <div className="flex flex-col items-center gap-1">
+    <div
+      className={`flex flex-col items-center gap-1 ${ready ? "" : "invisible"}`}
+      // 同期前は操作させない（見た目は invisible で領域だけ確保）
+      aria-hidden={!ready}
+    >
       <span className="text-[9px] font-medium uppercase tracking-[0.18em] text-zinc-400">
         {copy.caption}
       </span>
@@ -44,7 +48,7 @@ export default function LayoutToggle() {
           className="layout-toggle__indicator"
           style={{
             transform: `translateX(${MODE_INDEX[layoutMode] * 100}%)`,
-            transition: animate ? undefined : "none",
+            transition: animate && ready ? undefined : "none",
           }}
         />
         {LAYOUT_MODES.map((mode) => {
@@ -53,6 +57,7 @@ export default function LayoutToggle() {
             <button
               key={mode}
               type="button"
+              disabled={!ready}
               onClick={() => {
                 setAnimate(true);
                 setLayoutMode(mode);

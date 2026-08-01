@@ -1,5 +1,6 @@
 "use client";
 
+import { trackEvent } from "@/lib/analytics";
 import { useI18n } from "./I18nProvider";
 import type { Locale } from "./types";
 
@@ -31,7 +32,10 @@ export default function LanguageToggle() {
           <button
             key={value}
             type="button"
-            onClick={() => setLocale(value)}
+            onClick={() => {
+              setLocale(value);
+              trackEvent("Language Changed", { locale: value });
+            }}
             aria-pressed={active}
             className={`lang-toggle__btn min-w-[2.25rem] sm:min-w-[2.5rem] ${
               active ? "lang-toggle__btn--active" : "lang-toggle__btn--inactive"

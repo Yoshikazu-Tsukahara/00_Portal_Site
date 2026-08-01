@@ -134,7 +134,7 @@ export const en: Dictionary = {
     environmentLabel: "Environment",
     noticeLabel: "Notes",
     localOnly:
-      "🔒 All data is processed and stored only in your browser (locally) and is never sent to our servers.",
+      "🔒 The Site runs 100% locally: your files and inputs are never sent to our servers. We do not use cookies for personal tracking. For improvement only, we measure anonymized page views and tool-usage counts.",
   },
   messages: {
     environment:
@@ -337,7 +337,7 @@ export const en: Dictionary = {
     },
     privacy: {
       title: "Privacy Policy",
-      updatedAt: "July 21, 2026",
+      updatedAt: "August 1, 2026",
       sections: [
         {
           title: "1. Introduction",
@@ -395,15 +395,15 @@ export const en: Dictionary = {
           ],
         },
         {
-          title: "4. Analytics and communication logs",
+          title: "4. Analytics",
           blocks: [
             {
               type: "p",
-              text: "Hosting environments or future analytics tools (e.g. traffic counts, error monitoring, performance measurement) may automatically record general usage data such as IP address, browser type, referrer URL, access time, and pages viewed.",
+              text: "The Site runs 100% locally and never sends your files or inputs to a server. We also do not use cookies for personal tracking.",
             },
             {
               type: "p",
-              text: "Such data is for operation, improvement, and security, and is distinct from content handled inside tools. This Policy may be updated if analytics tools are introduced or changed.",
+              text: "For site improvement only, we use Vercel Analytics to measure anonymized page views and tool-usage counts. Personally identifiable information and any files or inputs inside tools are not included.",
             },
             {
               type: "p",
@@ -416,7 +416,7 @@ export const en: Dictionary = {
           blocks: [
             {
               type: "p",
-              text: "The Site does not use non-essential cookies for advertising without consent. If cookies or similar technologies are used later for analytics, this Policy will be updated.",
+              text: "The Site does not use advertising cookies or cookies for personal tracking. Analytics (Vercel Analytics) does not rely on cookies.",
             },
             {
               type: "p",

@@ -67,9 +67,8 @@ type AppShellProps = {
    */
   afterDataManager?: ReactNode;
   /**
-   * true のとき、作業領域の高さを「サイト Header 直下〜画面下端」に固定する。
-   * Footer はすぐ下に続くため、初期表示では見えず、少しスクロールすると到達できる。
-   * ヘッダー実高さは `--site-header-height`（Header が計測）を使う。
+   * true のとき、作業領域を親の残り高さ（Header 直下〜画面下端）いっぱいにする。
+   * SiteChrome が Footer をその外に置くため、初期表示ではフッターが見えない。
    */
   fillViewport?: boolean;
   /**
@@ -136,15 +135,13 @@ export default function AppShell({
   ) : null;
 
   // 背景はフル幅のまま、中身の列だけ layoutMode の幅に揃える
-  // fillViewport: サイト Header 直下〜画面下端ちょうど（Footer はすぐ下に続き、初期表示では見えない）
-  const fillViewportClass = isStandaloneApp
-    ? "h-dvh max-h-dvh overflow-hidden py-2"
-    : "h-[calc(100dvh-var(--site-header-height,4.5rem))] max-h-[calc(100dvh-var(--site-header-height,4.5rem))] overflow-hidden py-2";
-
+  // fillViewport: SiteChrome が確保した「Header 直下〜画面下端」を埋める
   return (
     <main
       className={`flex w-full flex-1 flex-col overflow-x-hidden ${contentClassName} ${
-        fillViewport ? fillViewportClass : "py-4"
+        fillViewport
+          ? "h-full min-h-0 max-h-full overflow-hidden py-2"
+          : "py-4"
       }`}
     >
       <header
