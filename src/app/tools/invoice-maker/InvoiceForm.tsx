@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Eye } from "lucide-react";
+import { Eye, Upload, X } from "lucide-react";
 
 import type { InvoiceMakerDict } from "@/i18n/apps/invoiceMaker";
 import {
@@ -13,6 +13,7 @@ import {
 } from "./calc";
 import {
   CURRENCY_CODES,
+  DOCUMENT_TYPES,
   FIELD_LIMITS,
   MAX_INVOICE_ITEMS,
   TAX_RATE_PRESETS,
@@ -21,6 +22,7 @@ import {
   clampText,
   type CurrencyCode,
   type DocLocale,
+  type DocumentType,
   type InvoiceData,
   type InvoiceItem,
   type InvoiceParty,
@@ -50,6 +52,30 @@ function parseNumberField(raw: string, max: number): number {
   const parsed = Number(raw);
   if (!Number.isFinite(parsed) || parsed < 0) return 0;
   return clampNonNegative(parsed, max);
+}
+
+/** 画像ファイルを Base64 data URL に変換 */
+async function readImageAsDataURL(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+/** 画像アップロードハンドラー */
+function handleImageUpload(
+  event: React.ChangeEvent<HTMLInputElement>,
+  onBase64: (dataURL: string) => void,
+) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  if (!file.type.startsWith("image/")) {
+    alert("画像ファイルを選択してください");
+    return;
+  }
+  readImageAsDataURL(file).then(onBase64).catch(console.error);
 }
 
 function Field({ label, children }: { label: string; children: ReactNode }) {
@@ -224,6 +250,12 @@ export default function InvoiceForm({
     { value: "ja", label: copy.settings.localeJa },
     { value: "en", label: copy.settings.localeEn },
   ];
+  const documentTypeOptions: { value: DocumentType; label: string }[] = [
+    { value: "invoice", label: copy.settings.typeInvoice },
+    { value: "estimate", label: copy.settings.typeEstimate },
+    { value: "deliveryNote", label: copy.settings.typeDeliveryNote },
+    { value: "receipt", label: copy.settings.typeReceipt },
+  ];
   const totals = computeTotals(data);
 
   return (
@@ -297,9 +329,25 @@ export default function InvoiceForm({
         <div className="min-w-0 space-y-0">
           <Section
             title={copy.settings.heading}
-            hint={copy.settings.docLanguageHint}
+            hint={copy.settings.documentTypeHint}
           >
             <div className="space-y-2.5">
+              <Field label={copy.settings.documentType}>
+                <select
+                  value={data.documentType}
+                  onChange={(e) =>
+                    onPatch({ documentType: e.target.value as DocumentType })
+                  }
+                  className="inv-input"
+                >
+                  {documentTypeOptions.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+
               <Field label={copy.settings.docLanguage}>
                 <div className="inv-seg">
                   {localeOptions.map((option) => (
@@ -372,6 +420,121 @@ export default function InvoiceForm({
                     />
                     <span className="text-[11px] text-zinc-500">%</span>
                   </span>
+                </div>
+              </Field>
+
+              <label className="flex items-start gap-2 text-[13px] cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={data.withholdingTaxEnabled}
+                  onChange={(e) =>
+                    onPatch({ withholdingTaxEnabled: e.target.checked })
+                  }
+                  className="mt-0.5"
+                />
+                <span>
+                  <span className="font-medium">{copy.settings.withholdingTax}</span>
+                  {copy.settings.withholdingTaxHint && (
+                    <span className="block text-[11px] text-zinc-500 mt-0.5">
+                      {copy.settings.withholdingTaxHint}
+                    </span>
+                  )}
+                </span>
+              </label>
+
+              <Field label={copy.settings.accentColor}>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={data.accentColor || "#18181b"}
+                    onChange={(e) => onPatch({ accentColor: e.target.value })}
+                    className="h-9 w-16 cursor-pointer rounded border border-zinc-200"
+                  />
+                  <span className="text-[11px] text-zinc-500">
+                    {copy.settings.accentColorHint}
+                  </span>
+                </div>
+              </Field>
+
+              <Field label={copy.settings.logo}>
+                <div className="flex flex-col gap-2">
+                  {data.logoImageBase64 && (
+                    <div className="flex items-center gap-2">
+                      <img
+                        src={data.logoImageBase64}
+                        alt="Logo"
+                        className="h-12 w-auto max-w-[120px] object-contain"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => onPatch({ logoImageBase64: undefined })}
+                        className="inv-ghost-btn text-xs"
+                      >
+                        <X className="h-3 w-3" />
+                        {copy.settings.logoClear}
+                      </button>
+                    </div>
+                  )}
+                  <label className="inv-ghost-btn inline-flex w-fit cursor-pointer items-center gap-1.5">
+                    <Upload className="h-4 w-4" />
+                    {copy.settings.logoSelect}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) =>
+                        handleImageUpload(e, (base64) =>
+                          onPatch({ logoImageBase64: base64 }),
+                        )
+                      }
+                      className="hidden"
+                    />
+                  </label>
+                  {copy.settings.logoHint && (
+                    <span className="text-[11px] text-zinc-500">
+                      {copy.settings.logoHint}
+                    </span>
+                  )}
+                </div>
+              </Field>
+
+              <Field label={copy.settings.stamp}>
+                <div className="flex flex-col gap-2">
+                  {data.stampImageBase64 && (
+                    <div className="flex items-center gap-2">
+                      <img
+                        src={data.stampImageBase64}
+                        alt="Stamp"
+                        className="h-14 w-14 object-contain"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => onPatch({ stampImageBase64: undefined })}
+                        className="inv-ghost-btn text-xs"
+                      >
+                        <X className="h-3 w-3" />
+                        {copy.settings.stampClear}
+                      </button>
+                    </div>
+                  )}
+                  <label className="inv-ghost-btn inline-flex w-fit cursor-pointer items-center gap-1.5">
+                    <Upload className="h-4 w-4" />
+                    {copy.settings.stampSelect}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) =>
+                        handleImageUpload(e, (base64) =>
+                          onPatch({ stampImageBase64: base64 }),
+                        )
+                      }
+                      className="hidden"
+                    />
+                  </label>
+                  {copy.settings.stampHint && (
+                    <span className="text-[11px] text-zinc-500">
+                      {copy.settings.stampHint}
+                    </span>
+                  )}
                 </div>
               </Field>
             </div>

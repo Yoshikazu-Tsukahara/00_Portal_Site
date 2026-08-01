@@ -44,6 +44,12 @@ export type InvoiceMakerDict = {
   };
   settings: {
     heading: string;
+    documentType: string;
+    documentTypeHint: string;
+    typeInvoice: string;
+    typeEstimate: string;
+    typeDeliveryNote: string;
+    typeReceipt: string;
     docLanguage: string;
     docLanguageHint: string;
     localeJa: string;
@@ -51,6 +57,18 @@ export type InvoiceMakerDict = {
     currency: string;
     taxRate: string;
     taxRateCustomAria: string;
+    withholdingTax: string;
+    withholdingTaxHint: string;
+    accentColor: string;
+    accentColorHint: string;
+    logo: string;
+    logoHint: string;
+    logoSelect: string;
+    logoClear: string;
+    stamp: string;
+    stampHint: string;
+    stampSelect: string;
+    stampClear: string;
   };
   basics: {
     heading: string;
@@ -160,6 +178,12 @@ export const invoiceMakerJa: InvoiceMakerDict = {
   },
   settings: {
     heading: "書類の設定",
+    documentType: "書類の種類",
+    documentTypeHint: "プレビューのタイトルが切り替わります",
+    typeInvoice: "請求書",
+    typeEstimate: "見積書",
+    typeDeliveryNote: "納品書",
+    typeReceipt: "領収書",
     docLanguage: "請求書の言語",
     docLanguageHint: "プレビューに印字される見出しの言語です",
     localeJa: "日本語",
@@ -167,6 +191,18 @@ export const invoiceMakerJa: InvoiceMakerDict = {
     currency: "通貨",
     taxRate: "税率",
     taxRateCustomAria: "税率をパーセントで入力",
+    withholdingTax: "源泉徴収税 (-10.21%) を計算する",
+    withholdingTaxHint: "小計に対して10.21%を引いた額が最終合計になります",
+    accentColor: "アクセントカラー",
+    accentColorHint: "見出しや罫線の色を変更できます",
+    logo: "ロゴ画像",
+    logoHint: "ヘッダー部分に表示されます",
+    logoSelect: "画像を選択",
+    logoClear: "削除",
+    stamp: "印鑑画像（角印）",
+    stampHint: "発行者名の横に表示されます",
+    stampSelect: "画像を選択",
+    stampClear: "削除",
   },
   basics: {
     heading: "基本情報",
@@ -300,6 +336,12 @@ export const invoiceMakerEn: InvoiceMakerDict = {
   },
   settings: {
     heading: "Document settings",
+    documentType: "Document Type",
+    documentTypeHint: "The preview title will change accordingly",
+    typeInvoice: "Invoice",
+    typeEstimate: "Estimate",
+    typeDeliveryNote: "Delivery Note",
+    typeReceipt: "Receipt",
     docLanguage: "Invoice language",
     docLanguageHint: "Language printed on the preview headings",
     localeJa: "日本語",
@@ -307,6 +349,18 @@ export const invoiceMakerEn: InvoiceMakerDict = {
     currency: "Currency",
     taxRate: "Tax rate",
     taxRateCustomAria: "Enter tax rate in percent",
+    withholdingTax: "Calculate withholding tax (-10.21%)",
+    withholdingTaxHint: "10.21% will be deducted from the subtotal",
+    accentColor: "Accent Color",
+    accentColorHint: "Change the color of headings and borders",
+    logo: "Logo Image",
+    logoHint: "Displayed in the header area",
+    logoSelect: "Select Image",
+    logoClear: "Remove",
+    stamp: "Stamp Image",
+    stampHint: "Displayed next to the issuer name",
+    stampSelect: "Select Image",
+    stampClear: "Remove",
   },
   basics: {
     heading: "Basics",
@@ -401,6 +455,14 @@ export const invoiceMakerEn: InvoiceMakerDict = {
  * サイトの表示言語ではなく、ユーザーが選んだ「請求書の言語」で切り替える。
  */
 export type InvoiceSheetLabels = {
+  /** 書類タイプごとのタイトル */
+  titles: {
+    invoice: string;
+    estimate: string;
+    deliveryNote: string;
+    receipt: string;
+  };
+  /** 後方互換性のため title も残す（invoice と同じ） */
   title: string;
   invoiceNumber: string;
   issueDate: string;
@@ -415,6 +477,8 @@ export type InvoiceSheetLabels = {
   amount: string;
   subtotal: string;
   tax: string;
+  /** 源泉徴収税ラベル */
+  withholdingTax: string;
   total: string;
   amountDue: string;
   paymentMethod: string;
@@ -429,6 +493,12 @@ export type InvoiceSheetLabels = {
 
 export const invoiceSheetLabels: Record<Locale, InvoiceSheetLabels> = {
   ja: {
+    titles: {
+      invoice: "請求書",
+      estimate: "見積書",
+      deliveryNote: "納品書",
+      receipt: "領収書",
+    },
     title: "請求書",
     invoiceNumber: "請求書番号",
     issueDate: "発行日",
@@ -442,6 +512,7 @@ export const invoiceSheetLabels: Record<Locale, InvoiceSheetLabels> = {
     amount: "金額",
     subtotal: "小計",
     tax: "消費税",
+    withholdingTax: "源泉徴収税",
     total: "合計",
     amountDue: "ご請求金額",
     paymentMethod: "お支払い方法",
@@ -453,6 +524,12 @@ export const invoiceSheetLabels: Record<Locale, InvoiceSheetLabels> = {
     },
   },
   en: {
+    titles: {
+      invoice: "INVOICE",
+      estimate: "ESTIMATE",
+      deliveryNote: "DELIVERY NOTE",
+      receipt: "RECEIPT",
+    },
     title: "INVOICE",
     invoiceNumber: "Invoice No.",
     issueDate: "Issue Date",
@@ -466,6 +543,7 @@ export const invoiceSheetLabels: Record<Locale, InvoiceSheetLabels> = {
     amount: "Amount",
     subtotal: "Subtotal",
     tax: "Tax",
+    withholdingTax: "Withholding Tax",
     total: "Total",
     amountDue: "Amount Due",
     paymentMethod: "Payment Method",

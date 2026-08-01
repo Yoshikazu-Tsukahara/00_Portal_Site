@@ -11,6 +11,7 @@ import {
   createEmptyParty,
   createId,
   CURRENCY_CODES,
+  DOCUMENT_TYPES,
   clampMultiline,
   clampNonNegative,
   clampText,
@@ -18,6 +19,7 @@ import {
   MAX_INVOICE_ITEMS,
   type CurrencyCode,
   type DocLocale,
+  type DocumentType,
   type InvoiceAppStore,
   type InvoiceData,
   type InvoiceItem,
@@ -34,6 +36,10 @@ function isCurrencyCode(value: unknown): value is CurrencyCode {
 
 function isDocLocale(value: unknown): value is DocLocale {
   return value === "ja" || value === "en";
+}
+
+function isDocumentType(value: unknown): value is DocumentType {
+  return DOCUMENT_TYPES.includes(value as DocumentType);
 }
 
 function asString(value: unknown, fallback = ""): string {
@@ -109,11 +115,15 @@ export function parseInvoiceData(raw: unknown): InvoiceData | null {
   );
   return {
     docLocale: isDocLocale(o.docLocale) ? o.docLocale : base.docLocale,
+    documentType: isDocumentType(o.documentType)
+      ? o.documentType
+      : base.documentType,
     currency: isCurrencyCode(o.currency) ? o.currency : base.currency,
     taxRatePercent: Math.min(
       100,
       Math.max(0, asNumber(o.taxRatePercent, base.taxRatePercent)),
     ),
+    withholdingTaxEnabled: Boolean(o.withholdingTaxEnabled),
     invoiceNumber: clampText(
       asString(o.invoiceNumber, base.invoiceNumber),
       FIELD_LIMITS.invoiceNumber,
@@ -133,6 +143,11 @@ export function parseInvoiceData(raw: unknown): InvoiceData | null {
       FIELD_LIMITS.notes,
       FIELD_LIMITS.notesLines,
     ),
+    logoImageBase64:
+      typeof o.logoImageBase64 === "string" ? o.logoImageBase64 : undefined,
+    stampImageBase64:
+      typeof o.stampImageBase64 === "string" ? o.stampImageBase64 : undefined,
+    accentColor: typeof o.accentColor === "string" ? o.accentColor : undefined,
   };
 }
 

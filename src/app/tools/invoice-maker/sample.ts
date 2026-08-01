@@ -39,14 +39,17 @@ export function createSampleInvoice(siteLocale: DocLocale): InvoiceData {
   if (siteLocale === "en") {
     return {
       docLocale: "en",
+      documentType: "invoice",
       currency: "USD",
       taxRatePercent: 0,
+      withholdingTaxEnabled: false,
       invoiceNumber: suggestInvoiceNumber(issueDate),
       issueDate,
       dueDate,
       from: {
         name: "Alex Morgan (Freelance Designer)",
-        address: "128 Market Street, Suite 4B\nSan Francisco, CA 94105\nUnited States",
+        address:
+          "128 Market Street, Suite 4B\nSan Francisco, CA 94105\nUnited States",
         email: "alex.morgan@example.com",
         extra: "Tel +1 (415) 555-0198",
         registrationNumber: "",
@@ -88,8 +91,10 @@ export function createSampleInvoice(siteLocale: DocLocale): InvoiceData {
   // 日本語版デモ
   return {
     docLocale: "ja",
+    documentType: "invoice",
     currency: "JPY",
     taxRatePercent: 10,
+    withholdingTaxEnabled: false,
     invoiceNumber: suggestInvoiceNumber(issueDate),
     issueDate,
     dueDate,

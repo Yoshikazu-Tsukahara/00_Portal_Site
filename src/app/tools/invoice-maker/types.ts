@@ -5,6 +5,16 @@ import type { Locale } from "@/i18n";
 /** 請求書に印字する言語。サイトの表示言語とは独立して選べる */
 export type DocLocale = Locale;
 
+/** 書類の種類（請求書・見積書・納品書・領収書） */
+export type DocumentType = "invoice" | "estimate" | "deliveryNote" | "receipt";
+
+export const DOCUMENT_TYPES: readonly DocumentType[] = [
+  "invoice",
+  "estimate",
+  "deliveryNote",
+  "receipt",
+] as const;
+
 export type CurrencyCode = "JPY" | "USD" | "EUR";
 
 /** 発行者・請求先の共通項目 */
@@ -31,9 +41,13 @@ export type InvoiceItem = {
 
 export type InvoiceData = {
   docLocale: DocLocale;
+  /** 書類タイプ（請求書・見積書・納品書・領収書） */
+  documentType: DocumentType;
   currency: CurrencyCode;
   /** 税率（%）。0 のときは税行を印字しない */
   taxRatePercent: number;
+  /** 源泉徴収税（-10.21%）を計算するか */
+  withholdingTaxEnabled: boolean;
   invoiceNumber: string;
   /** YYYY-MM-DD */
   issueDate: string;
@@ -45,6 +59,12 @@ export type InvoiceData = {
   /** 銀行口座や決済 URL などのフリーテキスト */
   paymentMethod: string;
   notes: string;
+  /** ロゴ画像（Base64 data URL） */
+  logoImageBase64?: string;
+  /** 印鑑画像（Base64 data URL） */
+  stampImageBase64?: string;
+  /** アクセントカラー（16進数 #rrggbb）。未指定時はモノクロ */
+  accentColor?: string;
 };
 
 /** 名前付きで保存した請求書（履歴） */
@@ -169,8 +189,10 @@ export function createDefaultInvoice(locale: DocLocale): InvoiceData {
   const issueDate = toDateInputValue(new Date());
   return {
     docLocale: locale,
+    documentType: "invoice",
     currency: defaultCurrencyFor(locale),
     taxRatePercent: locale === "ja" ? 10 : 0,
+    withholdingTaxEnabled: false,
     invoiceNumber: suggestInvoiceNumber(issueDate),
     issueDate,
     dueDate: addDays(issueDate, DEFAULT_DUE_DAYS),

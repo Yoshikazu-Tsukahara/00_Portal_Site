@@ -55,10 +55,12 @@ export function printableItems(items: InvoiceItem[]): InvoiceItem[] {
 export type InvoiceTotals = {
   subtotal: number;
   tax: number;
+  /** 源泉徴収税（マイナス値） */
+  withholdingTax: number;
   total: number;
 };
 
-/** 小計 → 税額 → 合計。端数は通貨の小数桁に丸める */
+/** 小計 → 税額 → 源泉徴収税 → 合計。端数は通貨の小数桁に丸める */
 export function computeTotals(data: InvoiceData): InvoiceTotals {
   const digits = CURRENCY_META[data.currency].fractionDigits;
   const subtotal = roundTo(
@@ -66,7 +68,15 @@ export function computeTotals(data: InvoiceData): InvoiceTotals {
     digits,
   );
   const tax = roundTo(subtotal * (safeNumber(data.taxRatePercent) / 100), digits);
-  return { subtotal, tax, total: roundTo(subtotal + tax, digits) };
+  const withholdingTax = data.withholdingTaxEnabled
+    ? roundTo(subtotal * 0.1021, digits)
+    : 0;
+  return {
+    subtotal,
+    tax,
+    withholdingTax,
+    total: roundTo(subtotal + tax - withholdingTax, digits),
+  };
 }
 
 /** 例: ¥12,000 / $1,200.00 / €1.200,00 相当の桁区切り */

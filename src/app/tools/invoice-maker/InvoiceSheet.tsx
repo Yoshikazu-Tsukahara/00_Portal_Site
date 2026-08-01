@@ -42,22 +42,53 @@ export default function InvoiceSheet({ data, labels }: InvoiceSheetProps) {
   const registrationNumber = data.from.registrationNumber.trim();
   const paymentText = data.paymentMethod.trim();
   const notesText = data.notes.trim();
+  const accentColor = data.accentColor || "#18181b";
+  const documentTitle = labels.titles[data.documentType] || labels.title;
 
   const metaRows: { label: string; value: string }[] = [
     { label: labels.invoiceNumber, value: data.invoiceNumber.trim() },
-    { label: labels.issueDate, value: formatDocDate(data.issueDate, data.docLocale) },
+    {
+      label: labels.issueDate,
+      value: formatDocDate(data.issueDate, data.docLocale),
+    },
     { label: labels.dueDate, value: formatDocDate(data.dueDate, data.docLocale) },
   ].filter((row) => row.value !== "");
 
   return (
-    <article className="inv-sheet" lang={data.docLocale}>
+    <article
+      className="inv-sheet"
+      lang={data.docLocale}
+      style={
+        {
+          "--accent-color": accentColor,
+        } as React.CSSProperties
+      }
+    >
       {/* .inv-sheet は flex 縦並び。この列が伸びることでフッターが用紙下端に付く */}
       <div className="flex flex-1 flex-col">
         {/* ヘッダー：タイトルと発行情報 */}
         <header className="flex items-start justify-between gap-8">
-          <div>
-            <h2 className="inv-sheet__title">{labels.title}</h2>
-            <span aria-hidden className="inv-sheet__rule" />
+          <div className="flex items-center gap-4">
+            {data.logoImageBase64 && (
+              <img
+                src={data.logoImageBase64}
+                alt="Logo"
+                className="h-12 w-auto max-w-[140px] object-contain print:color-adjust-exact"
+              />
+            )}
+            <div>
+              <h2
+                className="inv-sheet__title"
+                style={{ color: accentColor }}
+              >
+                {documentTitle}
+              </h2>
+              <span
+                aria-hidden
+                className="inv-sheet__rule"
+                style={{ backgroundColor: accentColor }}
+              />
+            </div>
           </div>
           {metaRows.length > 0 ? (
             <dl className="grid shrink-0 grid-cols-[auto_auto] gap-x-4 gap-y-1 text-[11px]">
@@ -92,15 +123,25 @@ export default function InvoiceSheet({ data, labels }: InvoiceSheetProps) {
               <MultiLine text={data.to.extra} />
             </div>
           </div>
-          <div>
+          <div className="relative">
             <p className="inv-sheet__caption">{labels.from}</p>
-            <p className="mt-1.5 break-words text-[13px] font-semibold text-zinc-900">
-              {data.from.name.trim() || (
-                <span className="font-normal text-zinc-300 print:invisible">
-                  {labels.placeholders.partyName}
-                </span>
+            <div className="relative">
+              <p className="mt-1.5 break-words text-[13px] font-semibold text-zinc-900">
+                {data.from.name.trim() || (
+                  <span className="font-normal text-zinc-300 print:invisible">
+                    {labels.placeholders.partyName}
+                  </span>
+                )}
+              </p>
+              {data.stampImageBase64 && (
+                <img
+                  src={data.stampImageBase64}
+                  alt="Stamp"
+                  className="absolute -right-4 -top-2 h-14 w-14 object-contain opacity-90 mix-blend-multiply print:color-adjust-exact"
+                  style={{ mixBlendMode: "multiply" }}
+                />
               )}
-            </p>
+            </div>
             {registrationNumber ? (
               <p className="mt-0.5 text-xs text-zinc-500">
                 {labels.registrationNumber}: {registrationNumber}
@@ -174,6 +215,17 @@ export default function InvoiceSheet({ data, labels }: InvoiceSheetProps) {
               </dt>
               <dd className="tabular-nums">{money(totals.tax)}</dd>
             </div>
+            {data.withholdingTaxEnabled && totals.withholdingTax > 0 && (
+              <div className="inv-sheet__totals-row">
+                <dt>
+                  {labels.withholdingTax}
+                  <span className="inv-sheet__totals-rate">(-10.21%)</span>
+                </dt>
+                <dd className="tabular-nums text-red-700">
+                  -{money(totals.withholdingTax)}
+                </dd>
+              </div>
+            )}
             <div className="inv-sheet__totals-row inv-sheet__totals-row--grand">
               <dt>{labels.total}</dt>
               <dd className="tabular-nums">{money(totals.total)}</dd>
