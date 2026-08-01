@@ -7,6 +7,7 @@ const apps = [
   "mail-template",
   "pdf-editor",
   "image-compressor",
+  "invoice-maker",
   "pixel-drop-puzzle",
   "crypto-message",
   "palette-collector",

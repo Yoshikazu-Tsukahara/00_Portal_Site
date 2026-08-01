@@ -1,9 +1,11 @@
 import type { Locale } from "../types";
+import type { PwaInstallCopy } from "@/lib/pwa/installCopy";
 import type { AppShellCopy } from "./otherApps";
 
 /** アプリ側 UI の文言 */
 export type InvoiceMakerDict = {
   shell: AppShellCopy;
+  install: PwaInstallCopy;
   loading: string;
   actions: {
     newInvoice: string;
@@ -229,6 +231,29 @@ export const invoiceMakerJa: InvoiceMakerDict = {
     print: "PDF出力（印刷）",
     close: "閉じる",
   },
+  install: {
+    button: "このアプリをホーム画面に追加",
+    buttonShort: "ホームに追加",
+    buttonTiny: "追加",
+    buttonAria: "請求書メーカーをホーム画面に追加してアプリとして使う",
+    modalTitle: "ホーム画面に追加",
+    modalLead:
+      "Safari からホーム画面に追加すると、請求書メーカーだけを独立アプリとしてすぐ開けます。",
+    step1Title: "共有をタップ",
+    step1Body: "画面下（または上）の共有アイコン［↑］をタップします。",
+    step2Title: "「ホーム画面に追加」",
+    step2Body: "メニューを下にスクロールし、「ホーム画面に追加」を選びます。",
+    desktopTitle: "アプリとしてインストール",
+    desktopLead:
+      "Chrome / Edge なら、アドレスバーやメニューから請求書メーカーを独立アプリとして追加できます。",
+    desktopStep1Title: "ブラウザのメニューを開く",
+    desktopStep1Body:
+      "画面右上の「︙」またはアドレスバー横のインストールアイコンを探します。",
+    desktopStep2Title: "「アプリをインストール」",
+    desktopStep2Body:
+      "「請求書メーカーをインストール」や「アプリをインストール」を選ぶとホーム／デスクトップに追加されます。",
+    modalClose: "わかった",
+  },
 };
 
 export const invoiceMakerEn: InvoiceMakerDict = {
@@ -345,6 +370,29 @@ export const invoiceMakerEn: InvoiceMakerDict = {
       "※ Faint placeholder text for empty fields will not appear on PDF / print — those spots stay blank.",
     print: "Export PDF (Print)",
     close: "Close",
+  },
+  install: {
+    button: "Add this app to Home Screen",
+    buttonShort: "Add to Home",
+    buttonTiny: "Add",
+    buttonAria: "Add Invoice Maker to your home screen as a standalone app",
+    modalTitle: "Add to Home Screen",
+    modalLead:
+      "Add Invoice Maker from Safari to open it as its own app — not the portal.",
+    step1Title: "Tap Share",
+    step1Body: "Tap the Share icon [↑] at the bottom (or top) of Safari.",
+    step2Title: "Add to Home Screen",
+    step2Body: "Scroll the menu and choose “Add to Home Screen”.",
+    desktopTitle: "Install as an app",
+    desktopLead:
+      "In Chrome or Edge, install Invoice Maker as its own app from the address bar or browser menu.",
+    desktopStep1Title: "Open the browser menu",
+    desktopStep1Body:
+      "Look for the ⋮ menu or the install icon near the address bar.",
+    desktopStep2Title: "Install app",
+    desktopStep2Body:
+      "Choose “Install Invoice Maker” / “Install app” to add it to your home screen or desktop.",
+    modalClose: "Got it",
   },
 };
 
