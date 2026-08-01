@@ -4,8 +4,9 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { fmt } from "@/i18n";
+import type { Locale } from "@/i18n";
 import type { InvoiceMakerDict } from "@/i18n/apps/invoiceMaker";
-import type { DocLocale, SavedInvoice } from "./types";
+import type { SavedInvoice } from "./types";
 
 type SaveDialogProps = {
   open: boolean;
@@ -120,7 +121,7 @@ type LoadDialogProps = {
   open: boolean;
   copy: InvoiceMakerDict["history"];
   history: SavedInvoice[];
-  locale: DocLocale;
+  locale: Locale;
   onClose: () => void;
   onLoad: (id: string) => void;
   onDelete: (id: string) => void;
@@ -128,7 +129,7 @@ type LoadDialogProps = {
   onLoadSample: () => void;
 };
 
-function formatSavedAt(iso: string, locale: DocLocale): string {
+function formatSavedAt(iso: string, locale: Locale): string {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return iso;
   return new Intl.DateTimeFormat(locale === "ja" ? "ja-JP" : "en-US", {

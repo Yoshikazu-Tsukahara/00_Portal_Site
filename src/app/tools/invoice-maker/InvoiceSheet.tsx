@@ -1,6 +1,6 @@
 "use client";
 
-import type { InvoiceSheetLabels } from "@/i18n/apps/invoiceMaker";
+import type { InvoiceSheetLabels } from "./docLabels";
 import {
   computeTotals,
   formatDocDate,
@@ -37,13 +37,18 @@ export default function InvoiceSheet({ data, labels }: InvoiceSheetProps) {
   const items = printableItems(data.items);
   const totals = computeTotals({ ...data, items });
   const money = (value: number) =>
-    formatMoney(value, data.currency, data.docLocale);
+    formatMoney(
+      value,
+      data.currency,
+      data.docLocale,
+      data.customCurrencySymbol,
+    );
   // 0% も含め税率行は常に出す（海外 Invoice で Tax の有無が分かるように）
   const registrationNumber = data.from.registrationNumber.trim();
   const paymentText = data.paymentMethod.trim();
   const notesText = data.notes.trim();
   const accentColor = data.accentColor || "#18181b";
-  const documentTitle = labels.titles[data.documentType] || labels.title;
+  const documentTitle = labels.titles[data.documentType];
   const fieldLabels = labels.byDocumentType;
   const numberLabel = fieldLabels.number[data.documentType];
   const dueDateLabel = fieldLabels.dueDate[data.documentType];

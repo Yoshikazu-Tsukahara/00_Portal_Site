@@ -1,4 +1,4 @@
-/** 金額計算と表示フォーマット（通貨・言語ごと） */
+/** 金額計算と表示フォーマット（通貨・帳票言語ごと） */
 
 import {
   parseDateInputValue,
@@ -10,28 +10,89 @@ import {
 
 type CurrencyMeta = {
   symbol: string;
-  /** 小数桁数（円は 0、ドル・ユーロは 2） */
+  /** 小数桁数（円・ウォンは 0、その他はおおむね 2） */
   fractionDigits: number;
   /** 入力欄の刻み */
   step: number;
 };
 
-const CURRENCY_META: Record<CurrencyCode, CurrencyMeta> = {
+const CURRENCY_META: Record<Exclude<CurrencyCode, "CUSTOM">, CurrencyMeta> = {
   JPY: { symbol: "¥", fractionDigits: 0, step: 1 },
   USD: { symbol: "$", fractionDigits: 2, step: 0.01 },
   EUR: { symbol: "€", fractionDigits: 2, step: 0.01 },
+  GBP: { symbol: "£", fractionDigits: 2, step: 0.01 },
+  AUD: { symbol: "A$", fractionDigits: 2, step: 0.01 },
+  CAD: { symbol: "C$", fractionDigits: 2, step: 0.01 },
+  SGD: { symbol: "S$", fractionDigits: 2, step: 0.01 },
+  CNY: { symbol: "元", fractionDigits: 2, step: 0.01 },
+  KRW: { symbol: "₩", fractionDigits: 0, step: 1 },
 };
 
-export function currencySymbol(currency: CurrencyCode): string {
-  return CURRENCY_META[currency].symbol;
+/** セレクト表示用（記号 + コード）。CUSTOM は別扱い */
+export const CURRENCY_SELECT_OPTIONS: readonly {
+  code: Exclude<CurrencyCode, "CUSTOM">;
+  label: string;
+}[] = [
+  { code: "JPY", label: "¥ JPY" },
+  { code: "USD", label: "$ USD" },
+  { code: "EUR", label: "€ EUR" },
+  { code: "GBP", label: "£ GBP" },
+  { code: "AUD", label: "A$ AUD" },
+  { code: "CAD", label: "C$ CAD" },
+  { code: "SGD", label: "S$ SGD" },
+  { code: "CNY", label: "元 CNY" },
+  { code: "KRW", label: "₩ KRW" },
+] as const;
+
+export function resolveCurrencyMeta(data: {
+  currency: CurrencyCode;
+  customCurrencySymbol?: string;
+}): CurrencyMeta {
+  if (data.currency === "CUSTOM") {
+    const symbol = (data.customCurrencySymbol ?? "").trim() || "¤";
+    return { symbol, fractionDigits: 2, step: 0.01 };
+  }
+  return CURRENCY_META[data.currency];
 }
 
-export function currencyStep(currency: CurrencyCode): number {
-  return CURRENCY_META[currency].step;
+export function currencySymbol(
+  currency: CurrencyCode,
+  customSymbol = "",
+): string {
+  return resolveCurrencyMeta({
+    currency,
+    customCurrencySymbol: customSymbol,
+  }).symbol;
 }
 
-function intlLocale(locale: DocLocale): string {
-  return locale === "ja" ? "ja-JP" : "en-US";
+export function currencyStep(
+  currency: CurrencyCode,
+  customSymbol = "",
+): number {
+  return resolveCurrencyMeta({
+    currency,
+    customCurrencySymbol: customSymbol,
+  }).step;
+}
+
+/** Intl 用ロケール（帳票言語 → BCP 47） */
+export function intlLocale(locale: DocLocale): string {
+  switch (locale) {
+    case "ja":
+      return "ja-JP";
+    case "zh":
+      return "zh-CN";
+    case "ko":
+      return "ko-KR";
+    case "es":
+      return "es-ES";
+    case "fr":
+      return "fr-FR";
+    case "de":
+      return "de-DE";
+    default:
+      return "en-US";
+  }
 }
 
 function safeNumber(value: number): number {
@@ -62,7 +123,7 @@ export type InvoiceTotals = {
 
 /** 小計 → 税額 → 源泉徴収税 → 合計。端数は通貨の小数桁に丸める */
 export function computeTotals(data: InvoiceData): InvoiceTotals {
-  const digits = CURRENCY_META[data.currency].fractionDigits;
+  const digits = resolveCurrencyMeta(data).fractionDigits;
   const subtotal = roundTo(
     data.items.reduce((sum, item) => sum + itemAmount(item), 0),
     digits,
@@ -84,8 +145,12 @@ export function formatMoney(
   amount: number,
   currency: CurrencyCode,
   locale: DocLocale,
+  customCurrencySymbol = "",
 ): string {
-  const meta = CURRENCY_META[currency];
+  const meta = resolveCurrencyMeta({
+    currency,
+    customCurrencySymbol,
+  });
   const formatted = new Intl.NumberFormat(intlLocale(locale), {
     minimumFractionDigits: meta.fractionDigits,
     maximumFractionDigits: meta.fractionDigits,
@@ -100,13 +165,14 @@ export function formatQuantity(quantity: number, locale: DocLocale): string {
   }).format(safeNumber(quantity));
 }
 
-/** 帳票用の日付表記（ja: 2026年8月1日 / en: Aug 1, 2026） */
+/** 帳票用の日付表記 */
 export function formatDocDate(iso: string, locale: DocLocale): string {
   const date = parseDateInputValue(iso);
   if (!date) return iso;
+  const useLongMonth = locale === "ja" || locale === "zh" || locale === "ko";
   return new Intl.DateTimeFormat(intlLocale(locale), {
     year: "numeric",
-    month: locale === "ja" ? "long" : "short",
+    month: useLongMonth ? "long" : "short",
     day: "numeric",
   }).format(date);
 }
@@ -121,8 +187,11 @@ export function formatTaxRate(rate: number): string {
  * 「名前を付けて保存」用のデフォルトファイル名（拡張子なし）。
  * 例: 請求書_INV-20260802-01_株式会社サンプルデザイン
  */
-export function suggestPdfFileName(data: InvoiceData): string {
-  const prefix = data.docLocale === "ja" ? "請求書" : "Invoice";
+export function suggestPdfFileName(
+  data: InvoiceData,
+  documentTitle: string,
+): string {
+  const prefix = documentTitle.trim() || "Document";
   const number = data.invoiceNumber.trim() || "draft";
   const toName = data.to.name
     .trim()

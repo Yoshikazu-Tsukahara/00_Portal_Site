@@ -3551,6 +3551,11 @@ html.pxd-pwa-standalone .pxd-block-guide {
     @apply w-full min-w-0 rounded-md border border-zinc-200 bg-white px-2.5 py-1.5 text-[13px] text-zinc-900 transition-colors placeholder:text-zinc-400 focus:border-zinc-950 focus:outline-none focus:ring-1 focus:ring-zinc-950;
   }
 
+  .inv-select {
+    @apply cursor-pointer appearance-none bg-[length:12px] bg-[right_0.6rem_center] bg-no-repeat pr-8;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%2371717a'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E");
+  }
+
   .inv-seg {
     @apply inline-flex flex-wrap items-center gap-1 rounded-lg border border-zinc-200 bg-zinc-50 p-0.5;
   }

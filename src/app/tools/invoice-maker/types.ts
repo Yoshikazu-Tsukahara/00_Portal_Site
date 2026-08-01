@@ -1,9 +1,36 @@
-/** 請求書メーカーの型定義（すべてブラウザ内で完結する） */
+/** 帳票メーカーの型定義（すべてブラウザ内で完結する） */
 
 import type { Locale } from "@/i18n";
 
-/** 請求書に印字する言語。サイトの表示言語とは独立して選べる */
-export type DocLocale = Locale;
+/**
+ * 帳票（入力ラベル・PDF印字）専用の言語。
+ * ポータル全体の Locale とは独立。
+ */
+export type DocLocale = "ja" | "en" | "zh" | "ko" | "es" | "fr" | "de";
+
+export const DOC_LOCALES: readonly DocLocale[] = [
+  "ja",
+  "en",
+  "zh",
+  "ko",
+  "es",
+  "fr",
+  "de",
+] as const;
+
+/** 言語セレクト用（表示名は各言語の自称。ポータル言語に依存しない） */
+export const DOC_LOCALE_OPTIONS: readonly {
+  value: DocLocale;
+  label: string;
+}[] = [
+  { value: "ja", label: "日本語" },
+  { value: "en", label: "English" },
+  { value: "zh", label: "🇨🇳 简体中文" },
+  { value: "ko", label: "🇰🇷 한국어" },
+  { value: "es", label: "🇪🇸 Español" },
+  { value: "fr", label: "🇫🇷 Français" },
+  { value: "de", label: "🇩🇪 Deutsch" },
+] as const;
 
 /** 書類の種類（請求書・見積書・納品書・領収書） */
 export type DocumentType = "invoice" | "estimate" | "deliveryNote" | "receipt";
@@ -20,7 +47,33 @@ export function documentTypeShowsDueDate(type: DocumentType): boolean {
   return type === "invoice" || type === "estimate";
 }
 
-export type CurrencyCode = "JPY" | "USD" | "EUR";
+/**
+ * 通貨コード。CUSTOM はユーザー入力の記号を使う。
+ */
+export type CurrencyCode =
+  | "JPY"
+  | "USD"
+  | "EUR"
+  | "GBP"
+  | "AUD"
+  | "CAD"
+  | "SGD"
+  | "CNY"
+  | "KRW"
+  | "CUSTOM";
+
+export const CURRENCY_CODES: readonly CurrencyCode[] = [
+  "JPY",
+  "USD",
+  "EUR",
+  "GBP",
+  "AUD",
+  "CAD",
+  "SGD",
+  "CNY",
+  "KRW",
+  "CUSTOM",
+] as const;
 
 /** 発行者・請求先の共通項目 */
 export type InvoiceParty = {
@@ -49,6 +102,11 @@ export type InvoiceData = {
   /** 書類タイプ（請求書・見積書・納品書・領収書） */
   documentType: DocumentType;
   currency: CurrencyCode;
+  /**
+   * currency === "CUSTOM" のときの表示記号（例: ₹, ฿, R$）。
+   * 未入力時は汎用記号で表示する。
+   */
+  customCurrencySymbol: string;
   /** 税率（%）。0 のときは税行を印字しない */
   taxRatePercent: number;
   /** 源泉徴収税（-10.21%）を計算するか */
@@ -88,8 +146,6 @@ export type InvoiceAppStore = {
   history: SavedInvoice[];
 };
 
-export const CURRENCY_CODES = ["JPY", "USD", "EUR"] as const;
-
 export const TAX_RATE_PRESETS = [0, 8, 10] as const;
 
 /** 品目行の上限 */
@@ -115,6 +171,7 @@ export const FIELD_LIMITS = {
   paymentMethodLines: 5,
   notes: 220,
   notesLines: 5,
+  customCurrencySymbol: 8,
 } as const;
 
 /** 文字数カット */
@@ -184,19 +241,26 @@ export function suggestInvoiceNumber(issueDate: string): string {
   return `INV-${compact || "00000000"}-01`;
 }
 
+/** サイト言語に合わせた初期の帳票言語 */
+export function defaultDocLocaleFor(siteLocale: Locale): DocLocale {
+  return siteLocale === "ja" ? "ja" : "en";
+}
+
 /** サイト言語に合わせた初期通貨（日本語なら円） */
-export function defaultCurrencyFor(locale: DocLocale): CurrencyCode {
-  return locale === "ja" ? "JPY" : "USD";
+export function defaultCurrencyFor(siteLocale: Locale): CurrencyCode {
+  return siteLocale === "ja" ? "JPY" : "USD";
 }
 
 /** 新規請求書の初期値。日付を使うためクライアント側でのみ呼ぶ */
-export function createDefaultInvoice(locale: DocLocale): InvoiceData {
+export function createDefaultInvoice(siteLocale: Locale): InvoiceData {
   const issueDate = toDateInputValue(new Date());
+  const docLocale = defaultDocLocaleFor(siteLocale);
   return {
-    docLocale: locale,
+    docLocale,
     documentType: "invoice",
-    currency: defaultCurrencyFor(locale),
-    taxRatePercent: locale === "ja" ? 10 : 0,
+    currency: defaultCurrencyFor(siteLocale),
+    customCurrencySymbol: "",
+    taxRatePercent: siteLocale === "ja" ? 10 : 0,
     withholdingTaxEnabled: false,
     invoiceNumber: suggestInvoiceNumber(issueDate),
     issueDate,

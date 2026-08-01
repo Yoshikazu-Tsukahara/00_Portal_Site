@@ -5,7 +5,6 @@ import { useCallback, useEffect, useState } from "react";
 import AppShell from "@/components/AppShell";
 import PrivacyNotice from "@/components/PrivacyNotice";
 import { useI18n } from "@/i18n";
-import { invoiceSheetLabels } from "@/i18n/apps/invoiceMaker";
 import {
   LoadInvoiceDialog,
   SaveInvoiceDialog,
@@ -15,6 +14,9 @@ import InvoiceForm from "./InvoiceForm";
 import InvoiceSheet from "./InvoiceSheet";
 import PreviewModal from "./PreviewModal";
 import PrintLayer from "./PrintLayer";
+import { suggestPdfFileName } from "./calc";
+import { getDocLabels, getInvoiceSheetLabels } from "./docLabels";
+import { createSampleInvoice } from "./sample";
 import {
   addSavedInvoice,
   loadInvoiceStore,
@@ -32,8 +34,6 @@ import {
   type InvoiceParty,
   type SavedInvoice,
 } from "./types";
-import { createSampleInvoice } from "./sample";
-import { suggestPdfFileName } from "./calc";
 
 export default function InvoiceMakerPage() {
   const { t, locale, ready } = useI18n();
@@ -76,12 +76,12 @@ export default function InvoiceMakerPage() {
     setData((prev) => {
       if (!prev) return prev;
       if (prev.items.length >= MAX_INVOICE_ITEMS) {
-        window.alert(copy.items.maxItemsAlert);
+        window.alert(getDocLabels(prev.docLocale).form.items.maxItemsAlert);
         return prev;
       }
       return { ...prev, items: [...prev.items, createEmptyItem()] };
     });
-  }, [copy.items.maxItemsAlert]);
+  }, []);
 
   const patchItem = useCallback((id: string, next: Partial<InvoiceItem>) => {
     setData((prev) =>
@@ -96,19 +96,16 @@ export default function InvoiceMakerPage() {
     );
   }, []);
 
-  const removeItem = useCallback(
-    (id: string) => {
-      setData((prev) => {
-        if (!prev) return prev;
-        if (prev.items.length <= 1) {
-          window.alert(copy.items.removeLastAlert);
-          return prev;
-        }
-        return { ...prev, items: prev.items.filter((item) => item.id !== id) };
-      });
-    },
-    [copy.items.removeLastAlert],
-  );
+  const removeItem = useCallback((id: string) => {
+    setData((prev) => {
+      if (!prev) return prev;
+      if (prev.items.length <= 1) {
+        window.alert(getDocLabels(prev.docLocale).form.items.removeLastAlert);
+        return prev;
+      }
+      return { ...prev, items: prev.items.filter((item) => item.id !== id) };
+    });
+  }, []);
 
   const startNextInvoice = useCallback(() => {
     if (!window.confirm(copy.actions.newInvoiceConfirm)) return;
@@ -154,7 +151,10 @@ export default function InvoiceMakerPage() {
     }
     // ブラウザの「PDFに保存」は document.title を初期ファイル名に使う
     const previousTitle = document.title;
-    document.title = suggestPdfFileName(data);
+    const labels = getInvoiceSheetLabels(data.docLocale);
+    const title =
+      labels.titles[data.documentType] || labels.titles.invoice;
+    document.title = suggestPdfFileName(data, title);
 
     let restored = false;
     const restore = () => {
@@ -182,7 +182,7 @@ export default function InvoiceMakerPage() {
     );
   }
 
-  const labels = invoiceSheetLabels[data.docLocale];
+  const labels = getInvoiceSheetLabels(data.docLocale);
   const sheet = <InvoiceSheet data={data} labels={labels} />;
 
   return (

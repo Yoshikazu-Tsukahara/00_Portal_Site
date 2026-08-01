@@ -6,13 +6,15 @@ import { Eye, Upload, X } from "lucide-react";
 import type { InvoiceMakerDict } from "@/i18n/apps/invoiceMaker";
 import {
   computeTotals,
+  CURRENCY_SELECT_OPTIONS,
   currencyStep,
-  currencySymbol,
   formatMoney,
   itemAmount,
 } from "./calc";
+import { getDocLabels, type DocLabels } from "./docLabels";
 import {
-  CURRENCY_CODES,
+  DOCUMENT_TYPES,
+  DOC_LOCALE_OPTIONS,
   FIELD_LIMITS,
   MAX_INVOICE_ITEMS,
   TAX_RATE_PRESETS,
@@ -120,14 +122,14 @@ function Section({
 function PartyFields({
   party,
   which,
-  copy,
+  fields,
   placeholders,
   onPatchParty,
   showRegistrationNumber = false,
 }: {
   party: InvoiceParty;
   which: PartyKey;
-  copy: InvoiceMakerDict;
+  fields: DocLabels["form"]["fields"];
   placeholders: {
     namePlaceholder: string;
     addressPlaceholder: string;
@@ -140,7 +142,7 @@ function PartyFields({
 }) {
   return (
     <div className="space-y-2.5">
-      <Field label={copy.fields.name}>
+      <Field label={fields.name}>
         <input
           type="text"
           value={party.name}
@@ -155,7 +157,7 @@ function PartyFields({
         />
       </Field>
       {showRegistrationNumber ? (
-        <Field label={copy.fields.registrationNumber}>
+        <Field label={fields.registrationNumber}>
           <input
             type="text"
             value={party.registrationNumber}
@@ -168,14 +170,14 @@ function PartyFields({
               })
             }
             maxLength={FIELD_LIMITS.registrationNumber}
-            placeholder={copy.fields.registrationNumberPlaceholder}
+            placeholder={fields.registrationNumberPlaceholder}
             className="inv-input"
             autoComplete="off"
             spellCheck={false}
           />
         </Field>
       ) : null}
-      <Field label={copy.fields.address}>
+      <Field label={fields.address}>
         <textarea
           value={party.address}
           onChange={(e) =>
@@ -194,7 +196,7 @@ function PartyFields({
         />
       </Field>
       <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-        <Field label={copy.fields.email}>
+        <Field label={fields.email}>
           <input
             type="email"
             value={party.email}
@@ -208,7 +210,7 @@ function PartyFields({
             className="inv-input"
           />
         </Field>
-        <Field label={copy.fields.extra}>
+        <Field label={fields.extra}>
           <textarea
             value={party.extra}
             onChange={(e) =>
@@ -246,34 +248,27 @@ export default function InvoiceForm({
   onPreview,
   onPrint,
 }: InvoiceFormProps) {
-  const localeOptions: { value: DocLocale; label: string }[] = [
-    { value: "ja", label: copy.settings.localeJa },
-    { value: "en", label: copy.settings.localeEn },
-  ];
-  const documentTypeOptions: { value: DocumentType; label: string }[] = [
-    { value: "invoice", label: copy.settings.typeInvoice },
-    { value: "estimate", label: copy.settings.typeEstimate },
-    { value: "deliveryNote", label: copy.settings.typeDeliveryNote },
-    { value: "receipt", label: copy.settings.typeReceipt },
-  ];
+  const doc = getDocLabels(data.docLocale);
+  const form = doc.form;
+  const byType = doc.byDocumentType;
   const totals = computeTotals(data);
-  const numberLabel = copy.basics.byDocumentType.number[data.documentType];
-  const dueDateLabel = copy.basics.byDocumentType.dueDate[data.documentType];
-  const issueDateLabel = copy.basics.byDocumentType.issueDate[data.documentType];
+  const numberLabel = byType.number[data.documentType];
+  const dueDateLabel = byType.dueDate[data.documentType];
+  const issueDateLabel = byType.issueDate[data.documentType];
   const showDueDate = documentTypeShowsDueDate(data.documentType);
-  const paymentHeading = copy.payment.headingByType[data.documentType];
-  const paymentHint = copy.payment.hintByType[data.documentType];
-  const paymentPlaceholder = copy.payment.placeholderByType[data.documentType];
-  const toHeading = copy.to.headingByType[data.documentType];
-  const toNamePlaceholder = copy.to.namePlaceholderByType[data.documentType];
-  const fromHeading = copy.from.headingByType[data.documentType];
+  const paymentHeading = byType.paymentMethod[data.documentType];
+  const paymentHint = form.paymentHintByType[data.documentType];
+  const paymentPlaceholder = form.paymentPlaceholderByType[data.documentType];
+  const toHeading = byType.to[data.documentType];
+  const toNamePlaceholder = form.toNamePlaceholderByType[data.documentType];
+  const fromHeading = byType.from[data.documentType];
 
   return (
     <div className="inv-panel">
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8">
         {/* ---------- 左列 ---------- */}
         <div className="min-w-0 space-y-0">
-          <Section title={copy.basics.heading}>
+          <Section title={form.basicsHeading}>
             <div className="space-y-2.5">
               <Field label={numberLabel}>
                 <input
@@ -288,7 +283,7 @@ export default function InvoiceForm({
                     })
                   }
                   maxLength={FIELD_LIMITS.invoiceNumber}
-                  placeholder={copy.basics.invoiceNumberPlaceholder}
+                  placeholder={form.invoiceNumberPlaceholder}
                   className="inv-input"
                 />
               </Field>
@@ -321,12 +316,17 @@ export default function InvoiceForm({
             </div>
           </Section>
 
-          <Section title={fromHeading} hint={copy.from.hint}>
+          <Section title={fromHeading} hint={form.fromHint}>
             <PartyFields
               party={data.from}
               which="from"
-              copy={copy}
-              placeholders={copy.from}
+              fields={form.fields}
+              placeholders={{
+                namePlaceholder: form.fromNamePlaceholder,
+                addressPlaceholder: form.fromAddressPlaceholder,
+                emailPlaceholder: form.fromEmailPlaceholder,
+                extraPlaceholder: form.fromExtraPlaceholder,
+              }}
               onPatchParty={onPatchParty}
               showRegistrationNumber
             />
@@ -336,12 +336,12 @@ export default function InvoiceForm({
             <PartyFields
               party={data.to}
               which="to"
-              copy={copy}
+              fields={form.fields}
               placeholders={{
                 namePlaceholder: toNamePlaceholder,
-                addressPlaceholder: copy.to.addressPlaceholder,
-                emailPlaceholder: copy.to.emailPlaceholder,
-                extraPlaceholder: copy.to.extraPlaceholder,
+                addressPlaceholder: form.toAddressPlaceholder,
+                emailPlaceholder: form.toEmailPlaceholder,
+                extraPlaceholder: form.toExtraPlaceholder,
               }}
               onPatchParty={onPatchParty}
             />
@@ -355,60 +355,100 @@ export default function InvoiceForm({
             hint={copy.settings.documentTypeHint}
           >
             <div className="space-y-2.5">
-              <Field label={copy.settings.documentType}>
-                <select
-                  value={data.documentType}
-                  onChange={(e) =>
-                    onPatch({ documentType: e.target.value as DocumentType })
-                  }
-                  className="inv-input"
-                >
-                  {documentTypeOptions.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
+              <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+                <Field label={copy.settings.documentType}>
+                  <select
+                    value={data.documentType}
+                    onChange={(e) =>
+                      onPatch({
+                        documentType: e.target.value as DocumentType,
+                      })
+                    }
+                    className="inv-input inv-select"
+                  >
+                    {DOCUMENT_TYPES.map((type) => (
+                      <option key={type} value={type}>
+                        {doc.titles[type]}
+                      </option>
+                    ))}
+                  </select>
+                </Field>
+
+                <Field label={copy.settings.docLanguage}>
+                  <select
+                    value={data.docLocale}
+                    onChange={(e) =>
+                      onPatch({ docLocale: e.target.value as DocLocale })
+                    }
+                    className="inv-input inv-select"
+                    aria-describedby="inv-doc-lang-hint"
+                  >
+                    {DOC_LOCALE_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </Field>
+              </div>
+              <p
+                id="inv-doc-lang-hint"
+                className="text-[10px] leading-relaxed text-zinc-500"
+              >
+                {copy.settings.docLanguageHint}
+              </p>
+
+              <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+                <Field label={copy.settings.currency}>
+                  <select
+                    value={data.currency}
+                    onChange={(e) =>
+                      onPatch({
+                        currency: e.target.value as CurrencyCode,
+                      })
+                    }
+                    className="inv-input inv-select"
+                  >
+                    {CURRENCY_SELECT_OPTIONS.map((option) => (
+                      <option key={option.code} value={option.code}>
+                        {option.label}
+                      </option>
+                    ))}
+                    <option value="CUSTOM">
+                      {copy.settings.currencyCustom}…
                     </option>
-                  ))}
-                </select>
-              </Field>
+                  </select>
+                </Field>
 
-              <Field label={copy.settings.docLanguage}>
-                <div className="inv-seg">
-                  {localeOptions.map((option) => (
-                    <button
-                      key={option.value}
-                      type="button"
-                      onClick={() => onPatch({ docLocale: option.value })}
-                      aria-pressed={data.docLocale === option.value}
-                      className={`inv-seg__btn ${
-                        data.docLocale === option.value
-                          ? "inv-seg__btn--on"
-                          : ""
-                      }`}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-              </Field>
-
-              <Field label={copy.settings.currency}>
-                <div className="inv-seg">
-                  {CURRENCY_CODES.map((code: CurrencyCode) => (
-                    <button
-                      key={code}
-                      type="button"
-                      onClick={() => onPatch({ currency: code })}
-                      aria-pressed={data.currency === code}
-                      className={`inv-seg__btn ${
-                        data.currency === code ? "inv-seg__btn--on" : ""
-                      }`}
-                    >
-                      <span className="mr-1">{currencySymbol(code)}</span>
-                      {code}
-                    </button>
-                  ))}
-                </div>
-              </Field>
+                {data.currency === "CUSTOM" ? (
+                  <Field label={copy.settings.currencyCustom}>
+                    <input
+                      type="text"
+                      value={data.customCurrencySymbol}
+                      onChange={(e) =>
+                        onPatch({
+                          customCurrencySymbol: clampText(
+                            e.target.value,
+                            FIELD_LIMITS.customCurrencySymbol,
+                          ),
+                        })
+                      }
+                      maxLength={FIELD_LIMITS.customCurrencySymbol}
+                      placeholder={copy.settings.currencyCustomPlaceholder}
+                      className="inv-input"
+                      autoComplete="off"
+                      spellCheck={false}
+                    />
+                  </Field>
+                ) : (
+                  <div className="hidden sm:block" aria-hidden />
+                )}
+              </div>
+              {data.currency === "CUSTOM" ? (
+                <p className="text-[10px] leading-relaxed text-zinc-500">
+                  {copy.settings.currencyCustomHint}
+                </p>
+              ) : null}
 
               <Field label={copy.settings.taxRate}>
                 <div className="flex flex-wrap items-center gap-1.5">
@@ -558,7 +598,7 @@ export default function InvoiceForm({
           </Section>
 
           <Section
-            title={copy.items.heading}
+            title={form.items.heading}
             action={
               <button
                 type="button"
@@ -566,7 +606,7 @@ export default function InvoiceForm({
                 disabled={data.items.length >= MAX_INVOICE_ITEMS}
                 className="inv-ghost-btn disabled:cursor-not-allowed disabled:opacity-40"
               >
-                {copy.items.add}
+                {form.items.add}
               </button>
             }
           >
@@ -591,15 +631,15 @@ export default function InvoiceForm({
                           })
                         }
                         maxLength={FIELD_LIMITS.itemName}
-                        placeholder={copy.items.namePlaceholder}
-                        aria-label={copy.items.name}
+                        placeholder={form.items.namePlaceholder}
+                        aria-label={form.items.name}
                         className="inv-input !py-1 min-w-0 flex-1"
                       />
                       <button
                         type="button"
                         onClick={() => onRemoveItem(item.id)}
-                        title={copy.items.remove}
-                        aria-label={copy.items.removeAria}
+                        title={form.items.remove}
+                        aria-label={form.items.removeAria}
                         className="inv-remove-btn sm:hidden"
                       >
                         ✕
@@ -610,7 +650,10 @@ export default function InvoiceForm({
                         type="number"
                         min={0}
                         max={FIELD_LIMITS.unitPrice}
-                        step={currencyStep(data.currency)}
+                        step={currencyStep(
+                          data.currency,
+                          data.customCurrencySymbol,
+                        )}
                         value={numberFieldValue(item.unitPrice)}
                         onChange={(e) =>
                           onPatchItem(item.id, {
@@ -620,8 +663,8 @@ export default function InvoiceForm({
                             ),
                           })
                         }
-                        placeholder={copy.items.unitPrice}
-                        aria-label={copy.items.unitPrice}
+                        placeholder={form.items.unitPrice}
+                        aria-label={form.items.unitPrice}
                         className="inv-input !py-1 w-[6.5rem] text-right sm:w-[5.5rem]"
                       />
                       <input
@@ -638,25 +681,26 @@ export default function InvoiceForm({
                             ),
                           })
                         }
-                        placeholder={copy.items.quantity}
-                        aria-label={copy.items.quantity}
+                        placeholder={form.items.quantity}
+                        aria-label={form.items.quantity}
                         className="inv-input !py-1 w-14 text-right sm:w-[3.75rem]"
                       />
                       <p
                         className="inv-item-row__amount w-[4.5rem] shrink-0 text-right"
-                        title={copy.items.amount}
+                        title={form.items.amount}
                       >
                         {formatMoney(
                           itemAmount(item),
                           data.currency,
                           data.docLocale,
+                          data.customCurrencySymbol,
                         )}
                       </p>
                       <button
                         type="button"
                         onClick={() => onRemoveItem(item.id)}
-                        title={copy.items.remove}
-                        aria-label={copy.items.removeAria}
+                        title={form.items.remove}
+                        aria-label={form.items.removeAria}
                         className="inv-remove-btn hidden sm:flex"
                       >
                         ✕
@@ -668,10 +712,15 @@ export default function InvoiceForm({
             </ul>
             <div className="mt-2.5 flex items-baseline justify-between border-t border-zinc-100 pt-2">
               <span className="text-[11px] text-zinc-500">
-                {copy.items.subtotalLabel}
+                {form.items.subtotalLabel}
               </span>
               <span className="tabular-nums text-sm font-semibold text-zinc-900">
-                {formatMoney(totals.subtotal, data.currency, data.docLocale)}
+                {formatMoney(
+                  totals.subtotal,
+                  data.currency,
+                  data.docLocale,
+                  data.customCurrencySymbol,
+                )}
               </span>
             </div>
           </Section>
@@ -695,7 +744,7 @@ export default function InvoiceForm({
             />
           </Section>
 
-          <Section title={copy.notes.heading}>
+          <Section title={doc.notes}>
             <textarea
               value={data.notes}
               onChange={(e) =>
@@ -708,7 +757,7 @@ export default function InvoiceForm({
                 })
               }
               maxLength={FIELD_LIMITS.notes}
-              placeholder={copy.notes.placeholder}
+              placeholder={form.notesPlaceholder}
               rows={2}
               className="inv-input resize-y"
             />

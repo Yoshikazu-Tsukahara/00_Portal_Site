@@ -6,11 +6,11 @@
  * ※帳票側の言語トグル（docLocale）とは独立。
  */
 
+import type { Locale } from "@/i18n";
 import {
   createId,
   suggestInvoiceNumber,
   toDateInputValue,
-  type DocLocale,
   type InvoiceData,
 } from "./types";
 
@@ -32,7 +32,7 @@ export function isSampleInvoiceId(id: string): boolean {
  * 架空のデモデータ。
  * @param siteLocale サイトの表示言語（useI18n の locale）。これに合わせて JA / EN の内容を返す。
  */
-export function createSampleInvoice(siteLocale: DocLocale): InvoiceData {
+export function createSampleInvoice(siteLocale: Locale): InvoiceData {
   const issueDate = toDateInputValue(new Date());
   const dueDate = endOfNextMonth();
 
@@ -41,6 +41,7 @@ export function createSampleInvoice(siteLocale: DocLocale): InvoiceData {
       docLocale: "en",
       documentType: "invoice",
       currency: "USD",
+      customCurrencySymbol: "",
       taxRatePercent: 0,
       withholdingTaxEnabled: false,
       invoiceNumber: suggestInvoiceNumber(issueDate),
@@ -93,6 +94,7 @@ export function createSampleInvoice(siteLocale: DocLocale): InvoiceData {
     docLocale: "ja",
     documentType: "invoice",
     currency: "JPY",
+    customCurrencySymbol: "",
     taxRatePercent: 10,
     withholdingTaxEnabled: false,
     invoiceNumber: suggestInvoiceNumber(issueDate),

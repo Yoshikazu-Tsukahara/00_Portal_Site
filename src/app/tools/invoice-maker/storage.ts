@@ -5,12 +5,14 @@
  */
 
 import { loadLocalJson, saveLocalJson } from "@/lib/localData";
+import type { Locale } from "@/i18n";
 import {
   createDefaultInvoice,
   createEmptyItem,
   createEmptyParty,
   createId,
   CURRENCY_CODES,
+  DOC_LOCALES,
   DOCUMENT_TYPES,
   clampMultiline,
   clampNonNegative,
@@ -35,7 +37,7 @@ function isCurrencyCode(value: unknown): value is CurrencyCode {
 }
 
 function isDocLocale(value: unknown): value is DocLocale {
-  return value === "ja" || value === "en";
+  return DOC_LOCALES.includes(value as DocLocale);
 }
 
 function isDocumentType(value: unknown): value is DocumentType {
@@ -110,15 +112,17 @@ export function parseInvoiceData(raw: unknown): InvoiceData | null {
   const o = raw as Record<string, unknown>;
   // v1 の素の InvoiceData か、draft オブジェクトかを判別（items がある）
   if (!("items" in o) && !("invoiceNumber" in o)) return null;
-  const base = createDefaultInvoice(
-    isDocLocale(o.docLocale) ? o.docLocale : "ja",
-  );
+  const base = createDefaultInvoice("ja");
   return {
     docLocale: isDocLocale(o.docLocale) ? o.docLocale : base.docLocale,
     documentType: isDocumentType(o.documentType)
       ? o.documentType
       : base.documentType,
     currency: isCurrencyCode(o.currency) ? o.currency : base.currency,
+    customCurrencySymbol: clampText(
+      asString(o.customCurrencySymbol, base.customCurrencySymbol),
+      FIELD_LIMITS.customCurrencySymbol,
+    ),
     taxRatePercent: Math.min(
       100,
       Math.max(0, asNumber(o.taxRatePercent, base.taxRatePercent)),
@@ -176,7 +180,7 @@ function normalizeHistory(raw: unknown): SavedInvoice[] {
     .filter((item): item is SavedInvoice => item !== null);
 }
 
-export function createDefaultStore(locale: DocLocale): InvoiceAppStore {
+export function createDefaultStore(locale: Locale): InvoiceAppStore {
   return {
     draft: createDefaultInvoice(locale),
     history: [],
@@ -224,7 +228,7 @@ export function parseImportedData(raw: unknown): InvoiceAppStore | null {
 }
 
 /** 保存済みがあれば復元。v1 からの移行にも対応 */
-export function loadInvoiceStore(locale: DocLocale): InvoiceAppStore {
+export function loadInvoiceStore(locale: Locale): InvoiceAppStore {
   const raw =
     loadLocalJson<unknown>(STORAGE_KEY, null) ??
     loadLocalJson<unknown>(LEGACY_KEY, null);
