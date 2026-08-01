@@ -41,6 +41,12 @@ export const genres: Genre[] = [
     label: "Business",
     tools: [
       {
+        id: "invoice-maker",
+        icon: "🧾",
+        href: "/tools/invoice-maker",
+        isMobileSupported: true,
+      },
+      {
         id: "mail-template",
         icon: "✉️",
         href: "/tools/mail-template",

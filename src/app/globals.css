@@ -3522,3 +3522,385 @@ html.pxd-pwa-standalone .pxd-block-guide {
     opacity: 0;
   }
 }
+
+/* ============================================================
+   請求書メーカー（/tools/invoice-maker）
+   2カラム入力フォーム＋モーダルプレビュー。
+   印刷は body 直下の PrintLayer（A4 実寸）だけを出す。
+   ============================================================ */
+
+@layer components {
+  /* ---------- 入力パネル（サイト標準のライト） ---------- */
+  .inv-panel {
+    @apply min-w-0 overflow-x-hidden rounded-xl border border-zinc-200/80 bg-white p-3 shadow-sm sm:p-4 md:p-5;
+  }
+
+  .inv-section + .inv-section {
+    @apply mt-4 border-t border-zinc-100 pt-4;
+  }
+
+  .inv-section__title {
+    @apply text-xs font-semibold tracking-tight text-zinc-900;
+  }
+
+  .inv-field-label {
+    @apply mb-1 block text-[10px] font-medium tracking-wide text-zinc-500;
+  }
+
+  .inv-input {
+    @apply w-full min-w-0 rounded-md border border-zinc-200 bg-white px-2.5 py-1.5 text-[13px] text-zinc-900 transition-colors placeholder:text-zinc-400 focus:border-zinc-950 focus:outline-none focus:ring-1 focus:ring-zinc-950;
+  }
+
+  .inv-seg {
+    @apply inline-flex flex-wrap items-center gap-1 rounded-lg border border-zinc-200 bg-zinc-50 p-0.5;
+  }
+
+  .inv-seg__btn {
+    @apply rounded-md px-2.5 py-1.5 text-[11px] font-medium text-zinc-500 transition-colors hover:text-zinc-900 sm:py-1;
+  }
+
+  .inv-seg__btn--on {
+    @apply bg-zinc-900 text-zinc-50 shadow-sm hover:text-zinc-50;
+  }
+
+  .inv-chip {
+    @apply rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-[11px] font-medium text-zinc-600 transition-colors hover:border-zinc-300 hover:bg-zinc-50 sm:px-2.5 sm:py-1;
+  }
+
+  .inv-chip--on {
+    @apply border-zinc-900 bg-zinc-900 text-zinc-50 hover:bg-zinc-800 hover:text-zinc-50;
+  }
+
+  .inv-ghost-btn {
+    @apply rounded-md border border-zinc-200 bg-white px-2 py-1 text-[10px] font-medium text-zinc-600 transition-all hover:border-zinc-300 hover:bg-zinc-50 hover:text-zinc-900 active:scale-[0.98];
+  }
+
+  .inv-remove-btn {
+    @apply flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-zinc-200 bg-white text-[11px] text-zinc-400 transition-all hover:border-red-200 hover:bg-red-50 hover:text-red-600 active:scale-[0.98];
+  }
+
+  /* 品目行：パディングを抑えてコンパクトに */
+  .inv-item-row {
+    @apply rounded-md border border-zinc-100 bg-zinc-50/60 px-2 py-1.5;
+  }
+
+  .inv-item-row__amount {
+    @apply tabular-nums text-[12px] font-medium text-zinc-800;
+  }
+
+  /* プレビュー／PDF ボタン（入力パネル内） */
+  .inv-action-btn {
+    @apply inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-2 text-xs font-medium transition-all active:scale-[0.98] sm:min-h-10 sm:flex-none sm:px-4 sm:text-sm;
+  }
+
+  .inv-action-btn--primary {
+    @apply bg-zinc-950 text-zinc-50 hover:bg-zinc-800;
+  }
+
+  .inv-action-btn--secondary {
+    @apply border border-zinc-200 bg-white text-zinc-900 hover:bg-zinc-50;
+  }
+
+  /* PDF 出力ボタン（モーダル内） */
+  .inv-print-btn {
+    @apply inline-flex min-h-11 items-center gap-1.5 rounded-md bg-zinc-950 px-3.5 py-1.5 text-xs font-medium text-zinc-50 transition-all hover:bg-zinc-800 active:scale-[0.98] sm:min-h-9 sm:px-3;
+  }
+
+  /* ---------- モーダル共通 ---------- */
+  .inv-modal-root {
+    @apply fixed inset-0 z-[100] flex items-end justify-center p-0 opacity-0 transition-opacity duration-200 sm:items-center sm:p-4;
+  }
+
+  .inv-modal-root--visible {
+    @apply opacity-100;
+  }
+
+  .inv-modal-backdrop {
+    @apply absolute inset-0 bg-zinc-950/50 backdrop-blur-[1px];
+  }
+
+  .inv-modal-panel {
+    @apply relative flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-2xl border border-zinc-200 bg-white shadow-2xl transition-all duration-200 sm:rounded-xl;
+    transform: translateY(0.5rem) scale(0.98);
+    opacity: 0;
+  }
+
+  .inv-modal-panel--visible {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+
+  .inv-modal-panel--sm {
+    @apply max-w-md;
+  }
+
+  .inv-modal-panel--md {
+    @apply max-w-lg;
+  }
+
+  .inv-modal-panel--preview {
+    @apply max-w-[52rem];
+  }
+
+  .inv-modal-header {
+    @apply flex shrink-0 flex-wrap items-start justify-between gap-3 border-b border-zinc-100 px-4 py-3 sm:px-5;
+  }
+
+  .inv-modal-title {
+    @apply text-sm font-semibold tracking-tight text-zinc-900;
+  }
+
+  .inv-modal-lead {
+    @apply mt-0.5 break-words text-[11px] leading-relaxed text-zinc-500;
+  }
+
+  .inv-modal-close {
+    @apply inline-flex min-h-11 items-center rounded-md border border-zinc-200 bg-white px-3 text-xs font-medium text-zinc-600 transition-colors hover:bg-zinc-50 hover:text-zinc-900 active:scale-[0.98] sm:min-h-9 sm:px-3;
+  }
+
+  .inv-modal-preview-frame {
+    @apply min-h-0 flex-1 overflow-auto bg-zinc-100/80 p-3 sm:p-5;
+  }
+}
+
+/* ---------- A4 シート（モノクロ＋アクセント1色） ---------- */
+.inv-sheet {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: 210mm;
+  min-height: 297mm;
+  padding: 16mm 16mm 14mm;
+  background: #ffffff;
+  color: #18181b;
+  font-size: 12px;
+  line-height: 1.55;
+  /* 罫線・アクセント色を印刷にも反映させる */
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.inv-sheet__title {
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.inv-sheet__rule {
+  display: block;
+  width: 18mm;
+  height: 3px;
+  margin-top: 4px;
+  border-radius: 2px;
+  background: #059669;
+}
+
+.inv-sheet__caption {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #a1a1aa;
+}
+
+/* ご請求金額：シート内で唯一の強調ブロック */
+.inv-sheet__due {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8mm;
+  margin-top: 10mm;
+  padding: 4mm 5mm;
+  border-left: 3px solid #059669;
+  background: #f4f4f5;
+}
+
+.inv-sheet__due-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  text-transform: uppercase;
+  color: #52525b;
+}
+
+.inv-sheet__due-value {
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.inv-sheet__table {
+  width: 100%;
+  margin-top: 8mm;
+  border-collapse: collapse;
+}
+
+.inv-sheet__table th {
+  padding: 2mm 2mm 1.6mm;
+  border-bottom: 1px solid #18181b;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #52525b;
+}
+
+.inv-sheet__table td {
+  padding: 2.2mm 2mm;
+  border-bottom: 1px solid #e4e4e7;
+  font-size: 11px;
+  color: #27272a;
+  vertical-align: top;
+}
+
+/* 品目が多くページをまたぐ場合も、1行が分断されないようにする */
+.inv-sheet__table tr {
+  break-inside: avoid;
+}
+
+.inv-sheet__total-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-top: 1.5mm;
+  padding-top: 2mm;
+  border-top: 1.5px solid #18181b;
+}
+
+.inv-sheet__block {
+  padding-left: 3mm;
+  border-left: 2px solid #e4e4e7;
+}
+
+/* 小計・税・合計 */
+.inv-sheet__totals {
+  margin-top: 6mm;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.inv-sheet__totals dl {
+  width: 72mm;
+}
+
+.inv-sheet__totals-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4mm;
+  padding: 1.8mm 0;
+  font-size: 11px;
+  color: #52525b;
+}
+
+.inv-sheet__totals-row dd {
+  color: #18181b;
+}
+
+.inv-sheet__totals-rate {
+  margin-left: 1.5mm;
+  color: #a1a1aa;
+}
+
+.inv-sheet__totals-row--grand {
+  margin-top: 1.5mm;
+  padding-top: 2.5mm;
+  border-top: 1.5px solid #18181b;
+}
+
+.inv-sheet__totals-row--grand dt {
+  font-size: 13px;
+  font-weight: 700;
+  color: #18181b;
+}
+
+.inv-sheet__totals-row--grand dd {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* 支払方法・備考（帳票下部） */
+.inv-sheet__footer-blocks {
+  margin-top: 8mm;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4mm;
+  break-inside: avoid;
+}
+
+.inv-sheet__footer-blocks:has(> :only-child) {
+  grid-template-columns: 1fr;
+}
+
+.inv-sheet__pay-box,
+.inv-sheet__notes-box {
+  padding: 3.5mm 4mm;
+  border-radius: 2mm;
+  background: #f4f4f5;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.inv-sheet__pay-box-body,
+.inv-sheet__notes-box-body {
+  margin-top: 1.5mm;
+  white-space: pre-line;
+  word-break: break-word;
+  font-size: 11px;
+  line-height: 1.55;
+  color: #3f3f46;
+}
+
+.inv-sheet__pay-box-body {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 640px) {
+  .inv-sheet__footer-blocks {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 印刷レイヤー：画面では出さない（印刷時だけ body 直下から実寸で出る） */
+.inv-print-layer {
+  display: none;
+}
+
+@media print {
+  /*
+   * 用紙の余白はシート側の padding で作るため 0 にする。
+   * @page は DOM で条件分岐できないので、他ページの印刷にも効く点は許容
+   * （このサイトに印刷前提のページは他にない）。
+   */
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  /*
+   * 印刷レイヤーがある請求書ページだけ「レイヤー以外を全部隠す」。
+   * :has() で限定することで、他ページを印刷したときに白紙にならない。
+   */
+  html:has(.inv-print-layer),
+  html:has(.inv-print-layer) body {
+    background: #ffffff !important;
+  }
+
+  html:has(.inv-print-layer) body > *:not(.inv-print-layer) {
+    display: none !important;
+  }
+
+  .inv-print-layer {
+    display: block !important;
+  }
+
+  .inv-print-layer .inv-sheet {
+    /* 297mm ぴったりだと丸め誤差で白紙ページが増えることがあるため少し縮める */
+    min-height: 292mm;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+}

@@ -77,7 +77,7 @@ export type TextCleanerDict = {
 
 export const textCleanerJa: TextCleanerDict = {
   shell: {
-    title: "テキスト・クレンジング",
+    title: "テキストクレンジング",
     description:
       "不要な改行・空白・制御文字を一発掃除。独自の一括置換も。",
   },
@@ -152,7 +152,7 @@ export const textCleanerJa: TextCleanerDict = {
 
 export const textCleanerEn: TextCleanerDict = {
   shell: {
-    title: "Text Cleaner",
+    title: "Text Cleansing",
     description:
       "Strip unwanted line breaks, spaces, and control characters. Custom bulk replace included.",
   },

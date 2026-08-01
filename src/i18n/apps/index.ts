@@ -15,6 +15,8 @@ import {
   imageCompressorEn,
   imageCompressorJa,
 } from "./imageCompressor";
+import type { InvoiceMakerDict } from "./invoiceMaker";
+import { invoiceMakerEn, invoiceMakerJa } from "./invoiceMaker";
 import type { LinkStockerDict } from "./linkStocker";
 import { linkStockerEn, linkStockerJa } from "./linkStocker";
 import type { LunchSavingsDict } from "./lunchSavings";
@@ -47,6 +49,7 @@ export type AppsDictionary = {
   textCleaner: TextCleanerDict;
   folderGenerator: FolderGeneratorDict;
   imageCompressor: ImageCompressorDict;
+  invoiceMaker: InvoiceMakerDict;
   pdfEditor: PdfEditorDict;
   mediaMetadata: MediaMetadataDict;
   characterRelation: CharacterRelationDict;
@@ -64,6 +67,7 @@ export const appsJa: AppsDictionary = {
   textCleaner: textCleanerJa,
   folderGenerator: folderGeneratorJa,
   imageCompressor: imageCompressorJa,
+  invoiceMaker: invoiceMakerJa,
   pdfEditor: pdfEditorJa,
   mediaMetadata: mediaMetadataJa,
   characterRelation: characterRelationJa,
@@ -81,6 +85,7 @@ export const appsEn: AppsDictionary = {
   textCleaner: textCleanerEn,
   folderGenerator: folderGeneratorEn,
   imageCompressor: imageCompressorEn,
+  invoiceMaker: invoiceMakerEn,
   pdfEditor: pdfEditorEn,
   mediaMetadata: mediaMetadataEn,
   characterRelation: characterRelationEn,

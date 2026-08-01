@@ -1,0 +1,225 @@
+/**
+ * LocalStorage への保存と復元。
+ * - draft: 編集中の請求書（入力のたびオートセーブ）
+ * - history: 名前付きで明示保存した請求書一覧
+ */
+
+import { loadLocalJson, saveLocalJson } from "@/lib/localData";
+import {
+  createDefaultInvoice,
+  createEmptyItem,
+  createEmptyParty,
+  createId,
+  CURRENCY_CODES,
+  type CurrencyCode,
+  type DocLocale,
+  type InvoiceAppStore,
+  type InvoiceData,
+  type InvoiceItem,
+  type InvoiceParty,
+  type SavedInvoice,
+} from "./types";
+
+const STORAGE_KEY = "invoice-maker-app:v2";
+const LEGACY_KEY = "invoice-maker-app:v1";
+
+function isCurrencyCode(value: unknown): value is CurrencyCode {
+  return CURRENCY_CODES.includes(value as CurrencyCode);
+}
+
+function isDocLocale(value: unknown): value is DocLocale {
+  return value === "ja" || value === "en";
+}
+
+function asString(value: unknown, fallback = ""): string {
+  return typeof value === "string" ? value : fallback;
+}
+
+function asNumber(value: unknown, fallback: number): number {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string" && value.trim() !== "") {
+    const parsed = Number(value);
+    if (Number.isFinite(parsed)) return parsed;
+  }
+  return fallback;
+}
+
+function normalizeParty(raw: unknown): InvoiceParty {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
+    return createEmptyParty();
+  }
+  const o = raw as Record<string, unknown>;
+  return {
+    name: asString(o.name),
+    address: asString(o.address),
+    email: asString(o.email),
+    extra: asString(o.extra),
+    registrationNumber: asString(o.registrationNumber),
+  };
+}
+
+function normalizeItems(raw: unknown): InvoiceItem[] {
+  if (!Array.isArray(raw)) return [createEmptyItem()];
+  const items = raw
+    .filter((item): item is Record<string, unknown> =>
+      Boolean(item && typeof item === "object" && !Array.isArray(item)),
+    )
+    .map((item) => ({
+      id: typeof item.id === "string" ? item.id : createId(),
+      name: asString(item.name),
+      unitPrice: asNumber(item.unitPrice, 0),
+      quantity: asNumber(item.quantity, 1),
+    }));
+  return items.length > 0 ? items : [createEmptyItem()];
+}
+
+/** 1件分の請求書データを正規化。読めない場合は null */
+export function parseInvoiceData(raw: unknown): InvoiceData | null {
+  if (raw === null || raw === undefined) return null;
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+  const o = raw as Record<string, unknown>;
+  // v1 の素の InvoiceData か、draft オブジェクトかを判別（items がある）
+  if (!("items" in o) && !("invoiceNumber" in o)) return null;
+  const base = createDefaultInvoice(
+    isDocLocale(o.docLocale) ? o.docLocale : "ja",
+  );
+  return {
+    docLocale: isDocLocale(o.docLocale) ? o.docLocale : base.docLocale,
+    currency: isCurrencyCode(o.currency) ? o.currency : base.currency,
+    taxRatePercent: Math.min(
+      100,
+      Math.max(0, asNumber(o.taxRatePercent, base.taxRatePercent)),
+    ),
+    invoiceNumber: asString(o.invoiceNumber, base.invoiceNumber),
+    issueDate: asString(o.issueDate, base.issueDate),
+    dueDate: asString(o.dueDate, base.dueDate),
+    from: normalizeParty(o.from),
+    to: normalizeParty(o.to),
+    items: normalizeItems(o.items),
+    paymentMethod: asString(o.paymentMethod),
+    notes: asString(o.notes),
+  };
+}
+
+function normalizeHistory(raw: unknown): SavedInvoice[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .filter((item): item is Record<string, unknown> =>
+      Boolean(item && typeof item === "object" && !Array.isArray(item)),
+    )
+    .map((item) => {
+      const data = parseInvoiceData(item.data);
+      if (!data) return null;
+      return {
+        id: typeof item.id === "string" ? item.id : createId("saved"),
+        name:
+          typeof item.name === "string" && item.name.trim()
+            ? item.name.trim()
+            : data.invoiceNumber || "Untitled",
+        savedAt:
+          typeof item.savedAt === "string" && item.savedAt
+            ? item.savedAt
+            : new Date().toISOString(),
+        data,
+      };
+    })
+    .filter((item): item is SavedInvoice => item !== null);
+}
+
+export function createDefaultStore(locale: DocLocale): InvoiceAppStore {
+  return {
+    draft: createDefaultInvoice(locale),
+    history: [],
+  };
+}
+
+/**
+ * バックアップ／読込用に正規化。
+ * - v2: { draft, history }
+ * - v1: InvoiceData 単体 → draft として取り込み
+ * - バックアップ封筒 { data: ... } にも対応
+ */
+export function parseImportedData(raw: unknown): InvoiceAppStore | null {
+  if (raw === null || raw === undefined) return null;
+  let payload: unknown = raw;
+  if (
+    payload &&
+    typeof payload === "object" &&
+    !Array.isArray(payload) &&
+    "data" in payload &&
+    !("draft" in payload) &&
+    !("items" in payload)
+  ) {
+    payload = (payload as { data: unknown }).data;
+  }
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+    return null;
+  }
+  const o = payload as Record<string, unknown>;
+
+  // v2 形式
+  if ("draft" in o || "history" in o) {
+    const draft =
+      parseInvoiceData(o.draft) ?? createDefaultInvoice("ja");
+    return {
+      draft,
+      history: normalizeHistory(o.history),
+    };
+  }
+
+  // v1 形式（素の InvoiceData）
+  const draft = parseInvoiceData(o);
+  if (!draft) return null;
+  return { draft, history: [] };
+}
+
+/** 保存済みがあれば復元。v1 からの移行にも対応 */
+export function loadInvoiceStore(locale: DocLocale): InvoiceAppStore {
+  const raw =
+    loadLocalJson<unknown>(STORAGE_KEY, null) ??
+    loadLocalJson<unknown>(LEGACY_KEY, null);
+  const store = parseImportedData(raw) ?? createDefaultStore(locale);
+  // v2 キーへ寄せておく（次回から LEGACY を読まない）
+  saveInvoiceStore(store);
+  return store;
+}
+
+export function saveInvoiceStore(store: InvoiceAppStore): void {
+  saveLocalJson(STORAGE_KEY, store);
+}
+
+/** 下書きだけ更新して保存 */
+export function saveDraft(
+  draft: InvoiceData,
+  history: SavedInvoice[],
+): void {
+  saveInvoiceStore({ draft, history });
+}
+
+/** 履歴に1件追加（先頭＝新しい順） */
+export function addSavedInvoice(
+  history: SavedInvoice[],
+  name: string,
+  data: InvoiceData,
+): SavedInvoice[] {
+  const entry: SavedInvoice = {
+    id: createId("saved"),
+    name: name.trim() || data.invoiceNumber || "Untitled",
+    savedAt: new Date().toISOString(),
+    // 参照共有を避けるためディープコピー相当
+    data: structuredClone(data),
+  };
+  return [entry, ...history];
+}
+
+export function removeSavedInvoice(
+  history: SavedInvoice[],
+  id: string,
+): SavedInvoice[] {
+  return history.filter((item) => item.id !== id);
+}
+
+/** @deprecated 互換用エイリアス（バックアップの単体 InvoiceData 読込向け） */
+export function parseImportedInvoiceData(raw: unknown): InvoiceData | null {
+  return parseInvoiceData(raw);
+}

@@ -1,4 +1,4 @@
-/** テキスト・クレンジング＆一括置換ツールの型定義 */
+/** テキストクレンジングツールの型定義 */
 
 /** 空行・改行の扱い */
 export type LineBreakMode = "keep" | "collapse" | "remove";

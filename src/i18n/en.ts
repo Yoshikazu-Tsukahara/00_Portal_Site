@@ -55,6 +55,11 @@ export const en: Dictionary = {
     },
   },
   tools: {
+    "invoice-maker": {
+      title: "Invoice Maker",
+      description:
+        "Fill in the form to get a clean A4 invoice. Multi-language, multi-currency, one-click PDF.",
+    },
     "mail-template": {
       title: "Mail Template Organizer",
       description: "Speed up email replies with tags and variable substitution.",
@@ -73,7 +78,7 @@ export const en: Dictionary = {
       description: "Resize and compress images in-browser with width and quality.",
     },
     "text-cleaner": {
-      title: "Text Cleaner & Bulk Replace",
+      title: "Text Cleansing",
       description: "Clean breaks, spaces, and control chars. Save custom rules.",
     },
     "media-metadata-editor": {

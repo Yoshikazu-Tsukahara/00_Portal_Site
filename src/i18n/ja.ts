@@ -55,6 +55,10 @@ export const ja: Dictionary = {
     },
   },
   tools: {
+    "invoice-maker": {
+      title: "請求書メーカー",
+      description: "入力するだけでA4の請求書に。多言語・多通貨対応でPDF保存も一発。",
+    },
     "mail-template": {
       title: "メールテンプレ整理アプリ",
       description: "タグ分類と変数置換で、日々のメール返信を爆速に。",
@@ -72,7 +76,7 @@ export const ja: Dictionary = {
       description: "最大幅と画質を指定して、ブラウザ内で一括リサイズ・圧縮。",
     },
     "text-cleaner": {
-      title: "テキスト・クレンジング＆一括置換",
+      title: "テキストクレンジング",
       description: "改行・空白・制御文字を一発掃除。独自の置換ルールも保存可能。",
     },
     "media-metadata-editor": {
