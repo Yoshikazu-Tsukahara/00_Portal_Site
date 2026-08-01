@@ -4,7 +4,7 @@
   "description": "毎日のランチ代の差額をタップで記録。浮いたお金をゲーム感覚で貯めるアプリ。",
   "id": "/lunch-savings",
   "start_url": "/lunch-savings",
-  "scope": "/lunch-savings/",
+  "scope": "/lunch-savings",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#fafafa",

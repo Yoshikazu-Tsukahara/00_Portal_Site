@@ -1,5 +1,5 @@
 /* とりあえずキープ専用 Service Worker（scope: /link-stocker） */
-const CACHE_NAME = "link-stocker-v2";
+const CACHE_NAME = "link-stocker-v3";
 const PRECACHE = [
   "/link-stocker",
   "/link-stocker/manifest.webmanifest",

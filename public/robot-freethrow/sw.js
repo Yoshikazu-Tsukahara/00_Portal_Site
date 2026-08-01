@@ -1,5 +1,5 @@
 /* 投射フリースロー専用 Service Worker（scope: /robot-freethrow） */
-const CACHE_NAME = "robot-freethrow-v15";
+const CACHE_NAME = "robot-freethrow-v16";
 const PRECACHE = [
   "/robot-freethrow",
   "/robot-freethrow/manifest.webmanifest",

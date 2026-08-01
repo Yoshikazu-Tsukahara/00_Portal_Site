@@ -11,7 +11,7 @@ export const PALETTE_COLLECTOR_MANIFEST = {
     "画像からカラーコードを抽出し、自分だけのカラーパレットを作成・管理するツール。",
   id: "/palette-collector",
   start_url: "/palette-collector",
-  scope: "/palette-collector/",
+  scope: "/palette-collector",
   display: "standalone",
   orientation: "any",
   background_color: "#f9fafb",

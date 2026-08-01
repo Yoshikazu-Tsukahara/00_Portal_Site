@@ -12,7 +12,7 @@ export const PDF_EDITOR_MANIFEST = {
     "結合・並び替え・回転・白紙挿入。ブラウザ内で完結する PDF エディタ。",
   id: "/tools/pdf-editor",
   start_url: "/tools/pdf-editor",
-  scope: "/tools/pdf-editor/",
+  scope: "/tools/pdf-editor",
   display: "standalone",
   orientation: "any",
   background_color: "#fafafa",

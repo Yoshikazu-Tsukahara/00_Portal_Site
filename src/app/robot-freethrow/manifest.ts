@@ -8,7 +8,7 @@ export const ROBOT_FREETHROW_MANIFEST = {
     "角度・推力・スピンを指定してリングを狙う、投射運動のミニゲーム。",
   id: "/robot-freethrow",
   start_url: "/robot-freethrow",
-  scope: "/robot-freethrow/",
+  scope: "/robot-freethrow",
   display: "standalone",
   orientation: "any",
   background_color: "#f3e6c8",

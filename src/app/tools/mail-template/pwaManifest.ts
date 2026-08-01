@@ -12,7 +12,7 @@ export const MAIL_TEMPLATE_MANIFEST = {
     "変数・ラベルで返信を即作成。データはブラウザ内に保存するメールテンプレート管理アプリ。",
   id: "/tools/mail-template",
   start_url: "/tools/mail-template",
-  scope: "/tools/mail-template/",
+  scope: "/tools/mail-template",
   display: "standalone",
   orientation: "any",
   background_color: "#fafafa",

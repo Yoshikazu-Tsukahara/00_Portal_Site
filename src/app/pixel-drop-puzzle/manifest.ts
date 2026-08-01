@@ -11,7 +11,7 @@ export const PIXEL_DROP_PUZZLE_MANIFEST = {
     "写真を隙間に落とすだけ。判定は小数点以下のピクセル単位という、鬼畜な精度パズル。",
   id: "/pixel-drop-puzzle",
   start_url: "/pixel-drop-puzzle",
-  scope: "/pixel-drop-puzzle/",
+  scope: "/pixel-drop-puzzle",
   display: "standalone",
   orientation: "portrait",
   background_color: "#09090b",

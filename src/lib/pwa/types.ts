@@ -4,8 +4,9 @@
  */
 export type PwaAppConfig = {
   /**
-   * アプリのルートパス（例: "/lunch-savings"）。
-   * Service Worker は `${basePath}/sw.js` を `${basePath}/` スコープで登録する。
+   * アプリのルートパス（例: "/lunch-savings"）。末尾スラッシュなし。
+   * Service Worker は `${basePath}/sw.js` を `scope: basePath` で登録する
+   * （Next.js 既定の `/app` URL を SW が制御できるようにする）。
    */
   basePath: string;
   /**

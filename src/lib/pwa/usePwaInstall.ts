@@ -28,6 +28,28 @@ function detectIos(): boolean {
   );
 }
 
+/** React マウント前に BIP が来ても取りこぼさないためのモジュールキャッシュ */
+let cachedBip: BeforeInstallPromptEvent | null = null;
+let bipListenerBound = false;
+
+function ensureBipCapture() {
+  if (typeof window === "undefined" || bipListenerBound) return;
+  bipListenerBound = true;
+
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    cachedBip = e as BeforeInstallPromptEvent;
+    window.dispatchEvent(new Event("pwa:bip"));
+  });
+
+  window.addEventListener("appinstalled", () => {
+    cachedBip = null;
+    window.dispatchEvent(new Event("pwa:installed"));
+  });
+}
+
+ensureBipCapture();
+
 /**
  * PWA インストール可否と beforeinstallprompt の保持。
  * BIP が無くてもボタンは表示し、クリック時にネイティブ prompt か案内モーダルへ分岐する。
@@ -41,11 +63,12 @@ export function usePwaInstall(): PwaInstallState {
   const [installed, setInstalled] = useState(false);
 
   useEffect(() => {
+    ensureBipCapture();
     setIsIos(detectIos());
+    if (cachedBip) setDeferred(cachedBip);
 
-    function onBip(e: Event) {
-      e.preventDefault();
-      setDeferred(e as BeforeInstallPromptEvent);
+    function onBip() {
+      setDeferred(cachedBip);
     }
 
     function onInstalled() {
@@ -53,20 +76,22 @@ export function usePwaInstall(): PwaInstallState {
       setDeferred(null);
     }
 
-    window.addEventListener("beforeinstallprompt", onBip);
-    window.addEventListener("appinstalled", onInstalled);
+    window.addEventListener("pwa:bip", onBip);
+    window.addEventListener("pwa:installed", onInstalled);
 
     return () => {
-      window.removeEventListener("beforeinstallprompt", onBip);
-      window.removeEventListener("appinstalled", onInstalled);
+      window.removeEventListener("pwa:bip", onBip);
+      window.removeEventListener("pwa:installed", onInstalled);
     };
   }, []);
 
   const promptInstall = useCallback(async () => {
-    if (!deferred) return "unavailable" as const;
+    const event = deferred ?? cachedBip;
+    if (!event) return "unavailable" as const;
     try {
-      await deferred.prompt();
-      const { outcome } = await deferred.userChoice;
+      await event.prompt();
+      const { outcome } = await event.userChoice;
+      cachedBip = null;
       setDeferred(null);
       if (outcome === "accepted") setInstalled(true);
       return outcome;
@@ -81,7 +106,7 @@ export function usePwaInstall(): PwaInstallState {
     canShow,
     isStandalone,
     isIos,
-    canPrompt: deferred !== null,
+    canPrompt: deferred !== null || cachedBip !== null,
     promptInstall,
   };
 }

@@ -1,5 +1,5 @@
 /* ランチ貯金専用 Service Worker（scope: /lunch-savings） */
-const CACHE_NAME = "lunch-savings-v2";
+const CACHE_NAME = "lunch-savings-v3";
 const PRECACHE = [
   "/lunch-savings",
   "/lunch-savings.webmanifest",

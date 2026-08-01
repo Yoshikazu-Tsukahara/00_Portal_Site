@@ -1,5 +1,5 @@
 /* 究極確率スロット専用 Service Worker（scope: /ultimate-probability-slot） */
-const CACHE_NAME = "ultimate-probability-slot-v2";
+const CACHE_NAME = "ultimate-probability-slot-v3";
 const PRECACHE = [
   "/ultimate-probability-slot",
   "/ultimate-probability-slot/manifest.webmanifest",

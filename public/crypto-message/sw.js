@@ -1,5 +1,5 @@
 /* ひみつメッセージ専用 Service Worker（scope: /crypto-message） */
-const CACHE_NAME = "crypto-message-v2";
+const CACHE_NAME = "crypto-message-v3";
 const PRECACHE = [
   "/crypto-message",
   "/crypto-message/manifest.webmanifest",

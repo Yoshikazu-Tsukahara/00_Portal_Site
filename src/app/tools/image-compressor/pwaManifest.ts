@@ -12,7 +12,7 @@ export const IMAGE_COMPRESSOR_MANIFEST = {
     "リサイズ・圧縮をブラウザ内で一括処理。ZIPで保存する画像軽量化アプリ。",
   id: "/tools/image-compressor",
   start_url: "/tools/image-compressor",
-  scope: "/tools/image-compressor/",
+  scope: "/tools/image-compressor",
   display: "standalone",
   orientation: "any",
   background_color: "#fafafa",

@@ -1,5 +1,5 @@
 /* Palette Collector 専用 Service Worker（scope: /palette-collector） */
-const CACHE_NAME = "palette-collector-v2";
+const CACHE_NAME = "palette-collector-v3";
 const PRECACHE = [
   "/palette-collector",
   "/palette-collector/manifest.webmanifest",

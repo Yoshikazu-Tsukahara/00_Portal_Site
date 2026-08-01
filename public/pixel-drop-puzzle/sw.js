@@ -1,5 +1,5 @@
 /* 極小ピクセル隙間落としパズル専用 Service Worker（scope: /pixel-drop-puzzle） */
-const CACHE_NAME = "pixel-drop-puzzle-v3";
+const CACHE_NAME = "pixel-drop-puzzle-v4";
 const PRECACHE = [
   "/pixel-drop-puzzle",
   "/pixel-drop-puzzle/manifest.webmanifest",

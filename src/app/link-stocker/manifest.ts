@@ -9,7 +9,7 @@ export const LINK_STOCKER_MANIFEST = {
     "とりあえずキープしたい URL を、OGP サムネ付きカードで視覚的に管理。",
   id: "/link-stocker",
   start_url: "/link-stocker",
-  scope: "/link-stocker/",
+  scope: "/link-stocker",
   display: "standalone",
   orientation: "any",
   background_color: "#fafafa",

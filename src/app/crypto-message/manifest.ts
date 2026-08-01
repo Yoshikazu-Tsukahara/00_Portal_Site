@@ -8,7 +8,7 @@ export const CRYPTO_MESSAGE_MANIFEST = {
     "合言葉で暗号化・復号する秘密のやり取りと、シーザー暗号を解き明かす解読チャレンジ。",
   id: "/crypto-message",
   start_url: "/crypto-message",
-  scope: "/crypto-message/",
+  scope: "/crypto-message",
   display: "standalone",
   orientation: "any",
   background_color: "#09090b",

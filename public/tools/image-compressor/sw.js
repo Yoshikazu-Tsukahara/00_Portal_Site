@@ -1,5 +1,5 @@
 /* 画像一括軽量化専用 Service Worker（scope: /tools/image-compressor） */
-const CACHE_NAME = "image-compressor-v2";
+const CACHE_NAME = "image-compressor-v3";
 const PRECACHE = [
   "/tools/image-compressor",
   "/tools/image-compressor/manifest.webmanifest",

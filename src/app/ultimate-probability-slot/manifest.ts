@@ -11,7 +11,7 @@ export const SLOT_PWA_MANIFEST = {
     "自作の天文学的低確率スロットで「当たるまで」「外し続ける」に挑む、無機質な演算エンジン。",
   id: "/ultimate-probability-slot",
   start_url: "/ultimate-probability-slot",
-  scope: "/ultimate-probability-slot/",
+  scope: "/ultimate-probability-slot",
   display: "standalone",
   orientation: "portrait",
   background_color: "#09090b",

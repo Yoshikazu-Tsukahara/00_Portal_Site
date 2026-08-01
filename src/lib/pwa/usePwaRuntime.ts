@@ -35,8 +35,11 @@ export function usePwaRuntime({
     const isLocal = SW_LOCAL_HOSTS.includes(window.location.hostname);
     if (process.env.NODE_ENV !== "production" && !isLocal) return;
 
+    // 末尾スラッシュなしの scope にする（/app は /app/ スコープ外になるため）
+    const scope = basePath.endsWith("/") ? basePath.slice(0, -1) : basePath;
+
     void navigator.serviceWorker
-      .register(`${basePath}/sw.js`, { scope: `${basePath}/` })
+      .register(`${basePath}/sw.js`, { scope })
       .catch(() => {
         // 登録失敗は無視（オフライン非対応でもアプリ自体は動く）
       });

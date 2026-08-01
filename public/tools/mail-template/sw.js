@@ -1,5 +1,5 @@
 /* メールテンプレ専用 Service Worker（scope: /tools/mail-template） */
-const CACHE_NAME = "mail-template-v2";
+const CACHE_NAME = "mail-template-v3";
 const PRECACHE = [
   "/tools/mail-template",
   "/tools/mail-template/manifest.webmanifest",
