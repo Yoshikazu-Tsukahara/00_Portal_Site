@@ -56,8 +56,9 @@ export const ja: Dictionary = {
   },
   tools: {
     "invoice-maker": {
-      title: "請求書メーカー",
-      description: "入力するだけでA4の請求書に。多言語・多通貨対応でPDF保存も一発。",
+      title: "帳票メーカー",
+      description:
+        "請求書・見積書・納品書・領収書をA4で作成。多言語・多通貨対応でPDF保存も一発。",
     },
     "mail-template": {
       title: "メールテンプレ整理アプリ",

@@ -13,7 +13,6 @@ import {
 } from "./calc";
 import {
   CURRENCY_CODES,
-  DOCUMENT_TYPES,
   FIELD_LIMITS,
   MAX_INVOICE_ITEMS,
   TAX_RATE_PRESETS,
@@ -456,87 +455,81 @@ export default function InvoiceForm({
                 </div>
               </Field>
 
-              <Field label={copy.settings.logo}>
-                <div className="flex flex-col gap-2">
-                  {data.logoImageBase64 && (
-                    <div className="flex items-center gap-2">
-                      <img
-                        src={data.logoImageBase64}
-                        alt="Logo"
-                        className="h-12 w-auto max-w-[120px] object-contain"
+              <div className="grid grid-cols-2 gap-2.5">
+                <Field label={copy.settings.logo}>
+                  <div className="flex flex-col gap-1.5">
+                    {data.logoImageBase64 ? (
+                      <div className="flex items-center gap-1.5">
+                        <img
+                          src={data.logoImageBase64}
+                          alt=""
+                          className="h-10 w-auto max-w-full object-contain"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => onPatch({ logoImageBase64: undefined })}
+                          className="inv-ghost-btn shrink-0 text-xs"
+                          aria-label={copy.settings.logoClear}
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ) : null}
+                    <label className="inv-ghost-btn inline-flex w-full cursor-pointer items-center justify-center gap-1 text-[11px]">
+                      <Upload className="h-3.5 w-3.5 shrink-0" />
+                      {copy.settings.logoSelect}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) =>
+                          handleImageUpload(e, (base64) =>
+                            onPatch({ logoImageBase64: base64 }),
+                          )
+                        }
+                        className="hidden"
                       />
-                      <button
-                        type="button"
-                        onClick={() => onPatch({ logoImageBase64: undefined })}
-                        className="inv-ghost-btn text-xs"
-                      >
-                        <X className="h-3 w-3" />
-                        {copy.settings.logoClear}
-                      </button>
-                    </div>
-                  )}
-                  <label className="inv-ghost-btn inline-flex w-fit cursor-pointer items-center gap-1.5">
-                    <Upload className="h-4 w-4" />
-                    {copy.settings.logoSelect}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) =>
-                        handleImageUpload(e, (base64) =>
-                          onPatch({ logoImageBase64: base64 }),
-                        )
-                      }
-                      className="hidden"
-                    />
-                  </label>
-                  {copy.settings.logoHint && (
-                    <span className="text-[11px] text-zinc-500">
-                      {copy.settings.logoHint}
-                    </span>
-                  )}
-                </div>
-              </Field>
+                    </label>
+                  </div>
+                </Field>
 
-              <Field label={copy.settings.stamp}>
-                <div className="flex flex-col gap-2">
-                  {data.stampImageBase64 && (
-                    <div className="flex items-center gap-2">
-                      <img
-                        src={data.stampImageBase64}
-                        alt="Stamp"
-                        className="h-14 w-14 object-contain"
+                <Field label={copy.settings.stamp}>
+                  <div className="flex flex-col gap-1.5">
+                    {data.stampImageBase64 ? (
+                      <div className="flex items-center gap-1.5">
+                        <img
+                          src={data.stampImageBase64}
+                          alt=""
+                          className="h-10 w-10 object-contain"
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            onPatch({ stampImageBase64: undefined })
+                          }
+                          className="inv-ghost-btn shrink-0 text-xs"
+                          aria-label={copy.settings.stampClear}
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ) : null}
+                    <label className="inv-ghost-btn inline-flex w-full cursor-pointer items-center justify-center gap-1 text-[11px]">
+                      <Upload className="h-3.5 w-3.5 shrink-0" />
+                      {copy.settings.stampSelect}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) =>
+                          handleImageUpload(e, (base64) =>
+                            onPatch({ stampImageBase64: base64 }),
+                          )
+                        }
+                        className="hidden"
                       />
-                      <button
-                        type="button"
-                        onClick={() => onPatch({ stampImageBase64: undefined })}
-                        className="inv-ghost-btn text-xs"
-                      >
-                        <X className="h-3 w-3" />
-                        {copy.settings.stampClear}
-                      </button>
-                    </div>
-                  )}
-                  <label className="inv-ghost-btn inline-flex w-fit cursor-pointer items-center gap-1.5">
-                    <Upload className="h-4 w-4" />
-                    {copy.settings.stampSelect}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) =>
-                        handleImageUpload(e, (base64) =>
-                          onPatch({ stampImageBase64: base64 }),
-                        )
-                      }
-                      className="hidden"
-                    />
-                  </label>
-                  {copy.settings.stampHint && (
-                    <span className="text-[11px] text-zinc-500">
-                      {copy.settings.stampHint}
-                    </span>
-                  )}
-                </div>
-              </Field>
+                    </label>
+                  </div>
+                </Field>
+              </div>
             </div>
           </Section>
 

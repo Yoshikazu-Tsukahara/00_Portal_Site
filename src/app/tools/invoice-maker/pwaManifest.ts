@@ -6,10 +6,10 @@ import type { MetadataRoute } from "next";
  * （ファイル名を manifest.ts にしない。Next.js の特殊メタファイルと衝突するため）
  */
 export const INVOICE_MAKER_MANIFEST = {
-  name: "請求書メーカー",
-  short_name: "請求書",
+  name: "帳票メーカー",
+  short_name: "帳票",
   description:
-    "入力するだけでA4の請求書に。多言語・多通貨対応でPDF保存も一発。データはブラウザ内に保存。",
+    "請求書・見積書・納品書・領収書をA4で作成。多言語・多通貨対応でPDF保存も一発。データはブラウザ内に保存。",
   id: "/tools/invoice-maker",
   start_url: "/tools/invoice-maker",
   scope: "/tools/invoice-maker",

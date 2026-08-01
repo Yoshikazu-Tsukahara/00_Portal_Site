@@ -136,9 +136,9 @@ export type InvoiceMakerDict = {
 
 export const invoiceMakerJa: InvoiceMakerDict = {
   shell: {
-    title: "請求書メーカー",
+    title: "帳票メーカー",
     description:
-      "2カラムで入力し、プレビュー確認からそのままPDFとして保存できます。過去の請求書もブラウザ内に保存できます。",
+      "請求書・見積書・納品書・領収書を2カラムで入力し、プレビューからそのままPDF保存。過去の帳票もブラウザ内に残せます。",
   },
   loading: "読込中…",
   actions: {
@@ -271,32 +271,32 @@ export const invoiceMakerJa: InvoiceMakerDict = {
     button: "このアプリをホーム画面に追加",
     buttonShort: "ホームに追加",
     buttonTiny: "追加",
-    buttonAria: "請求書メーカーをホーム画面に追加してアプリとして使う",
+    buttonAria: "帳票メーカーをホーム画面に追加してアプリとして使う",
     modalTitle: "ホーム画面に追加",
     modalLead:
-      "Safari からホーム画面に追加すると、請求書メーカーだけを独立アプリとしてすぐ開けます。",
+      "Safari からホーム画面に追加すると、帳票メーカーだけを独立アプリとしてすぐ開けます。",
     step1Title: "共有をタップ",
     step1Body: "画面下（または上）の共有アイコン［↑］をタップします。",
     step2Title: "「ホーム画面に追加」",
     step2Body: "メニューを下にスクロールし、「ホーム画面に追加」を選びます。",
     desktopTitle: "アプリとしてインストール",
     desktopLead:
-      "Chrome / Edge なら、アドレスバーやメニューから請求書メーカーを独立アプリとして追加できます。",
+      "Chrome / Edge なら、アドレスバーやメニューから帳票メーカーを独立アプリとして追加できます。",
     desktopStep1Title: "ブラウザのメニューを開く",
     desktopStep1Body:
       "画面右上の「︙」またはアドレスバー横のインストールアイコンを探します。",
     desktopStep2Title: "「アプリをインストール」",
     desktopStep2Body:
-      "「請求書メーカーをインストール」や「アプリをインストール」を選ぶとホーム／デスクトップに追加されます。",
+      "「帳票メーカーをインストール」や「アプリをインストール」を選ぶとホーム／デスクトップに追加されます。",
     modalClose: "わかった",
   },
 };
 
 export const invoiceMakerEn: InvoiceMakerDict = {
   shell: {
-    title: "Invoice Maker",
+    title: "Form Maker",
     description:
-      "Fill the two-column form, preview the A4 invoice, then save as PDF. Past invoices stay in your browser.",
+      "Fill the two-column form for invoices, estimates, delivery notes, or receipts, then save as PDF. Past documents stay in your browser.",
   },
   loading: "Loading…",
   actions: {
@@ -429,23 +429,23 @@ export const invoiceMakerEn: InvoiceMakerDict = {
     button: "Add this app to Home Screen",
     buttonShort: "Add to Home",
     buttonTiny: "Add",
-    buttonAria: "Add Invoice Maker to your home screen as a standalone app",
+    buttonAria: "Add Form Maker to your home screen as a standalone app",
     modalTitle: "Add to Home Screen",
     modalLead:
-      "Add Invoice Maker from Safari to open it as its own app — not the portal.",
+      "Add Form Maker from Safari to open it as its own app — not the portal.",
     step1Title: "Tap Share",
     step1Body: "Tap the Share icon [↑] at the bottom (or top) of Safari.",
     step2Title: "Add to Home Screen",
     step2Body: "Scroll the menu and choose “Add to Home Screen”.",
     desktopTitle: "Install as an app",
     desktopLead:
-      "In Chrome or Edge, install Invoice Maker as its own app from the address bar or browser menu.",
+      "In Chrome or Edge, install Form Maker as its own app from the address bar or browser menu.",
     desktopStep1Title: "Open the browser menu",
     desktopStep1Body:
       "Look for the ⋮ menu or the install icon near the address bar.",
     desktopStep2Title: "Install app",
     desktopStep2Body:
-      "Choose “Install Invoice Maker” / “Install app” to add it to your home screen or desktop.",
+      "Choose “Install Form Maker” / “Install app” to add it to your home screen or desktop.",
     modalClose: "Got it",
   },
 };

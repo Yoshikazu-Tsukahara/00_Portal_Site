@@ -3703,7 +3703,7 @@ html.pxd-pwa-standalone .pxd-block-guide {
   color: #a1a1aa;
 }
 
-/* ご請求金額：シート内で唯一の強調ブロック */
+/* ご請求金額：シート内で唯一の強調ブロック（縦棒はアクセントカラー連動） */
 .inv-sheet__due {
   display: flex;
   align-items: center;
@@ -3711,8 +3711,10 @@ html.pxd-pwa-standalone .pxd-block-guide {
   gap: 8mm;
   margin-top: 10mm;
   padding: 4mm 5mm;
-  border-left: 3px solid #059669;
+  border-left: 3px solid var(--accent-color, #18181b);
   background: #f4f4f5;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 }
 
 .inv-sheet__due-label {

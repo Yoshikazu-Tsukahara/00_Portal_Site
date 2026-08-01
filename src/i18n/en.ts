@@ -56,9 +56,9 @@ export const en: Dictionary = {
   },
   tools: {
     "invoice-maker": {
-      title: "Invoice Maker",
+      title: "Form Maker",
       description:
-        "Fill in the form to get a clean A4 invoice. Multi-language, multi-currency, one-click PDF.",
+        "Create A4 invoices, estimates, delivery notes, and receipts. Multi-language, multi-currency, one-click PDF.",
     },
     "mail-template": {
       title: "Mail Template Organizer",
