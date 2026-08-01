@@ -14,6 +14,7 @@ import {
 import { arrayMove } from "@dnd-kit/sortable";
 
 import AppShell from "@/components/AppShell";
+import PrivacyNotice from "@/components/PrivacyNotice";
 import { fmt, useI18n } from "@/i18n";
 import ExportDialog, {
   type ExportDialogMode,
@@ -586,6 +587,7 @@ export default function PdfEditorPage() {
       }}
     >
       <div className="flex min-h-0 w-full max-w-full flex-1 flex-col gap-2 overflow-x-hidden overflow-y-auto md:overflow-hidden">
+        <PrivacyNotice />
         <div className="min-w-0 shrink-0 space-y-1.5">
           <PdfUploadZone
             onFiles={handleFiles}

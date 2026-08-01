@@ -108,6 +108,8 @@ export type Dictionary = {
     persistence: string;
     safety: string;
     safetyShort: string;
+    /** データ系ツール上部の共通プライバシー案内（穏やかな一文） */
+    privacyBanner: string;
   };
   dataManager: {
     buttonTitle: string;

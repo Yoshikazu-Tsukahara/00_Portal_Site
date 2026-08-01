@@ -1,9 +1,10 @@
 /* Palette Collector 専用 Service Worker（scope: /palette-collector） */
-const CACHE_NAME = "palette-collector-v1";
+const CACHE_NAME = "palette-collector-v2";
 const PRECACHE = [
   "/palette-collector",
   "/palette-collector/manifest.webmanifest",
-  "/icons/palette-collector.svg",
+  "/icons/palette-collector-192.png",
+  "/icons/palette-collector-512.png",
 ];
 
 self.addEventListener("install", (event) => {

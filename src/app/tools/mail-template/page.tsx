@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import AppShell from "@/components/AppShell";
+import PrivacyNotice from "@/components/PrivacyNotice";
 import { fmt, useI18n } from "@/i18n";
 import InstallAppButton from "./InstallAppButton";
 import PreviewPane from "./PreviewPane";
@@ -343,6 +344,7 @@ export default function MailTemplatePage() {
         </div>
       }
     >
+      <PrivacyNotice className="mb-2" />
       {!hydrated ? (
         <p className="text-sm text-zinc-400">{mt.loading}</p>
       ) : (

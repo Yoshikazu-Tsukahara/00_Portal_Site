@@ -5,10 +5,22 @@ export type PaletteCollectorDict = {
   install: {
     button: string;
     buttonShort: string;
+    buttonTiny: string;
     buttonAria: string;
-    iosHint: string;
+    modalTitle: string;
+    modalLead: string;
+    step1Title: string;
+    step1Body: string;
+    step2Title: string;
+    step2Body: string;
+    desktopTitle: string;
+    desktopLead: string;
+    desktopStep1Title: string;
+    desktopStep1Body: string;
+    desktopStep2Title: string;
+    desktopStep2Body: string;
+    modalClose: string;
   };
-  privacyBanner: string;
   stage: {
     dropTitle: string;
     dropHint: string;
@@ -123,14 +135,28 @@ export const paletteCollectorJa: PaletteCollectorDict = {
       "画像からカラーコードをスポイト抽出し、自分だけのカラーパレットを作成・管理。",
   },
   install: {
-    button: "ホーム画面に追加",
-    buttonShort: "追加",
-    buttonAria: "Palette Collector をホーム画面に追加",
-    iosHint:
-      "共有ボタン →「ホーム画面に追加」で単体アプリのようにインストールできます。",
+    button: "このアプリをホーム画面に追加",
+    buttonShort: "ホームに追加",
+    buttonTiny: "追加",
+    buttonAria: "Palette Collector をホーム画面に追加してアプリとして使う",
+    modalTitle: "ホーム画面に追加",
+    modalLead:
+      "Safari からホーム画面に追加すると、Palette Collector だけを独立アプリとしてすぐ開けます。",
+    step1Title: "共有をタップ",
+    step1Body: "画面下（または上）の共有アイコン［↑］をタップします。",
+    step2Title: "「ホーム画面に追加」",
+    step2Body: "メニューを下にスクロールし、「ホーム画面に追加」を選びます。",
+    desktopTitle: "アプリとしてインストール",
+    desktopLead:
+      "Chrome / Edge なら、アドレスバーやメニューから Palette Collector を独立アプリとして追加できます。",
+    desktopStep1Title: "ブラウザのメニューを開く",
+    desktopStep1Body:
+      "画面右上の「︙」またはアドレスバー横のインストールアイコンを探します。",
+    desktopStep2Title: "「アプリをインストール」",
+    desktopStep2Body:
+      "「Palette Collector をインストール」や「アプリをインストール」を選ぶとホーム／デスクトップに追加されます。",
+    modalClose: "わかった",
   },
-  privacyBanner:
-    "🔒 画像もパレットもすべてお使いのブラウザ内（ローカル）だけで処理・保存され、サーバーへ送信されることは一切ありません。",
   stage: {
     dropTitle: "画像をここにドラッグ＆ドロップ",
     dropHint: "クリックしてファイルを選ぶか、画像をドロップしてください",
@@ -251,14 +277,28 @@ export const paletteCollectorEn: PaletteCollectorDict = {
       "Pick colors from any image with an eyedropper and build your own color palette.",
   },
   install: {
-    button: "Add to Home Screen",
-    buttonShort: "Add",
-    buttonAria: "Add Palette Collector to your home screen",
-    iosHint:
-      'Tap the Share button, then "Add to Home Screen" to install it like a standalone app.',
+    button: "Add this app to Home Screen",
+    buttonShort: "Add to Home",
+    buttonTiny: "Add",
+    buttonAria: "Add Palette Collector to your home screen as a standalone app",
+    modalTitle: "Add to Home Screen",
+    modalLead:
+      "Add Palette Collector from Safari to open it as its own app — not the portal.",
+    step1Title: "Tap Share",
+    step1Body: "Tap the Share icon [↑] at the bottom (or top) of Safari.",
+    step2Title: "Add to Home Screen",
+    step2Body: "Scroll the menu and choose “Add to Home Screen”.",
+    desktopTitle: "Install as an app",
+    desktopLead:
+      "In Chrome or Edge, install Palette Collector as its own app from the address bar or browser menu.",
+    desktopStep1Title: "Open the browser menu",
+    desktopStep1Body:
+      "Look for the ⋮ menu or the install icon near the address bar.",
+    desktopStep2Title: "Install app",
+    desktopStep2Body:
+      "Choose “Install Palette Collector” / “Install app” to add it to your home screen or desktop.",
+    modalClose: "Got it",
   },
-  privacyBanner:
-    "🔒 Both your image and palette are processed and stored only in your browser (locally) and are never sent to a server.",
   stage: {
     dropTitle: "Drag & drop an image here",
     dropHint: "Click to choose a file, or drop an image",

@@ -17,8 +17,19 @@ export const metadata: Metadata = {
   },
   manifest: ROBOT_FREETHROW_MANIFEST_PATH,
   icons: {
-    icon: [{ url: "/icons/robot-freethrow.svg", type: "image/svg+xml" }],
-    apple: [{ url: "/icons/robot-freethrow.svg" }],
+    icon: [
+      {
+        url: "/icons/robot-freethrow-192.png",
+        sizes: "192x192",
+        type: "image/png",
+      },
+      {
+        url: "/icons/robot-freethrow-512.png",
+        sizes: "512x512",
+        type: "image/png",
+      },
+    ],
+    apple: [{ url: "/icons/robot-freethrow-192.png", sizes: "192x192" }],
   },
   other: {
     "mobile-web-app-capable": "yes",

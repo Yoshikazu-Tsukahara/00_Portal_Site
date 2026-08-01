@@ -72,6 +72,44 @@ html[data-layout-mode="full"] .layout-content {
     @apply bg-white border border-zinc-200/60 rounded-lg p-6 shadow-sm;
   }
 
+  /*
+   * プライバシー案内帯
+   * 警戒色（赤・琥珀）は使わず、柔らかい emerald で「安心・ローカル完結」を示す
+   */
+  .privacy-notice {
+    @apply relative flex shrink-0 items-center gap-2.5 overflow-hidden rounded-xl border border-emerald-100/90 bg-gradient-to-br from-emerald-50/95 via-white to-zinc-50/90 px-3.5 py-2.5 shadow-[0_1px_2px_rgba(16,185,129,0.05),0_8px_20px_-16px_rgba(24,24,27,0.12)];
+  }
+
+  .privacy-notice::before {
+    content: "";
+    @apply pointer-events-none absolute inset-y-2 left-0 w-0.5 rounded-full bg-gradient-to-b from-emerald-300/80 to-teal-200/50;
+  }
+
+  .privacy-notice__badge {
+    @apply relative z-[1] flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/90 shadow-[inset_0_0_0_1px_rgba(167,243,208,0.9),0_1px_2px_rgba(16,185,129,0.08)];
+  }
+
+  .privacy-notice__emoji {
+    @apply flex items-center justify-center text-[13px] leading-none;
+  }
+
+  .privacy-notice__text {
+    @apply relative z-[1] min-w-0 flex-1 text-[11px] leading-relaxed text-zinc-600 sm:text-xs;
+  }
+
+  .privacy-notice--plain {
+    @apply items-center justify-center gap-1.5 border-0 bg-transparent p-0 shadow-none;
+    background-image: none;
+  }
+
+  .privacy-notice--plain::before {
+    content: none;
+  }
+
+  .privacy-notice--plain .privacy-notice__emoji {
+    @apply text-xs opacity-90;
+  }
+
   /* ポータルトップ：上品なフェードアップ */
   .portal-fade-up {
     animation: portal-fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;

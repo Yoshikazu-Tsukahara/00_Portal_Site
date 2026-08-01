@@ -3,7 +3,6 @@ import type { AppShellCopy } from "./otherApps";
 /** ひみつメッセージアプリの UI 文言 */
 export type CryptoMessageDict = {
   shell: AppShellCopy;
-  privacyNote: string;
   modes: {
     create: string;
     /** 狭い画面向け */
@@ -115,8 +114,6 @@ export const cryptoMessageJa: CryptoMessageDict = {
     description:
       "合言葉で暗号化・復号する『ひみつメッセージ』と、シーザー暗号を解き明かす『解読チャレンジ』。すべてこの端末内だけで完結します。",
   },
-  privacyNote:
-    "🔒 入力内容・合言葉はすべてこの端末（ブラウザ）内のみで処理されます。サーバーへ送信されることは一切ありません。",
   modes: {
     create: "🔏 ひみつ作成",
     createShort: "🔏 作成",
@@ -238,8 +235,6 @@ export const cryptoMessageEn: CryptoMessageDict = {
     description:
       "Encrypt notes with a shared passphrase, or crack a Caesar cipher in the decoding challenge — all local, no server.",
   },
-  privacyNote:
-    "🔒 Everything you type stays on this device. Nothing is sent to a server.",
   modes: {
     create: "🔏 Create secret",
     createShort: "🔏 Create",

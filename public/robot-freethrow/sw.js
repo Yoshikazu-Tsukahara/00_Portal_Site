@@ -1,11 +1,12 @@
 /* 投射フリースロー専用 Service Worker（scope: /robot-freethrow） */
-const CACHE_NAME = "robot-freethrow-v14";
+const CACHE_NAME = "robot-freethrow-v15";
 const PRECACHE = [
   "/robot-freethrow",
   "/robot-freethrow/manifest.webmanifest",
   "/robot-freethrow/game.html",
   "/robot-freethrow/matter.min.js",
-  "/icons/robot-freethrow.svg",
+  "/icons/robot-freethrow-192.png",
+  "/icons/robot-freethrow-512.png",
 ];
 
 self.addEventListener("install", (event) => {

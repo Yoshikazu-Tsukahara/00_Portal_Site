@@ -166,7 +166,8 @@ export default function AppShell({
             </>
           ) : null}
           <div className="flex min-w-0 flex-1 items-center gap-1.5 sm:gap-2">
-            <h1 className="min-w-0 flex-1 truncate text-base font-semibold tracking-tight text-zinc-900">
+            {/* flex-1 を付けない：バックアップ／インストールをタイトル直後に置く */}
+            <h1 className="min-w-0 shrink truncate text-base font-semibold tracking-tight text-zinc-900">
               {title}
             </h1>
             {titleAddon ? <div className="shrink-0">{titleAddon}</div> : null}

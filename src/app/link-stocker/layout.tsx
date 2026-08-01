@@ -17,8 +17,19 @@ export const metadata: Metadata = {
   },
   manifest: LINK_STOCKER_MANIFEST_PATH,
   icons: {
-    icon: [{ url: "/icons/link-stocker.svg", type: "image/svg+xml" }],
-    apple: [{ url: "/icons/link-stocker.svg" }],
+    icon: [
+      {
+        url: "/icons/link-stocker-192.png",
+        sizes: "192x192",
+        type: "image/png",
+      },
+      {
+        url: "/icons/link-stocker-512.png",
+        sizes: "512x512",
+        type: "image/png",
+      },
+    ],
+    apple: [{ url: "/icons/link-stocker-192.png", sizes: "192x192" }],
   },
   other: {
     "mobile-web-app-capable": "yes",

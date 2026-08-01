@@ -18,8 +18,19 @@ export const metadata: Metadata = {
   /** 共通ポータル manifest ではなく、専用 manifest を明示参照 */
   manifest: PALETTE_COLLECTOR_MANIFEST_PATH,
   icons: {
-    icon: [{ url: "/icons/palette-collector.svg", type: "image/svg+xml" }],
-    apple: [{ url: "/icons/palette-collector.svg" }],
+    icon: [
+      {
+        url: "/icons/palette-collector-192.png",
+        sizes: "192x192",
+        type: "image/png",
+      },
+      {
+        url: "/icons/palette-collector-512.png",
+        sizes: "512x512",
+        type: "image/png",
+      },
+    ],
+    apple: [{ url: "/icons/palette-collector-192.png", sizes: "192x192" }],
   },
   other: {
     "mobile-web-app-capable": "yes",

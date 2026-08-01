@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import AppShell from "@/components/AppShell";
+import PrivacyNotice from "@/components/PrivacyNotice";
 import { fmt, useI18n } from "@/i18n";
 import {
   cleanText,
@@ -228,6 +229,7 @@ export default function TextCleanerPage() {
         },
       }}
     >
+      <PrivacyNotice className="mb-2" />
       <div className="grid min-h-0 flex-1 gap-3 lg:grid-cols-2 lg:gap-4 lg:overflow-hidden">
         {/* 左：入力＋設定 */}
         <section className="flex min-h-0 flex-col gap-3 overflow-y-auto rounded-lg border border-zinc-200/80 bg-white p-3 sm:p-4 lg:min-h-0">

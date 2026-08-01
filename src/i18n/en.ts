@@ -145,6 +145,8 @@ export const en: Dictionary = {
       "Data you enter or create with these tools stays only on your computer (in the browser). Nothing is sent to the operator’s servers, so the risk of external leakage is effectively zero.",
     safetyShort:
       "Data stays in your browser and is never sent to a server.",
+    privacyBanner:
+      "Everything runs in this browser. Your files and inputs stay on your device.",
   },
   dataManager: {
     buttonTitle: "Data management (backup & restore)",

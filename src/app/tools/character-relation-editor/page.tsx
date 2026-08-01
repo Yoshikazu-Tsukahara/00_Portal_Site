@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import AppShell from "@/components/AppShell";
+import PrivacyNotice from "@/components/PrivacyNotice";
 import { fmt, useI18n } from "@/i18n";
 import { loadLocalJson, useLocalStorageState } from "@/lib/localData";
 import CharacterModal from "./CharacterModal";
@@ -224,9 +225,7 @@ export default function CharacterRelationEditorPage() {
       }
     >
       <div className="flex min-h-0 flex-1 flex-col gap-3">
-        <p className="shrink-0 rounded-md border border-zinc-200/80 bg-zinc-100/70 px-3.5 py-2.5 text-xs leading-relaxed text-zinc-600">
-          {copy.privacyBanner}
-        </p>
+        <PrivacyNotice />
 
         <div className="grid min-h-0 flex-1 gap-3 lg:grid-cols-[minmax(0,17.5rem)_minmax(0,1fr)]">
           <div className="min-h-0 max-h-[min(70vh,40rem)] lg:max-h-none">

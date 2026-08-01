@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import JSZip from "jszip";
 
 import AppShell from "@/components/AppShell";
+import PrivacyNotice from "@/components/PrivacyNotice";
 import { fmt, useI18n } from "@/i18n";
 import { useLocalStorageState } from "@/lib/localData";
 import ImageGrid from "./ImageGrid";
@@ -305,6 +306,7 @@ export default function ImageCompressorPage() {
       }
     >
       <div className="w-full max-w-full min-w-0 space-y-3 overflow-x-hidden">
+        <PrivacyNotice />
         {/* モバイルではヘッダー下に総削減率を表示 */}
         <div className="sm:hidden">{totalSummary}</div>
 

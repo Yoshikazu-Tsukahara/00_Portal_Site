@@ -9,6 +9,9 @@ const apps = [
   "image-compressor",
   "pixel-drop-puzzle",
   "crypto-message",
+  "palette-collector",
+  "robot-freethrow",
+  "link-stocker",
 ];
 
 async function render(name) {

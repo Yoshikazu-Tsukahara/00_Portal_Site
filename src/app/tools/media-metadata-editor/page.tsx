@@ -4,6 +4,7 @@ import { Download, FolderOpen, Save, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import AppShell from "@/components/AppShell";
+import PrivacyNotice from "@/components/PrivacyNotice";
 import { useI18n } from "@/i18n";
 import { trackToolUsed } from "@/lib/analytics";
 import FileRail from "./FileRail";
@@ -363,9 +364,7 @@ export default function MediaMetadataEditorPage() {
       }
     >
       <div className="flex min-h-0 flex-1 flex-col gap-3">
-        <p className="shrink-0 rounded-md border border-zinc-200/80 bg-zinc-100/70 px-3.5 py-2.5 text-xs leading-relaxed text-zinc-600">
-          {copy.privacyBanner}
-        </p>
+        <PrivacyNotice />
 
         {!hasItems ? (
           <div

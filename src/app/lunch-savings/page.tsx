@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import AppShell from "@/components/AppShell";
+import PrivacyNotice from "@/components/PrivacyNotice";
 import { useI18n } from "@/i18n";
 import { useLocalStorageState } from "@/lib/localData";
 import { calcPeriodStats, parseLunchData } from "./calc";
@@ -209,6 +210,7 @@ export default function LunchSavingsPage() {
         },
       }}
     >
+      <PrivacyNotice className="mb-3" />
       {settings && stats ? (
         <Dashboard
           settings={settings}

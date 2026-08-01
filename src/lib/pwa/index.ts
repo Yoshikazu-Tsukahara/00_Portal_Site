@@ -10,3 +10,9 @@
 
 export type { PwaAppConfig, PwaScrollLock } from "./types";
 export { usePwaRuntime } from "./usePwaRuntime";
+export {
+  usePwaInstall,
+  type BeforeInstallPromptEvent,
+  type PwaInstallState,
+} from "./usePwaInstall";
+export type { PwaInstallCopy } from "./installCopy";

@@ -2,7 +2,6 @@ import type { AppShellCopy } from "./otherApps";
 
 export type MediaMetadataDict = {
   shell: AppShellCopy;
-  privacyBanner: string;
   dropHint: string;
   dropSub: string;
   addFiles: string;
@@ -71,8 +70,6 @@ export const mediaMetadataJa: MediaMetadataDict = {
     description:
       "音楽・動画のタグとカバー／サムネを、ブラウザ内だけで編集するクリエイター向けツール。",
   },
-  privacyBanner:
-    "ファイルと編集内容はすべてブラウザ内で処理します。サーバーへ送信しません。",
   dropHint: "音楽・動画ファイルをドロップ（複数可）",
   dropSub:
     "またはクリックして選択。タグ埋め込みは MP3 と MP4 / MOV / WebM / MKV に対応。処理は完全ローカルです。",
@@ -148,8 +145,6 @@ export const mediaMetadataEn: MediaMetadataDict = {
     description:
       "A local-first creator tool to edit audio/video tags and cover/thumbnail art in the browser.",
   },
-  privacyBanner:
-    "Files and edits stay in your browser. Nothing is sent to a server.",
   dropHint: "Drop audio or video files (multiple OK)",
   dropSub:
     "Or click to choose. Tag embedding supports MP3 and MP4 / MOV / WebM / MKV—fully local.",

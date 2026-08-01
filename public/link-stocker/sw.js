@@ -1,9 +1,10 @@
 /* とりあえずキープ専用 Service Worker（scope: /link-stocker） */
-const CACHE_NAME = "link-stocker-v1";
+const CACHE_NAME = "link-stocker-v2";
 const PRECACHE = [
   "/link-stocker",
   "/link-stocker/manifest.webmanifest",
-  "/icons/link-stocker.svg",
+  "/icons/link-stocker-192.png",
+  "/icons/link-stocker-512.png",
 ];
 
 self.addEventListener("install", (event) => {

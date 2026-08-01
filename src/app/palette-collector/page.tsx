@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import AppShell from "@/components/AppShell";
+import PrivacyNotice from "@/components/PrivacyNotice";
 import { fmt, useI18n } from "@/i18n";
 import { useLocalStorageState } from "@/lib/localData";
 import AutoExtractPanel from "./AutoExtractPanel";
@@ -254,9 +255,7 @@ export default function PaletteCollectorPage() {
           },
         }}
       >
-        <p className="mb-4 rounded-md border border-zinc-200/80 bg-zinc-100/70 px-3.5 py-2.5 text-xs leading-relaxed text-zinc-600">
-          {copy.privacyBanner}
-        </p>
+        <PrivacyNotice className="mb-4" />
 
         {!ready ? (
           <div className="flex min-h-[40vh] items-center justify-center text-sm text-zinc-400">

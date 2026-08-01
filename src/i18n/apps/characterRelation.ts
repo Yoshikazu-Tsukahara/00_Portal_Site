@@ -3,7 +3,6 @@ import type { AppShellCopy } from "./otherApps";
 export type CharacterRelationDict = {
   shell: AppShellCopy;
   loading: string;
-  privacyBanner: string;
   edit: string;
   delete: string;
   save: string;
@@ -134,8 +133,6 @@ export const characterRelationJa: CharacterRelationDict = {
       "登場人物の立ち位置と関係性を、カードと線で直感的に整理する相関図ツール。",
   },
   loading: "読込中…",
-  privacyBanner:
-    "🔒 相関図データはすべてお使いのブラウザ内（ローカル）のみに保存され、サーバーへ送信されることは一切ありません。",
   edit: "編集",
   delete: "削除",
   save: "保存",
@@ -269,8 +266,6 @@ export const characterRelationEn: CharacterRelationDict = {
       "Map characters and their relationships with draggable cards and labeled links.",
   },
   loading: "Loading…",
-  privacyBanner:
-    "🔒 Relation map data stays only in your browser (locally) and is never sent to a server.",
   edit: "Edit",
   delete: "Delete",
   save: "Save",
