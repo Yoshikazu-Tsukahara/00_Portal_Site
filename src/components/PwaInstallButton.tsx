@@ -14,7 +14,7 @@ export default function PwaInstallButton({
   /** ボタン用クラス（未指定時はランチ貯金と同系） */
   className?: string;
 }) {
-  const { canShow, isIos, canPrompt, promptInstall } = usePwaInstall();
+  const { canShow, isIos, prepareAndPrompt } = usePwaInstall();
   const [guideOpen, setGuideOpen] = useState(false);
   const [guideVariant, setGuideVariant] = useState<"ios" | "desktop">(
     "desktop",
@@ -30,22 +30,19 @@ export default function PwaInstallButton({
       return;
     }
 
-    if (canPrompt) {
-      setBusy(true);
-      try {
-        const result = await promptInstall();
-        if (result === "unavailable") {
+    setBusy(true);
+    try {
+      const result = await prepareAndPrompt();
+      if (result === "guide" || result === "unavailable") {
+        // unavailable はリロード中のこともあり、その場合はモーダルを出さない
+        if (result === "guide") {
           setGuideVariant("desktop");
           setGuideOpen(true);
         }
-      } finally {
-        setBusy(false);
       }
-      return;
+    } finally {
+      setBusy(false);
     }
-
-    setGuideVariant("desktop");
-    setGuideOpen(true);
   }
 
   return (

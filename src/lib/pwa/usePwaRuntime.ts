@@ -13,6 +13,101 @@ const SHARED_STANDALONE_CLASS = "pwa-standalone";
 
 const SW_LOCAL_HOSTS = ["localhost", "127.0.0.1", "[::1]"];
 
+/** basePath ごとの SW 登録 Promise（インストール待機用） */
+const registrationByPath = new Map<string, Promise<ServiceWorkerRegistration | null>>();
+
+function normalizeBasePath(basePath: string): string {
+  return basePath.endsWith("/") ? basePath.slice(0, -1) : basePath;
+}
+
+/**
+ * 期待スコープ以外の同一 script 登録を外し、正しい scope で再登録する。
+ * （過去の `/app/` スコープが残ると `/app` を制御できず BIP が発火しない）
+ */
+async function registerAppServiceWorker(
+  basePath: string,
+): Promise<ServiceWorkerRegistration | null> {
+  if (!("serviceWorker" in navigator)) return null;
+
+  const scopePath = normalizeBasePath(basePath);
+  const scriptUrl = new URL(`${scopePath}/sw.js`, window.location.origin).href;
+  const expectedScope = new URL(scopePath, window.location.origin).href;
+
+  try {
+    const existing = await navigator.serviceWorker.getRegistrations();
+    await Promise.all(
+      existing.map(async (reg) => {
+        // 同じアプリの SW で、スコープが期待と違うものだけ破棄
+        const scriptMatches =
+          reg.active?.scriptURL === scriptUrl ||
+          reg.waiting?.scriptURL === scriptUrl ||
+          reg.installing?.scriptURL === scriptUrl;
+        if (!scriptMatches) return;
+        if (reg.scope.replace(/\/$/, "") !== expectedScope.replace(/\/$/, "")) {
+          await reg.unregister();
+        }
+      }),
+    );
+
+    const reg = await navigator.serviceWorker.register(`${scopePath}/sw.js`, {
+      scope: scopePath,
+      updateViaCache: "none",
+    });
+
+    // 可能ならすぐ制御下に置く（BIP 判定に controller が必要なため）
+    await reg.update().catch(() => undefined);
+    if (reg.installing) {
+      await new Promise<void>((resolve) => {
+        const sw = reg.installing;
+        if (!sw) {
+          resolve();
+          return;
+        }
+        if (sw.state === "activated") {
+          resolve();
+          return;
+        }
+        sw.addEventListener("statechange", () => {
+          if (sw.state === "activated" || sw.state === "redundant") resolve();
+        });
+      });
+    }
+    await navigator.serviceWorker.ready;
+
+    if (!navigator.serviceWorker.controller && reg.active) {
+      // 初回はリロード無しだと controller が付かないことがある → claim 待ち
+      await new Promise<void>((resolve) => {
+        const timer = window.setTimeout(() => resolve(), 1500);
+        navigator.serviceWorker.addEventListener(
+          "controllerchange",
+          () => {
+            window.clearTimeout(timer);
+            resolve();
+          },
+          { once: true },
+        );
+      });
+    }
+
+    return reg;
+  } catch {
+    return null;
+  }
+}
+
+/** 指定アプリの SW 登録完了を待つ（インストールボタン用） */
+export function ensurePwaServiceWorker(
+  basePath: string,
+): Promise<ServiceWorkerRegistration | null> {
+  const key = normalizeBasePath(basePath);
+  let pending = registrationByPath.get(key);
+  if (!pending) {
+    pending = registerAppServiceWorker(key);
+    registrationByPath.set(key, pending);
+  }
+  return pending;
+}
+
 /**
  * 独立 PWA（Type C）共通のランタイム処理。
  *
@@ -30,19 +125,10 @@ export function usePwaRuntime({
   const { isStandalone } = useStandaloneDisplay();
 
   useEffect(() => {
-    if (!("serviceWorker" in navigator)) return;
-
     const isLocal = SW_LOCAL_HOSTS.includes(window.location.hostname);
     if (process.env.NODE_ENV !== "production" && !isLocal) return;
 
-    // 末尾スラッシュなしの scope にする（/app は /app/ スコープ外になるため）
-    const scope = basePath.endsWith("/") ? basePath.slice(0, -1) : basePath;
-
-    void navigator.serviceWorker
-      .register(`${basePath}/sw.js`, { scope })
-      .catch(() => {
-        // 登録失敗は無視（オフライン非対応でもアプリ自体は動く）
-      });
+    void ensurePwaServiceWorker(basePath);
   }, [basePath]);
 
   useEffect(() => {

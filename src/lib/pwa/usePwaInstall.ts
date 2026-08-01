@@ -1,7 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { useStandaloneDisplay } from "@/lib/useStandaloneDisplay";
+import { ensurePwaServiceWorker } from "./usePwaRuntime";
 
 /** Chromium 系の beforeinstallprompt イベント型 */
 export type BeforeInstallPromptEvent = Event & {
@@ -15,6 +17,10 @@ export type PwaInstallState = {
   isIos: boolean;
   canPrompt: boolean;
   promptInstall: () => Promise<"accepted" | "dismissed" | "unavailable">;
+  /** BIP が無いとき: SW 準備→BIP 待機→必要なら 1 回だけハードリロード */
+  prepareAndPrompt: () => Promise<
+    "accepted" | "dismissed" | "unavailable" | "guide"
+  >;
 };
 
 function detectIos(): boolean {
@@ -28,9 +34,16 @@ function detectIos(): boolean {
   );
 }
 
-/** React マウント前に BIP が来ても取りこぼさないためのモジュールキャッシュ */
+/** React マウント前の BIP 取りこぼし防止（パス単位） */
 let cachedBip: BeforeInstallPromptEvent | null = null;
+let cachedBipPath: string | null = null;
 let bipListenerBound = false;
+
+function currentAppPath(): string {
+  if (typeof window === "undefined") return "";
+  const path = window.location.pathname;
+  return path.endsWith("/") && path.length > 1 ? path.slice(0, -1) : path;
+}
 
 function ensureBipCapture() {
   if (typeof window === "undefined" || bipListenerBound) return;
@@ -39,22 +52,69 @@ function ensureBipCapture() {
   window.addEventListener("beforeinstallprompt", (e) => {
     e.preventDefault();
     cachedBip = e as BeforeInstallPromptEvent;
+    cachedBipPath = currentAppPath();
     window.dispatchEvent(new Event("pwa:bip"));
   });
 
   window.addEventListener("appinstalled", () => {
     cachedBip = null;
+    cachedBipPath = null;
     window.dispatchEvent(new Event("pwa:installed"));
   });
 }
 
 ensureBipCapture();
 
+function bipForCurrentPath(): BeforeInstallPromptEvent | null {
+  if (!cachedBip) return null;
+  if (cachedBipPath && cachedBipPath !== currentAppPath()) return null;
+  return cachedBip;
+}
+
+function waitForBip(timeoutMs: number): Promise<BeforeInstallPromptEvent | null> {
+  const existing = bipForCurrentPath();
+  if (existing) return Promise.resolve(existing);
+
+  return new Promise((resolve) => {
+    const timer = window.setTimeout(() => {
+      window.removeEventListener("pwa:bip", onBip);
+      resolve(bipForCurrentPath());
+    }, timeoutMs);
+
+    function onBip() {
+      window.clearTimeout(timer);
+      window.removeEventListener("pwa:bip", onBip);
+      resolve(bipForCurrentPath());
+    }
+
+    window.addEventListener("pwa:bip", onBip);
+  });
+}
+
+function reloadOnceKey(path: string): string {
+  return `pwa-install-reload:${path}`;
+}
+
+async function runPrompt(
+  event: BeforeInstallPromptEvent,
+): Promise<"accepted" | "dismissed" | "unavailable"> {
+  try {
+    await event.prompt();
+    const { outcome } = await event.userChoice;
+    cachedBip = null;
+    cachedBipPath = null;
+    return outcome;
+  } catch {
+    return "unavailable";
+  }
+}
+
 /**
  * PWA インストール可否と beforeinstallprompt の保持。
- * BIP が無くてもボタンは表示し、クリック時にネイティブ prompt か案内モーダルへ分岐する。
+ * BIP が遅れてもボタン押下時に待ち、必要なら 1 回だけ再読み込みしてからネイティブ prompt を出す。
  */
 export function usePwaInstall(): PwaInstallState {
+  const pathname = usePathname();
   const { isStandalone, ready } = useStandaloneDisplay();
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(
     null,
@@ -65,10 +125,18 @@ export function usePwaInstall(): PwaInstallState {
   useEffect(() => {
     ensureBipCapture();
     setIsIos(detectIos());
-    if (cachedBip) setDeferred(cachedBip);
+
+    const path = currentAppPath();
+    if (cachedBipPath && cachedBipPath !== path) {
+      cachedBip = null;
+      cachedBipPath = null;
+      setDeferred(null);
+    } else {
+      setDeferred(bipForCurrentPath());
+    }
 
     function onBip() {
-      setDeferred(cachedBip);
+      setDeferred(bipForCurrentPath());
     }
 
     function onInstalled() {
@@ -83,30 +151,64 @@ export function usePwaInstall(): PwaInstallState {
       window.removeEventListener("pwa:bip", onBip);
       window.removeEventListener("pwa:installed", onInstalled);
     };
-  }, []);
+  }, [pathname]);
 
   const promptInstall = useCallback(async () => {
-    const event = deferred ?? cachedBip;
+    const event = deferred ?? bipForCurrentPath();
     if (!event) return "unavailable" as const;
-    try {
-      await event.prompt();
-      const { outcome } = await event.userChoice;
-      cachedBip = null;
+    const outcome = await runPrompt(event);
+    setDeferred(null);
+    if (outcome === "accepted") setInstalled(true);
+    return outcome;
+  }, [deferred]);
+
+  const prepareAndPrompt = useCallback(async () => {
+    const path = currentAppPath();
+
+    let event = deferred ?? bipForCurrentPath();
+    if (!event) {
+      await ensurePwaServiceWorker(path);
+      event = await waitForBip(4500);
+      if (event) setDeferred(event);
+    }
+
+    if (event) {
+      try {
+        sessionStorage.removeItem(reloadOnceKey(path));
+      } catch {
+        // ignore
+      }
+      const outcome = await runPrompt(event);
       setDeferred(null);
       if (outcome === "accepted") setInstalled(true);
       return outcome;
-    } catch {
-      return "unavailable" as const;
     }
+
+    // BIP がまだ無い → 1 回だけハードリロード（古い SW 残留対策）
+    try {
+      const key = reloadOnceKey(path);
+      if (sessionStorage.getItem(key) !== "1") {
+        sessionStorage.setItem(key, "1");
+        window.location.reload();
+        return "unavailable";
+      }
+      sessionStorage.removeItem(key);
+    } catch {
+      // sessionStorage 不可ならガイドへ
+    }
+
+    return "guide";
   }, [deferred]);
 
   const canShow = ready && !isStandalone && !installed;
+  const hasBip = deferred !== null || bipForCurrentPath() !== null;
 
   return {
     canShow,
     isStandalone,
     isIos,
-    canPrompt: deferred !== null || cachedBip !== null,
+    canPrompt: hasBip,
     promptInstall,
+    prepareAndPrompt,
   };
 }

@@ -11,7 +11,7 @@ export default function InstallAppButton({
 }: {
   copy: PdfEditorDict["install"];
 }) {
-  const { canShow, isIos, canPrompt, promptInstall } = usePwaInstall();
+  const { canShow, isIos, prepareAndPrompt } = usePwaInstall();
   const [guideOpen, setGuideOpen] = useState(false);
   const [guideVariant, setGuideVariant] = useState<"ios" | "desktop">("desktop");
   const [busy, setBusy] = useState(false);
@@ -25,22 +25,16 @@ export default function InstallAppButton({
       return;
     }
 
-    if (canPrompt) {
-      setBusy(true);
-      try {
-        const result = await promptInstall();
-        if (result === "unavailable") {
-          setGuideVariant("desktop");
-          setGuideOpen(true);
-        }
-      } finally {
-        setBusy(false);
+    setBusy(true);
+    try {
+      const result = await prepareAndPrompt();
+      if (result === "guide") {
+        setGuideVariant("desktop");
+        setGuideOpen(true);
       }
-      return;
+    } finally {
+      setBusy(false);
     }
-
-    setGuideVariant("desktop");
-    setGuideOpen(true);
   }
 
   return (

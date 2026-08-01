@@ -9,7 +9,7 @@
  */
 
 export type { PwaAppConfig, PwaScrollLock } from "./types";
-export { usePwaRuntime } from "./usePwaRuntime";
+export { usePwaRuntime, ensurePwaServiceWorker } from "./usePwaRuntime";
 export {
   usePwaInstall,
   type BeforeInstallPromptEvent,
