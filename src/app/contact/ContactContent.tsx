@@ -1,71 +1,115 @@
 "use client";
 
 import Link from "next/link";
-import { Bug, Mail, MessageSquare } from "lucide-react";
-import type { ReactNode } from "react";
+import { useMemo, useState, type FormEvent } from "react";
+import { Mail } from "lucide-react";
 import { useI18n } from "@/i18n";
+import { genres } from "@/data/tools";
 import { useLayout } from "@/lib/layout";
 
 /** 運営者への連絡先（mailto のみ・サーバー送信なし） */
 const CONTACT_EMAIL = "mtb.yoshikazu@gmail.com";
 
-function buildMailto(subject: string, body?: string): string {
-  let href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}`;
-  if (body != null && body !== "") {
-    // メーラー向けに CRLF（%0D%0A）へ揃える
-    const normalized = body.replace(/\r?\n/g, "\r\n");
-    href += `&body=${encodeURIComponent(normalized)}`;
-  }
-  return href;
+type ContactCategory = "general" | "feature" | "bug" | "other";
+
+const CATEGORY_KEYS: ContactCategory[] = [
+  "general",
+  "feature",
+  "bug",
+  "other",
+];
+
+/** ポータル掲載アプリ（coming-soon 以外） */
+function useListedAppOptions(
+  tools: Record<string, { title: string }>,
+): { id: string; title: string }[] {
+  return useMemo(() => {
+    const options: { id: string; title: string }[] = [];
+    for (const genre of genres) {
+      for (const tool of genre.tools) {
+        if (tool.id === "coming-soon") continue;
+        const title = tools[tool.id]?.title;
+        if (title) options.push({ id: tool.id, title });
+      }
+    }
+    return options;
+  }, [tools]);
 }
 
-type ContactCardProps = {
-  href: string;
-  icon: ReactNode;
-  title: string;
-  description: string;
-  cta: string;
-  hint: string;
-};
+function collectEnvironmentInfo(): string {
+  if (typeof navigator === "undefined") return "";
+  const lines = [
+    `User-Agent: ${navigator.userAgent || "(unknown)"}`,
+    `Language: ${navigator.language || "(unknown)"}`,
+    `Platform: ${navigator.platform || "(unknown)"}`,
+  ];
+  if (typeof screen !== "undefined") {
+    lines.push(`Screen: ${screen.width}×${screen.height}`);
+  }
+  return lines.join("\n");
+}
 
-function ContactCard({
-  href,
-  icon,
-  title,
-  description,
-  cta,
-  hint,
-}: ContactCardProps) {
-  return (
-    <a
-      href={href}
-      className="group flex flex-col rounded-xl border border-zinc-200 bg-white p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-colors hover:border-zinc-300 hover:bg-zinc-50/80 active:scale-[0.99] sm:p-6"
-    >
-      <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-full border border-zinc-200 bg-zinc-50 text-zinc-700 transition-colors group-hover:border-zinc-300 group-hover:bg-white">
-        {icon}
-      </div>
-      <h2 className="text-base font-semibold tracking-tight text-zinc-900 sm:text-lg">
-        {title}
-      </h2>
-      <p className="mt-2 flex-1 text-sm leading-relaxed text-zinc-500">
-        {description}
-      </p>
-      <span className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-zinc-800 underline-offset-4 group-hover:underline">
-        <Mail className="h-4 w-4 shrink-0" aria-hidden />
-        {cta}
-      </span>
-      <span className="mt-1.5 text-[11px] text-zinc-400">{hint}</span>
-    </a>
-  );
+function buildMailto(subject: string, body: string): string {
+  const normalized = body.replace(/\r?\n/g, "\r\n");
+  return `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(normalized)}`;
 }
 
 export default function ContactContent() {
   const { t } = useI18n();
   const { contentClassName } = useLayout();
   const copy = t.contact;
+  const appOptions = useListedAppOptions(t.tools);
 
-  const generalHref = buildMailto(copy.general.subject);
-  const feedbackHref = buildMailto(copy.feedback.subject, copy.feedback.body);
+  const [category, setCategory] = useState<ContactCategory>("general");
+  const [appId, setAppId] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const trimmed = message.trim();
+    if (!trimmed) {
+      setError(copy.messageRequired);
+      return;
+    }
+    setError("");
+
+    const labels = copy.bodyLabels;
+    const categoryLabel = copy.categories[category];
+    const appTitle =
+      appId === ""
+        ? labels.notProvided
+        : (appOptions.find((a) => a.id === appId)?.title ?? appId);
+    const nameValue = name.trim() || labels.notProvided;
+    const emailValue = email.trim() || labels.notProvided;
+
+    const body = [
+      `【${labels.category}】`,
+      categoryLabel,
+      "",
+      `【${labels.app}】`,
+      appTitle,
+      "",
+      `【${labels.name}】`,
+      nameValue,
+      "",
+      `【${labels.email}】`,
+      emailValue,
+      "",
+      `【${labels.message}】`,
+      trimmed,
+      "",
+      "--------------------",
+      `【${labels.environment}】`,
+      collectEnvironmentInfo(),
+      "",
+    ].join("\n");
+
+    const subject = `${copy.subjectPrefix}（${categoryLabel}）`;
+    window.location.href = buildMailto(subject, body);
+  };
 
   return (
     <main className="w-full flex-1 py-12 sm:py-16">
@@ -86,24 +130,131 @@ export default function ContactContent() {
           </p>
         </header>
 
-        <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5">
-          <ContactCard
-            href={generalHref}
-            icon={<MessageSquare className="h-5 w-5" aria-hidden />}
-            title={copy.general.title}
-            description={copy.general.description}
-            cta={copy.general.cta}
-            hint={copy.mailtoHint}
-          />
-          <ContactCard
-            href={feedbackHref}
-            icon={<Bug className="h-5 w-5" aria-hidden />}
-            title={copy.feedback.title}
-            description={copy.feedback.description}
-            cta={copy.feedback.cta}
-            hint={copy.mailtoHint}
-          />
-        </div>
+        <form
+          onSubmit={handleSubmit}
+          noValidate
+          className="content-card mt-8 max-w-xl space-y-5"
+        >
+          <label className="block min-w-0">
+            <span className="mb-1.5 block text-[13px] font-medium text-zinc-700">
+              {copy.categoryLabel}
+            </span>
+            <select
+              value={category}
+              onChange={(e) =>
+                setCategory(e.target.value as ContactCategory)
+              }
+              className="input-field w-full"
+            >
+              {CATEGORY_KEYS.map((key) => (
+                <option key={key} value={key}>
+                  {copy.categories[key]}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="block min-w-0">
+            <span className="mb-1.5 block text-[13px] font-medium text-zinc-700">
+              {copy.appLabel}
+              <span className="ml-1.5 font-normal text-zinc-400">
+                ({copy.appPlaceholder})
+              </span>
+            </span>
+            <select
+              value={appId}
+              onChange={(e) => setAppId(e.target.value)}
+              className="input-field w-full"
+            >
+              <option value="">{copy.appNone}</option>
+              {appOptions.map((app) => (
+                <option key={app.id} value={app.id}>
+                  {app.title}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="block min-w-0">
+            <span className="mb-1.5 block text-[13px] font-medium text-zinc-700">
+              {copy.nameLabel}
+              <span className="ml-1.5 font-normal text-zinc-400">
+                ({copy.namePlaceholder})
+              </span>
+            </span>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              autoComplete="name"
+              className="input-field w-full"
+            />
+          </label>
+
+          <label className="block min-w-0">
+            <span className="mb-1.5 block text-[13px] font-medium text-zinc-700">
+              {copy.emailLabel}
+            </span>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder={copy.emailPlaceholder}
+              autoComplete="email"
+              className="input-field w-full"
+            />
+            <span className="mt-1 block text-[11px] text-zinc-400">
+              {copy.emailHint}
+            </span>
+          </label>
+
+          <label className="block min-w-0">
+            <span className="mb-1.5 block text-[13px] font-medium text-zinc-700">
+              {copy.messageLabel}
+              <span className="ml-1 text-red-600" aria-hidden>
+                *
+              </span>
+            </span>
+            <textarea
+              value={message}
+              onChange={(e) => {
+                setMessage(e.target.value);
+                if (error) setError("");
+              }}
+              required
+              rows={7}
+              placeholder={copy.messagePlaceholder}
+              aria-invalid={error ? true : undefined}
+              aria-describedby={error ? "contact-message-error" : undefined}
+              className={`input-field w-full resize-y ${
+                error ? "border-red-300 focus:border-red-400" : ""
+              }`}
+            />
+            {error ? (
+              <span
+                id="contact-message-error"
+                className="mt-1.5 block text-[12px] text-red-600"
+                role="alert"
+              >
+                {error}
+              </span>
+            ) : null}
+          </label>
+
+          <div className="border-t border-zinc-100 pt-4">
+            <button
+              type="submit"
+              disabled={!message.trim()}
+              className="btn-primary inline-flex w-full items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto"
+            >
+              <Mail className="h-4 w-4" aria-hidden />
+              {copy.submit}
+            </button>
+            <p className="mt-2.5 text-[11px] leading-relaxed text-zinc-400">
+              {copy.mailtoHint}
+            </p>
+          </div>
+        </form>
       </div>
     </main>
   );

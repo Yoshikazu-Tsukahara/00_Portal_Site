@@ -153,21 +153,38 @@ export type Dictionary = {
   contact: {
     title: string;
     lead: string;
+    /** 送信ボタン付近の注記 */
     mailtoHint: string;
-    general: {
-      title: string;
-      description: string;
-      cta: string;
-      /** mailto の subject */
-      subject: string;
+    submit: string;
+    messageRequired: string;
+    categoryLabel: string;
+    categories: {
+      general: string;
+      feature: string;
+      bug: string;
+      other: string;
     };
-    feedback: {
-      title: string;
-      description: string;
-      cta: string;
-      subject: string;
-      /** mailto の body（改行は \n） */
-      body: string;
+    appLabel: string;
+    appPlaceholder: string;
+    /** 対象アプリ未指定 */
+    appNone: string;
+    nameLabel: string;
+    namePlaceholder: string;
+    emailLabel: string;
+    emailPlaceholder: string;
+    emailHint: string;
+    messageLabel: string;
+    messagePlaceholder: string;
+    /** mailto 件名の接頭辞（種類を括弧で付ける） */
+    subjectPrefix: string;
+    bodyLabels: {
+      category: string;
+      app: string;
+      name: string;
+      email: string;
+      message: string;
+      environment: string;
+      notProvided: string;
     };
   };
   /** 各ツールアプリ内 UI */
