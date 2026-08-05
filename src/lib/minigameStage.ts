@@ -1,7 +1,8 @@
 /**
  * ミニゲーム作業領域の最低サイズ。
  * ウィンドウがこれ以上なら残り領域いっぱいに広げ、
- * それ未満なら縮めずスクロールで確保する（AppShell の minStageSize）。
+ * それ未満なら縮めず Header〜Footer を含むページ全体が伸びてスクロールする
+ *（AppShell の minStageSize + SiteChrome の MIN_STAGE_PAGE_SCROLL_PATHS）。
  */
 export type MinStageSize = {
   width: number;

@@ -77,8 +77,8 @@ type AppShellProps = {
   /**
    * ミニゲーム向け：作業領域の最低サイズ（px）。
    * - ウィンドウがこれより大きい → 残り領域いっぱいにきっちり表示
-   * - これより小さい → 無理に縮小せず、スクロールで最低サイズを確保
-   * `fillViewport` と併用するのが基本。
+   * - これより小さい → 無理に縮小せず、Header〜Footer を含むページ全体が伸びてスクロール
+   * （アプリ枠内だけのスクロールにはしない。`fillViewport` と併用）
    */
   minStageSize?: MinStageSize;
   /**
@@ -147,15 +147,17 @@ export default function AppShell({
 
   // 背景はフル幅のまま、中身の列だけ layoutMode の幅に揃える
   // fillViewport: SiteChrome が確保した「Header 直下〜画面下端」を埋める
-  // minStageSize あり: 横は必要ならスクロール（overflow-x-auto）
+  // minStageSize: アプリ内スクロールではなくページ全体（Footer 含む）が伸びる前提
+  const fillWithMinStage = Boolean(fillViewport && minStageSize);
+
   return (
     <main
       className={`flex w-full flex-1 flex-col ${contentClassName} ${
-        fillViewport
-          ? `h-full min-h-0 max-h-full overflow-y-hidden py-2 ${
-              minStageSize ? "overflow-x-auto" : "overflow-x-hidden"
-            }`
-          : "overflow-x-hidden py-4"
+        fillWithMinStage
+          ? "min-h-full overflow-x-auto py-2"
+          : fillViewport
+            ? "h-full min-h-0 max-h-full overflow-hidden py-2"
+            : "overflow-x-hidden py-4"
       }`}
     >
       <header
@@ -217,30 +219,19 @@ export default function AppShell({
         </p>
       </header>
       {minStageSize ? (
-        // スクロール親：短いウィンドウでもシェル見出しは固定し、作業領域だけスクロール
+        // 最低サイズを確保。狭い窓ではこの分だけページ全体（Footer 含む）が伸びる
         <div
           className={
             fillViewport
-              ? "min-h-0 flex-1 overflow-auto"
-              : "overflow-x-auto"
+              ? "box-border flex min-h-0 w-full flex-1 flex-col"
+              : "box-border w-full"
           }
+          style={{
+            minWidth: minStageSize.width,
+            minHeight: minStageSize.height,
+          }}
         >
-          <div
-            className={
-              fillViewport
-                ? "box-border flex w-full flex-col"
-                : "box-border w-full"
-            }
-            style={{
-              minWidth: minStageSize.width,
-              // 大きい窓: 親いっぱいに広げる / 小さい窓: 最低高を確保してスクロール
-              ...(fillViewport
-                ? { height: `max(100%, ${minStageSize.height}px)` }
-                : {}),
-            }}
-          >
-            {children}
-          </div>
+          {children}
         </div>
       ) : (
         <div

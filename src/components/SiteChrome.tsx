@@ -45,6 +45,17 @@ const FILL_VIEWPORT_PATHS = [
 ];
 
 /**
+ * ミニゲーム（AppShell `minStageSize` 併用）。
+ * 最低サイズ未満のときはアプリ内スクロールではなく、
+ * Header〜Footer を含むページ全体が伸びてスクロールする。
+ */
+const MIN_STAGE_PAGE_SCROLL_PATHS = [
+  "/robot-freethrow",
+  "/ultimate-probability-slot",
+  "/pixel-drop-puzzle",
+];
+
+/**
  * Type D（没入型）のルートパス一覧。
  * ブラウザでも常にポータル枠を外し、フルスクリーンで出す（一人称ミニゲームなど）。
  * AppShell は使わず、各ページが独自ヘッダー + iframe を持つ。
@@ -78,14 +89,48 @@ export default function SiteChrome({ children }: { children: ReactNode }) {
     ready && isStandalone && matchesAppPath(pathname, STANDALONE_APP_PATHS);
   const isolateFullscreen = matchesAppPath(pathname, ALWAYS_ISOLATE_PATHS);
   const fillViewport = matchesAppPath(pathname, FILL_VIEWPORT_PATHS);
+  const minStagePageScroll = matchesAppPath(
+    pathname,
+    MIN_STAGE_PAGE_SCROLL_PATHS,
+  );
 
   if (isolatePwa || isolateFullscreen) {
+    // ミニゲーム PWA: 狭いときはページ全体が伸びる（中だけスクロールしない）
+    if (isolatePwa && minStagePageScroll) {
+      return (
+        <>
+          <KeepTabBridge />
+          <div className="flex min-h-dvh flex-1 flex-col">{children}</div>
+        </>
+      );
+    }
     return (
       <>
         <KeepTabBridge />
         <div className="flex h-dvh flex-1 flex-col overflow-hidden">
           {children}
         </div>
+      </>
+    );
+  }
+
+  // ミニゲーム: 広いときは Header〜画面下端を埋め、狭いときはページ全体＋Footer が下がる
+  if (fillViewport && minStagePageScroll) {
+    return (
+      <>
+        <KeepTabBridge />
+        <div className="flex min-h-dvh flex-col">
+          <Header />
+          <div
+            className="relative flex w-full flex-1 flex-col"
+            style={{
+              minHeight: "calc(100dvh - var(--site-header-height, 4.5rem))",
+            }}
+          >
+            {children}
+          </div>
+        </div>
+        <Footer />
       </>
     );
   }
