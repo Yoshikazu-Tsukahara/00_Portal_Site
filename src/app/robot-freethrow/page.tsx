@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import AppShell from "@/components/AppShell";
 import { useI18n } from "@/i18n";
+import { ROBOT_FREETHROW_MIN_STAGE } from "@/lib/minigameStage";
 import InstallAppButton from "./InstallAppButton";
 
 /** iframe 内ゲームへ言語を同期する */
@@ -41,10 +42,11 @@ export default function RobotFreethrowPage() {
       title={copy.shell.title}
       description={copy.shell.description}
       fillViewport
+      minStageSize={ROBOT_FREETHROW_MIN_STAGE}
       isPwa
       afterDataManager={<InstallAppButton copy={copy.install} />}
     >
-      <div className="relative min-h-0 flex-1 overflow-hidden rounded-lg border border-zinc-200 bg-[#f3e6c8]">
+      <div className="relative h-full min-h-0 w-full flex-1 overflow-hidden rounded-lg border border-zinc-200 bg-[#f3e6c8]">
         <iframe
           ref={iframeRef}
           title={copy.shell.title}

@@ -5,6 +5,7 @@ import AppShell from "@/components/AppShell";
 import PrivacyNotice from "@/components/PrivacyNotice";
 import { useI18n } from "@/i18n";
 import { useLocalStorageState } from "@/lib/localData";
+import { PIXEL_DROP_MIN_STAGE } from "@/lib/minigameStage";
 import { useStandaloneDisplay } from "@/lib/useStandaloneDisplay";
 import { readImageSize, type LoadedGameImage } from "./imageUtil";
 import { loadDefaultGameImage } from "./defaultImage";
@@ -293,6 +294,8 @@ export default function PixelDropPuzzlePage() {
     <AppShell
       title={copy.shell.title}
       description={copy.shell.description}
+      fillViewport
+      minStageSize={PIXEL_DROP_MIN_STAGE}
       isPwa
       afterDataManager={<InstallAppButton copy={copy.install} />}
       dataManager={{

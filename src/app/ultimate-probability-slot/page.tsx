@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import AppShell from "@/components/AppShell";
 import { useI18n } from "@/i18n";
 import { useLocalStorageState } from "@/lib/localData";
+import { SLOT_MIN_STAGE } from "@/lib/minigameStage";
 import {
   evaluateAntiBingoBadges,
   evaluateHitUntilWinBadges,
@@ -397,6 +398,7 @@ export default function UltimateProbabilitySlotPage() {
       title={copy.shell.title}
       description={copy.shell.description}
       fillViewport
+      minStageSize={SLOT_MIN_STAGE}
       isPwa
       afterDataManager={<InstallAppButton copy={copy.install} />}
       dataManager={{

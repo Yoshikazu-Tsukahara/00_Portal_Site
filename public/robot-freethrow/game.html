@@ -224,6 +224,12 @@
       box-shadow: inset 0 0 0 1px rgba(58, 52, 44, 0.1);
       /* 方眼はキャンバス上で発射原点に厳密合わせるため、ここは紙色のみ */
       background: #fffaf0;
+      /* ウィンドウ幅に応じて JS が上書き（文字とイラストの重なり回避） */
+      --ui-scale: 1;
+      --memo-left: 12px;
+      --memo-top: 10px;
+      --hud-right: 12px;
+      --hud-top: 10px;
     }
 
     canvas {
@@ -237,8 +243,8 @@
     /* 右上：[問] 条件付箋（読みやすい箇条書き） */
     .hud {
       position: absolute;
-      right: 12px;
-      top: 10px;
+      right: var(--hud-right);
+      top: var(--hud-top);
       z-index: 7;
       font-family: var(--font-jp), var(--font-exam), sans-serif;
       font-size: 14px;
@@ -253,11 +259,12 @@
       box-shadow:
         2px 3px 0 rgba(60, 40, 20, 0.1),
         0 1px 0 rgba(255, 255, 255, 0.55) inset;
-      max-width: min(240px, 48vw);
+      max-width: min(240px, 42vw);
       text-align: left;
       opacity: 1;
-      transform: rotate(1.1deg);
+      transform: rotate(1.1deg) scale(var(--ui-scale));
       transform-origin: top right;
+      will-change: transform, top, right;
     }
 
     .hud .given-title {
@@ -306,8 +313,8 @@
     /* 左上：未知数（答え欄） */
     .margin-memo {
       position: absolute;
-      left: 12px;
-      top: 10px;
+      left: var(--memo-left);
+      top: var(--memo-top);
       z-index: 8;
       background: transparent;
       border: none;
@@ -318,11 +325,44 @@
       font-size: 18px;
       font-weight: 600;
       line-height: 1.7;
-      transform: rotate(-0.8deg);
+      transform: rotate(-0.8deg) scale(var(--ui-scale));
       transform-origin: top left;
       user-select: text;
       -webkit-user-select: text;
-      max-width: min(360px, 74vw);
+      max-width: min(360px, 68vw);
+      will-change: transform, top, left;
+    }
+
+    /* 狭い画面では注釈を畳んで射手との干渉を減らす */
+    .canvas-wrap.ui-compact .margin-memo .memo-hint {
+      display: none;
+    }
+
+    .canvas-wrap.ui-compact .margin-memo {
+      font-size: 16px;
+      line-height: 1.55;
+    }
+
+    .canvas-wrap.ui-compact .margin-memo .memo-label {
+      font-size: 16px;
+    }
+
+    .canvas-wrap.ui-compact .margin-memo input[type="number"] {
+      font-size: 18px;
+    }
+
+    .canvas-wrap.ui-compact .hud {
+      font-size: 12px;
+      padding: 8px 10px 9px;
+      max-width: min(200px, 40vw);
+    }
+
+    .canvas-wrap.ui-compact .hud .given-title {
+      font-size: 13px;
+    }
+
+    .canvas-wrap.ui-compact .hud .given-list li {
+      font-size: 12px;
     }
 
     .margin-memo .memo-head {
@@ -1848,6 +1888,179 @@
         return state.armAngleDeg;
       }
 
+      /** syncUiLayout の前回適用値（毎フレームの無駄書き込み防止） */
+      let uiLayoutSig = "";
+      let uiLayoutMeasure = { memoW: 220, memoH: 160, hudW: 180, hudH: 150 };
+
+      /**
+       * 左メモ／右付箋と射手・ゴールが重ならないよう、UI縮尺と配置を自動調整する。
+       * resize 後・カメラ更新時に呼ぶ。
+       */
+      function syncUiLayout() {
+        if (!wrap || !marginMemo || !envHud) return;
+
+        // —— 基本スケール（狭いほど小さく）——
+        let scale = 1;
+        if (W < 980) scale = Math.min(scale, 0.94);
+        if (W < 820) scale = Math.min(scale, 0.86);
+        if (W < 680) scale = Math.min(scale, 0.78);
+        if (W < 540) scale = Math.min(scale, 0.7);
+        if (H < 460) scale = Math.min(scale, 0.88);
+        if (H < 380) scale = Math.min(scale, 0.78);
+
+        const compact = W < 760 || H < 420;
+        wrap.classList.toggle("ui-compact", compact);
+
+        // 実寸は scale=1・既定位置のときだけたまに測る（毎フレ DOM 計測しない）
+        const camQ = Math.round(state.cameraX / 4) * 4;
+        const hudContentKey = state.stage
+          ? `${state.level}:${Math.round(state.stage.dist)}:${state.stage.env}`
+          : "none";
+        const measureKey = `${W}x${H}|c${compact ? 1 : 0}|${hudContentKey}`;
+        if (uiLayoutMeasure.key !== measureKey) {
+          wrap.style.setProperty("--ui-scale", "1");
+          wrap.style.setProperty("--memo-left", "12px");
+          wrap.style.setProperty("--memo-top", "10px");
+          wrap.style.setProperty("--hud-right", "12px");
+          wrap.style.setProperty("--hud-top", "10px");
+          uiLayoutMeasure = {
+            key: measureKey,
+            memoW: Math.max(1, marginMemo.offsetWidth),
+            memoH: Math.max(1, marginMemo.offsetHeight),
+            hudW: Math.max(1, envHud.offsetWidth || 160),
+            hudH: Math.max(1, envHud.offsetHeight || 140),
+          };
+        }
+
+        const memoW0 = uiLayoutMeasure.memoW;
+        const memoH0 = uiLayoutMeasure.memoH;
+        const hudW0 = uiLayoutMeasure.hudW;
+        const hudH0 = uiLayoutMeasure.hudH;
+
+        // —— 左：射手バウンディングとメモの干渉を避ける ——
+        const shooter = getShooterMetrics(origin, false);
+        const sLeft = shooter.left - state.cameraX;
+        const sTop = shooter.top;
+
+        let memoLeft = 12;
+        let memoTop = 10;
+        let memoScale = scale;
+
+        function memoBox(sc) {
+          return {
+            left: memoLeft,
+            top: memoTop,
+            right: memoLeft + memoW0 * sc,
+            bottom: memoTop + memoH0 * sc,
+          };
+        }
+
+        function overlaps(a, b, pad = 8) {
+          return !(
+            a.right + pad <= b.left ||
+            a.left - pad >= b.right ||
+            a.bottom + pad <= b.top ||
+            a.top - pad >= b.bottom
+          );
+        }
+
+        const shooterBox = {
+          left: sLeft,
+          top: sTop,
+          right: sLeft + shooter.w,
+          bottom: sTop + shooter.h * 0.62,
+        };
+
+        for (let i = 0; i < 10; i++) {
+          const box = memoBox(memoScale);
+          if (!overlaps(box, shooterBox, 10)) break;
+          if (memoTop > 2) {
+            memoTop = Math.max(2, memoTop - 2);
+            continue;
+          }
+          if (memoScale > 0.58) {
+            memoScale = Math.max(0.58, memoScale - 0.04);
+            continue;
+          }
+          break;
+        }
+
+        // —— 右：ゴール（ボード＋リム上部）と付箋の干渉を避ける ——
+        let hudRight = 12;
+        let hudTop = 10;
+        let hudScale = scale;
+
+        function hudBox(sc) {
+          const w = hudW0 * sc;
+          const h = hudH0 * sc;
+          return {
+            left: W - hudRight - w,
+            top: hudTop,
+            right: W - hudRight,
+            bottom: hudTop + h,
+          };
+        }
+
+        if (state.stage) {
+          const gm = getGoalMetrics(state.stage);
+          const goalArt = {
+            left: Math.min(gm.board.left, gm.rimFront.x, gm.left) - state.cameraX,
+            top: Math.min(gm.board.top, gm.top),
+            right:
+              Math.max(gm.board.right, gm.rimBack.x, gm.left + gm.w) -
+              state.cameraX,
+            bottom: gm.rimFront.y + Math.max(36, gm.h * 0.12),
+          };
+          const goalOnScreen =
+            goalArt.right > 8 && goalArt.left < W - 8 && goalArt.bottom > 0;
+
+          if (goalOnScreen) {
+            for (let i = 0; i < 14; i++) {
+              const box = hudBox(hudScale);
+              if (!overlaps(box, goalArt, 12)) break;
+
+              const needRight = W - goalArt.left + 14;
+              if (needRight > hudRight && needRight < W * 0.55) {
+                hudRight = needRight;
+                continue;
+              }
+              if (goalArt.top > hudH0 * hudScale + 16 && hudTop < 24) {
+                hudTop = Math.min(24, hudTop + 4);
+                continue;
+              }
+              if (hudScale > 0.55) {
+                hudScale = Math.max(0.55, hudScale - 0.04);
+                continue;
+              }
+              if (hudRight < W * 0.5) {
+                hudRight = Math.min(W * 0.5, hudRight + 16);
+                continue;
+              }
+              break;
+            }
+          }
+        }
+
+        const finalScale = Math.min(memoScale, hudScale);
+        const sig = [
+          finalScale.toFixed(3),
+          Math.round(memoLeft),
+          Math.round(memoTop),
+          Math.round(hudRight),
+          Math.round(hudTop),
+          compact ? 1 : 0,
+          camQ,
+        ].join("|");
+        if (sig === uiLayoutSig) return;
+        uiLayoutSig = sig;
+
+        wrap.style.setProperty("--ui-scale", finalScale.toFixed(3));
+        wrap.style.setProperty("--memo-left", `${Math.round(memoLeft)}px`);
+        wrap.style.setProperty("--memo-top", `${Math.round(memoTop)}px`);
+        wrap.style.setProperty("--hud-right", `${Math.round(hudRight)}px`);
+        wrap.style.setProperty("--hud-top", `${Math.round(hudTop)}px`);
+      }
+
       function resize() {
         const rect = wrap.getBoundingClientRect();
         W = Math.max(320, Math.floor(rect.width));
@@ -1858,19 +2071,78 @@
         canvas.style.width = W + "px";
         canvas.style.height = H + "px";
 
-        // 発射点（絶対原点＝手先）を方眼交差へ。リングが手の上下に置けるようやや高め
+        // 左メモ用の安全領域を見積もってから発射点を決める
         const cell = GRID_CELL_PX;
-        let ox = snapToGrid(W * 0.18);
-        let oy = snapToGrid(H * 0.40);
-        const probe = getShooterMetrics({ x: ox, y: oy }, false);
-        // 立ち絵左のはみ出しだけ補正（足元は奈落側へ出てよい）
-        if (probe.left < 4) ox = snapToGrid(ox + (4 - probe.left));
-        if (probe.top < 6) oy = snapToGrid(oy + (6 - probe.top));
+        const compact = W < 760 || H < 420;
+        wrap.classList.toggle("ui-compact", compact);
+        // 計測前に既定へ戻す
+        wrap.style.setProperty("--ui-scale", "1");
+        wrap.style.setProperty("--memo-left", "12px");
+        wrap.style.setProperty("--memo-top", "10px");
+        const memoSafeW = marginMemo
+          ? Math.max(170, Math.min(320, marginMemo.offsetWidth + 20))
+          : 220;
+        const memoSafeH = marginMemo
+          ? Math.max(110, Math.min(280, marginMemo.offsetHeight + 16))
+          : 160;
+
+        // 発射点：メモ帯の外（右・下）に立ち絵が収まるよう初期配置
+        let ox = snapToGrid(Math.max(W * 0.2, memoSafeW * 0.42 + cell * 3));
+        let oy = snapToGrid(Math.max(H * 0.42, memoSafeH + cell * 2));
+
+        for (let i = 0; i < 10; i++) {
+          const probe = getShooterMetrics({ x: ox, y: oy }, false);
+          let moved = false;
+          // 立ち絵左のはみ出し補正
+          if (probe.left < 4) {
+            ox = snapToGrid(ox + (4 - probe.left));
+            moved = true;
+          }
+          if (probe.top < 6) {
+            oy = snapToGrid(oy + (6 - probe.top));
+            moved = true;
+          }
+          // 左上メモ帯との重なり回避（足元は帯外でも可）
+          const headBand = {
+            left: 0,
+            top: 0,
+            right: memoSafeW,
+            bottom: memoSafeH,
+          };
+          const body = {
+            left: probe.left,
+            top: probe.top,
+            right: probe.left + probe.w,
+            bottom: probe.top + probe.h * 0.55, // 上半身だけ見る
+          };
+          const hit =
+            body.left < headBand.right &&
+            body.right > headBand.left &&
+            body.top < headBand.bottom &&
+            body.bottom > headBand.top;
+          if (hit) {
+            if (body.top < headBand.bottom) {
+              oy = snapToGrid(oy + (headBand.bottom - body.top + 4));
+              moved = true;
+            }
+            if (body.left < headBand.right * 0.85) {
+              ox = snapToGrid(
+                ox + Math.min(cell * 2, headBand.right * 0.85 - body.left),
+              );
+              moved = true;
+            }
+          }
+          if (!moved) break;
+        }
+
         ox = clamp(ox, cell * 2, W - cell * 8);
         oy = clamp(oy, cell * 4, H - cell * 3);
         origin = { x: snapToGrid(ox), y: snapToGrid(oy) };
 
         if (engine) rebuildWorld(false);
+        uiLayoutSig = "";
+        uiLayoutMeasure.key = "";
+        syncUiLayout();
       }
 
       function rand(a, b) {
@@ -2222,6 +2494,9 @@
             goalIndicator.dataset.sig = "";
           }
         }
+
+        // カメラ位置に応じて付箋とゴールの重なりを再調整
+        syncUiLayout();
       }
 
       function applyEnvironment(stage) {
@@ -2362,6 +2637,8 @@
           `<li>${c.hudGoal} (${gx}, ${gy}) cm</li>` +
           `<li><span class="given-sym">e</span> = ${s.restitution.toFixed(2)}</li>` +
           `</ul>`;
+        // 内容が変わると付箋サイズも変わるので配置をやり直す
+        requestAnimationFrame(() => syncUiLayout());
       }
 
       function showHint() {

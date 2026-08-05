@@ -33,6 +33,7 @@ const STANDALONE_APP_PATHS = [
 const FILL_VIEWPORT_PATHS = [
   "/robot-freethrow",
   "/ultimate-probability-slot",
+  "/pixel-drop-puzzle",
   "/crypto-message",
   "/tools/mail-template",
   "/tools/pdf-editor",

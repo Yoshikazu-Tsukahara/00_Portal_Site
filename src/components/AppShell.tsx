@@ -7,6 +7,7 @@ import DataManager from "@/components/DataManager";
 import type { DataManagerConfig } from "@/lib/localData";
 import { LanguageToggle, useI18n } from "@/i18n";
 import { useLayout } from "@/lib/layout";
+import type { MinStageSize } from "@/lib/minigameStage";
 import { useStandaloneDisplay } from "@/lib/useStandaloneDisplay";
 
 /**
@@ -18,6 +19,8 @@ import { useStandaloneDisplay } from "@/lib/useStandaloneDisplay";
  * - AppShell を使う。
  * - サイト共通の Header と **Footer は必ず表示する**。
  * - 1 画面に収めたい場合も `fillViewport` を使う（Footer は画面外のすぐ下に続く）。
+ * - ミニゲームは `fillViewport` + `minStageSize` で、広いときはぴったり埋め、
+ *   狭いときは最低サイズを保ったままスクロールする。
  * - LocalStorage を使うなら `dataManager` を渡す。
  * - 例: メールテンプレ管理、PDF編集、テキスト整形。
  *
@@ -72,6 +75,13 @@ type AppShellProps = {
    */
   fillViewport?: boolean;
   /**
+   * ミニゲーム向け：作業領域の最低サイズ（px）。
+   * - ウィンドウがこれより大きい → 残り領域いっぱいにきっちり表示
+   * - これより小さい → 無理に縮小せず、スクロールで最低サイズを確保
+   * `fillViewport` と併用するのが基本。
+   */
+  minStageSize?: MinStageSize;
+  /**
    * @deprecated 表示幅は Header の LayoutToggle（layoutMode）が一元管理する。
    * 互換のため受け取っても幅には影響しない。
    */
@@ -115,6 +125,7 @@ export default function AppShell({
   dataManager,
   afterDataManager,
   fillViewport = false,
+  minStageSize,
   isPwa = false,
   children,
 }: AppShellProps) {
@@ -136,12 +147,15 @@ export default function AppShell({
 
   // 背景はフル幅のまま、中身の列だけ layoutMode の幅に揃える
   // fillViewport: SiteChrome が確保した「Header 直下〜画面下端」を埋める
+  // minStageSize あり: 横は必要ならスクロール（overflow-x-auto）
   return (
     <main
-      className={`flex w-full flex-1 flex-col overflow-x-hidden ${contentClassName} ${
+      className={`flex w-full flex-1 flex-col ${contentClassName} ${
         fillViewport
-          ? "h-full min-h-0 max-h-full overflow-hidden py-2"
-          : "py-4"
+          ? `h-full min-h-0 max-h-full overflow-y-hidden py-2 ${
+              minStageSize ? "overflow-x-auto" : "overflow-x-hidden"
+            }`
+          : "overflow-x-hidden py-4"
       }`}
     >
       <header
@@ -202,15 +216,43 @@ export default function AppShell({
           {description}
         </p>
       </header>
-      <div
-        className={
-          fillViewport
-            ? "flex min-h-0 flex-1 flex-col overflow-hidden"
-            : undefined
-        }
-      >
-        {children}
-      </div>
+      {minStageSize ? (
+        // スクロール親：短いウィンドウでもシェル見出しは固定し、作業領域だけスクロール
+        <div
+          className={
+            fillViewport
+              ? "min-h-0 flex-1 overflow-auto"
+              : "overflow-x-auto"
+          }
+        >
+          <div
+            className={
+              fillViewport
+                ? "box-border flex w-full flex-col"
+                : "box-border w-full"
+            }
+            style={{
+              minWidth: minStageSize.width,
+              // 大きい窓: 親いっぱいに広げる / 小さい窓: 最低高を確保してスクロール
+              ...(fillViewport
+                ? { height: `max(100%, ${minStageSize.height}px)` }
+                : {}),
+            }}
+          >
+            {children}
+          </div>
+        </div>
+      ) : (
+        <div
+          className={
+            fillViewport
+              ? "flex min-h-0 flex-1 flex-col overflow-hidden"
+              : undefined
+          }
+        >
+          {children}
+        </div>
+      )}
     </main>
   );
 }
