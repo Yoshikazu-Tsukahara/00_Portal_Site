@@ -91,6 +91,12 @@ export const genres: Genre[] = [
         href: "/tools/character-relation-editor",
       },
       {
+        id: "book-visualizer",
+        icon: "📖",
+        href: "/tools/book-visualizer",
+        isMobileSupported: true,
+      },
+      {
         id: "palette-collector",
         icon: "🎨",
         href: "/palette-collector",

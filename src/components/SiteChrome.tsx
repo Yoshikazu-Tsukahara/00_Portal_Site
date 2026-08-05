@@ -40,6 +40,7 @@ const FILL_VIEWPORT_PATHS = [
   "/tools/text-cleaner",
   "/tools/media-metadata-editor",
   "/tools/character-relation-editor",
+  "/tools/book-visualizer",
 ];
 
 /**

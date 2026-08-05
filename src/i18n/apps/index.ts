@@ -1,3 +1,5 @@
+import type { BookVisualizerDict } from "./bookVisualizer";
+import { bookVisualizerEn, bookVisualizerJa } from "./bookVisualizer";
 import type { CharacterRelationDict } from "./characterRelation";
 import {
   characterRelationEn,
@@ -53,6 +55,7 @@ export type AppsDictionary = {
   pdfEditor: PdfEditorDict;
   mediaMetadata: MediaMetadataDict;
   characterRelation: CharacterRelationDict;
+  bookVisualizer: BookVisualizerDict;
   paletteCollector: PaletteCollectorDict;
   lunchSavings: LunchSavingsDict;
   linkStocker: LinkStockerDict;
@@ -71,6 +74,7 @@ export const appsJa: AppsDictionary = {
   pdfEditor: pdfEditorJa,
   mediaMetadata: mediaMetadataJa,
   characterRelation: characterRelationJa,
+  bookVisualizer: bookVisualizerJa,
   paletteCollector: paletteCollectorJa,
   lunchSavings: lunchSavingsJa,
   linkStocker: linkStockerJa,
@@ -89,6 +93,7 @@ export const appsEn: AppsDictionary = {
   pdfEditor: pdfEditorEn,
   mediaMetadata: mediaMetadataEn,
   characterRelation: characterRelationEn,
+  bookVisualizer: bookVisualizerEn,
   paletteCollector: paletteCollectorEn,
   lunchSavings: lunchSavingsEn,
   linkStocker: linkStockerEn,

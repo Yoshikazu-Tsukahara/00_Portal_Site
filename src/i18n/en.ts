@@ -89,6 +89,11 @@ export const en: Dictionary = {
       title: "Character Relation Editor",
       description: "Map story ties with character cards and labeled links.",
     },
+    "book-visualizer": {
+      title: "AI Book Studio",
+      description:
+        "Pick paper size and typesetting, edit on the page itself, share as .mybook.",
+    },
     "palette-collector": {
       title: "Palette Collector",
       description: "Eyedrop colors from images. Auto-extract and contrast checks.",

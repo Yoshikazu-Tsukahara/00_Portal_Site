@@ -88,6 +88,11 @@ export const ja: Dictionary = {
       title: "小説相関図エディター",
       description: "人物カードと関係線で、物語の相関図を視覚的に整理。",
     },
+    "book-visualizer": {
+      title: "AI ブック・スタジオ",
+      description:
+        "用紙サイズと組版を指定して、紙面そのものを直接編集。.mybook で共有。",
+    },
     "palette-collector": {
       title: "Palette Collector",
       description: "画像から配色を抽出。自動抽出やコントラスト判定付き。",
