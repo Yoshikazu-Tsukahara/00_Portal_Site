@@ -9,12 +9,6 @@ import Link from "next/link";
 import { useI18n } from "@/i18n";
 import { useLayout } from "@/lib/layout";
 
-/** note プロフィールなど（未設定時は "#" のまま） */
-const NOTE_URL = "#";
-
-/** お問い合わせ用メール（後から実アドレスに差し替え） */
-const CONTACT_EMAIL = "contact@example.com";
-
 export default function Footer() {
   const { t } = useI18n();
   const { contentClassName } = useLayout();
@@ -37,21 +31,12 @@ export default function Footer() {
           aria-label={t.footer.navAria}
           className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm"
         >
-          <a
-            href={NOTE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href="/contact"
             className="text-zinc-600 transition-colors hover:text-zinc-900"
           >
-            note
-          </a>
-          <span aria-hidden className="hidden h-3 w-px bg-zinc-200 sm:block" />
-          <a
-            href={`mailto:${CONTACT_EMAIL}`}
-            className="text-zinc-600 transition-colors hover:text-zinc-900"
-          >
-            {CONTACT_EMAIL}
-          </a>
+            {t.footer.contact}
+          </Link>
           <span aria-hidden className="hidden h-3 w-px bg-zinc-200 sm:block" />
           <Link
             href="/terms"

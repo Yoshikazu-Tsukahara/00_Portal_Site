@@ -137,6 +137,7 @@ export const pt: PartialDictionary = {
   footer: {
     tagline: "Ferramentas indie que aliviam o dia a dia",
     navAria: "Informações do operador",
+    contact: "Contato",
     terms: "Termos",
     privacy: "Privacidade",
     environmentLabel: "Ambiente",
@@ -175,4 +176,22 @@ export const pt: PartialDictionary = {
     importConfirm: "Os dados atuais serão sobrescritos. Continuar?",
   },
   apps: appsPt,
+  contact: {
+    title: "Contato",
+    lead: "Escolha um cartão para abrir seu app de e-mail. Não há formulário no servidor.",
+    mailtoHint: "Abre seu aplicativo de e-mail",
+    general: {
+      title: "Consultas gerais",
+      description: "Perguntas sobre o site em geral ou outros assuntos.",
+      cta: "Enviar e-mail",
+      subject: "[My Tool Box] Contato",
+    },
+    feedback: {
+      title: "Sugestões e relatos de bugs",
+      description: "Ideias de novos apps ou erros em recursos existentes.",
+      cta: "Enviar feedback",
+      subject: "[My Tool Box] Sugestão / Bug",
+      body: "[Nome do app]\n\n[Sua sugestão ou detalhes do bug]\n",
+    },
+  },
 };

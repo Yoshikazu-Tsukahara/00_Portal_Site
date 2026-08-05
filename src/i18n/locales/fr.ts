@@ -137,6 +137,7 @@ export const fr: PartialDictionary = {
   footer: {
     tagline: "Des outils indie qui allègent le quotidien",
     navAria: "Infos opérateur",
+    contact: "Contact",
     terms: "Conditions",
     privacy: "Confidentialité",
     environmentLabel: "Environnement",
@@ -175,4 +176,22 @@ export const fr: PartialDictionary = {
     importConfirm: "Les données actuelles seront écrasées. Continuer ?",
   },
   apps: appsFr,
+  contact: {
+    title: "Contact",
+    lead: "Choisissez une carte pour ouvrir votre application mail. Aucun formulaire côté serveur.",
+    mailtoHint: "Ouvre votre application mail",
+    general: {
+      title: "Demandes générales",
+      description: "Questions sur le site dans son ensemble, ou tout autre sujet.",
+      cta: "Envoyer un e-mail",
+      subject: "[My Tool Box] Contact",
+    },
+    feedback: {
+      title: "Suggestions et bugs",
+      description: "Idées de nouveaux outils, ou erreurs rencontrées.",
+      cta: "Envoyer un retour",
+      subject: "[My Tool Box] Suggestion / Bug",
+      body: "[Nom de l’app]\n\n[Votre suggestion ou détail du bug]\n",
+    },
+  },
 };

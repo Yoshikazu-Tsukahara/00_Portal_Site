@@ -137,6 +137,7 @@ export const ko: PartialDictionary = {
   footer: {
     tagline: "일상의 번거로움을 덜어 주는 개인 개발 도구 모음",
     navAria: "운영자 정보",
+    contact: "문의하기",
     terms: "이용약관",
     privacy: "개인정보 처리방침",
     environmentLabel: "동작 환경",
@@ -175,4 +176,22 @@ export const ko: PartialDictionary = {
     importConfirm: "현재 데이터가 덮어쓰입니다. 계속할까요?",
   },
   apps: appsKo,
+  contact: {
+    title: "문의하기",
+    lead: "아래 카드를 선택하면 메일 앱이 열립니다. 서버 전송 폼은 없습니다.",
+    mailtoHint: "메일 앱이 실행됩니다",
+    general: {
+      title: "일반 문의",
+      description: "사이트 전반에 관한 질문이나 기타 문의.",
+      cta: "메일 보내기",
+      subject: "【My Tool Box】문의",
+    },
+    feedback: {
+      title: "기능 요청 · 오류 제보",
+      description: "새 앱 아이디어나 기존 기능의 오류 제보.",
+      cta: "피드백 보내기",
+      subject: "【My Tool Box】기능 요청 / 오류 제보",
+      body: "【앱 이름】\n\n【요청 또는 오류 내용】\n",
+    },
+  },
 };

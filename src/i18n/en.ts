@@ -138,6 +138,7 @@ export const en: Dictionary = {
   footer: {
     tagline: "Indie tools that ease everyday hassle",
     navAria: "Site information",
+    contact: "Contact",
     terms: "Terms of Use",
     privacy: "Privacy Policy",
     environmentLabel: "Environment",
@@ -176,6 +177,26 @@ export const en: Dictionary = {
     importFail: "Import failed.",
     importInvalid: "Could not apply the file contents.",
     importConfirm: "Current data will be overwritten. Continue?",
+  },
+  contact: {
+    title: "Contact",
+    lead: "Choose a card below to open your email app. There is no server-side form—everything stays on your device until you send mail yourself.",
+    mailtoHint: "Opens your email app",
+    general: {
+      title: "General inquiries",
+      description:
+        "Questions about the site as a whole, or anything else not listed below.",
+      cta: "Email us",
+      subject: "[My Tool Box] Contact",
+    },
+    feedback: {
+      title: "Feature requests & bug reports",
+      description:
+        "Ideas for new tools, or errors you hit in an existing feature.",
+      cta: "Send feedback",
+      subject: "[My Tool Box] Feature request / Bug report",
+      body: "[App name]\n\n[Your request or bug details]\n",
+    },
   },
   legal: {
     back: "← Back to portal",

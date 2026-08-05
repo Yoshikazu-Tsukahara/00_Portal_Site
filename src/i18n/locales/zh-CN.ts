@@ -139,6 +139,7 @@ export const zhCN: PartialDictionary = {
   footer: {
     tagline: "让日常琐事更轻松的个人开发工具集",
     navAria: "运营者信息",
+    contact: "联系我们",
     terms: "使用条款",
     privacy: "隐私政策",
     environmentLabel: "运行环境",
@@ -177,4 +178,22 @@ export const zhCN: PartialDictionary = {
     importConfirm: "当前数据将被覆盖，确定继续吗？",
   },
   apps: appsZhCN,
+  contact: {
+    title: "联系我们",
+    lead: "请选择下方卡片以打开邮件应用。本站不提供服务器端表单。",
+    mailtoHint: "将打开您的邮件应用",
+    general: {
+      title: "一般咨询",
+      description: "关于本站整体的问题或其他咨询。",
+      cta: "发送邮件",
+      subject: "【My Tool Box】咨询",
+    },
+    feedback: {
+      title: "功能建议与问题反馈",
+      description: "希望新增的应用、或现有功能的错误报告。",
+      cta: "发送反馈",
+      subject: "【My Tool Box】功能建议 / 问题反馈",
+      body: "【应用名称】\n\n【建议或问题详情】\n",
+    },
+  },
 };

@@ -137,6 +137,7 @@ export const zhTW: PartialDictionary = {
   footer: {
     tagline: "讓日常瑣事更輕鬆的個人開發工具集",
     navAria: "營運者資訊",
+    contact: "聯絡我們",
     terms: "使用條款",
     privacy: "隱私權政策",
     environmentLabel: "執行環境",
@@ -175,4 +176,22 @@ export const zhTW: PartialDictionary = {
     importConfirm: "目前資料將被覆蓋，確定繼續嗎？",
   },
   apps: appsZhTW,
+  contact: {
+    title: "聯絡我們",
+    lead: "請選擇下方卡片以開啟郵件應用程式。本站不提供伺服器端表單。",
+    mailtoHint: "將開啟您的郵件應用程式",
+    general: {
+      title: "一般諮詢",
+      description: "關於本站整體的問題或其他諮詢。",
+      cta: "傳送郵件",
+      subject: "【My Tool Box】諮詢",
+    },
+    feedback: {
+      title: "功能建議與問題回報",
+      description: "希望新增的應用、或現有功能的錯誤回報。",
+      cta: "傳送回饋",
+      subject: "【My Tool Box】功能建議 / 問題回報",
+      body: "【應用名稱】\n\n【建議或問題詳情】\n",
+    },
+  },
 };

@@ -109,6 +109,7 @@ export type Dictionary = {
   footer: {
     tagline: string;
     navAria: string;
+    contact: string;
     terms: string;
     privacy: string;
     environmentLabel: string;
@@ -147,6 +148,27 @@ export type Dictionary = {
     updatedPrefix: string;
     terms: LegalDoc;
     privacy: LegalDoc;
+  };
+  /** お問い合わせページ（mailto のみ・サーバー送信なし） */
+  contact: {
+    title: string;
+    lead: string;
+    mailtoHint: string;
+    general: {
+      title: string;
+      description: string;
+      cta: string;
+      /** mailto の subject */
+      subject: string;
+    };
+    feedback: {
+      title: string;
+      description: string;
+      cta: string;
+      subject: string;
+      /** mailto の body（改行は \n） */
+      body: string;
+    };
   };
   /** 各ツールアプリ内 UI */
   apps: AppsDictionary;

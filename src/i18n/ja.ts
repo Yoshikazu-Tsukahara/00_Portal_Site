@@ -136,6 +136,7 @@ export const ja: Dictionary = {
   footer: {
     tagline: "日々の面倒をラクにする個人開発ツール群",
     navAria: "運営者情報",
+    contact: "お問い合わせ",
     terms: "利用規約",
     privacy: "プライバシーポリシー",
     environmentLabel: "動作環境",
@@ -174,6 +175,26 @@ export const ja: Dictionary = {
     importFail: "読み込みに失敗しました。",
     importInvalid: "データの内容を反映できませんでした。",
     importConfirm: "現在のデータが上書きされますがよろしいですか？",
+  },
+  contact: {
+    title: "お問い合わせ",
+    lead: "用途に合わせて下のカードを選ぶと、お使いのメールアプリが開きます。サーバーへの送信フォームはありません。",
+    mailtoHint: "クリックするとメールアプリが起動します",
+    general: {
+      title: "一般的なお問い合わせ",
+      description:
+        "サイト全体に関するご質問や、その他のお問い合わせはこちらから。",
+      cta: "メールで問い合わせる",
+      subject: "【My Tool Box】お問い合わせ",
+    },
+    feedback: {
+      title: "アプリのご要望・不具合報告",
+      description:
+        "新しいアプリのアイデアや、既存機能の不具合報告など、フィードバックをお寄せください。",
+      cta: "要望・不具合を送る",
+      subject: "【My Tool Box】ご要望・不具合報告",
+      body: "【対象のアプリ名】\n\n【ご要望・不具合の内容】\n",
+    },
   },
   legal: {
     back: "← ポータルに戻る",
