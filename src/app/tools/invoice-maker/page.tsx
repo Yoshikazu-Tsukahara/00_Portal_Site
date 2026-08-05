@@ -27,6 +27,8 @@ import {
 import {
   createEmptyItem,
   createNextInvoice,
+  defaultDocLocaleFor,
+  docLocaleLabel,
   MAX_INVOICE_ITEMS,
   suggestSaveName,
   type InvoiceData,
@@ -45,7 +47,8 @@ export default function InvoiceMakerPage() {
   const [loadOpen, setLoadOpen] = useState(false);
   const [savedToast, setSavedToast] = useState(false);
 
-  // サイト言語は「初回の既定値」を決めるためだけに使う（以降はユーザーの選択が優先）
+  // 初回のみ: 空ストアならサイト言語から書類言語・通貨の初期値を推測。
+  // 以降ヘッダーでサイト言語を変えても、書類言語（docLocale）は自動では変えない。
   useEffect(() => {
     if (!ready || data !== null) return;
     const store = loadInvoiceStore(locale);
@@ -73,15 +76,16 @@ export default function InvoiceMakerPage() {
   );
 
   const addItem = useCallback(() => {
+    const uiLabels = getDocLabels(defaultDocLocaleFor(locale));
     setData((prev) => {
       if (!prev) return prev;
       if (prev.items.length >= MAX_INVOICE_ITEMS) {
-        window.alert(getDocLabels(prev.docLocale).form.items.maxItemsAlert);
+        window.alert(uiLabels.form.items.maxItemsAlert);
         return prev;
       }
       return { ...prev, items: [...prev.items, createEmptyItem()] };
     });
-  }, []);
+  }, [locale]);
 
   const patchItem = useCallback((id: string, next: Partial<InvoiceItem>) => {
     setData((prev) =>
@@ -96,16 +100,20 @@ export default function InvoiceMakerPage() {
     );
   }, []);
 
-  const removeItem = useCallback((id: string) => {
-    setData((prev) => {
-      if (!prev) return prev;
-      if (prev.items.length <= 1) {
-        window.alert(getDocLabels(prev.docLocale).form.items.removeLastAlert);
-        return prev;
-      }
-      return { ...prev, items: prev.items.filter((item) => item.id !== id) };
-    });
-  }, []);
+  const removeItem = useCallback(
+    (id: string) => {
+      const uiLabels = getDocLabels(defaultDocLocaleFor(locale));
+      setData((prev) => {
+        if (!prev) return prev;
+        if (prev.items.length <= 1) {
+          window.alert(uiLabels.form.items.removeLastAlert);
+          return prev;
+        }
+        return { ...prev, items: prev.items.filter((item) => item.id !== id) };
+      });
+    },
+    [locale],
+  );
 
   const startNextInvoice = useCallback(() => {
     if (!window.confirm(copy.actions.newInvoiceConfirm)) return;
@@ -135,8 +143,10 @@ export default function InvoiceMakerPage() {
   );
 
   const handleLoadSample = useCallback(() => {
-    // デモだけはサイトの表示言語（Header の JA/EN）で内容を切り替える
-    setData(createSampleInvoice(locale));
+    // デモは「書類の言語」に合わせる（サイト表示言語とは独立）
+    setData((prev) =>
+      createSampleInvoice(prev?.docLocale ?? defaultDocLocaleFor(locale)),
+    );
     setLoadOpen(false);
   }, [locale]);
 
@@ -235,6 +245,7 @@ export default function InvoiceMakerPage() {
 
       <InvoiceForm
         data={data}
+        siteLocale={locale}
         copy={copy}
         onPatch={patch}
         onPatchParty={patchParty}
@@ -257,6 +268,7 @@ export default function InvoiceMakerPage() {
       <PreviewModal
         open={previewOpen}
         copy={copy.preview}
+        docLanguageLabel={docLocaleLabel(data.docLocale)}
         onClose={() => setPreviewOpen(false)}
         onPrint={handlePrint}
       >

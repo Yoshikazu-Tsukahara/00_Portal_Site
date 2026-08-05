@@ -175,7 +175,15 @@ export default function PageCanvas({
         ]
           .filter(Boolean)
           .join(" ")}
-        onClick={interactive ? (event) => event.stopPropagation() : undefined}
+        onClick={
+          interactive
+            ? (event) => {
+                // 版面クリックでも選択解除（伝播だけ止めてシート二重処理を避ける）
+                event.stopPropagation();
+                onSelectBlock?.(null);
+              }
+            : undefined
+        }
       >
         {isTocPage ? (
           <TocView
@@ -208,7 +216,13 @@ export default function PageCanvas({
           {guides.map((guide, index) => (
             <div
               key={`${guide.orientation}-${guide.position}-${index}`}
-              className={`bv-snap-guide bv-snap-guide--${guide.orientation}`}
+              className={[
+                "bv-snap-guide",
+                `bv-snap-guide--${guide.orientation}`,
+                guide.source === "peer" ? "bv-snap-guide--peer" : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
               style={
                 guide.orientation === "v"
                   ? { left: guide.position * metrics.width }

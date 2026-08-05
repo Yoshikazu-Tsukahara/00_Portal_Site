@@ -2,8 +2,8 @@ import type { PwaInstallCopy } from "@/lib/pwa/installCopy";
 import type { AppShellCopy } from "./otherApps";
 
 /**
- * ポータル／AppShell 側の UI 文言（サイト言語 ja/en）。
- * 帳票の印字・入力ラベルは docLabels.ts（書類言語）を使う。
+ * サイト表示言語向けの操作 UI 文言。
+ * PDF／プレビューの印字見出しは docLabels.ts（書類言語 docLocale）側。
  */
 export type InvoiceMakerDict = {
   shell: AppShellCopy;
@@ -36,6 +36,7 @@ export type InvoiceMakerDict = {
     empty: string;
     sampleName: string;
     sampleBadge: string;
+    sampleLead: string;
     loadAction: string;
     deleteAction: string;
     deleteConfirm: string;
@@ -47,6 +48,8 @@ export type InvoiceMakerDict = {
     heading: string;
     documentType: string;
     documentTypeHint: string;
+    /** サイト言語と書類言語の違いを説明するコールアウト */
+    languageSeparation: string;
     docLanguage: string;
     docLanguageHint: string;
     currency: string;
@@ -67,11 +70,14 @@ export type InvoiceMakerDict = {
     stampHint: string;
     stampSelect: string;
     stampClear: string;
+    imageTypeError: string;
   };
   preview: {
     modalTitle: string;
     hint: string;
     emptyHint: string;
+    /** {language} = 書類言語の自称 */
+    docLanguageNote: string;
     print: string;
     close: string;
   };
@@ -112,6 +118,8 @@ export const invoiceMakerJa: InvoiceMakerDict = {
     empty: "保存済みの帳票はまだありません。",
     sampleName: "📄 【サンプル】Webサイト制作費請求書（デモ）",
     sampleBadge: "デモ",
+    sampleLead:
+      "いま選んでいる「書類の言語」に合わせたデモを読み込みます（サイトの表示言語は変わりません）。",
     loadAction: "呼び出す",
     deleteAction: "削除",
     deleteConfirm: "「{name}」を削除しますか？この操作は取り消せません。",
@@ -122,10 +130,12 @@ export const invoiceMakerJa: InvoiceMakerDict = {
   settings: {
     heading: "書類の設定",
     documentType: "書類の種類",
-    documentTypeHint:
-      "書類言語を変えると、入力ラベルとPDFの見出しが切り替わります（サイト全体の言語は変わりません）",
-    docLanguage: "書類の言語",
-    docLanguageHint: "入力欄・プレビュー／PDF の印字言語です",
+    documentTypeHint: "請求書・見積書・納品書・領収書から選びます",
+    languageSeparation:
+      "画面の操作文言はヘッダーの表示言語に従います。下の「書類の言語」は、お客様へ渡す PDF／プレビューの見出し専用です。",
+    docLanguage: "書類の言語（PDF）",
+    docLanguageHint:
+      "プレビューと PDF の見出し・日付表記だけが切り替わります。サイト全体の言語はヘッダーで変更してください。",
     currency: "通貨",
     currencyCustom: "カスタム記号",
     currencyCustomPlaceholder: "例: ₹ ฿ R$",
@@ -144,12 +154,14 @@ export const invoiceMakerJa: InvoiceMakerDict = {
     stampHint: "発行者名の横に表示されます",
     stampSelect: "画像を選択",
     stampClear: "削除",
+    imageTypeError: "画像ファイルを選択してください",
   },
   preview: {
     modalTitle: "プレビュー確認",
     hint: "印刷ダイアログで「PDFに保存」を選ぶとファイルとして残せます。",
     emptyHint:
       "※薄く表示されている未入力項目は、PDF出力・印刷時には印字されず空白になります。",
+    docLanguageNote: "PDF／印刷の言語: {language}",
     print: "PDF出力（印刷）",
     close: "閉じる",
   },
@@ -214,6 +226,8 @@ export const invoiceMakerEn: InvoiceMakerDict = {
     empty: "No saved documents yet.",
     sampleName: "📄 [Sample] Website design invoice (demo)",
     sampleBadge: "Demo",
+    sampleLead:
+      "Loads a demo that matches the current Document language (site language stays unchanged).",
     loadAction: "Load",
     deleteAction: "Delete",
     deleteConfirm: "Delete “{name}”? This cannot be undone.",
@@ -224,10 +238,12 @@ export const invoiceMakerEn: InvoiceMakerDict = {
   settings: {
     heading: "Document settings",
     documentType: "Document type",
-    documentTypeHint:
-      "Changing document language updates form labels and PDF headings (site language stays the same)",
-    docLanguage: "Document language",
-    docLanguageHint: "Language for form labels and PDF print",
+    documentTypeHint: "Choose invoice, estimate, delivery note, or receipt",
+    languageSeparation:
+      "On-screen controls follow the site language in the header. “Document language” below only changes PDF / preview headings for your client.",
+    docLanguage: "Document language (PDF)",
+    docLanguageHint:
+      "Switches preview and PDF headings and date formats only. Change the site language from the header.",
     currency: "Currency",
     currencyCustom: "Custom symbol",
     currencyCustomPlaceholder: "e.g. ₹ ฿ R$",
@@ -246,12 +262,14 @@ export const invoiceMakerEn: InvoiceMakerDict = {
     stampHint: "Displayed next to the issuer name",
     stampSelect: "Select image",
     stampClear: "Remove",
+    imageTypeError: "Please choose an image file",
   },
   preview: {
     modalTitle: "Preview",
     hint: "In the print dialog, choose “Save as PDF” to keep a file.",
     emptyHint:
       "※ Faint placeholder text for empty fields will not appear on PDF / print — those spots stay blank.",
+    docLanguageNote: "PDF / print language: {language}",
     print: "Export PDF (Print)",
     close: "Close",
   },

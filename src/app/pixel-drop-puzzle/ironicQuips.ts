@@ -1,5 +1,7 @@
 // 極小ピクセル隙間落としパズル: 失敗時の皮肉スケール判定
 
+import type { Locale } from "@/i18n";
+
 /** 誤差スケール1件（閾値以上で該当） */
 export type IronyScaleEntry = {
   /** この絶対誤差（px）以上なら候補（降順で評価） */
@@ -214,10 +216,11 @@ function trimTrailingZeros(s: string): string {
  */
 export function formatIronyQuip(
   absErrorPx: number,
-  locale: "ja" | "en" = "ja",
+  locale: Locale = "ja",
 ): string {
   const scale = resolveIronyScale(absErrorPx);
   const err = formatAbsErrorForQuip(absErrorPx);
+  // 専用文案は ja / en のみ。他言語は英語にフォールバック
   if (locale === "ja") {
     return `誤差${err}pxもあったら、${scale.itemJa}が${scale.actionJa}ちゃいます。`;
   }

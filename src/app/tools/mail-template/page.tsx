@@ -60,7 +60,7 @@ export default function MailTemplatePage() {
 
   useEffect(() => {
     if (!ready) return;
-    // 初期サンプルのままなら、表示言語に合わせて差し替える
+    // 初期サンプルのままなら、サイト言語の defaults（テンプレ／変数／タグ）に差し替える
     const data = loadAppData(mt.defaults, locale);
     const sorted = filterTemplates(data.templates, "", null);
     setTemplates(data.templates);

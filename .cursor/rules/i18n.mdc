@@ -6,11 +6,22 @@ alwaysApply: false
 
 # i18n
 
+## 対応言語（9）
+
+`en` / `ja` / `zh-CN` / `zh-TW` / `ko` / `es` / `fr` / `de` / `pt`
+
+- 型・一覧・自称ラベル・Intl タグ → `src/i18n/localeMeta.ts`
+- 完全辞書: `ja.ts`（正）と `en.ts`（フォールバック基底）
+- 他 7 言語: `src/i18n/locales/*.ts`（ポータル共通）＋ `src/i18n/locales/apps/*.ts`（アプリ内 UI）を `deepMerge(en, partial)` で解決
+- UI 切替: `LanguageToggle`（ネイティブ `<select>`）。旧 JA/EN セグメントは廃止
+- `legal` は当面 en フォールバック（法的レビュー後に追加）
+
 ## 原則
 
 - **日本語（`ja.ts` / `*Ja`）を正** とし、英語は同じキー構造で追従
-- 画面に出す文字列は辞書経由。コンポーネント内に日本語/英語を直書きしない
+- 画面に出す文字列は辞書経由。コンポーネント内に言語直書きしない
 - プレースホルダーは `fmt()` を使う（`src/i18n/fmt.ts`）
+- 日付・数値の Intl は `intlLocale(locale)` を使う
 
 ## 新規ツールの辞書追加
 
@@ -18,6 +29,8 @@ alwaysApply: false
 2. `src/i18n/apps/index.ts` の `AppsDictionary` と export に登録
 3. `src/i18n/ja.ts` / `en.ts` の `tools.<kebab-id>` にポータルカード用 title/description
 4. ページでは `t.apps.<camelCase>` を参照（例: `mail-template` → `mailTemplate`）
+5. 他 7 言語: `src/i18n/locales/apps/<locale>.ts` の該当アプリキーを更新（未訳時は英語フォールバック）
+   - 一括再生成の補助: `scripts/apps-json-to-ts.mjs`
 
 ## 命名対応
 

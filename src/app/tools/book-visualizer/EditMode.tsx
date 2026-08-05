@@ -63,6 +63,17 @@ import {
   type PaginatedPage,
 } from "./paginate";
 import PropertiesPanel from "./PropertiesPanel";
+import {
+  asFreeBlock,
+  cloneFreeBlock,
+  copyFreeBlock,
+  isEditableKeyboardTarget,
+  isImeComposing,
+  isModKey,
+  nudgeDelta,
+  nudgeFrame,
+  type FreeBlock,
+} from "./editorHotkeys";
 import { applyLayerAction, type LayerAction } from "./layers";
 import {
   isOutlineSoloEntry,
@@ -108,6 +119,8 @@ const ZOOM_MIN = 0.25;
 const ZOOM_MAX = 3;
 /** 見開きの中央すき間（px） */
 const SPREAD_GAP = 12;
+/** 複製・貼り付け時のずらし量（用紙比） */
+const CLONE_OFFSET = 0.03;
 
 /** 編集画面の表示領域 */
 type EditChromeMode = "normal" | "immersive" | "browser";
@@ -161,6 +174,8 @@ export default function EditMode({
   );
   /** ページ区切り直後にジャンプするブロック id */
   const pendingNavBlockIdRef = useRef<string | null>(null);
+  /** 自由オブジェクト用の内部クリップボード（Ctrl+C/X/V） */
+  const freeClipboardRef = useRef<FreeBlock | null>(null);
 
   bookRef.current = book;
   outlineIndexRef.current = outlineIndex;
@@ -209,19 +224,6 @@ export default function EditMode({
     return () => {
       document.body.style.overflow = previous;
     };
-  }, [chromeMode]);
-
-  // Esc でウィンドウ全画面だけ解除（完全フルスクリーンはブラウザが処理）
-  useEffect(() => {
-    function handleKey(event: KeyboardEvent) {
-      if (event.key !== "Escape") return;
-      if (document.fullscreenElement) return;
-      if (chromeMode !== "immersive") return;
-      event.preventDefault();
-      setChromeMode("normal");
-    }
-    window.addEventListener("keydown", handleKey);
-    return () => window.removeEventListener("keydown", handleKey);
   }, [chromeMode]);
 
   const handleTocSyncPages = useCallback(
@@ -645,6 +647,103 @@ export default function EditMode({
       ),
       true,
     );
+  }
+
+  /** いまの用紙上の自由オブジェクト一覧（複製時の zIndex 用） */
+  function currentFreePeers(): Block[] {
+    if (currentEntry?.kind === "body") {
+      return bodyOverlayBlocks(
+        currentBodyOverlays,
+        currentEntry.columnIndex,
+      );
+    }
+    return currentPage?.blocks.filter(isFreeBlock) ?? [];
+  }
+
+  /** 選択ブロックを削除。キーボードは確認なし（元に戻せる）、パネルは確認あり */
+  function removeSelectedBlock(options?: { confirm?: boolean }) {
+    if (!selectedBlock) return false;
+    if (options?.confirm !== false) {
+      if (!window.confirm(copy.edit.block.confirmRemove)) return false;
+    }
+    if (currentEntry?.kind === "body" && selectedBlock.type === "text") {
+      rememberBeforeMainEdit();
+      onChangeBook({
+        body: book.body.filter(
+          (item) =>
+            !(item.type === "text" && item.id === selectedBlock.id),
+        ),
+      });
+      setSelectedBlockId(null);
+      return true;
+    }
+    if (currentEntry?.kind === "body" && isFreeBlock(selectedBlock)) {
+      const existing = bodyOverlayBlocks(
+        currentBodyOverlays,
+        currentEntry.columnIndex,
+      );
+      updateBodyOverlayBlocks(
+        currentEntry.columnIndex,
+        existing.filter((block) => block.id !== selectedBlock.id),
+      );
+      setSelectedBlockId(null);
+      return true;
+    }
+    if (!currentPage) return false;
+    updateCurrentPageBlocks(
+      currentPage.blocks.filter((block) => block.id !== selectedBlock.id),
+    );
+    setSelectedBlockId(null);
+    return true;
+  }
+
+  function copySelectedFreeBlock(): boolean {
+    const free = asFreeBlock(selectedBlock);
+    if (!free) return false;
+    freeClipboardRef.current = copyFreeBlock(free);
+    return true;
+  }
+
+  function cutSelectedFreeBlock(): boolean {
+    if (!copySelectedFreeBlock()) return false;
+    return removeSelectedBlock({ confirm: false });
+  }
+
+  function pasteFreeClipboard(): boolean {
+    const source = freeClipboardRef.current;
+    if (!source) return false;
+    const peers = currentFreePeers();
+    const cloned = cloneFreeBlock(
+      source,
+      CLONE_OFFSET,
+      nextZIndex(peers),
+    );
+    // 連続貼り付けで少しずつずれるよう、次の基準を更新
+    freeClipboardRef.current = copyFreeBlock(cloned);
+    addFreeBlock(cloned);
+    return true;
+  }
+
+  function duplicateSelectedFreeBlock(): boolean {
+    const free = asFreeBlock(selectedBlock);
+    if (!free) return false;
+    const peers = currentFreePeers();
+    const cloned = cloneFreeBlock(
+      free,
+      CLONE_OFFSET,
+      nextZIndex(peers),
+    );
+    addFreeBlock(cloned);
+    return true;
+  }
+
+  function nudgeSelectedFreeBlock(key: string, shift: boolean): boolean {
+    const free = asFreeBlock(selectedBlock);
+    if (!free) return false;
+    const delta = nudgeDelta(key, metrics.width, metrics.height, shift);
+    if (!delta) return false;
+    changeFreeFrame(free.id, nudgeFrame(free.frame, delta.dx, delta.dy));
+    return true;
   }
 
   function changeFreeText(id: string, text: string) {
@@ -1129,43 +1228,123 @@ export default function EditMode({
         updateCurrentPageBlocks(blocks);
       }}
       onRemoveBlock={() => {
-        if (!selectedBlock) return;
-        if (!window.confirm(copy.edit.block.confirmRemove)) {
-          return;
-        }
-        if (currentEntry?.kind === "body" && selectedBlock.type === "text") {
-          rememberBeforeMainEdit();
-          onChangeBook({
-            body: book.body.filter(
-              (item) =>
-                !(item.type === "text" && item.id === selectedBlock.id),
-            ),
-          });
-          setSelectedBlockId(null);
-          return;
-        }
-        if (currentEntry?.kind === "body" && isFreeBlock(selectedBlock)) {
-          const existing = bodyOverlayBlocks(
-            currentBodyOverlays,
-            currentEntry.columnIndex,
-          );
-          updateBodyOverlayBlocks(
-            currentEntry.columnIndex,
-            existing.filter((block) => block.id !== selectedBlock.id),
-          );
-          setSelectedBlockId(null);
-          return;
-        }
-        if (!currentPage) return;
-        updateCurrentPageBlocks(
-          currentPage.blocks.filter((block) => block.id !== selectedBlock.id),
-        );
-        setSelectedBlockId(null);
+        removeSelectedBlock({ confirm: true });
       }}
       prompts={prompts}
       onChangePrompts={onChangePrompts}
     />
   );
+
+  // 編集ショートカット（文字入力中はブラウザ標準に委譲）
+  const hotkeysRef = useRef({
+    chromeMode,
+    selectedBlockId,
+    selectedBlock,
+    handleUndo,
+    handleRedo,
+    removeSelectedBlock,
+    copySelectedFreeBlock,
+    cutSelectedFreeBlock,
+    pasteFreeClipboard,
+    duplicateSelectedFreeBlock,
+    nudgeSelectedFreeBlock,
+  });
+  hotkeysRef.current = {
+    chromeMode,
+    selectedBlockId,
+    selectedBlock,
+    handleUndo,
+    handleRedo,
+    removeSelectedBlock,
+    copySelectedFreeBlock,
+    cutSelectedFreeBlock,
+    pasteFreeClipboard,
+    duplicateSelectedFreeBlock,
+    nudgeSelectedFreeBlock,
+  };
+
+  useEffect(() => {
+    function handleKey(event: KeyboardEvent) {
+      if (isImeComposing(event)) return;
+
+      const mod = isModKey(event);
+      const key = event.key;
+      const lower = key.length === 1 ? key.toLowerCase() : key;
+      const typing = isEditableKeyboardTarget(event.target);
+      const cmd = hotkeysRef.current;
+
+      // 元に戻す／やり直しは入力中もアプリ履歴を使う
+      if (mod && lower === "z" && !event.shiftKey) {
+        event.preventDefault();
+        cmd.handleUndo();
+        return;
+      }
+      if (mod && (lower === "y" || (lower === "z" && event.shiftKey))) {
+        event.preventDefault();
+        cmd.handleRedo();
+        return;
+      }
+
+      // 文字編集中は以降のショートカットを奪わない
+      if (typing) return;
+
+      // Esc：選択解除 → ウィンドウ全画面解除
+      if (key === "Escape") {
+        if (cmd.selectedBlockId) {
+          event.preventDefault();
+          setSelectedBlockId(null);
+          return;
+        }
+        if (document.fullscreenElement) return;
+        if (cmd.chromeMode === "immersive") {
+          event.preventDefault();
+          setChromeMode("normal");
+        }
+        return;
+      }
+
+      // 削除（自由オブジェクトは確認なし。本文ブロックもキー操作は確認なし）
+      if (key === "Delete" || key === "Backspace") {
+        if (!cmd.selectedBlock) return;
+        event.preventDefault();
+        cmd.removeSelectedBlock({ confirm: false });
+        return;
+      }
+
+      // コピー／切り取り／貼り付け／複製（自由オブジェクト）
+      if (mod && lower === "c") {
+        if (cmd.copySelectedFreeBlock()) event.preventDefault();
+        return;
+      }
+      if (mod && lower === "x") {
+        if (cmd.cutSelectedFreeBlock()) event.preventDefault();
+        return;
+      }
+      if (mod && lower === "v") {
+        if (cmd.pasteFreeClipboard()) event.preventDefault();
+        return;
+      }
+      if (mod && lower === "d") {
+        if (cmd.duplicateSelectedFreeBlock()) event.preventDefault();
+        return;
+      }
+
+      // 矢印で微調整（Shift で大きく）
+      if (
+        key === "ArrowLeft" ||
+        key === "ArrowRight" ||
+        key === "ArrowUp" ||
+        key === "ArrowDown"
+      ) {
+        if (cmd.nudgeSelectedFreeBlock(key, event.shiftKey)) {
+          event.preventDefault();
+        }
+      }
+    }
+
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, []);
 
   const viewModeIndex = viewMode === "spread" ? 1 : 0;
   const chromeModeIndex =

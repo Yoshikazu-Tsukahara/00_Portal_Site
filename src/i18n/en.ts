@@ -58,7 +58,7 @@ export const en: Dictionary = {
     "invoice-maker": {
       title: "Form Maker",
       description:
-        "Create A4 invoices, estimates, delivery notes, and receipts. Multi-language, multi-currency, one-click PDF.",
+        "A4 invoices, estimates, delivery notes & receipts. Multi-currency PDF.",
     },
     "mail-template": {
       title: "Mail Template Organizer",
@@ -91,8 +91,7 @@ export const en: Dictionary = {
     },
     "book-visualizer": {
       title: "AI Book Studio",
-      description:
-        "Pick paper size and typesetting, edit on the page itself, share as .mybook.",
+      description: "Edit the page layout directly and share as .mybook.",
     },
     "palette-collector": {
       title: "Palette Collector",
@@ -111,7 +110,7 @@ export const en: Dictionary = {
       description: "Chase or dodge your own ultra-low-odds jackpot slot.",
     },
     "pixel-drop-puzzle": {
-      title: "Tiny Pixel Gap Drop Puzzle",
+      title: "Pixel Gap Drop Puzzle",
       description: "Drop a photo into the gap—judged to a fraction of a pixel.",
     },
     "robot-freethrow": {

@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
-import { fmt } from "@/i18n";
-import type { Locale } from "@/i18n";
+import { fmt, intlLocale, type Locale } from "@/i18n";
 import type { InvoiceMakerDict } from "@/i18n/apps/invoiceMaker";
 import type { SavedInvoice } from "./types";
 
@@ -132,7 +131,7 @@ type LoadDialogProps = {
 function formatSavedAt(iso: string, locale: Locale): string {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return iso;
-  return new Intl.DateTimeFormat(locale === "ja" ? "ja-JP" : "en-US", {
+  return new Intl.DateTimeFormat(intlLocale(locale), {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -216,9 +215,12 @@ export function LoadInvoiceDialog({
                   <p className="truncate text-sm font-medium text-zinc-900">
                     {copy.sampleName}
                   </p>
-                  <p className="mt-0.5 text-[11px] text-emerald-700/80">
+                  <p className="mt-0.5 flex flex-wrap items-center gap-1.5 text-[11px] text-emerald-700/80">
                     <span className="rounded bg-emerald-100 px-1.5 py-0.5 text-[10px] font-medium text-emerald-800">
                       {copy.sampleBadge}
+                    </span>
+                    <span className="text-[10px] leading-snug text-zinc-500">
+                      {copy.sampleLead}
                     </span>
                   </p>
                 </div>

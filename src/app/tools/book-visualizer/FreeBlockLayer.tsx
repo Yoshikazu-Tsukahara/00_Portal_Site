@@ -58,9 +58,17 @@ export default function FreeBlockLayer({
 
   const freeBlocks = blocks.filter(isFreeBlock);
   const { under, over } = splitFreeBlocksByBodyPlane(freeBlocks);
+
   if (freeBlocks.length === 0) return null;
   if (plane === "under" && under.length === 0) return null;
   if (plane === "over" && over.length === 0) return null;
+
+  /** 吸着用：同じ用紙上の他オブジェクト枠（自分は除く） */
+  function peerFramesFor(blockId: string): FreeFrame[] {
+    return freeBlocks
+      .filter((block) => block.id !== blockId)
+      .map((block) => block.frame);
+  }
 
   function renderBlocks(
     list: typeof freeBlocks,
@@ -83,6 +91,7 @@ export default function FreeBlockLayer({
               interactive={interactive}
               selected={selectedBlockId === block.id}
               alt={block.caption || imageAlt}
+              peerFrames={peerFramesFor(block.id)}
               onSelect={() => onSelectBlock?.(block.id)}
               onChangeFrame={(frame) => onChangeFreeFrame?.(block.id, frame)}
               onGuidesChange={interactive ? setGuides : undefined}
@@ -98,6 +107,7 @@ export default function FreeBlockLayer({
               selected={selectedBlockId === block.id}
               placeholder={copy.edit.freeTextPlaceholder}
               dragHint={copy.edit.block.freeTextDragHint}
+              peerFrames={peerFramesFor(block.id)}
               onSelect={() => onSelectBlock?.(block.id)}
               onChangeFrame={(frame) => onChangeFreeFrame?.(block.id, frame)}
               onChangeText={(text) => onChangeText?.(block.id, text)}
@@ -124,7 +134,13 @@ export default function FreeBlockLayer({
           {localGuides.map((guide, index) => (
             <div
               key={`${guide.orientation}-${guide.position}-${index}`}
-              className={`bv-snap-guide bv-snap-guide--${guide.orientation}`}
+              className={[
+                "bv-snap-guide",
+                `bv-snap-guide--${guide.orientation}`,
+                guide.source === "peer" ? "bv-snap-guide--peer" : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
               style={
                 guide.orientation === "v"
                   ? { left: guide.position * metrics.width }

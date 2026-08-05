@@ -1,7 +1,19 @@
 import type { AppsDictionary } from "./apps";
 
-/** 対応言語 */
-export type Locale = "ja" | "en";
+/**
+ * 対応言語（主要市場向け 9 言語）。
+ * LocalStorage / URL でもこのコードを使う。
+ */
+export type Locale =
+  | "en"
+  | "ja"
+  | "zh-CN"
+  | "zh-TW"
+  | "ko"
+  | "es"
+  | "fr"
+  | "de"
+  | "pt";
 
 /** LocalStorage に保存するキー */
 export const LOCALE_STORAGE_KEY = "my-tool-box-locale";

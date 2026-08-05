@@ -14,9 +14,9 @@ const ACCENT_BY_GENRE: Record<string, CardAccent> = {
   minigames: "gold",
 };
 
-/** カード共通：高さ固定（日英で文言量が違ってもカード高さが変わらない） */
+/** カード共通：タイトル2行＋説明3行が収まる高さ（言語差でも揃う） */
 const CARD_BASE =
-  "portal-tool-card group relative flex h-[12.25rem] min-w-0 flex-col overflow-hidden rounded-xl bg-white/95 p-3 shadow-md backdrop-blur-[2px] transition-all duration-300 ease-out sm:h-[12rem] sm:p-5";
+  "portal-tool-card group relative flex h-[13.5rem] min-w-0 flex-col overflow-hidden rounded-xl bg-white/95 p-3 shadow-md backdrop-blur-[2px] transition-all duration-300 ease-out sm:h-[13.75rem] sm:p-5";
 
 const ACCENT_CLASS: Record<CardAccent, string> = {
   blue: "portal-tool-card--blue",
@@ -117,29 +117,21 @@ export default function ToolCard({
 
   const content = (
     <>
-      <div className="mb-1.5 flex min-w-0 items-start gap-2 sm:mb-2.5 sm:items-center sm:gap-3">
+      {/* アイコンとタイトル：1〜2行いずれでも縦中央揃え */}
+      <div className="mb-1.5 flex min-w-0 items-center gap-2 sm:mb-2.5 sm:gap-3">
         <span
           aria-hidden
           className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-zinc-100 bg-gradient-to-b from-zinc-50 to-zinc-100/80 text-[1.05rem] leading-none shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_1px_2px_rgba(24,24,27,0.04)] transition-all duration-300 group-hover:border-zinc-200 group-hover:from-white group-hover:to-zinc-50 group-hover:shadow-[inset_0_1px_0_rgba(255,255,255,1),0_2px_6px_rgba(24,24,27,0.06)] sm:h-11 sm:w-11 sm:rounded-xl sm:text-[1.35rem]"
         >
           {icon}
         </span>
-        <h3
-          title={title}
-          className="line-clamp-2 min-w-0 flex-1 break-words text-[13px] font-semibold leading-snug tracking-tight text-zinc-900 transition-colors duration-300 [overflow-wrap:anywhere] group-hover:text-zinc-950 sm:line-clamp-none sm:truncate sm:text-base sm:leading-tight"
-        >
+        <h3 className="line-clamp-2 min-w-0 flex-1 break-words text-[13px] font-semibold leading-snug tracking-tight text-zinc-900 transition-colors duration-300 [overflow-wrap:anywhere] group-hover:text-zinc-950 sm:text-base sm:leading-snug">
           {title}
         </h3>
       </div>
 
-      {/*
-        狭いカード: 3行＋単語途中の見切れを抑える。
-        バッジ用の大きな右余白（pr-14）は狭い幅では付けない。
-      */}
-      <p
-        title={description}
-        className="mb-2 min-h-0 flex-1 overflow-hidden break-words text-[11px] leading-relaxed text-zinc-500 transition-colors duration-300 [overflow-wrap:anywhere] line-clamp-3 group-hover:text-zinc-600 sm:mb-3 sm:line-clamp-2 sm:pr-14 sm:text-sm sm:leading-snug"
-      >
+      {/* 説明は最大3行。長い文案は辞書側で短縮する（CSS省略に頼らない） */}
+      <p className="mb-2 min-h-0 flex-1 break-words text-[11px] leading-relaxed text-zinc-500 transition-colors duration-300 [overflow-wrap:anywhere] line-clamp-3 group-hover:text-zinc-600 sm:mb-3 sm:pr-14 sm:text-sm sm:leading-snug">
         {description}
       </p>
 

@@ -1,5 +1,8 @@
 // 極小ピクセル隙間落としパズル: 数値の表示フォーマット（NASA コンソール風）
 
+import type { Locale } from "@/i18n";
+import { intlLocale } from "@/i18n";
+
 /** 符号付きpx表記（例: "+0.024100"） */
 export function formatSignedPx(value: number, decimals: number): string {
   const sign = value >= 0 ? "+" : "-";
@@ -14,17 +17,18 @@ export function formatSignedMs(value: number): string {
 
 /**
  * 「純粋な運だけで許容誤差内に止まる確率」を天文学的な体裁で表記する。
- * 一様分布を仮定した簡易モデル（演出用）。
+ * 一様分布を仮定した簡易モデル（演出用）。日本語以外は英語表記。
  */
 export function formatOddsRatio(
   tolerancePx: number,
   maxXPx: number,
-  locale: "ja" | "en" = "en",
+  locale: Locale = "en",
 ): string {
   if (tolerancePx <= 0 || maxXPx <= 0) return locale === "ja" ? "該当なし" : "N/A";
   const chance = Math.min(1, (2 * tolerancePx) / maxXPx);
   if (chance <= 0) return locale === "ja" ? "∞分の1" : "1 in ∞";
   const n = 1 / chance;
+  const numLocale = intlLocale(locale);
   if (n >= 1e6) {
     const exp = Math.floor(Math.log10(n));
     const mantissa = n / Math.pow(10, exp);
@@ -34,9 +38,9 @@ export function formatOddsRatio(
     return `1 in ${mantissa.toFixed(3)} \u00d7 10^${exp}`;
   }
   if (locale === "ja") {
-    return `${Math.round(n).toLocaleString("ja-JP")}分の1`;
+    return `${Math.round(n).toLocaleString(numLocale)}分の1`;
   }
-  return `1 in ${Math.round(n).toLocaleString("en-US")}`;
+  return `1 in ${Math.round(n).toLocaleString(numLocale)}`;
 }
 
 /** 誤差の許容誤差に対する「信頼度」演出値（%、小数6桁） */

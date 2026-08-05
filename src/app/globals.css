@@ -333,32 +333,18 @@ html[data-layout-mode="full"] .layout-content {
     @apply inline-flex items-center justify-center;
   }
 
-  /* 言語トグル：スライドする選択インジケータ
-   * padding 0.5(2px) と幅 calc(50%-2px) の組み合わせでは、
-   * EN 側は translateX(100%) だけで左右対称になる（+α を足すと右下にずれる） */
-  .lang-toggle {
-    @apply relative inline-grid grid-cols-2 items-center p-0.5;
+  /* 9 言語対応の言語セレクト（旧 JA/EN セグメントの代替） */
+  .lang-select {
+    @apply relative inline-flex items-center;
   }
 
-  .lang-toggle__indicator {
-    @apply pointer-events-none absolute inset-y-0.5 left-0.5 w-[calc(50%-2px)] rounded-full bg-zinc-900 shadow-sm;
-    transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  .lang-select__control {
+    @apply appearance-none rounded-full border border-zinc-200/90 bg-white/80 py-1.5 pl-3 pr-8 text-[11px] font-medium leading-none tracking-wide text-zinc-700 shadow-[0_1px_2px_rgba(0,0,0,0.04)] backdrop-blur-sm transition-colors hover:border-zinc-300 hover:text-zinc-900 focus:border-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 sm:text-xs;
+    max-width: 9.5rem;
   }
 
-  .lang-toggle__indicator--en {
-    transform: translateX(100%);
-  }
-
-  .lang-toggle__btn {
-    @apply relative z-10 inline-flex items-center justify-center rounded-full px-2.5 py-1 text-[11px] font-medium leading-none tracking-wide transition-colors duration-200 sm:px-3 sm:text-xs;
-  }
-
-  .lang-toggle__btn--active {
-    @apply text-zinc-50;
-  }
-
-  .lang-toggle__btn--inactive {
-    @apply text-zinc-500 hover:text-zinc-800;
+  .lang-select__chevron {
+    @apply pointer-events-none absolute right-2.5 size-3.5 text-zinc-400;
   }
 
   /* 表示幅トグル：3 セグメント＋スライドする選択ピル */
@@ -3463,7 +3449,6 @@ html.pxd-pwa-standalone .pxd-block-guide {
     animation: none;
   }
 
-  .lang-toggle__indicator,
   .layout-toggle__indicator,
   .lunch-mode-segment__indicator,
   .slot-mode-segment__indicator {
@@ -5426,14 +5411,32 @@ select.bv-ui-field optgroup {
 }
 
 /*
- * 選択中は他オブジェクトのヒットを通し、背面に送った選択オブジェクトを操作しやすくする。
- * 見た目の重ね順（z-index）はそのままなので、レイヤー変更は即時に見える。
+ * 背面レイヤーのオブジェクト選択中だけ、前面の未選択ヒットを通す。
+ * （常時無効にすると、別テキストボックスへ選択を移せなくなる）
  */
-.bv-sheet:has(.bv-free-image--selected, .bv-free-text--selected) .bv-free-image--hit,
-.bv-sheet:has(.bv-free-image--selected, .bv-free-text--selected) .bv-free-text--hit,
-.bv-paged-sheet:has(.bv-free-image--selected, .bv-free-text--selected)
+.bv-sheet:has(
+    .bv-free-layer--under .bv-free-image--selected,
+    .bv-free-layer--under .bv-free-text--selected
+  )
+  .bv-free-layer--over
   .bv-free-image--hit,
-.bv-paged-sheet:has(.bv-free-image--selected, .bv-free-text--selected)
+.bv-sheet:has(
+    .bv-free-layer--under .bv-free-image--selected,
+    .bv-free-layer--under .bv-free-text--selected
+  )
+  .bv-free-layer--over
+  .bv-free-text--hit,
+.bv-paged-sheet:has(
+    .bv-free-layer--under .bv-free-image--selected,
+    .bv-free-layer--under .bv-free-text--selected
+  )
+  .bv-free-layer--over
+  .bv-free-image--hit,
+.bv-paged-sheet:has(
+    .bv-free-layer--under .bv-free-image--selected,
+    .bv-free-layer--under .bv-free-text--selected
+  )
+  .bv-free-layer--over
   .bv-free-text--hit {
   pointer-events: none;
 }
@@ -5578,7 +5581,9 @@ select.bv-ui-field optgroup {
   line-break: anywhere;
   letter-spacing: normal;
   line-height: 1.25;
-  color: #18181b;
+  /* 紙面の墨色（親 UI の dark color-scheme に引っ張られないよう明示） */
+  color: var(--bv-ink-color, #18181b);
+  -webkit-text-fill-color: var(--bv-ink-color, #18181b);
   /* 選択中（非編集）は枠ごとドラッグしやすいよう move */
   cursor: inherit;
   user-select: none;
@@ -5604,6 +5609,7 @@ select.bv-ui-field optgroup {
 
 .bv-sheet--photo .bv-free-text__inner {
   color: #fafafa;
+  -webkit-text-fill-color: #fafafa;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
 }
 
@@ -5620,7 +5626,7 @@ select.bv-ui-field optgroup {
   background: #27272a;
 }
 
-/* スマートガイド（中央・端への吸着時） */
+/* スマートガイド（用紙／他オブジェクトの端・中央への吸着時） */
 .bv-snap-guide {
   position: absolute;
   z-index: 50;
@@ -5640,6 +5646,20 @@ select.bv-ui-field optgroup {
   right: 0;
   height: 1px;
   transform: translateY(-0.5px);
+}
+
+/* 他オブジェクト揃え（パワポ風）。用紙ガイドより少し強調 */
+.bv-snap-guide--peer {
+  background: #f43f5e;
+  box-shadow: 0 0 0 0.5px rgb(244 63 94 / 0.35);
+}
+
+.bv-snap-guide--peer.bv-snap-guide--v {
+  width: 1.5px;
+}
+
+.bv-snap-guide--peer.bv-snap-guide--h {
+  height: 1.5px;
 }
 
 /* 柱（ランニングヘッダー） */

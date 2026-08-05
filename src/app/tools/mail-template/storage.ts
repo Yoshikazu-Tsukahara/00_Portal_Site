@@ -1,9 +1,10 @@
-import type { Locale } from "@/i18n/types";
+import { isLocale, type Locale } from "@/i18n";
 import {
   mailTemplateEn,
   mailTemplateJa,
   type MailTemplateDefaults,
 } from "@/i18n/apps/mailTemplate";
+import { appsByLocale } from "@/i18n/locales/apps";
 import {
   createDefaultVariableMaster,
   extractVariables,
@@ -19,17 +20,20 @@ import { createSampleTemplates } from "./sampleTemplates";
 
 const STORAGE_KEY = "mail-template-app:v4";
 
-/** 初期サンプルを流し込んだときの言語。ユーザーが編集したら null */
-export type SeedLocale = "ja" | "en";
+/**
+ * 初期サンプルを流し込んだときのサイト言語。
+ * ユーザーが編集したら null（以降は言語切替で上書きしない）。
+ */
+export type SeedLocale = Locale;
 
 export type AppData = {
   templates: MailTemplate[];
   variables: VariableMasterItem[];
   tags: TagMasterItem[];
   /**
-   * 初期サンプルの言語。
-   * - ja / en: まだサンプルのまま → 言語切替で差し替え可能
-   * - null: ユーザーが編集済み → 言語切替でも上書きしない
+   * 初期サンプルの言語コード（サイト Locale と同じ）。
+   * - Locale: まだサンプルのまま → サイト言語切替で差し替え可能
+   * - null: ユーザー編集済み → 言語切替でも上書きしない
    */
   seedLocale: SeedLocale | null;
 };
@@ -132,7 +136,7 @@ function readJson(key: string): unknown {
 
 function readSeedLocale(value: unknown): SeedLocale | null | undefined {
   if (value === null) return null;
-  if (value === "ja" || value === "en") return value;
+  if (typeof value === "string" && isLocale(value)) return value;
   return undefined;
 }
 
@@ -148,11 +152,16 @@ function titlesMatchDefaults(
 
 /**
  * seedLocale 未保存の古いデータ向け。
- * JA / EN いずれかの初期サンプルと一致すればその言語、違えば編集済み扱い。
+ * いずれかの言語の初期サンプルとタイトルが一致すればその言語、違えば編集済み扱い。
  */
 function inferSeedLocale(data: Omit<AppData, "seedLocale">): SeedLocale | null {
   if (titlesMatchDefaults(data.templates, mailTemplateJa.defaults)) return "ja";
   if (titlesMatchDefaults(data.templates, mailTemplateEn.defaults)) return "en";
+  for (const [code, apps] of Object.entries(appsByLocale)) {
+    if (titlesMatchDefaults(data.templates, apps.mailTemplate.defaults)) {
+      return code as Locale;
+    }
+  }
   return null;
 }
 
@@ -256,13 +265,14 @@ function migrateFromLegacy(
 
 /**
  * LocalStorage から読み込み。
- * 初期サンプルのままなら、表示言語に合わせて差し替える。
+ * 初期サンプルのままなら、サイトの表示言語の defaults に差し替える。
  */
 export function loadAppData(
   defaults: MailTemplateDefaults,
   locale: Locale,
 ): AppData {
-  const seedLocale = locale === "en" ? "en" : "ja";
+  // サイト言語そのものをシードとして記録（9言語すべて対応）
+  const seedLocale: SeedLocale = locale;
 
   if (typeof window === "undefined") {
     return { templates: [], variables: [], tags: [], seedLocale };
@@ -289,7 +299,7 @@ export function loadAppData(
         ? migrated.seedLocale
         : inferSeedLocale(migrated);
 
-    // サンプルのままで、今の表示言語と違う → 差し替え
+    // サンプルのままで、今のサイト言語と違う → その言語の defaults で差し替え
     if (resolvedSeed !== null && resolvedSeed !== seedLocale) {
       const fresh = createFreshData(defaults, seedLocale);
       saveAppData(fresh);

@@ -1,3 +1,5 @@
+import type { Locale } from "@/i18n";
+import { intlLocale } from "@/i18n";
 import type { LunchCurrency } from "./currency";
 import { roundMoney } from "./currency";
 import type { LunchEntry, LunchSettings } from "./types";
@@ -148,9 +150,9 @@ export { formatMoney, formatYen } from "./currency";
 export function formatPeriodRange(
   startDate: string,
   endDate: string,
-  displayLocale: "ja" | "en" = "ja",
+  displayLocale: Locale = "ja",
 ): string {
-  const loc = displayLocale === "en" ? "en-US" : "ja-JP";
+  const loc = intlLocale(displayLocale);
   const fmt = (iso: string) => {
     const d = parseIsoDate(iso);
     return new Intl.DateTimeFormat(loc, {
@@ -165,9 +167,9 @@ export function formatPeriodRange(
 /** 履歴用の日付表示（ローカル） */
 export function formatEntryDate(
   iso: string,
-  displayLocale: "ja" | "en" = "ja",
+  displayLocale: Locale = "ja",
 ): string {
-  const loc = displayLocale === "en" ? "en-US" : "ja-JP";
+  const loc = intlLocale(displayLocale);
   const d = parseIsoDate(iso);
   const { year: nowY } = getLocalDateParts();
   const { year } = getLocalDateParts(d);

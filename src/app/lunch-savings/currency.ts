@@ -1,3 +1,6 @@
+import type { Locale } from "@/i18n";
+import { intlLocale } from "@/i18n";
+
 /** 対応通貨コード */
 export type LunchCurrency = "JPY" | "USD" | "EUR" | "GBP";
 
@@ -44,15 +47,16 @@ export function roundMoney(amount: number, currency: LunchCurrency): number {
 
 /**
  * 金額を通貨フォーマットで表示。
- * displayLocale は UI 言語（"ja" / "en"）。通貨ロケールと組み合わせて記号位置を調整。
+ * displayLocale は UI 言語。記号位置は Intl に任せる。
  */
 export function formatMoney(
   amount: number,
   currency: LunchCurrency,
-  displayLocale: "ja" | "en" = "ja",
+  displayLocale: Locale = "ja",
 ): string {
   const meta = CURRENCY_META[currency];
-  const locale = displayLocale === "en" ? "en-US" : meta.numberLocale;
+  const locale =
+    displayLocale === "ja" ? meta.numberLocale : intlLocale(displayLocale);
   try {
     return new Intl.NumberFormat(locale, {
       style: "currency",
@@ -74,10 +78,11 @@ export function formatMoney(
 export function formatMoneyDigits(
   amount: number,
   currency: LunchCurrency,
-  displayLocale: "ja" | "en" = "ja",
+  displayLocale: Locale = "ja",
 ): string {
   const meta = CURRENCY_META[currency];
-  const locale = displayLocale === "en" ? "en-US" : meta.numberLocale;
+  const locale =
+    displayLocale === "ja" ? meta.numberLocale : intlLocale(displayLocale);
   return amount.toLocaleString(locale, {
     minimumFractionDigits: 0,
     maximumFractionDigits: meta.decimals,

@@ -412,7 +412,7 @@ export const bookVisualizerJa: BookVisualizerDict = {
       undo: "元に戻す",
       redo: "やり直し",
       undoHint: "Ctrl+Z",
-      redoHint: "Ctrl+Y",
+      redoHint: "Ctrl+Y / Ctrl+Shift+Z",
       pageBreak: "ページ区切り",
       pageBreakHint:
         "キャレット位置でページを分けます（Ctrl+Enter／本文ページのみ）",
@@ -554,7 +554,7 @@ export const bookVisualizerJa: BookVisualizerDict = {
       kindImage: "画像ブロック",
       kindFreeText: "テキストボックス",
       freeTextDragHint:
-        "枠をドラッグして移動。ダブルクリックまたは Enter で文字編集（Esc で終了）",
+        "枠をドラッグして移動。Enter で編集、Esc で終了。Delete で削除、矢印で微調整、Ctrl+C/V/D でコピー・貼付・複製",
       level: "テキスト階層",
       levelH1: "章",
       levelH2: "節",
@@ -738,7 +738,7 @@ export const bookVisualizerEn: BookVisualizerDict = {
       undo: "Undo",
       redo: "Redo",
       undoHint: "Ctrl+Z",
-      redoHint: "Ctrl+Y",
+      redoHint: "Ctrl+Y / Ctrl+Shift+Z",
       pageBreak: "Page break",
       pageBreakHint:
         "Insert a page break at the caret (Ctrl+Enter; body pages only)",
@@ -879,7 +879,7 @@ export const bookVisualizerEn: BookVisualizerDict = {
       kindImage: "Image block",
       kindFreeText: "Text box",
       freeTextDragHint:
-        "Drag the box to move. Double-click or press Enter to edit text (Esc to finish)",
+        "Drag to move. Enter to edit, Esc to finish. Delete to remove, arrows to nudge, Ctrl+C/V/D to copy/paste/duplicate",
       level: "Text level",
       levelH1: "Chapter",
       levelH2: "Section",

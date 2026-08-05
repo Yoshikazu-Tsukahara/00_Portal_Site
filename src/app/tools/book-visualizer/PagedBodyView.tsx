@@ -36,6 +36,7 @@ import {
   type PageSlice,
 } from "./paginate";
 import FreeBlockLayer from "./FreeBlockLayer";
+import type { SnapGuide } from "./snap";
 import {
   isBodyText,
   type Block,
@@ -141,6 +142,7 @@ export default function PagedBodyView({
   const [editingId, setEditingId] = useState<string | null>(null);
   /** IME 変換中、またはページまたぎ編集中は分割結果を凍結 */
   const [frozenPages, setFrozenPages] = useState<PaginatedPage[] | null>(null);
+  const [guides, setGuides] = useState<SnapGuide[]>([]);
   /**
    * またぎ編集用。編集開始時の前後を固定し、このページ分だけを差し替える。
    * （全文を紙面に展開しない＝Word の「このページ上の続き」に近い）
@@ -433,6 +435,7 @@ export default function PagedBodyView({
         onSelectBlock={onSelectBlock}
         onChangeFreeFrame={onChangeFreeFrame}
         onChangeText={onChangeFreeText}
+        onGuidesChange={editable ? setGuides : undefined}
       />
 
       <div style={innerStyle} className="bv-paged-sheet__inner">
@@ -618,7 +621,30 @@ export default function PagedBodyView({
         onSelectBlock={onSelectBlock}
         onChangeFreeFrame={onChangeFreeFrame}
         onChangeText={onChangeFreeText}
+        onGuidesChange={editable ? setGuides : undefined}
       />
+
+      {guides.length > 0 ? (
+        <div className="bv-snap-guides" aria-hidden>
+          {guides.map((guide, index) => (
+            <div
+              key={`${guide.orientation}-${guide.position}-${index}`}
+              className={[
+                "bv-snap-guide",
+                `bv-snap-guide--${guide.orientation}`,
+                guide.source === "peer" ? "bv-snap-guide--peer" : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              style={
+                guide.orientation === "v"
+                  ? { left: guide.position * metrics.width }
+                  : { top: guide.position * metrics.height }
+              }
+            />
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -57,8 +57,7 @@ export const ja: Dictionary = {
   tools: {
     "invoice-maker": {
       title: "帳票メーカー",
-      description:
-        "請求書・見積書・納品書・領収書をA4で作成。多言語・多通貨対応でPDF保存も一発。",
+      description: "請求書など帳票をA4作成。多言語・多通貨でPDF保存。",
     },
     "mail-template": {
       title: "メールテンプレ整理アプリ",
@@ -81,8 +80,8 @@ export const ja: Dictionary = {
       description: "改行・空白・制御文字を一発掃除。独自の置換ルールも保存可能。",
     },
     "media-metadata-editor": {
-      title: "メディア・メタデータ エディター",
-      description: "音楽・動画のタグとカバーを、ブラウザ内だけで編集・プレビュー。",
+      title: "メディア・メタデータ編集",
+      description: "音楽・動画のタグとカバーをブラウザ内で編集。",
     },
     "character-relation-editor": {
       title: "小説相関図エディター",
@@ -90,8 +89,7 @@ export const ja: Dictionary = {
     },
     "book-visualizer": {
       title: "AI ブック・スタジオ",
-      description:
-        "用紙サイズと組版を指定して、紙面そのものを直接編集。.mybook で共有。",
+      description: "紙面を直接編集し、.mybook で共有。",
     },
     "palette-collector": {
       title: "Palette Collector",
@@ -110,8 +108,8 @@ export const ja: Dictionary = {
       description: "自作の低確率スロットで「当たるまで」「外し続ける」に挑む。",
     },
     "pixel-drop-puzzle": {
-      title: "極小ピクセル隙間落としパズル",
-      description: "写真を隙間に落とすだけ。小数点以下ピクセル判定の精度パズル。",
+      title: "ピクセル隙間落とし",
+      description: "写真を隙間に落とすだけ。小数点以下の精度パズル。",
     },
     "robot-freethrow": {
       title: "投射フリースロー",

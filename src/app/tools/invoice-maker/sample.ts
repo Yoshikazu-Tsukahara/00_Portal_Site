@@ -2,15 +2,15 @@
  * 初回ユーザー向けの固定サンプル請求書。
  * LocalStorage には保存せず、呼び出し一覧に常時表示する。
  *
- * デモ内容は「サイトの表示言語」（Header の JA / EN）に合わせて切り替える。
- * ※帳票側の言語トグル（docLocale）とは独立。
+ * デモ本文は「書類の言語」(docLocale) に合わせる。
+ * サイトの表示言語（ヘッダー）とは独立。
  */
 
-import type { Locale } from "@/i18n";
 import {
   createId,
   suggestInvoiceNumber,
   toDateInputValue,
+  type DocLocale,
   type InvoiceData,
 } from "./types";
 
@@ -30,113 +30,114 @@ export function isSampleInvoiceId(id: string): boolean {
 
 /**
  * 架空のデモデータ。
- * @param siteLocale サイトの表示言語（useI18n の locale）。これに合わせて JA / EN の内容を返す。
+ * @param docLocale いま選んでいる書類言語（PDF 印字言語）
+ * 日本語書類 → 日本語デモ、それ以外 → 英語デモ本文＋指定の書類言語。
  */
-export function createSampleInvoice(siteLocale: Locale): InvoiceData {
+export function createSampleInvoice(docLocale: DocLocale): InvoiceData {
   const issueDate = toDateInputValue(new Date());
   const dueDate = endOfNextMonth();
 
-  if (siteLocale === "en") {
+  if (docLocale === "ja") {
     return {
-      docLocale: "en",
+      docLocale: "ja",
       documentType: "invoice",
-      currency: "USD",
+      currency: "JPY",
       customCurrencySymbol: "",
-      taxRatePercent: 0,
+      taxRatePercent: 10,
       withholdingTaxEnabled: false,
       invoiceNumber: suggestInvoiceNumber(issueDate),
       issueDate,
       dueDate,
       from: {
-        name: "Alex Morgan (Freelance Designer)",
-        address:
-          "128 Market Street, Suite 4B\nSan Francisco, CA 94105\nUnited States",
-        email: "alex.morgan@example.com",
-        extra: "Tel +1 (415) 555-0198",
-        registrationNumber: "",
+        name: "山田 太郎（フリーランス）",
+        address: "〒150-0001\n東京都渋谷区神宮前1-2-3",
+        email: "taro.yamada@example.com",
+        extra: "TEL 090-1234-5678",
+        registrationNumber: "T1234567890123",
       },
       to: {
-        name: "Northwind Creative Inc.",
-        address: "500 Madison Avenue, Floor 12\nNew York, NY 10022\nUnited States",
-        email: "ap@northwind-creative.example",
-        extra: "Attn: Accounting Dept.",
+        name: "株式会社サンプルデザイン 御中",
+        address: "〒100-0001\n東京都千代田区千代田1-1",
+        email: "billing@sample-design.example",
+        extra: "ご担当: 鈴木様",
         registrationNumber: "",
       },
       items: [
         {
           id: createId(),
-          name: "Homepage UI design",
-          unitPrice: 1200,
+          name: "Webサイトトップページ デザイン制作",
+          unitPrice: 50000,
           quantity: 1,
         },
         {
           id: createId(),
-          name: "Inner pages development (3 pages)",
-          unitPrice: 900,
+          name: "下層ページ コーディング（3P）",
+          unitPrice: 45000,
           quantity: 1,
         },
         {
           id: createId(),
-          name: "Hosting & DNS initial setup",
-          unitPrice: 150,
+          name: "サーバー初期設定費用",
+          unitPrice: 10000,
           quantity: 1,
         },
       ],
       paymentMethod:
-        "Bank transfer: First National Bank / Main Branch / Checking 004821937\nCard / Stripe: https://buy.stripe.com/sample...",
+        "銀行振込：〇〇銀行 〇〇支店 普通 1234567\nクレジットカード決済：https://buy.stripe.com/sample...",
       notes:
-        "Thank you for your business!\nPlease cover any bank transfer fees on your side.\nPayment is due by the date shown above.",
+        "この度はお取引いただきありがとうございます。\n※振込手数料はお客様にてご負担をお願いいたします。",
     };
   }
 
-  // 日本語版デモ
+  // 日本語以外の書類言語: 英語デモ本文＋選択中の印字言語
   return {
-    docLocale: "ja",
+    docLocale,
     documentType: "invoice",
-    currency: "JPY",
+    currency: "USD",
     customCurrencySymbol: "",
-    taxRatePercent: 10,
+    taxRatePercent: 0,
     withholdingTaxEnabled: false,
     invoiceNumber: suggestInvoiceNumber(issueDate),
     issueDate,
     dueDate,
     from: {
-      name: "山田 太郎（フリーランス）",
-      address: "〒150-0001\n東京都渋谷区神宮前1-2-3",
-      email: "taro.yamada@example.com",
-      extra: "TEL 090-1234-5678",
-      registrationNumber: "T1234567890123",
+      name: "Alex Morgan (Freelance Designer)",
+      address:
+        "128 Market Street, Suite 4B\nSan Francisco, CA 94105\nUnited States",
+      email: "alex.morgan@example.com",
+      extra: "Tel +1 (415) 555-0198",
+      registrationNumber: "",
     },
     to: {
-      name: "株式会社サンプルデザイン 御中",
-      address: "〒100-0001\n東京都千代田区千代田1-1",
-      email: "billing@sample-design.example",
-      extra: "ご担当: 鈴木様",
+      name: "Northwind Creative Inc.",
+      address: "500 Madison Avenue, Floor 12\nNew York, NY 10022\nUnited States",
+      email: "ap@northwind-creative.example",
+      extra: "Attn: Accounting Dept.",
       registrationNumber: "",
     },
     items: [
       {
         id: createId(),
-        name: "Webサイトトップページ デザイン制作",
-        unitPrice: 50000,
+        name: "Homepage UI design",
+        unitPrice: 1200,
         quantity: 1,
       },
       {
         id: createId(),
-        name: "下層ページ コーディング（3P）",
-        unitPrice: 45000,
+        name: "Inner pages development (3 pages)",
+        unitPrice: 900,
         quantity: 1,
       },
       {
         id: createId(),
-        name: "サーバー初期設定費用",
-        unitPrice: 10000,
+        name: "Hosting & DNS initial setup",
+        unitPrice: 150,
         quantity: 1,
       },
     ],
     paymentMethod:
-      "銀行振込：〇〇銀行 〇〇支店 普通 1234567\nクレジットカード決済：https://buy.stripe.com/sample...",
+      "Bank transfer: First National Bank / Main Branch / Checking 004821937\nCard / Stripe: https://buy.stripe.com/sample...",
     notes:
-      "この度はお取引いただきありがとうございます。\n※振込手数料はお客様にてご負担をお願いいたします。",
+      "Thank you for your business!\nPlease cover any bank transfer fees on your side.\nPayment is due by the date shown above.",
   };
 }

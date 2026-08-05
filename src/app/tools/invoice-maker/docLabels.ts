@@ -1,4 +1,8 @@
-/** 帳票アプリ内の印字・入力ラベル辞書（ポータル言語とは独立） */
+/**
+ * 帳票ラベル辞書。
+ * - PDF／プレビュー印字: data.docLocale で取得
+ * - 入力フォーム操作 UI: サイト言語にマップした DocLocale で取得
+ */
 
 import type { DocLocale, DocumentType } from "./types";
 

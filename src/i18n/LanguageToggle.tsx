@@ -1,50 +1,45 @@
 "use client";
 
+import { ChevronDown } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
 import { useI18n } from "./I18nProvider";
+import { LOCALE_NATIVE_LABELS } from "./localeMeta";
 import type { Locale } from "./types";
 
-const OPTIONS: { value: Locale; label: string }[] = [
-  { value: "ja", label: "JA" },
-  { value: "en", label: "EN" },
-];
-
 /**
- * JA / EN をワンクリックで切り替えるセグメントトグル。
- * 選択ピルがスライドするアニメーション付き。
+ * 9 言語対応の言語ドロップダウン。
+ * ブラウザのネイティブ select でアクセシブルに切替。
  */
 export default function LanguageToggle() {
-  const { locale, setLocale, t } = useI18n();
+  const { locale, setLocale, locales, t } = useI18n();
 
   return (
-    <div
-      role="group"
-      aria-label={t.header.langToggleAria}
-      className="lang-toggle rounded-full border border-zinc-200/90 bg-white/80 shadow-[0_1px_2px_rgba(0,0,0,0.04)] backdrop-blur-sm"
-    >
-      <span
+    <div className="lang-select">
+      <label className="sr-only" htmlFor="site-lang-select">
+        {t.header.langToggleAria}
+      </label>
+      <select
+        id="site-lang-select"
+        value={locale}
+        aria-label={t.header.langToggleAria}
+        onChange={(e) => {
+          const next = e.target.value as Locale;
+          setLocale(next);
+          trackEvent("Language Changed", { locale: next });
+        }}
+        className="lang-select__control"
+      >
+        {locales.map((code) => (
+          <option key={code} value={code}>
+            {LOCALE_NATIVE_LABELS[code]}
+          </option>
+        ))}
+      </select>
+      <ChevronDown
+        className="lang-select__chevron"
         aria-hidden
-        className={`lang-toggle__indicator ${locale === "en" ? "lang-toggle__indicator--en" : ""}`}
+        strokeWidth={2}
       />
-      {OPTIONS.map(({ value, label }) => {
-        const active = locale === value;
-        return (
-          <button
-            key={value}
-            type="button"
-            onClick={() => {
-              setLocale(value);
-              trackEvent("Language Changed", { locale: value });
-            }}
-            aria-pressed={active}
-            className={`lang-toggle__btn min-w-[2.25rem] sm:min-w-[2.5rem] ${
-              active ? "lang-toggle__btn--active" : "lang-toggle__btn--inactive"
-            }`}
-          >
-            {label}
-          </button>
-        );
-      })}
     </div>
   );
 }

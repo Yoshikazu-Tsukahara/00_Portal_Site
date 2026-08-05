@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import AppShell from "@/components/AppShell";
 import PrivacyNotice from "@/components/PrivacyNotice";
-import { fmt, useI18n } from "@/i18n";
+import { fmt, intlLocale, useI18n } from "@/i18n";
 import { useLocalStorageState } from "@/lib/localData";
 import AutoExtractPanel from "./AutoExtractPanel";
 import {
@@ -281,7 +281,7 @@ export default function PaletteCollectorPage() {
                 projects={projects}
                 canSave={Boolean(image)}
                 saving={savingProject}
-                locale={locale === "ja" ? "ja-JP" : "en-US"}
+                locale={intlLocale(locale)}
                 copy={copy.projects}
                 onSave={handleSaveProject}
                 onLoad={handleLoadProject}

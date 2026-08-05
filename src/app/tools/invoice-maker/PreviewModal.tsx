@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { Printer } from "lucide-react";
 
+import { fmt } from "@/i18n";
 import type { InvoiceMakerDict } from "@/i18n/apps/invoiceMaker";
 
 /** A4 幅 210mm を CSS ピクセル換算（96dpi） */
@@ -12,6 +13,8 @@ const SHEET_WIDTH_PX = 794;
 type PreviewModalProps = {
   open: boolean;
   copy: InvoiceMakerDict["preview"];
+  /** 書類言語の自称（PDF 印字言語の明示） */
+  docLanguageLabel: string;
   onClose: () => void;
   onPrint: () => void;
   children: ReactNode;
@@ -24,6 +27,7 @@ type PreviewModalProps = {
 export default function PreviewModal({
   open,
   copy,
+  docLanguageLabel,
   onClose,
   onPrint,
   children,
@@ -101,6 +105,9 @@ export default function PreviewModal({
           <div className="min-w-0">
             <h2 className="inv-modal-title">{copy.modalTitle}</h2>
             <p className="inv-modal-lead">{copy.hint}</p>
+            <p className="mt-1 text-[11px] font-medium text-sky-800/90 print:hidden">
+              {fmt(copy.docLanguageNote, { language: docLanguageLabel })}
+            </p>
             <p
               className="mt-1.5 break-words text-[11px] leading-relaxed text-amber-700/90 print:hidden"
               role="note"

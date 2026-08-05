@@ -3,8 +3,8 @@
 import type { Locale } from "@/i18n";
 
 /**
- * 帳票（入力ラベル・PDF印字）専用の言語。
- * ポータル全体の Locale とは独立。
+ * 帳票 PDF／プレビュー印字専用の言語。
+ * サイト全体の Locale（ヘッダー）とは独立。操作 UI はサイト言語側。
  */
 export type DocLocale = "ja" | "en" | "zh" | "ko" | "es" | "fr" | "de";
 
@@ -18,19 +18,24 @@ export const DOC_LOCALES: readonly DocLocale[] = [
   "de",
 ] as const;
 
-/** 言語セレクト用（表示名は各言語の自称。ポータル言語に依存しない） */
+/** 書類言語セレクト用（自称ラベル。サイト言語に依存しない） */
 export const DOC_LOCALE_OPTIONS: readonly {
   value: DocLocale;
   label: string;
 }[] = [
   { value: "ja", label: "日本語" },
   { value: "en", label: "English" },
-  { value: "zh", label: "🇨🇳 简体中文" },
-  { value: "ko", label: "🇰🇷 한국어" },
-  { value: "es", label: "🇪🇸 Español" },
-  { value: "fr", label: "🇫🇷 Français" },
-  { value: "de", label: "🇩🇪 Deutsch" },
+  { value: "zh", label: "简体中文" },
+  { value: "ko", label: "한국어" },
+  { value: "es", label: "Español" },
+  { value: "fr", label: "Français" },
+  { value: "de", label: "Deutsch" },
 ] as const;
+
+/** 書類言語の自称を取得 */
+export function docLocaleLabel(locale: DocLocale): string {
+  return DOC_LOCALE_OPTIONS.find((o) => o.value === locale)?.label ?? locale;
+}
 
 /** 書類の種類（請求書・見積書・納品書・領収書） */
 export type DocumentType = "invoice" | "estimate" | "deliveryNote" | "receipt";
@@ -241,9 +246,22 @@ export function suggestInvoiceNumber(issueDate: string): string {
   return `INV-${compact || "00000000"}-01`;
 }
 
+/** サイト言語 → 帳票印字言語（未対応は英語） */
+const DOC_LOCALE_BY_SITE: Record<Locale, DocLocale> = {
+  ja: "ja",
+  en: "en",
+  "zh-CN": "zh",
+  "zh-TW": "zh",
+  ko: "ko",
+  es: "es",
+  fr: "fr",
+  de: "de",
+  pt: "en",
+};
+
 /** サイト言語に合わせた初期の帳票言語 */
 export function defaultDocLocaleFor(siteLocale: Locale): DocLocale {
-  return siteLocale === "ja" ? "ja" : "en";
+  return DOC_LOCALE_BY_SITE[siteLocale] ?? "en";
 }
 
 /** サイト言語に合わせた初期通貨（日本語なら円） */
@@ -299,6 +317,7 @@ export function suggestSaveName(data: InvoiceData): string {
   const number = data.invoiceNumber.trim();
   const date = parseDateInputValue(data.issueDate);
 
+  // 登録名候補は書類言語に合わせる（履歴一覧用。サイト言語とは別）
   if (data.docLocale === "ja") {
     const monthLabel = date
       ? `${date.getFullYear()}年${date.getMonth() + 1}月度`
@@ -309,8 +328,21 @@ export function suggestSaveName(data: InvoiceData): string {
     return "無題の請求書";
   }
 
+  const intlTag =
+    data.docLocale === "zh"
+      ? "zh-CN"
+      : data.docLocale === "ko"
+        ? "ko-KR"
+        : data.docLocale === "es"
+          ? "es-ES"
+          : data.docLocale === "fr"
+            ? "fr-FR"
+            : data.docLocale === "de"
+              ? "de-DE"
+              : "en-US";
+
   const monthLabel = date
-    ? new Intl.DateTimeFormat("en-US", {
+    ? new Intl.DateTimeFormat(intlTag, {
         year: "numeric",
         month: "short",
       }).format(date)

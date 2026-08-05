@@ -14,6 +14,8 @@ type FreeImageProps = {
   interactive: boolean;
   selected: boolean;
   alt: string;
+  /** 同じ用紙上の他オブジェクト（自分以外）の枠。スマートガイド用 */
+  peerFrames?: readonly FreeFrame[];
   onSelect: () => void;
   onChangeFrame: (frame: FreeFrame) => void;
   onGuidesChange?: (guides: SnapGuide[]) => void;
@@ -61,7 +63,7 @@ function isFullBleed(frame: FreeFrame): boolean {
 /**
  * 用紙上を自由に動かせる画像ブロック。
  * 選択中だけドラッグ＆リサイズ。スナップ対応。
- * インタラクティブ時は常に Rnd（選択切替で再マウントしない）。
+ * interactive 切替でも常に Rnd（再マウントしない）。
  */
 export default function FreeImage({
   block,
@@ -71,6 +73,7 @@ export default function FreeImage({
   interactive,
   selected,
   alt,
+  peerFrames = [],
   onSelect,
   onChangeFrame,
   onGuidesChange,
@@ -81,10 +84,19 @@ export default function FreeImage({
   const zStyle: CSSProperties = {
     zIndex: 10 + block.zIndex,
   };
+  const snapOpts = { peers: peerFrames };
 
-  function commitFrame(raw: FreeFrame) {
-    const snapped = snapFrame(raw, sheetWidth, sheetHeight);
+  function previewSnap(raw: FreeFrame, resizeDir?: string) {
+    const snapped = snapFrame(raw, sheetWidth, sheetHeight, {
+      ...snapOpts,
+      resizeDir,
+    });
     onGuidesChange?.(snapped.guides);
+    return snapped;
+  }
+
+  function commitFrame(raw: FreeFrame, resizeDir?: string) {
+    const snapped = previewSnap(raw, resizeDir);
     onChangeFrame(snapped.frame);
     window.setTimeout(() => onGuidesChange?.([]), 400);
   }
@@ -97,30 +109,6 @@ export default function FreeImage({
     .filter(Boolean)
     .join(" ");
 
-  if (!interactive) {
-    // 編集時の Rnd と同じく transform で置く（完成プレビューとの位置ずれを防ぐ）
-    return (
-      <div
-        className={boxClass}
-        style={{
-          left: 0,
-          top: 0,
-          width: px.width,
-          height: px.height,
-          transform: `translate(${px.x}px, ${px.y}px)`,
-          ...zStyle,
-        }}
-      >
-        <ImageBody
-          dataUrl={block.dataUrl}
-          alt={alt}
-          caption={block.caption}
-          cover={cover}
-        />
-      </div>
-    );
-  }
-
   return (
     <Rnd
       size={{ width: px.width, height: px.height }}
@@ -129,63 +117,91 @@ export default function FreeImage({
       bounds="parent"
       minWidth={32}
       minHeight={32}
-      disableDragging={!selected}
-      enableResizing={selected}
+      disableDragging={!interactive || !selected}
+      enableResizing={interactive && selected}
       style={zStyle}
-      onDrag={(_event, data) => {
-        const raw = pixelsToFrame(
-          data.x,
-          data.y,
-          px.width,
-          px.height,
-          sheetWidth,
-          sheetHeight,
-        );
-        onGuidesChange?.(snapFrame(raw, sheetWidth, sheetHeight).guides);
-      }}
-      onDragStop={(_event, data) => {
-        commitFrame(
-          pixelsToFrame(
-            data.x,
-            data.y,
-            px.width,
-            px.height,
-            sheetWidth,
-            sheetHeight,
-          ),
-        );
-      }}
-      onResize={(_event, _dir, element, _delta, position) => {
-        const raw = pixelsToFrame(
-          position.x,
-          position.y,
-          element.offsetWidth,
-          element.offsetHeight,
-          sheetWidth,
-          sheetHeight,
-        );
-        onGuidesChange?.(snapFrame(raw, sheetWidth, sheetHeight).guides);
-      }}
-      onResizeStop={(_event, _dir, element, _delta, position) => {
-        commitFrame(
-          pixelsToFrame(
-            position.x,
-            position.y,
-            element.offsetWidth,
-            element.offsetHeight,
-            sheetWidth,
-            sheetHeight,
-          ),
-        );
-      }}
+      onDrag={
+        interactive
+          ? (_event, data) => {
+              previewSnap(
+                pixelsToFrame(
+                  data.x,
+                  data.y,
+                  px.width,
+                  px.height,
+                  sheetWidth,
+                  sheetHeight,
+                ),
+              );
+            }
+          : undefined
+      }
+      onDragStop={
+        interactive
+          ? (_event, data) => {
+              commitFrame(
+                pixelsToFrame(
+                  data.x,
+                  data.y,
+                  px.width,
+                  px.height,
+                  sheetWidth,
+                  sheetHeight,
+                ),
+              );
+            }
+          : undefined
+      }
+      onResize={
+        interactive
+          ? (_event, dir, element, _delta, position) => {
+              previewSnap(
+                pixelsToFrame(
+                  position.x,
+                  position.y,
+                  element.offsetWidth,
+                  element.offsetHeight,
+                  sheetWidth,
+                  sheetHeight,
+                ),
+                dir,
+              );
+            }
+          : undefined
+      }
+      onResizeStop={
+        interactive
+          ? (_event, dir, element, _delta, position) => {
+              commitFrame(
+                pixelsToFrame(
+                  position.x,
+                  position.y,
+                  element.offsetWidth,
+                  element.offsetHeight,
+                  sheetWidth,
+                  sheetHeight,
+                ),
+                dir,
+              );
+            }
+          : undefined
+      }
       className={boxClass}
-      onMouseDown={(event) => {
-        event.stopPropagation();
-        onSelect();
-      }}
-      onClick={(event: MouseEvent) => {
-        event.stopPropagation();
-      }}
+      onMouseDown={
+        interactive
+          ? (event) => {
+              event.stopPropagation();
+              onSelect();
+            }
+          : undefined
+      }
+      onClick={
+        interactive
+          ? (event: MouseEvent) => {
+              event.stopPropagation();
+            }
+          : undefined
+      }
     >
       <ImageBody
         dataUrl={block.dataUrl}

@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { Eye, Upload, X } from "lucide-react";
 
+import type { Locale } from "@/i18n";
 import type { InvoiceMakerDict } from "@/i18n/apps/invoiceMaker";
 import {
   computeTotals,
@@ -21,6 +22,7 @@ import {
   clampMultiline,
   clampNonNegative,
   clampText,
+  defaultDocLocaleFor,
   documentTypeShowsDueDate,
   type CurrencyCode,
   type DocLocale,
@@ -34,6 +36,8 @@ type PartyKey = "from" | "to";
 
 type InvoiceFormProps = {
   data: InvoiceData;
+  /** サイト表示言語（操作 UI・入力ラベル） */
+  siteLocale: Locale;
   copy: InvoiceMakerDict;
   onPatch: (patch: Partial<InvoiceData>) => void;
   onPatchParty: (which: PartyKey, patch: Partial<InvoiceParty>) => void;
@@ -70,11 +74,12 @@ async function readImageAsDataURL(file: File): Promise<string> {
 function handleImageUpload(
   event: React.ChangeEvent<HTMLInputElement>,
   onBase64: (dataURL: string) => void,
+  imageTypeError: string,
 ) {
   const file = event.target.files?.[0];
   if (!file) return;
   if (!file.type.startsWith("image/")) {
-    alert("画像ファイルを選択してください");
+    alert(imageTypeError);
     return;
   }
   readImageAsDataURL(file).then(onBase64).catch(console.error);
@@ -239,6 +244,7 @@ function PartyFields({
  */
 export default function InvoiceForm({
   data,
+  siteLocale,
   copy,
   onPatch,
   onPatchParty,
@@ -248,9 +254,12 @@ export default function InvoiceForm({
   onPreview,
   onPrint,
 }: InvoiceFormProps) {
-  const doc = getDocLabels(data.docLocale);
-  const form = doc.form;
-  const byType = doc.byDocumentType;
+  // 操作 UI／入力ラベル = サイト言語（最も近い書類辞書へマップ）
+  // PDF 印字見出し = data.docLocale（InvoiceSheet 側）
+  const uiDocLocale = defaultDocLocaleFor(siteLocale);
+  const ui = getDocLabels(uiDocLocale);
+  const form = ui.form;
+  const byType = ui.byDocumentType;
   const totals = computeTotals(data);
   const numberLabel = byType.number[data.documentType];
   const dueDateLabel = byType.dueDate[data.documentType];
@@ -262,6 +271,7 @@ export default function InvoiceForm({
   const toHeading = byType.to[data.documentType];
   const toNamePlaceholder = form.toNamePlaceholderByType[data.documentType];
   const fromHeading = byType.from[data.documentType];
+  const moneyLocale = uiDocLocale;
 
   return (
     <div className="inv-panel">
@@ -355,6 +365,13 @@ export default function InvoiceForm({
             hint={copy.settings.documentTypeHint}
           >
             <div className="space-y-2.5">
+              <p
+                className="rounded-md border border-sky-100 bg-sky-50/80 px-2.5 py-2 text-[10px] leading-relaxed text-sky-950/80"
+                role="note"
+              >
+                {copy.settings.languageSeparation}
+              </p>
+
               <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
                 <Field label={copy.settings.documentType}>
                   <select
@@ -368,7 +385,7 @@ export default function InvoiceForm({
                   >
                     {DOCUMENT_TYPES.map((type) => (
                       <option key={type} value={type}>
-                        {doc.titles[type]}
+                        {ui.titles[type]}
                       </option>
                     ))}
                   </select>
@@ -546,8 +563,10 @@ export default function InvoiceForm({
                         type="file"
                         accept="image/*"
                         onChange={(e) =>
-                          handleImageUpload(e, (base64) =>
-                            onPatch({ logoImageBase64: base64 }),
+                          handleImageUpload(
+                            e,
+                            (base64) => onPatch({ logoImageBase64: base64 }),
+                            copy.settings.imageTypeError,
                           )
                         }
                         className="hidden"
@@ -584,8 +603,10 @@ export default function InvoiceForm({
                         type="file"
                         accept="image/*"
                         onChange={(e) =>
-                          handleImageUpload(e, (base64) =>
-                            onPatch({ stampImageBase64: base64 }),
+                          handleImageUpload(
+                            e,
+                            (base64) => onPatch({ stampImageBase64: base64 }),
+                            copy.settings.imageTypeError,
                           )
                         }
                         className="hidden"
@@ -692,7 +713,7 @@ export default function InvoiceForm({
                         {formatMoney(
                           itemAmount(item),
                           data.currency,
-                          data.docLocale,
+                          moneyLocale,
                           data.customCurrencySymbol,
                         )}
                       </p>
@@ -718,7 +739,7 @@ export default function InvoiceForm({
                 {formatMoney(
                   totals.subtotal,
                   data.currency,
-                  data.docLocale,
+                  moneyLocale,
                   data.customCurrencySymbol,
                 )}
               </span>
@@ -744,7 +765,7 @@ export default function InvoiceForm({
             />
           </Section>
 
-          <Section title={doc.notes}>
+          <Section title={ui.notes}>
             <textarea
               value={data.notes}
               onChange={(e) =>

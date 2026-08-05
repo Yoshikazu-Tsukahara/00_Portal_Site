@@ -264,7 +264,7 @@
       opacity: 1;
       transform: rotate(1.1deg) scale(var(--ui-scale));
       transform-origin: top right;
-      will-change: transform, top, right;
+      will-change: transform;
     }
 
     .hud .given-title {
@@ -690,20 +690,6 @@
       font-weight: 600;
     }
 
-    .sticky .close {
-      position: absolute;
-      top: 0;
-      right: 0;
-      border: none;
-      background: transparent;
-      box-shadow: none;
-      padding: 2px 8px;
-      font-size: 18px;
-      border-radius: 0;
-      color: var(--red-pen);
-      font-family: var(--font-exam);
-    }
-
     .msg {
       position: absolute;
       left: 50%;
@@ -826,7 +812,7 @@
 <body>
   <div class="app">
     <div class="topbar">
-      <div class="title">投射フリースロー</div>
+      <div class="title" id="appTitle">投射フリースロー</div>
       <div class="status">
         <span id="lvLabel">問.1</span>
         <span id="lifeLabel">試行 3</span>
@@ -875,7 +861,7 @@
             aria-label="Δy Hit Offset" />
           <span class="memo-unit">cm</span>
         </div>
-        <div class="memo-hint">※ 記入後、図中の射手がたをタップして軌道を検証（Δy≠0 でスピン）</div>
+        <div class="memo-hint" id="memoHint">※ 記入後、図中の射手がたをタップして軌道を検証（Δy≠0 でスピン）</div>
       </div>
 
       <div class="hud" id="envHud"></div>
@@ -887,15 +873,14 @@
       <div class="goal-indicator" id="goalIndicator" role="button" aria-hidden="true" title="クリックでゴール位置へ移動"></div>
 
       <div class="sticky" id="hintSticky">
-        <button type="button" class="close" id="hintClose" aria-label="閉じる">×</button>
         <h3>✎ 先生メモ（赤ペン）— Earth ref.</h3>
         <pre id="hintText"></pre>
       </div>
 
       <div class="overlay" id="startOverlay">
         <div class="panel">
-          <h2>投射フリースロー</h2>
-          <p>
+          <h2 id="startTitle">投射フリースロー</h2>
+          <p id="startBody">
             右上の条件を見て、左上に θ・F・Δy を入力。<br />
             射手がたをタップしてシュートし、リングを狙おう。<br />
             各ステージの試行は 3 回まで。
@@ -906,7 +891,7 @@
 
       <div class="overlay" id="gameOverOverlay">
         <div class="panel">
-          <h2>ゲームオーバー</h2>
+          <h2 id="gameOverTitle">ゲームオーバー</h2>
           <p id="gameOverText">試行回数を使い切った…</p>
           <button type="button" id="btnRetry">もう一度</button>
         </div>
@@ -943,7 +928,7 @@
       const gameOverText = document.getElementById("gameOverText");
       const hintSticky = document.getElementById("hintSticky");
       const hintText = document.getElementById("hintText");
-      const hintClose = document.getElementById("hintClose");
+      const btnHint = document.getElementById("btnHint");
       const envHud = document.getElementById("envHud");
       const flashMsg = document.getElementById("flashMsg");
       const lvLabel = document.getElementById("lvLabel");
@@ -951,26 +936,74 @@
       const scoreLabel = document.getElementById("scoreLabel");
       const marginMemo = document.getElementById("marginMemo");
       const memoSolveTitle = document.getElementById("memoSolveTitle");
+      const memoHint = document.getElementById("memoHint");
+      const appTitle = document.getElementById("appTitle");
+      const startTitle = document.getElementById("startTitle");
+      const startBody = document.getElementById("startBody");
+      const gameOverTitle = document.getElementById("gameOverTitle");
 
       /**
        * iframe 内 UI の言語（親ページの locale と同期）。
        * 問付箋・ステータス・デバッグ凡例などで使用。
        */
       let uiLocale = "ja";
+      /** サイト Locale（9言語）と同期するゲーム内 UI 文言 */
+      const UI_LOCALES = [
+        "ja",
+        "en",
+        "zh-CN",
+        "zh-TW",
+        "ko",
+        "es",
+        "fr",
+        "de",
+        "pt",
+      ];
+      function makeHintBody(parts) {
+        return (envName, gNow, ballLabel, mass, gEarth, ideal) => {
+          const head =
+            parts.current(envName, gNow, ballLabel, mass) +
+            "\n" +
+            parts.ref(gEarth) +
+            "\n\n";
+          const mid = ideal.found
+            ? parts.recommend +
+              `\n  θ  = ${ideal.angle} °\n` +
+              `  F  = ${ideal.F}\n` +
+              `  Δy = ${ideal.dyCm} cm\n`
+            : parts.noSolution + "\n";
+          return head + mid + "\n" + parts.note(envName);
+        };
+      }
       const UI_COPY = {
         ja: {
+          appTitle: "投射フリースロー",
           qTitle: (n) => `[問 ${n}]`,
           tries: (n) => `試行 ${n}`,
           clears: (n) => `正答 ${n}`,
           stage: (n) => `問.${n}`,
-          // 「求め、」のあとで改行してバランスを取る
           solveTitle: "[解] θ・F・Δy を求め、\n図で検証せよ",
+          memoHint:
+            "※ 記入後、図中の射手がたをタップして軌道を検証（Δy≠0 でスピン）",
           windTail: "追い風",
           windHead: "向かい風",
           windCalm: "無風",
-          hudEnv: "環境",
           hudBall: "球",
           hudGoal: "ゴール",
+          targetArrow: "Target ➔",
+          analyzeTitle: "地球標準での模範解答",
+          hintStickyTitle: "✎ 先生メモ（赤ペン）— Earth ref.",
+          hintBody: makeHintBody({
+            current: (env, g, ball, m) =>
+              `（本問：${env}  g≈${g} m/s²／${ball} m=${m}kg）`,
+            ref: (g) => `（参考：地球標準 g≈${g} m/s², a_x=0 のとき）`,
+            recommend: "推奨解答（目安・推力 F と打点 Δy）：",
+            noSolution: "解なし（この参考条件では到達困難）",
+            note: (env) =>
+              `※ F は約 1/60 秒だけ加わる推力 [N]。Δv≈F/m·τ。\n` +
+              `  同じ F でも重い球ほど初速が小さい。Δy でスピン。\n` +
+              `  与条件（${env}・g・a_x・m）に合わせて補正せよ。`,
+          }),
           debugTitle: "HITBOX DEBUG (H)",
           debugBody: "赤=物理 緑=ネット 橙=開口 水色=抜け",
           debugSolveOk: (a, F, dy, ax) =>
@@ -982,19 +1015,46 @@
           startFlash: (n) => `問.${n} 開始`,
           correct: "正答！",
           livesLeft: (n) => `残り試行 ${n}`,
+          startTitle: "投射フリースロー",
+          startBodyHtml:
+            "右上の条件を見て、左上に θ・F・Δy を入力。<br />" +
+            "射手がたをタップしてシュートし、リングを狙おう。<br />" +
+            "各ステージの試行は 3 回まで。",
+          startButton: "スタート",
+          gameOverTitle: "ゲームオーバー",
+          gameOverBody: "試行回数を使い切った…",
+          gameOverSummary: (clears, level) =>
+            `正答数 ${clears} ／ 到達 問.${level}`,
+          retryButton: "もう一度",
         },
         en: {
+          appTitle: "Projectile Free Throw",
           qTitle: (n) => `[Q${n}]`,
           tries: (n) => `Tries ${n}`,
           clears: (n) => `Clears ${n}`,
           stage: (n) => `Q.${n}`,
           solveTitle: "[Ans] Find θ, F, Δy,\nthen verify on the diagram",
+          memoHint:
+            "* After entering values, tap the shooter to verify the path (Δy≠0 adds spin)",
           windTail: "tailwind",
           windHead: "headwind",
           windCalm: "calm",
-          hudEnv: "env",
           hudBall: "ball",
           hudGoal: "goal",
+          targetArrow: "Target ➔",
+          analyzeTitle: "Model answer (Earth standard)",
+          hintStickyTitle: "✎ Teacher note — Earth ref.",
+          hintBody: makeHintBody({
+            current: (env, g, ball, m) =>
+              `(This Q: ${env}  g≈${g} m/s² / ${ball} m=${m}kg)`,
+            ref: (g) => `(Ref: Earth g≈${g} m/s², a_x=0)`,
+            recommend: "Suggested answer (F and Δy):",
+            noSolution: "No solution under this reference",
+            note: (env) =>
+              `* F is thrust for ~1/60 s [N]. Δv≈F/m·τ.\n` +
+              `  Heavier balls get less speed at the same F. Spin via Δy.\n` +
+              `  Adjust for ${env}, g, a_x, and m.`,
+          }),
           debugTitle: "HITBOX DEBUG (H)",
           debugBody: "red=body green=net orange=rim cyan=clear",
           debugSolveOk: (a, F, dy, ax) =>
@@ -1006,28 +1066,400 @@
           startFlash: (n) => `Q.${n} start`,
           correct: "Score!",
           livesLeft: (n) => `${n} tries left`,
+          startTitle: "Projectile Free Throw",
+          startBodyHtml:
+            "Check the given values (top right), then enter θ, F, and Δy (top left).<br />" +
+            "Tap the shooter to launch and aim for the rim.<br />" +
+            "You get up to 3 tries per stage.",
+          startButton: "Start",
+          gameOverTitle: "Game Over",
+          gameOverBody: "You're out of tries…",
+          gameOverSummary: (clears, level) =>
+            `Clears ${clears} ／ Reached Q.${level}`,
+          retryButton: "Try again",
+        },
+        "zh-CN": {
+          appTitle: "抛射罚球",
+          qTitle: (n) => `[第 ${n} 问]`,
+          tries: (n) => `尝试 ${n}`,
+          clears: (n) => `通关 ${n}`,
+          stage: (n) => `Q.${n}`,
+          solveTitle: "[解] 求 θ、F、Δy，\n并在图上验证",
+          memoHint: "※ 填写后，点按图中的投手以验证轨迹（Δy≠0 产生旋转）",
+          windTail: "顺风",
+          windHead: "逆风",
+          windCalm: "无风",
+          hudBall: "球",
+          hudGoal: "篮筐",
+          targetArrow: "目标 ➔",
+          analyzeTitle: "地球标准参考解",
+          hintStickyTitle: "✎ 教师备注 — Earth ref.",
+          hintBody: makeHintBody({
+            current: (env, g, ball, m) =>
+              `（本题：${env}  g≈${g} m/s²／${ball} m=${m}kg）`,
+            ref: (g) => `（参考：地球标准 g≈${g} m/s², a_x=0）`,
+            recommend: "建议答案（推力 F 与打点 Δy）：",
+            noSolution: "无解（此参考条件下难以到达）",
+            note: (env) =>
+              `※ F 为约 1/60 秒的推力 [N]。Δv≈F/m·τ。\n` +
+              `  同样的 F，球越重初速越小。用 Δy 控制旋转。\n` +
+              `  请按 ${env}、g、a_x、m 修正。`,
+          }),
+          debugTitle: "HITBOX DEBUG (H)",
+          debugBody: "红=物理 绿=网 橙=篮圈 青=穿越",
+          debugSolveOk: (a, F, dy, ax) =>
+            `SOLVE θ=${a} F=${F} Δy=${dy} ax=${ax} sim=OK`,
+          debugSolveFail: (ax) => `SOLVE impossible ax=${ax}`,
+          debugSolveNone: "SOLVE (计算中…)",
+          debugOn: "调试 ON",
+          debugOff: "调试 OFF",
+          startFlash: (n) => `Q.${n} 开始`,
+          correct: "命中！",
+          livesLeft: (n) => `剩余 ${n} 次`,
+          startTitle: "抛射罚球",
+          startBodyHtml:
+            "查看右上条件，在左上输入 θ、F、Δy。<br />" +
+            "点击投手投篮，瞄准篮筐。<br />" +
+            "每关最多尝试 3 次。",
+          startButton: "开始",
+          gameOverTitle: "游戏结束",
+          gameOverBody: "尝试次数用尽…",
+          gameOverSummary: (clears, level) =>
+            `通关 ${clears} ／ 到达 Q.${level}`,
+          retryButton: "再来一次",
+        },
+        "zh-TW": {
+          appTitle: "拋射罰球",
+          qTitle: (n) => `[第 ${n} 題]`,
+          tries: (n) => `嘗試 ${n}`,
+          clears: (n) => `過關 ${n}`,
+          stage: (n) => `Q.${n}`,
+          solveTitle: "[解] 求 θ、F、Δy，\n並在圖上驗證",
+          memoHint: "※ 填寫後，點按圖中的投手以驗證軌跡（Δy≠0 產生旋轉）",
+          windTail: "順風",
+          windHead: "逆風",
+          windCalm: "無風",
+          hudBall: "球",
+          hudGoal: "籃筐",
+          targetArrow: "目標 ➔",
+          analyzeTitle: "地球標準參考解",
+          hintStickyTitle: "✎ 教師備註 — Earth ref.",
+          hintBody: makeHintBody({
+            current: (env, g, ball, m) =>
+              `（本題：${env}  g≈${g} m/s²／${ball} m=${m}kg）`,
+            ref: (g) => `（參考：地球標準 g≈${g} m/s², a_x=0）`,
+            recommend: "建議答案（推力 F 與打點 Δy）：",
+            noSolution: "無解（此參考條件下難以到達）",
+            note: (env) =>
+              `※ F 為約 1/60 秒的推力 [N]。Δv≈F/m·τ。\n` +
+              `  同樣的 F，球越重初速越小。用 Δy 控制旋轉。\n` +
+              `  請依 ${env}、g、a_x、m 修正。`,
+          }),
+          debugTitle: "HITBOX DEBUG (H)",
+          debugBody: "紅=物理 綠=網 橙=籃圈 青=穿越",
+          debugSolveOk: (a, F, dy, ax) =>
+            `SOLVE θ=${a} F=${F} Δy=${dy} ax=${ax} sim=OK`,
+          debugSolveFail: (ax) => `SOLVE impossible ax=${ax}`,
+          debugSolveNone: "SOLVE (計算中…)",
+          debugOn: "除錯 ON",
+          debugOff: "除錯 OFF",
+          startFlash: (n) => `Q.${n} 開始`,
+          correct: "命中！",
+          livesLeft: (n) => `剩餘 ${n} 次`,
+          startTitle: "拋射罰球",
+          startBodyHtml:
+            "查看右上條件，在左上輸入 θ、F、Δy。<br />" +
+            "點擊投手投籃，瞄準籃筐。<br />" +
+            "每關最多嘗試 3 次。",
+          startButton: "開始",
+          gameOverTitle: "遊戲結束",
+          gameOverBody: "嘗試次數用盡…",
+          gameOverSummary: (clears, level) =>
+            `過關 ${clears} ／ 到達 Q.${level}`,
+          retryButton: "再來一次",
+        },
+        ko: {
+          appTitle: "투사 프리스로",
+          qTitle: (n) => `[문 ${n}]`,
+          tries: (n) => `시도 ${n}`,
+          clears: (n) => `클리어 ${n}`,
+          stage: (n) => `Q.${n}`,
+          solveTitle: "[풀이] θ·F·Δy를 구하고\n도형으로 검증하라",
+          memoHint:
+            "※ 입력 후 그림의 슈터를 탭해 궤적을 검증하세요 (Δy≠0이면 스핀)",
+          windTail: "순풍",
+          windHead: "역풍",
+          windCalm: "무풍",
+          hudBall: "공",
+          hudGoal: "골",
+          targetArrow: "목표 ➔",
+          analyzeTitle: "지구 표준 모범 답안",
+          hintStickyTitle: "✎ 선생님 메모 — Earth ref.",
+          hintBody: makeHintBody({
+            current: (env, g, ball, m) =>
+              `(이 문제: ${env}  g≈${g} m/s² / ${ball} m=${m}kg)`,
+            ref: (g) => `(참고: 지구 표준 g≈${g} m/s², a_x=0)`,
+            recommend: "권장 답안 (추력 F, 타점 Δy):",
+            noSolution: "해 없음 (이 참고 조건으로는 도달 어려움)",
+            note: (env) =>
+              `※ F는 약 1/60초 추력 [N]. Δv≈F/m·τ.\n` +
+              `  같은 F라도 무거운 공일수록 초속이 작다. Δy로 스핀.\n` +
+              `  ${env}·g·a_x·m에 맞춰 보정하라.`,
+          }),
+          debugTitle: "HITBOX DEBUG (H)",
+          debugBody: "빨강=물리 초록=네트 주황=림 청록=통과",
+          debugSolveOk: (a, F, dy, ax) =>
+            `SOLVE θ=${a} F=${F} Δy=${dy} ax=${ax} sim=OK`,
+          debugSolveFail: (ax) => `SOLVE impossible ax=${ax}`,
+          debugSolveNone: "SOLVE (계산 중…)",
+          debugOn: "디버그 ON",
+          debugOff: "디버그 OFF",
+          startFlash: (n) => `Q.${n} 시작`,
+          correct: "득점!",
+          livesLeft: (n) => `남은 시도 ${n}`,
+          startTitle: "투사 프리스로",
+          startBodyHtml:
+            "오른쪽 위 조건을 보고, 왼쪽 위에 θ·F·Δy를 입력하세요.<br />" +
+            "슈터를 탭해 슛하고 림을 노리세요.<br />" +
+            "스테이지마다 시도는 3회까지.",
+          startButton: "시작",
+          gameOverTitle: "게임 오버",
+          gameOverBody: "시도 횟수를 모두 썼습니다…",
+          gameOverSummary: (clears, level) =>
+            `클리어 ${clears} ／ 도달 Q.${level}`,
+          retryButton: "다시 하기",
+        },
+        es: {
+          appTitle: "Tiro libre proyectil",
+          qTitle: (n) => `[P${n}]`,
+          tries: (n) => `Intentos ${n}`,
+          clears: (n) => `Aciertos ${n}`,
+          stage: (n) => `Q.${n}`,
+          solveTitle: "[Sol] Hallar θ, F, Δy\ny verificar en el diagrama",
+          memoHint:
+            "* Tras rellenar, toca al tirador para verificar la trayectoria (Δy≠0 da efecto)",
+          windTail: "viento a favor",
+          windHead: "viento en contra",
+          windCalm: "calma",
+          hudBall: "balón",
+          hudGoal: "aro",
+          targetArrow: "Objetivo ➔",
+          analyzeTitle: "Solución modelo (estándar Tierra)",
+          hintStickyTitle: "✎ Nota del profe — Earth ref.",
+          hintBody: makeHintBody({
+            current: (env, g, ball, m) =>
+              `(Esta P: ${env}  g≈${g} m/s² / ${ball} m=${m}kg)`,
+            ref: (g) => `(Ref: Tierra g≈${g} m/s², a_x=0)`,
+            recommend: "Respuesta sugerida (F y Δy):",
+            noSolution: "Sin solución en esta referencia",
+            note: (env) =>
+              `* F es empuje ~1/60 s [N]. Δv≈F/m·τ.\n` +
+              `  A igual F, más masa ⇒ menos velocidad. Spin con Δy.\n` +
+              `  Ajusta a ${env}, g, a_x y m.`,
+          }),
+          debugTitle: "HITBOX DEBUG (H)",
+          debugBody: "rojo=cuerpo verde=red naranja=aro cian=paso",
+          debugSolveOk: (a, F, dy, ax) =>
+            `SOLVE θ=${a} F=${F} Δy=${dy} ax=${ax} sim=OK`,
+          debugSolveFail: (ax) => `SOLVE impossible ax=${ax}`,
+          debugSolveNone: "SOLVE (calculando…)",
+          debugOn: "Depuración ON",
+          debugOff: "Depuración OFF",
+          startFlash: (n) => `Inicio Q.${n}`,
+          correct: "¡Canasta!",
+          livesLeft: (n) => `${n} intentos`,
+          startTitle: "Tiro libre proyectil",
+          startBodyHtml:
+            "Mira las condiciones (arriba derecha) e introduce θ, F y Δy (arriba izquierda).<br />" +
+            "Toca al tirador para lanzar y apunta al aro.<br />" +
+            "Hasta 3 intentos por etapa.",
+          startButton: "Empezar",
+          gameOverTitle: "Fin del juego",
+          gameOverBody: "Sin más intentos…",
+          gameOverSummary: (clears, level) =>
+            `Aciertos ${clears} ／ Llegaste a Q.${level}`,
+          retryButton: "Otra vez",
+        },
+        fr: {
+          appTitle: "Lancer franc projectile",
+          qTitle: (n) => `[Q${n}]`,
+          tries: (n) => `Essais ${n}`,
+          clears: (n) => `Réussis ${n}`,
+          stage: (n) => `Q.${n}`,
+          solveTitle: "[Sol] Trouver θ, F, Δy\net vérifier sur le schéma",
+          memoHint:
+            "* Après saisie, touchez le tireur pour vérifier la trajectoire (Δy≠0 = spin)",
+          windTail: "vent arrière",
+          windHead: "vent de face",
+          windCalm: "calme",
+          hudBall: "balle",
+          hudGoal: "panier",
+          targetArrow: "Cible ➔",
+          analyzeTitle: "Corrigé type (norme Terre)",
+          hintStickyTitle: "✎ Note du prof — Earth ref.",
+          hintBody: makeHintBody({
+            current: (env, g, ball, m) =>
+              `(Cette Q : ${env}  g≈${g} m/s² / ${ball} m=${m}kg)`,
+            ref: (g) => `(Réf. : Terre g≈${g} m/s², a_x=0)`,
+            recommend: "Réponse suggérée (F et Δy) :",
+            noSolution: "Pas de solution sous cette référence",
+            note: (env) =>
+              `* F = poussée ~1/60 s [N]. Δv≈F/m·τ.\n` +
+              `  À F égal, plus la balle est lourde, plus v₀ baisse. Spin via Δy.\n` +
+              `  Corrige pour ${env}, g, a_x et m.`,
+          }),
+          debugTitle: "HITBOX DEBUG (H)",
+          debugBody: "rouge=corps vert=filet orange=anneau cyan=passage",
+          debugSolveOk: (a, F, dy, ax) =>
+            `SOLVE θ=${a} F=${F} Δy=${dy} ax=${ax} sim=OK`,
+          debugSolveFail: (ax) => `SOLVE impossible ax=${ax}`,
+          debugSolveNone: "SOLVE (calcul…)",
+          debugOn: "Debug ON",
+          debugOff: "Debug OFF",
+          startFlash: (n) => `Début Q.${n}`,
+          correct: "Panier !",
+          livesLeft: (n) => `${n} essais`,
+          startTitle: "Lancer franc projectile",
+          startBodyHtml:
+            "Regardez les données (haut droite), saisissez θ, F et Δy (haut gauche).<br />" +
+            "Touchez le tireur pour lancer vers l’anneau.<br />" +
+            "Jusqu’à 3 essais par étape.",
+          startButton: "Démarrer",
+          gameOverTitle: "Partie terminée",
+          gameOverBody: "Plus d’essais…",
+          gameOverSummary: (clears, level) =>
+            `Réussis ${clears} ／ Atteint Q.${level}`,
+          retryButton: "Rejouer",
+        },
+        de: {
+          appTitle: "Wurf-Freistoß",
+          qTitle: (n) => `[A${n}]`,
+          tries: (n) => `Versuche ${n}`,
+          clears: (n) => `Treffer ${n}`,
+          stage: (n) => `Q.${n}`,
+          solveTitle: "[Lös] θ, F, Δy finden\nund am Diagramm prüfen",
+          memoHint:
+            "* Nach Eingabe den Schützen antippen, um die Bahn zu prüfen (Δy≠0 = Spin)",
+          windTail: "Rückenwind",
+          windHead: "Gegenwind",
+          windCalm: "windstill",
+          hudBall: "Ball",
+          hudGoal: "Korb",
+          targetArrow: "Ziel ➔",
+          analyzeTitle: "Musterlösung (Erde-Standard)",
+          hintStickyTitle: "✎ Lehrernotiz — Earth ref.",
+          hintBody: makeHintBody({
+            current: (env, g, ball, m) =>
+              `(Diese A: ${env}  g≈${g} m/s² / ${ball} m=${m}kg)`,
+            ref: (g) => `(Ref: Erde g≈${g} m/s², a_x=0)`,
+            recommend: "Vorschlag (Schub F und Δy):",
+            noSolution: "Keine Lösung unter dieser Referenz",
+            note: (env) =>
+              `* F ist Schub ~1/60 s [N]. Δv≈F/m·τ.\n` +
+              `  Gleich F: schwererer Ball ⇒ kleinere v₀. Spin über Δy.\n` +
+              `  Anpassen an ${env}, g, a_x und m.`,
+          }),
+          debugTitle: "HITBOX DEBUG (H)",
+          debugBody: "rot=Körper grün=Netz orange=Ring cyan=Durchgang",
+          debugSolveOk: (a, F, dy, ax) =>
+            `SOLVE θ=${a} F=${F} Δy=${dy} ax=${ax} sim=OK`,
+          debugSolveFail: (ax) => `SOLVE impossible ax=${ax}`,
+          debugSolveNone: "SOLVE (berechne…)",
+          debugOn: "Debug AN",
+          debugOff: "Debug AUS",
+          startFlash: (n) => `Start Q.${n}`,
+          correct: "Treffer!",
+          livesLeft: (n) => `${n} Versuche`,
+          startTitle: "Wurf-Freistoß",
+          startBodyHtml:
+            "Bedingungen oben rechts prüfen, θ, F und Δy links oben eingeben.<br />" +
+            "Schützen antippen und auf den Ring zielen.<br />" +
+            "Bis zu 3 Versuche pro Stufe.",
+          startButton: "Start",
+          gameOverTitle: "Game Over",
+          gameOverBody: "Keine Versuche mehr…",
+          gameOverSummary: (clears, level) =>
+            `Treffer ${clears} ／ Erreicht Q.${level}`,
+          retryButton: "Nochmal",
+        },
+        pt: {
+          appTitle: "Lance livre projetil",
+          qTitle: (n) => `[Q${n}]`,
+          tries: (n) => `Tentativas ${n}`,
+          clears: (n) => `Acertos ${n}`,
+          stage: (n) => `Q.${n}`,
+          solveTitle: "[Sol] Ache θ, F, Δy\ne verifique no diagrama",
+          memoHint:
+            "* Depois de preencher, toque no atirador para verificar a trajetória (Δy≠0 = spin)",
+          windTail: "vento a favor",
+          windHead: "vento contrário",
+          windCalm: "calmo",
+          hudBall: "bola",
+          hudGoal: "aro",
+          targetArrow: "Alvo ➔",
+          analyzeTitle: "Resposta modelo (padrão Terra)",
+          hintStickyTitle: "✎ Nota do professor — Earth ref.",
+          hintBody: makeHintBody({
+            current: (env, g, ball, m) =>
+              `(Esta Q: ${env}  g≈${g} m/s² / ${ball} m=${m}kg)`,
+            ref: (g) => `(Ref: Terra g≈${g} m/s², a_x=0)`,
+            recommend: "Resposta sugerida (F e Δy):",
+            noSolution: "Sem solução nesta referência",
+            note: (env) =>
+              `* F é impulso ~1/60 s [N]. Δv≈F/m·τ.\n` +
+              `  Mesmo F: bola mais pesada ⇒ menor v₀. Spin com Δy.\n` +
+              `  Ajuste para ${env}, g, a_x e m.`,
+          }),
+          debugTitle: "HITBOX DEBUG (H)",
+          debugBody: "vermelho=corpo verde=rede laranja=aro ciano=passagem",
+          debugSolveOk: (a, F, dy, ax) =>
+            `SOLVE θ=${a} F=${F} Δy=${dy} ax=${ax} sim=OK`,
+          debugSolveFail: (ax) => `SOLVE impossible ax=${ax}`,
+          debugSolveNone: "SOLVE (calculando…)",
+          debugOn: "Debug ON",
+          debugOff: "Debug OFF",
+          startFlash: (n) => `Início Q.${n}`,
+          correct: "Cesta!",
+          livesLeft: (n) => `${n} tentativas`,
+          startTitle: "Lance livre projetil",
+          startBodyHtml:
+            "Veja as condições (canto superior direito) e digite θ, F e Δy (esquerdo).<br />" +
+            "Toque no atirador para lançar e mire o aro.<br />" +
+            "Até 3 tentativas por etapa.",
+          startButton: "Começar",
+          gameOverTitle: "Fim de jogo",
+          gameOverBody: "Sem mais tentativas…",
+          gameOverSummary: (clears, level) =>
+            `Acertos ${clears} ／ Chegou em Q.${level}`,
+          retryButton: "De novo",
         },
       };
       function ui() {
-        return UI_COPY[uiLocale] || UI_COPY.ja;
+        return UI_COPY[uiLocale] || UI_COPY.en;
+      }
+      function normalizeUiLocale(locale) {
+        if (typeof locale === "string" && UI_LOCALES.includes(locale)) {
+          return locale;
+        }
+        return "ja";
       }
       function readInitialLocale() {
         try {
           const q = new URLSearchParams(location.search).get("lang");
-          if (q === "en" || q === "ja") return q;
+          if (q) return normalizeUiLocale(q);
         } catch {
           /* ignore */
         }
         try {
           const s = localStorage.getItem("my-tool-box-locale");
-          if (s === "en" || s === "ja") return s;
+          if (s) return normalizeUiLocale(s);
         } catch {
           /* ignore */
         }
         return "ja";
       }
       function setUiLocale(locale) {
-        uiLocale = locale === "en" ? "en" : "ja";
+        uiLocale = normalizeUiLocale(locale);
         document.documentElement.lang = uiLocale;
         updateLabels();
         updateEnvHud();
@@ -1985,60 +2417,13 @@
           break;
         }
 
-        // —— 右：ゴール（ボード＋リム上部）と付箋の干渉を避ける ——
-        let hudRight = 12;
-        let hudTop = 10;
+        // —— 右上付箋：常に右上固定（ゴール回避で動かさない）——
+        const hudRight = 12;
+        const hudTop = 10;
+        // 画面が狭いときだけ縮尺。位置は変えない
         let hudScale = scale;
-
-        function hudBox(sc) {
-          const w = hudW0 * sc;
-          const h = hudH0 * sc;
-          return {
-            left: W - hudRight - w,
-            top: hudTop,
-            right: W - hudRight,
-            bottom: hudTop + h,
-          };
-        }
-
-        if (state.stage) {
-          const gm = getGoalMetrics(state.stage);
-          const goalArt = {
-            left: Math.min(gm.board.left, gm.rimFront.x, gm.left) - state.cameraX,
-            top: Math.min(gm.board.top, gm.top),
-            right:
-              Math.max(gm.board.right, gm.rimBack.x, gm.left + gm.w) -
-              state.cameraX,
-            bottom: gm.rimFront.y + Math.max(36, gm.h * 0.12),
-          };
-          const goalOnScreen =
-            goalArt.right > 8 && goalArt.left < W - 8 && goalArt.bottom > 0;
-
-          if (goalOnScreen) {
-            for (let i = 0; i < 14; i++) {
-              const box = hudBox(hudScale);
-              if (!overlaps(box, goalArt, 12)) break;
-
-              const needRight = W - goalArt.left + 14;
-              if (needRight > hudRight && needRight < W * 0.55) {
-                hudRight = needRight;
-                continue;
-              }
-              if (goalArt.top > hudH0 * hudScale + 16 && hudTop < 24) {
-                hudTop = Math.min(24, hudTop + 4);
-                continue;
-              }
-              if (hudScale > 0.55) {
-                hudScale = Math.max(0.55, hudScale - 0.04);
-                continue;
-              }
-              if (hudRight < W * 0.5) {
-                hudRight = Math.min(W * 0.5, hudRight + 16);
-                continue;
-              }
-              break;
-            }
-          }
+        if (hudW0 * hudScale > W * 0.46) {
+          hudScale = Math.max(0.55, (W * 0.46) / Math.max(1, hudW0));
         }
 
         const finalScale = Math.min(memoScale, hudScale);
@@ -2474,7 +2859,7 @@
               const gx = Math.round(goalPhys.x);
               const gy = Math.round(goalPhys.y);
               html =
-                `<span class="gi-title">Target ➔</span>` +
+                `<span class="gi-title">${ui().targetArrow}</span>` +
                 `<span class="gi-meta">x ≈ ${gx} cm</span>` +
                 `<span class="gi-meta">y ≈ ${gy} cm</span>`;
               show = true;
@@ -2606,6 +2991,25 @@
         lifeLabel.textContent = c.tries(state.lives);
         scoreLabel.textContent = c.clears(state.clears);
         if (memoSolveTitle) memoSolveTitle.textContent = c.solveTitle;
+        if (memoHint) memoHint.textContent = c.memoHint;
+        if (appTitle) appTitle.textContent = c.appTitle;
+        if (startTitle) startTitle.textContent = c.startTitle;
+        if (startBody) startBody.innerHTML = c.startBodyHtml;
+        if (btnStart) btnStart.textContent = c.startButton;
+        if (gameOverTitle) gameOverTitle.textContent = c.gameOverTitle;
+        if (gameOverText && !gameOverOverlay.classList.contains("show")) {
+          gameOverText.textContent = c.gameOverBody;
+        }
+        if (btnRetry) btnRetry.textContent = c.retryButton;
+        if (btnHint) {
+          btnHint.title = c.analyzeTitle;
+          btnHint.setAttribute("aria-label", c.analyzeTitle);
+        }
+        const hintHeading = hintSticky
+          ? hintSticky.querySelector("h3")
+          : null;
+        if (hintHeading) hintHeading.textContent = c.hintStickyTitle;
+        document.title = c.appTitle;
       }
 
       function updateEnvHud() {
@@ -2641,28 +3045,30 @@
         requestAnimationFrame(() => syncUiLayout());
       }
 
-      function showHint() {
+      /** ANALYZE ボタンで表示／非表示をトグル */
+      function toggleHint() {
         if (!state.stage) return;
+        if (hintSticky.classList.contains("show")) {
+          hintSticky.classList.remove("show");
+          return;
+        }
         const s = state.stage;
         const ideal = computeIdealEarthParams(s.dist, s.height, s);
         const gEarth = G_EARTH_MS2.toFixed(2);
         const gNow = gravityMs2ForEnv(s.env).toFixed(2);
         const envName = stageEnvLabel(s);
         const bt = getBallType(s);
-        hintText.textContent =
-          `（本問：${envName}  g≈${gNow} m/s²／${bt.label} m=${bt.mass}kg）\n` +
-          `（参考：地球標準 g≈${gEarth} m/s², a_x=0 のとき）\n` +
-          `\n` +
-          (ideal.found
-            ? `推奨解答（目安・推力 F と打点 Δy）：\n` +
-            `  θ  = ${ideal.angle} °\n` +
-            `  F  = ${ideal.F}\n` +
-            `  Δy = ${ideal.dyCm} cm\n`
-            : `解なし（この参考条件では到達困難）\n`) +
-          `\n` +
-          `※ F は約 1/60 秒だけ加わる推力 [N]。Δv≈F/m·τ。\n` +
-          `  同じ F でも重い球ほど初速が小さい。Δy でスピン。\n` +
-          `  与条件（${envName}・g・a_x・m）に合わせて補正せよ。`;
+        const c = ui();
+        hintText.textContent = c.hintBody(
+          envName,
+          gNow,
+          bt.label,
+          bt.mass,
+          gEarth,
+          ideal,
+        );
+        const hintHeading = hintSticky.querySelector("h3");
+        if (hintHeading) hintHeading.textContent = c.hintStickyTitle;
         hintSticky.classList.add("show");
       }
 
@@ -3387,7 +3793,10 @@
         state.ballInFlight = false;
         if (state.lives <= 0) {
           state.playing = false;
-          gameOverText.textContent = `正答数 ${state.clears} ／ 到達 問.${state.level}`;
+          gameOverText.textContent = ui().gameOverSummary(
+            state.clears,
+            state.level,
+          );
           gameOverOverlay.classList.add("show");
           resetCamera(false);
           return;
@@ -4881,9 +5290,8 @@
 
       btnHint.addEventListener("click", (e) => {
         e.stopPropagation();
-        showHint();
+        toggleHint();
       });
-      hintClose.addEventListener("click", () => hintSticky.classList.remove("show"));
       btnResetBall.addEventListener("click", (e) => {
         e.stopPropagation();
         if (!state.playing) return;
