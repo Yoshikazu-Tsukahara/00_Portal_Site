@@ -914,6 +914,17 @@ export const appsEs: AppsDictionary = {
     cancel: "Cancelar",
     close: "Cerrar",
     confirmDeleteCharacter: "¿Eliminar “{name}”? También se quitarán los enlaces relacionados.",
+    confirmLoadSample:
+      "¿Cargar el diagrama de ejemplo? Se reemplazarán los personajes y relaciones actuales.",
+    confirmClearAll:
+      "¿Eliminar todos los personajes y relaciones? Esto no se puede deshacer.",
+    sample: {
+      load: "Cargar ejemplo",
+      loadShort: "Ejemplo",
+      clear: "Borrar todo",
+      clearShort: "Borrar",
+      hint: "Un elenco de demostración que puedes borrar cuando quieras.",
+    },
     sidebar: {
       tabsLabel: "Vista de la barra lateral",
       characters: "Personajes",
@@ -935,6 +946,7 @@ export const appsEs: AppsDictionary = {
     },
     canvas: {
       empty: "Añade un personaje desde la barra lateral para empezar",
+      emptyLoadSample: "O probar con la muestra",
       noNote: "Nada en la tarjeta",
       labelPlaceholder: "Relación (p. ej. Rival)",
       pickTarget: "Haz clic en un destino…",

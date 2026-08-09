@@ -313,6 +313,17 @@ export const appsZhTW: AppsDictionary = {
     cancel: "取消",
     close: "關閉",
     confirmDeleteCharacter: "刪除「{name}」？相關連結也會一併移除。",
+    confirmLoadSample:
+      "載入範例關係圖？目前的人物與連結會被取代。",
+    confirmClearAll:
+      "刪除全部人物與連結？此操作無法復原。",
+    sample: {
+      load: "載入範例",
+      loadShort: "範例",
+      clear: "全部清除",
+      clearShort: "清除",
+      hint: "可隨時清除的體驗用示範。",
+    },
     sidebar: {
       tabsLabel: "側欄檢視",
       characters: "人物",
@@ -334,6 +345,7 @@ export const appsZhTW: AppsDictionary = {
     },
     canvas: {
       empty: "從側欄新增人物以開始",
+      emptyLoadSample: "或試用範例",
       noNote: "卡片上沒有內容",
       labelPlaceholder: "關係（例如：對手）",
       pickTarget: "點選目標…",

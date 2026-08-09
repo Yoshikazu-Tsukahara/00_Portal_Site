@@ -914,6 +914,17 @@ export const appsDe: AppsDictionary = {
     cancel: "Abbrechen",
     close: "Schließen",
     confirmDeleteCharacter: "„{name}“ löschen? Zugehörige Verbindungen werden ebenfalls entfernt.",
+    confirmLoadSample:
+      "Beispielszene laden? Aktuelle Charaktere und Verbindungen werden ersetzt.",
+    confirmClearAll:
+      "Alle Charaktere und Verbindungen löschen? Das kann nicht rückgängig gemacht werden.",
+    sample: {
+      load: "Beispiel laden",
+      loadShort: "Beispiel",
+      clear: "Alles löschen",
+      clearShort: "Löschen",
+      hint: "Eine Demo-Besetzung, die Sie jederzeit löschen können.",
+    },
     sidebar: {
       tabsLabel: "Seitenleistenansicht",
       characters: "Charaktere",
@@ -935,6 +946,7 @@ export const appsDe: AppsDictionary = {
     },
     canvas: {
       empty: "Charakter in der Seitenleiste hinzufügen, um zu beginnen",
+      emptyLoadSample: "Oder die Beispielszene laden",
       noNote: "Nichts auf der Karte",
       labelPlaceholder: "Beziehung (z. B. Rivale)",
       pickTarget: "Ziel anklicken…",

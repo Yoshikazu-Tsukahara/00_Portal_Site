@@ -313,6 +313,17 @@ export const appsKo: AppsDictionary = {
     cancel: "취소",
     close: "닫기",
     confirmDeleteCharacter: "“{name}”을(를) 삭제할까요? 관련 링크도 함께 제거됩니다.",
+    confirmLoadSample:
+      "샘플 상관도를 불러올까요? 현재 캐릭터와 관계선이 바뀝니다.",
+    confirmClearAll:
+      "캐릭터와 관계선을 모두 삭제할까요? 이 작업은 되돌릴 수 없습니다.",
+    sample: {
+      load: "샘플 불러오기",
+      loadShort: "샘플",
+      clear: "모두 지우기",
+      clearShort: "지우기",
+      hint: "언제든 지울 수 있는 체험용 데모입니다.",
+    },
     sidebar: {
       tabsLabel: "사이드바 보기",
       characters: "캐릭터",
@@ -334,6 +345,7 @@ export const appsKo: AppsDictionary = {
     },
     canvas: {
       empty: "사이드바에서 캐릭터를 추가해 시작하세요",
+      emptyLoadSample: "또는 샘플로 시작",
       noNote: "카드에 내용 없음",
       labelPlaceholder: "관계 (예: 라이벌)",
       pickTarget: "대상을 클릭…",

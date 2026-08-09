@@ -914,6 +914,17 @@ export const appsZhCN: AppsDictionary = {
     cancel: "取消",
     close: "关闭",
     confirmDeleteCharacter: "删除“{name}”？相关连线也会被移除。",
+    confirmLoadSample:
+      "加载示例关系图？当前角色与连线会被替换。",
+    confirmClearAll:
+      "删除全部角色与连线？此操作无法撤销。",
+    sample: {
+      load: "加载示例",
+      loadShort: "示例",
+      clear: "全部清除",
+      clearShort: "清除",
+      hint: "可随时清除的体验用演示。",
+    },
     sidebar: {
       tabsLabel: "侧栏视图",
       characters: "角色",
@@ -935,6 +946,7 @@ export const appsZhCN: AppsDictionary = {
     },
     canvas: {
       empty: "从侧栏添加角色开始",
+      emptyLoadSample: "或试用示例",
       noNote: "卡片上无内容",
       labelPlaceholder: "关系（例如：对手）",
       pickTarget: "点击目标…",

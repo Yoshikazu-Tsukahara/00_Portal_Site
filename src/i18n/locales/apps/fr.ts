@@ -313,6 +313,17 @@ export const appsFr: AppsDictionary = {
     cancel: "Annuler",
     close: "Fermer",
     confirmDeleteCharacter: "Supprimer « {name} » ? Les liens associés seront aussi retirés.",
+    confirmLoadSample:
+      "Charger le diagramme d’exemple ? Les personnages et relations actuels seront remplacés.",
+    confirmClearAll:
+      "Supprimer tous les personnages et relations ? Cette action est irréversible.",
+    sample: {
+      load: "Charger l’exemple",
+      loadShort: "Exemple",
+      clear: "Tout effacer",
+      clearShort: "Effacer",
+      hint: "Une distribution de démo que vous pouvez effacer à tout moment.",
+    },
     sidebar: {
       tabsLabel: "Vue de la barre latérale",
       characters: "Personnages",
@@ -334,6 +345,7 @@ export const appsFr: AppsDictionary = {
     },
     canvas: {
       empty: "Ajoutez un personnage depuis la barre latérale pour commencer",
+      emptyLoadSample: "Ou essayer l'exemple",
       noNote: "Rien sur la carte",
       labelPlaceholder: "Relation (ex. Rival)",
       pickTarget: "Cliquez une cible…",
