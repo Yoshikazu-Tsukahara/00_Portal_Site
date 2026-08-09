@@ -99,79 +99,77 @@ export default function LibraryAppDetailPage() {
 
   return (
     <main className="relative flex flex-1 flex-col">
-      <div
-        className={`${contentClassName} flex flex-col pb-16 pt-8 sm:pt-10`}
-      >
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] lg:items-start lg:gap-12">
-          <div className="overflow-hidden rounded-[1.35rem] bg-[color-mix(in_srgb,var(--accent)_14%,#eceef4)]">
-            <AppCover tool={tool} className="!rounded-none" />
-          </div>
-
-          <div className="flex flex-col">
-            <div className="flex items-start gap-4">
-              <span
-                className="store-app-icon flex h-[4.5rem] w-[4.5rem] items-center justify-center overflow-hidden text-3xl sm:h-[5.25rem] sm:w-[5.25rem] sm:text-4xl"
-                aria-hidden
-              >
-                <ToolGlyph tool={tool} />
-              </span>
-              <div className="min-w-0 flex-1 pt-1">
-                <h1
-                  id={titleId}
-                  className="font-display text-[1.65rem] font-bold leading-tight tracking-tight text-zinc-900 sm:text-[2rem]"
-                >
-                  {copy.title}
-                </h1>
-                {genreName ? (
-                  <p className="mt-1.5 text-[15px] text-zinc-500">{genreName}</p>
-                ) : null}
-              </div>
+      {/* 「このアプリについて」より上：暗め背景＋下端グラデーション */}
+      <section className="store-detail-hero" aria-labelledby={titleId}>
+        <div className={`${contentClassName} store-detail-hero__inner`}>
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] lg:items-start lg:gap-12">
+            <div className="overflow-hidden rounded-[1.35rem] bg-black/20 ring-1 ring-white/10">
+              <AppCover tool={tool} className="!rounded-none" />
             </div>
 
-            <p className="mt-5 text-[15px] leading-relaxed text-zinc-600">
-              {copy.description}
-            </p>
+            <div className="flex flex-col">
+              <div className="flex items-start gap-4">
+                <span
+                  className="store-app-icon flex h-[4.5rem] w-[4.5rem] items-center justify-center overflow-hidden text-3xl sm:h-[5.25rem] sm:w-[5.25rem] sm:text-4xl"
+                  aria-hidden
+                >
+                  <ToolGlyph tool={tool} />
+                </span>
+                <div className="min-w-0 flex-1 pt-1">
+                  <h1 id={titleId} className="store-detail-hero__title">
+                    {copy.title}
+                  </h1>
+                  {genreName ? (
+                    <p className="store-detail-hero__genre">{genreName}</p>
+                  ) : null}
+                </div>
+              </div>
 
-            <div className="mt-7">
-              {installed ? (
-                <div className="store-detail-actions">
-                  <Link
-                    href={tool.href}
-                    className="store-install-btn store-install-btn--lg"
-                    aria-label={`${copy.title}: ${t.library.openApp}`}
-                  >
-                    {t.library.openApp}
-                  </Link>
-                  <button
-                    type="button"
-                    className="store-remove-btn"
-                    aria-label={`${copy.title}: ${t.library.removeFromHome}`}
-                    onClick={() => uninstall(tool.id)}
-                  >
-                    {t.library.removeFromHome}
-                  </button>
-                </div>
-              ) : (
-                <div className="flex flex-col gap-2.5">
-                  <button
-                    type="button"
-                    disabled={!hydrated}
-                    className="store-install-btn store-install-btn--lg"
-                    aria-label={`${copy.title}: ${t.library.install}`}
-                    onClick={() => install(tool.id)}
-                  >
-                    {t.library.install}
-                  </button>
-                  <p className="text-[13px] leading-relaxed text-zinc-500">
-                    {t.library.installHint}
-                  </p>
-                </div>
-              )}
+              <p className="store-detail-hero__lead">{copy.description}</p>
+
+              <div className="mt-7">
+                {installed ? (
+                  <div className="store-detail-actions">
+                    <Link
+                      href={tool.href}
+                      className="store-install-btn store-install-btn--lg"
+                      aria-label={`${copy.title}: ${t.library.openApp}`}
+                    >
+                      {t.library.openApp}
+                    </Link>
+                    <button
+                      type="button"
+                      className="store-remove-btn"
+                      aria-label={`${copy.title}: ${t.library.removeFromHome}`}
+                      onClick={() => uninstall(tool.id)}
+                    >
+                      {t.library.removeFromHome}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-2.5">
+                    <button
+                      type="button"
+                      disabled={!hydrated}
+                      className="store-install-btn store-install-btn--lg"
+                      aria-label={`${copy.title}: ${t.library.install}`}
+                      onClick={() => install(tool.id)}
+                    >
+                      {t.library.install}
+                    </button>
+                    <p className="store-detail-hero__hint">
+                      {t.library.installHint}
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
+      </section>
 
-        <div className="store-detail-body mt-12 max-w-3xl sm:mt-14">
+      <div className={`store-detail-body-wrap ${contentClassName}`}>
+        <div className="store-detail-body max-w-3xl pt-2 sm:pt-3">
           <section aria-labelledby="store-detail-about">
             <h2 id="store-detail-about" className="store-detail-info__label">
               {t.library.aboutLabel}

@@ -57,6 +57,13 @@ export type Dictionary = {
       hint: string;
     };
   };
+  /** サイト初回のざっくり利用ガイド */
+  usageGuide: {
+    title: string;
+    steps: { title: string; body: string }[];
+    dontShowAgain: string;
+    close: string;
+  };
   header: {
     support: string;
     supportShort: string;

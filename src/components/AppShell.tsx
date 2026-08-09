@@ -210,11 +210,11 @@ export default function AppShell({
             : "border-b border-zinc-200/70"
         } ${fillViewport ? "mb-2 pb-2" : compact ? "mb-3 pb-2" : "mb-4 pb-3"}`}
       >
-        {/* 1行目: アプリ名 ＋ バックアップ ＋ インストール（コンパクト時はアイコンのみ） */}
+        {/* 1行目: タイトル直後にバックアップ／インストール（全アプリ共通）。機能ボタンは右端 */}
         <div className="flex min-h-8 min-w-0 items-center gap-2">
-          <div className="flex min-w-0 flex-1 items-center gap-1">
+          <div className="flex min-w-0 flex-1 items-center gap-1.5">
             <h1
-              className="app-shell-title min-w-0 flex-1 truncate text-base font-semibold tracking-tight text-zinc-900"
+              className="app-shell-title min-w-0 shrink truncate text-base font-semibold tracking-tight text-zinc-900"
               title={title}
             >
               {displayTitle}

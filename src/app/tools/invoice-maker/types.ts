@@ -264,21 +264,59 @@ export function defaultDocLocaleFor(siteLocale: Locale): DocLocale {
   return DOC_LOCALE_BY_SITE[siteLocale] ?? "en";
 }
 
-/** サイト言語に合わせた初期通貨（日本語なら円） */
+/** サイト表示言語に合わせた初期通貨 */
 export function defaultCurrencyFor(siteLocale: Locale): CurrencyCode {
-  return siteLocale === "ja" ? "JPY" : "USD";
+  switch (siteLocale) {
+    case "ja":
+      return "JPY";
+    case "ko":
+      return "KRW";
+    case "zh-CN":
+    case "zh-TW":
+      return "CNY";
+    case "es":
+    case "fr":
+    case "de":
+    case "pt":
+      return "EUR";
+    case "en":
+    default:
+      return "USD";
+  }
 }
 
-/** 新規請求書の初期値。日付を使うためクライアント側でのみ呼ぶ */
+/** サイト表示言語に合わせた初期税率（%） */
+export function defaultTaxRateFor(siteLocale: Locale): number {
+  switch (siteLocale) {
+    case "ja":
+      return 10;
+    case "ko":
+      return 10;
+    case "es":
+      return 21;
+    case "fr":
+      return 20;
+    case "de":
+      return 19;
+    case "pt":
+      return 23;
+    default:
+      return 0;
+  }
+}
+
+/**
+ * 新規帳票の初期値（記入欄は空）。
+ * 書類言語・通貨・税率だけ表示言語から自動設定する。
+ */
 export function createDefaultInvoice(siteLocale: Locale): InvoiceData {
   const issueDate = toDateInputValue(new Date());
-  const docLocale = defaultDocLocaleFor(siteLocale);
   return {
-    docLocale,
+    docLocale: defaultDocLocaleFor(siteLocale),
     documentType: "invoice",
     currency: defaultCurrencyFor(siteLocale),
     customCurrencySymbol: "",
-    taxRatePercent: siteLocale === "ja" ? 10 : 0,
+    taxRatePercent: defaultTaxRateFor(siteLocale),
     withholdingTaxEnabled: false,
     invoiceNumber: suggestInvoiceNumber(issueDate),
     issueDate,
@@ -287,23 +325,6 @@ export function createDefaultInvoice(siteLocale: Locale): InvoiceData {
     to: createEmptyParty(),
     items: [createEmptyItem()],
     paymentMethod: "",
-    notes: "",
-  };
-}
-
-/**
- * 「次の請求書」を作る。発行者情報・支払方法・通貨設定は引き継ぎ、
- * 請求先と品目だけを空にする（毎回入力するのは請求内容だけ）。
- */
-export function createNextInvoice(previous: InvoiceData): InvoiceData {
-  const issueDate = toDateInputValue(new Date());
-  return {
-    ...previous,
-    invoiceNumber: suggestInvoiceNumber(issueDate),
-    issueDate,
-    dueDate: addDays(issueDate, DEFAULT_DUE_DAYS),
-    to: createEmptyParty(),
-    items: [createEmptyItem()],
     notes: "",
   };
 }

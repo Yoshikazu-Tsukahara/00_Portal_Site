@@ -598,7 +598,7 @@ export const appsZhCN: AppsDictionary = {
     actions: {
       newInvoice: "新建单据",
       newInvoiceShort: "新建",
-      newInvoiceConfirm: "这将重置收件方、明细与单据编号（您自己的信息与付款信息会保留）。继续？",
+      newInvoiceConfirm: "将清空全部输入并新建单据。单据语言与货币会按当前显示语言自动设置。继续？",
     },
     toolbar: {
       save: "💾 保存当前单据",
@@ -622,7 +622,7 @@ export const appsZhCN: AppsDictionary = {
       empty: "尚无已保存的单据。",
       sampleName: "📄 [示例] 网站设计发票（演示）",
       sampleBadge: "演示",
-      sampleLead: "将按当前所选的「单据语言」加载演示（站点显示语言不变）。",
+      sampleLead: "将按当前站点显示语言加载演示（单据语言也会对齐）。",
       loadAction: "加载",
       deleteAction: "删除",
       deleteConfirm: "删除“{name}”？此操作无法撤销。",

@@ -757,7 +757,7 @@ export const appsPt: AppsDictionary = {
     actions: {
       newInvoice: "Novo documento",
       newInvoiceShort: "Novo",
-      newInvoiceConfirm: "Isso redefine o destinatário, os itens e o número do documento (seus dados e informações de pagamento permanecem). Continuar?",
+      newInvoiceConfirm: "Limpar todos os campos e começar um novo documento? O idioma do documento e a moeda seguirão o idioma de exibição atual.",
     },
     toolbar: {
       save: "💾 Salvar documento atual",
@@ -781,7 +781,7 @@ export const appsPt: AppsDictionary = {
       empty: "Nenhum documento salvo ainda.",
       sampleName: "📄 [Amostra] Fatura de design de site (demo)",
       sampleBadge: "Demo",
-      sampleLead: "Carrega uma demo conforme o idioma do documento atual (o idioma do site não muda).",
+      sampleLead: "Carrega uma demo conforme o idioma de exibição do site (o idioma do documento é alinhado).",
       loadAction: "Carregar",
       deleteAction: "Excluir",
       deleteConfirm: "Excluir “{name}”? Isso não pode ser desfeito.",

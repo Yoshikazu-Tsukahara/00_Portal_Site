@@ -19,14 +19,13 @@ export const TAG_COLOR_PRESETS = [
   { key: "lime", color: "#84cc16", label: "ライム" },
 ] as const;
 
-/** 初期プリセットタグ */
+/** 初期プリセットタグ（主要 SNS。色は各ブランドのテーマカラー） */
 export const DEFAULT_TAGS: CustomTag[] = [
-  { id: "tag-later", name: "あとで読む", color: "#10b981" },
-  { id: "tag-work", name: "仕事", color: "#0ea5e9" },
-  { id: "tag-tool", name: "ツール", color: "#06b6d4" },
-  { id: "tag-design", name: "デザイン", color: "#8b5cf6" },
-  { id: "tag-ref", name: "参考", color: "#f59e0b" },
-  { id: "tag-other", name: "その他", color: "#f43f5e" },
+  { id: "tag-x", name: "X", color: "#000000" },
+  { id: "tag-youtube", name: "YouTube", color: "#FF0000" },
+  { id: "tag-facebook", name: "Facebook", color: "#1877F2" },
+  { id: "tag-instagram", name: "Instagram", color: "#833AB4" },
+  { id: "tag-tiktok", name: "TikTok", color: "#00C4B4" },
 ];
 
 export type CustomTag = {

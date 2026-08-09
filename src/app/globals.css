@@ -788,6 +788,70 @@ html[data-layout-mode="portrait"] .launcher-icon__label {
   .store-remove-btn:focus-visible {
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 70%, white);
   }
+
+  /*
+   * ライブラリ詳細：ヒーロー（「このアプリについて」より上）
+   * 暗め背景 → ページ背景へ緩やかにフェード
+   */
+  .store-detail-hero {
+    position: relative;
+    isolation: isolate;
+    background:
+      radial-gradient(
+        120% 80% at 20% 0%,
+        color-mix(in srgb, var(--accent) 22%, transparent) 0%,
+        transparent 55%
+      ),
+      linear-gradient(
+        165deg,
+        #1f2026 0%,
+        #2a2c34 48%,
+        #32343d 100%
+      );
+  }
+  .store-detail-hero::after {
+    content: "";
+    pointer-events: none;
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: clamp(1.5rem, 4.5vw, 2.75rem);
+    /* ページ背景（#f8f8ff）ではなく純白へフェードして境目の濁りを防ぐ */
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgb(255 255 255 / 0.4) 48%,
+      #ffffff 100%
+    );
+  }
+  .store-detail-hero__inner {
+    @apply relative z-[1] pb-8 pt-8 sm:pb-10 sm:pt-10;
+  }
+  .store-detail-hero__title {
+    @apply font-display text-[1.65rem] font-bold leading-tight tracking-tight text-zinc-50 sm:text-[2rem];
+  }
+  .store-detail-hero__genre {
+    @apply mt-1.5 text-[15px] text-zinc-400;
+  }
+  .store-detail-hero__lead {
+    @apply mt-5 text-[15px] leading-relaxed text-zinc-300;
+  }
+  .store-detail-hero__hint {
+    @apply text-[13px] leading-relaxed text-zinc-400;
+  }
+  .store-detail-hero .store-remove-btn {
+    @apply bg-white/12 text-zinc-100 hover:bg-white/18;
+  }
+  .store-detail-hero .store-app-icon {
+    box-shadow:
+      0 1px 0 color-mix(in srgb, white 35%, transparent) inset,
+      0 2px 4px rgba(0, 0, 0, 0.25),
+      0 10px 24px rgba(0, 0, 0, 0.28);
+  }
+  .store-detail-body-wrap {
+    @apply relative z-[1] bg-white pb-16;
+  }
+
   .store-detail-info__label {
     @apply text-[13px] font-semibold tracking-tight text-zinc-500;
   }
@@ -1244,8 +1308,12 @@ html[data-layout-mode="portrait"] .launcher-icon__label {
     @apply gap-0 justify-center px-1.5 py-1;
     min-width: 1.75rem;
   }
+  /* タイトルは伸縮で押し出さず、💾／📱 をすぐ右に付ける（余白はグループ末尾へ） */
   .app-shell-header--compact .app-shell-title {
-    @apply min-w-0 flex-1 text-[13px] leading-snug tracking-tight;
+    @apply min-w-0 shrink truncate text-[13px] leading-snug tracking-tight;
+  }
+  .app-shell-header:not(.app-shell-header--compact) .app-shell-title {
+    @apply min-w-0 shrink truncate;
   }
 
   /*

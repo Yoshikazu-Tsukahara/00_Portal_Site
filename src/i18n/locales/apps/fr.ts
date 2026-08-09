@@ -757,7 +757,7 @@ export const appsFr: AppsDictionary = {
     actions: {
       newInvoice: "Nouveau document",
       newInvoiceShort: "Nouveau",
-      newInvoiceConfirm: "Cela réinitialise le destinataire, les lignes et le numéro de document (vos coordonnées et infos de paiement restent). Continuer ?",
+      newInvoiceConfirm: "Effacer tous les champs et créer un nouveau document ? La langue du document et la devise suivront la langue d’affichage actuelle.",
     },
     toolbar: {
       save: "💾 Enregistrer le document actuel",
@@ -781,7 +781,7 @@ export const appsFr: AppsDictionary = {
       empty: "Aucun document enregistré pour l’instant.",
       sampleName: "📄 [Exemple] Facture de conception de site (démo)",
       sampleBadge: "Démo",
-      sampleLead: "Charge une démo correspondant à la langue du document actuelle (la langue du site ne change pas).",
+      sampleLead: "Charge une démo correspondant à la langue d’affichage du site (la langue du document est alignée).",
       loadAction: "Charger",
       deleteAction: "Supprimer",
       deleteConfirm: "Supprimer « {name} » ? Cette action est irréversible.",

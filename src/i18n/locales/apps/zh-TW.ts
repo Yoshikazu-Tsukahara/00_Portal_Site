@@ -757,7 +757,7 @@ export const appsZhTW: AppsDictionary = {
     actions: {
       newInvoice: "新文件",
       newInvoiceShort: "新建",
-      newInvoiceConfirm: "這會重設收件方、品項與文件編號（您的資訊與付款資訊會保留）。要繼續嗎？",
+      newInvoiceConfirm: "將清空全部輸入並建立新單據。單據語言與貨幣會依目前顯示語言自動設定。要繼續嗎？",
     },
     toolbar: {
       save: "💾 儲存目前文件",
@@ -781,7 +781,7 @@ export const appsZhTW: AppsDictionary = {
       empty: "尚無已儲存的文件。",
       sampleName: "📄 【範例】網站設計發票（展示）",
       sampleBadge: "展示",
-      sampleLead: "會依目前選擇的「單據語言」載入示範（網站顯示語言不變）。",
+      sampleLead: "會依目前網站顯示語言載入示範（單據語言也會對齊）。",
       loadAction: "載入",
       deleteAction: "刪除",
       deleteConfirm: "刪除「{name}」？此操作無法復原。",

@@ -106,7 +106,7 @@ export const invoiceMakerJa: InvoiceMakerDict = {
     newInvoice: "新しい帳票",
     newInvoiceShort: "新規",
     newInvoiceConfirm:
-      "宛先・品目・番号をリセットします（あなたの情報と支払／受領方法は残ります）。よろしいですか？",
+      "入力内容をすべてクリアして新しい帳票にします。書類の言語と通貨は、いまの表示言語に合わせて設定されます。よろしいですか？",
   },
   toolbar: {
     save: "💾 現在の帳票を保存",
@@ -131,7 +131,7 @@ export const invoiceMakerJa: InvoiceMakerDict = {
     sampleName: "📄 【サンプル】Webサイト制作費請求書（デモ）",
     sampleBadge: "デモ",
     sampleLead:
-      "いま選んでいる「書類の言語」に合わせたデモを読み込みます（サイトの表示言語は変わりません）。",
+      "いまのサイト表示言語に合わせたデモを読み込みます（書類の言語もそれに揃えます）。",
     loadAction: "呼び出す",
     deleteAction: "削除",
     deleteConfirm: "「{name}」を削除しますか？この操作は取り消せません。",
@@ -222,7 +222,7 @@ export const invoiceMakerEn: InvoiceMakerDict = {
     newInvoice: "New document",
     newInvoiceShort: "New",
     newInvoiceConfirm:
-      "This resets the recipient, items, and document number (your own details and payment info stay). Continue?",
+      "Clear all fields and start a new document? Document language and currency will follow the current site language.",
   },
   toolbar: {
     save: "💾 Save current document",
@@ -248,7 +248,7 @@ export const invoiceMakerEn: InvoiceMakerDict = {
     sampleName: "📄 [Sample] Website design invoice (demo)",
     sampleBadge: "Demo",
     sampleLead:
-      "Loads a demo that matches the current Document language (site language stays unchanged).",
+      "Loads a demo that matches the current site language (document language is aligned to it).",
     loadAction: "Load",
     deleteAction: "Delete",
     deleteConfirm: "Delete “{name}”? This cannot be undone.",

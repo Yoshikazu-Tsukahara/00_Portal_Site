@@ -598,7 +598,7 @@ export const appsDe: AppsDictionary = {
     actions: {
       newInvoice: "Neues Dokument",
       newInvoiceShort: "Neu",
-      newInvoiceConfirm: "Dadurch werden Empfänger, Positionen und Dokumentnummer zurückgesetzt (eigene Angaben und Zahlungsinfos bleiben). Fortfahren?",
+      newInvoiceConfirm: "Alle Eingaben löschen und ein neues Dokument starten? Dokumentsprache und Währung folgen der aktuellen Site-Sprache.",
     },
     toolbar: {
       save: "💾 Aktuelles Dokument speichern",
@@ -622,7 +622,7 @@ export const appsDe: AppsDictionary = {
       empty: "Noch keine gespeicherten Dokumente.",
       sampleName: "📄 [Beispiel] Rechnung Webdesign (Demo)",
       sampleBadge: "Demo",
-      sampleLead: "Lädt eine Demo passend zur aktuellen Dokumentsprache (die Site-Sprache bleibt unverändert).",
+      sampleLead: "Lädt eine Demo passend zur aktuellen Site-Sprache (die Dokumentsprache wird angeglichen).",
       loadAction: "Laden",
       deleteAction: "Löschen",
       deleteConfirm: "„{name}“ löschen? Das kann nicht rückgängig gemacht werden.",

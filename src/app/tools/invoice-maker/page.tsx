@@ -25,8 +25,8 @@ import {
   saveInvoiceStore,
 } from "./storage";
 import {
+  createDefaultInvoice,
   createEmptyItem,
-  createNextInvoice,
   defaultDocLocaleFor,
   docLocaleLabel,
   MAX_INVOICE_ITEMS,
@@ -47,6 +47,8 @@ export default function InvoiceMakerPage() {
   const [saveOpen, setSaveOpen] = useState(false);
   const [loadOpen, setLoadOpen] = useState(false);
   const [savedToast, setSavedToast] = useState(false);
+  /** 新規帳票時にフォームを載せ替え、入力表示の取りこぼしを防ぐ */
+  const [formEpoch, setFormEpoch] = useState(0);
   /** 実機スマホ、または表示幅「縦型」では短いボタンラベル */
   const [narrowViewport, setNarrowViewport] = useState(false);
 
@@ -130,8 +132,10 @@ export default function InvoiceMakerPage() {
 
   const startNextInvoice = useCallback(() => {
     if (!window.confirm(copy.actions.newInvoiceConfirm)) return;
-    setData((prev) => (prev ? createNextInvoice(prev) : prev));
-  }, [copy.actions.newInvoiceConfirm]);
+    // 記入欄はすべて空に戻し、書類言語・通貨・税率だけ表示言語から設定
+    setData(createDefaultInvoice(locale));
+    setFormEpoch((n) => n + 1);
+  }, [copy.actions.newInvoiceConfirm, locale]);
 
   const handleSave = useCallback(
     (name: string) => {
@@ -150,16 +154,16 @@ export default function InvoiceMakerPage() {
       if (!entry) return;
       // 呼び出し時もディープコピーして、履歴側を汚さない
       setData(structuredClone(entry.data));
+      setFormEpoch((n) => n + 1);
       setLoadOpen(false);
     },
     [history],
   );
 
   const handleLoadSample = useCallback(() => {
-    // デモは「書類の言語」に合わせる（サイト表示言語とは独立）
-    setData((prev) =>
-      createSampleInvoice(prev?.docLocale ?? defaultDocLocaleFor(locale)),
-    );
+    // デモ本文はサイトの表示言語に合わせる（書類言語もそれに揃える）
+    setData(createSampleInvoice(locale));
+    setFormEpoch((n) => n + 1);
     setLoadOpen(false);
   }, [locale]);
 
@@ -267,6 +271,7 @@ export default function InvoiceMakerPage() {
     >
       <div className="w-full min-w-0 max-w-full overflow-x-hidden">
         <InvoiceForm
+          key={formEpoch}
           data={data}
           siteLocale={locale}
           copy={copy}

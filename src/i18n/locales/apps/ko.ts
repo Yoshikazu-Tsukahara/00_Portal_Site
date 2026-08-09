@@ -757,7 +757,7 @@ export const appsKo: AppsDictionary = {
     actions: {
       newInvoice: "새 문서",
       newInvoiceShort: "새로",
-      newInvoiceConfirm: "받는 사람·항목·문서 번호가 초기화됩니다(본인 정보와 결제 정보는 유지). 계속할까요?",
+      newInvoiceConfirm: "입력 내용을 모두 지우고 새 문서를 만듭니다. 문서 언어와 통화는 현재 표시 언어에 맞춰 설정됩니다. 계속할까요?",
     },
     toolbar: {
       save: "💾 현재 문서 저장",
@@ -781,7 +781,7 @@ export const appsKo: AppsDictionary = {
       empty: "저장된 문서가 아직 없습니다.",
       sampleName: "📄 [샘플] 웹사이트 디자인 청구서 (데모)",
       sampleBadge: "데모",
-      sampleLead: "현재 선택한 「문서 언어」에 맞는 데모를 불러옵니다(사이트 표시 언어는 바뀌지 않습니다).",
+      sampleLead: "현재 사이트 표시 언어에 맞는 데모를 불러옵니다(문서 언어도 그에 맞춥니다).",
       loadAction: "불러오기",
       deleteAction: "삭제",
       deleteConfirm: "“{name}”을(를) 삭제할까요? 되돌릴 수 없습니다.",

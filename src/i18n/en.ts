@@ -17,6 +17,25 @@ export const en: Dictionary = {
       hint: "This app is designed for landscape. Please turn your device sideways.",
     },
   },
+  usageGuide: {
+    title: "How Blank Note works",
+    steps: [
+      {
+        title: "Browse the Library",
+        body: "Open Library from the header, then pin apps you like to Home.",
+      },
+      {
+        title: "Launch from Home",
+        body: "Pinned apps sit on Home. Long-press to rearrange or make folders.",
+      },
+      {
+        title: "Data stays on this device",
+        body: "Nothing is sent to a server—it lives in this browser. Back up from each app before clearing data.",
+      },
+    ],
+    dontShowAgain: "Don’t show again",
+    close: "Get started",
+  },
   header: {
     support: "Support the developer",
     supportShort: "Support",

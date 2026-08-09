@@ -5,6 +5,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import KeepTabBridge from "@/app/link-stocker/KeepTabBridge";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import UsageGuideHost from "@/components/UsageGuideHost";
 import { useStandaloneDisplay } from "@/lib/useStandaloneDisplay";
 
 /**
@@ -124,38 +125,40 @@ export default function SiteChrome({ children }: { children: ReactNode }) {
     PAGE_SCROLL_STANDALONE_PATHS,
   );
 
+  /** ポータル枠があるときだけ初回ガイドを出す */
+  const showUsageGuide = !isPreview && !isolatePwa && !isolateFullscreen;
+
+  let body: ReactNode;
+
   // プレビュー埋め込み：サイト枠を外し、アプリ本体だけを固定サイズで見せる
   if (isPreview) {
-    return (
+    body = (
       <div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-[var(--background)]">
         {children}
       </div>
     );
-  }
-
-  if (isolatePwa || isolateFullscreen) {
+  } else if (isolatePwa || isolateFullscreen) {
     // ミニゲーム PWA / ページスクロール前提 PWA: 狭いときはページ全体が伸びる
     if (isolatePwa && (minStagePageScroll || pageScrollStandalone)) {
-      return (
+      body = (
         <>
           <KeepTabBridge />
           <div className="flex min-h-dvh flex-1 flex-col">{children}</div>
         </>
       );
+    } else {
+      body = (
+        <>
+          <KeepTabBridge />
+          <div className="flex h-dvh flex-1 flex-col overflow-hidden">
+            {children}
+          </div>
+        </>
+      );
     }
-    return (
-      <>
-        <KeepTabBridge />
-        <div className="flex h-dvh flex-1 flex-col overflow-hidden">
-          {children}
-        </div>
-      </>
-    );
-  }
-
-  // ミニゲーム: 広いときは Header〜画面下端を埋め、狭いときはページ全体＋Footer が下がる
-  if (fillViewport && minStagePageScroll) {
-    return (
+  } else if (fillViewport && minStagePageScroll) {
+    // ミニゲーム: 広いときは Header〜画面下端を埋め、狭いときはページ全体＋Footer が下がる
+    body = (
       <>
         <KeepTabBridge />
         <div className="flex min-h-dvh flex-col">
@@ -172,11 +175,9 @@ export default function SiteChrome({ children }: { children: ReactNode }) {
         <Footer />
       </>
     );
-  }
-
-  // fillViewport: ビューポートは Header+Main だけ。Footer は直後に続けて初期表示では隠す
-  if (fillViewport) {
-    return (
+  } else if (fillViewport) {
+    // fillViewport: ビューポートは Header+Main だけ。Footer は直後に続けて初期表示では隠す
+    body = (
       <>
         <KeepTabBridge />
         <div className="flex h-dvh flex-col overflow-hidden">
@@ -188,18 +189,25 @@ export default function SiteChrome({ children }: { children: ReactNode }) {
         <Footer />
       </>
     );
+  } else {
+    body = (
+      <>
+        <KeepTabBridge />
+        <div className="flex min-h-dvh flex-1 flex-col">
+          <Header />
+          {/* Main 舞台はフル幅。幅制限は各ページ / AppShell 内でかける。
+              min-h-0 は高さ固定スクロール用なので付けない（内容に合わせて下へ伸ばす） */}
+          <div className="relative flex w-full flex-1 flex-col">{children}</div>
+          <Footer />
+        </div>
+      </>
+    );
   }
 
   return (
     <>
-      <KeepTabBridge />
-      <div className="flex min-h-dvh flex-1 flex-col">
-        <Header />
-        {/* Main 舞台はフル幅。幅制限は各ページ / AppShell 内でかける。
-            min-h-0 は高さ固定スクロール用なので付けない（内容に合わせて下へ伸ばす） */}
-        <div className="relative flex w-full flex-1 flex-col">{children}</div>
-        <Footer />
-      </div>
+      {showUsageGuide ? <UsageGuideHost /> : null}
+      {body}
     </>
   );
 }

@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import type { ReactNode } from "react";
 import { useI18n } from "@/i18n";
 import type { LegalBlock, LegalDoc } from "@/i18n/types";
@@ -21,14 +20,7 @@ export default function LegalDocument({ doc }: LegalDocumentProps) {
   return (
     <main className="w-full flex-1 py-12 sm:py-16">
       <div className={contentClassName}>
-        <Link
-          href="/"
-          className="inline-flex text-sm text-zinc-500 transition-colors hover:text-zinc-900"
-        >
-          {t.legal.back}
-        </Link>
-
-        <header className="mt-8 border-b border-zinc-200 pb-8">
+        <header className="border-b border-zinc-200 pb-8">
           <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">
             {doc.title}
           </h1>
