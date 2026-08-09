@@ -37,6 +37,8 @@ export default function MetadataForm({
   labels,
   history,
   disabled,
+  /** true: 内側スクロールせず、項目ぶん縦に伸ばす */
+  expand = false,
   onChange,
   onFileNameChange,
   onRemoveHistoryItem,
@@ -47,12 +49,15 @@ export default function MetadataForm({
   labels: Labels;
   history: InputHistoryMap;
   disabled?: boolean;
+  expand?: boolean;
   onChange: (patch: Partial<MetadataFields>) => void;
   onFileNameChange: (name: string) => void;
   onRemoveHistoryItem: (key: HistoryKey, value: string) => void;
 }) {
   return (
-    <section className="flex h-full min-h-0 flex-col">
+    <section
+      className={expand ? "flex flex-col" : "flex h-full min-h-0 flex-col"}
+    >
       <header className="mb-3 shrink-0">
         <h2 className="text-sm font-semibold text-zinc-900">{labels.heading}</h2>
         <p className="mt-1 text-xs leading-relaxed text-zinc-500">
@@ -60,7 +65,13 @@ export default function MetadataForm({
         </p>
       </header>
 
-      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto pr-1">
+      <div
+        className={
+          expand
+            ? "flex flex-col gap-3"
+            : "flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto pr-1"
+        }
+      >
         <div>
           <HistoryField
             id="meta-filename"

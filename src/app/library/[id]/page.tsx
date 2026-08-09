@@ -13,6 +13,7 @@ import {
 import { intlLocale, useI18n } from "@/i18n";
 import { useHomePins } from "@/lib/homePins";
 import { useLayout } from "@/lib/layout";
+import { useCompactLayout } from "@/lib/useCompactLayout";
 
 /** 対応デバイス（1端末＝1チップ） */
 function deviceLabels(
@@ -59,6 +60,7 @@ export default function LibraryAppDetailPage() {
   const id = typeof params?.id === "string" ? params.id : "";
   const { t, locale } = useI18n();
   const { contentClassName } = useLayout();
+  const { compact } = useCompactLayout();
   const { isInstalled, install, uninstall, hydrated } = useHomePins();
 
   const tool = id ? findToolById(id) : undefined;
@@ -96,6 +98,7 @@ export default function LibraryAppDetailPage() {
   }).format(new Date(`${getToolUpdatedAt(tool.id)}T00:00:00`));
   const devices = deviceLabels(tool, t);
   const titleId = `app-detail-title-${tool.id}`;
+  const lockedOnMobile = compact && tool.isMobileSupported === false;
 
   return (
     <main className="relative flex flex-1 flex-col">
@@ -130,13 +133,25 @@ export default function LibraryAppDetailPage() {
               <div className="mt-7">
                 {installed ? (
                   <div className="store-detail-actions">
-                    <Link
-                      href={tool.href}
-                      className="store-install-btn store-install-btn--lg"
-                      aria-label={`${copy.title}: ${t.library.openApp}`}
-                    >
-                      {t.library.openApp}
-                    </Link>
+                    {lockedOnMobile ? (
+                      <button
+                        type="button"
+                        disabled
+                        className="store-install-btn store-install-btn--lg opacity-60"
+                        aria-label={`${copy.title}: ${t.card.pcRecommendedHint}`}
+                        title={t.card.pcRecommendedHint}
+                      >
+                        {t.card.pcRecommended}
+                      </button>
+                    ) : (
+                      <Link
+                        href={tool.href}
+                        className="store-install-btn store-install-btn--lg"
+                        aria-label={`${copy.title}: ${t.library.openApp}`}
+                      >
+                        {t.library.openApp}
+                      </Link>
+                    )}
                     <button
                       type="button"
                       className="store-remove-btn"

@@ -192,6 +192,7 @@ export const genres: Genre[] = [
         id: "character-relation-editor",
         icon: "🕸️",
         href: "/tools/character-relation-editor",
+        isMobileSupported: false,
       },
       {
         id: "book-visualizer",
@@ -245,6 +246,7 @@ export const genres: Genre[] = [
         id: "robot-freethrow",
         icon: "🏀",
         href: "/robot-freethrow",
+        isMobileSupported: false,
         omitLocalDataNote: true,
       },
       {

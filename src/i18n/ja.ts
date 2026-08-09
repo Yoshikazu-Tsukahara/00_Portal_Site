@@ -52,11 +52,9 @@ export const ja: Dictionary = {
     layoutToggle: {
       aria: "表示幅を切り替える",
       caption: "Width",
-      portraitShort: "縦型",
       defaultShort: "標準",
       wideShort: "広め",
       fullShort: "全幅",
-      portrait: "平均的な縦型（スマホ幅）で表示",
       default: "標準幅で表示",
       wide: "広めの幅で表示",
       full: "画面いっぱいに表示",
@@ -73,6 +71,8 @@ export const ja: Dictionary = {
     removeAria: "{title} をホームから削除",
     dragAria: "{title}。ドラッグまたは矢印キーで並べ替え。G で次とフォルダ化",
     openAria: "{title} を開く",
+    lockedOnMobileAria:
+      "{title}。スマホ／縦長画面では開けません。PCでご利用ください",
     moveLeft: "左へ移動",
     moveRight: "右へ移動",
     reorderedAnnounce: "{title} を {n} 番目に移動しました",

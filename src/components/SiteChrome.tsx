@@ -42,7 +42,7 @@ const FILL_VIEWPORT_PATHS = [
   "/tools/pdf-editor",
   "/tools/image-compressor",
   "/tools/text-cleaner",
-  "/tools/media-metadata-editor",
+  // メディア・メタデータはスマホでページ全体スクロール（項目数で縦に伸びる）
   "/tools/character-relation-editor",
   "/tools/book-visualizer",
 ];

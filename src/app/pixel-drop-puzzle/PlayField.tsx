@@ -36,6 +36,7 @@ import ResultOverlay from "./ResultOverlay";
 import {
   getScrollParent,
   getScrollTop,
+  getVisibleViewRect,
   setScrollTop,
 } from "./scrollParent";
 import UploadGate from "./UploadGate";
@@ -201,9 +202,12 @@ export default function PlayField({
   });
 
   const { compact: shellCompact } = useCompactLayout();
+  /** サイドレールが置けずコンパクト HUD になったとき（中間幅タブレット等） */
+  const [railCompactHud, setRailCompactHud] = useState(false);
+  const effectiveCompact = shellCompact || railCompactHud;
   /** 落下 rAF 中に identity が変わると演出が巻き戻るのを防ぐ */
-  const shellCompactRef = useRef(shellCompact);
-  shellCompactRef.current = shellCompact;
+  const shellCompactRef = useRef(effectiveCompact);
+  shellCompactRef.current = effectiveCompact;
   const [geometry, setGeometry] = useState<PlayGeometry | null>(null);
   const [phase, setPhase] = useState<Phase>("patrolling");
   /** 着地直後の「惜しい」溜め中（棒は地表上端で静止） */
@@ -331,7 +335,7 @@ export default function PlayField({
       ro.disconnect();
       window.removeEventListener("resize", measure);
     };
-  }, [naturalWidth, naturalHeight, shellCompact]);
+  }, [naturalWidth, naturalHeight, effectiveCompact]);
 
   // ラウンド開始時のカメラ（patrolling のときだけ）。
   // 失敗確定で restoreScrollY が null→値になると粉砕中にここが走り、
@@ -401,28 +405,29 @@ export default function PlayField({
 
   /**
    * 棒が画面上方にいるとき、ビューポート上端にX位置ガイドを出す。
-   * 盤面が画面下より下にあるときは、下端に盤面上辺・溝位置のアシストを出す。
+   * 盤面がプレイ領域より下にあるときは、下端に盤面上辺・溝位置のアシストを出す。
+   * ※スマホは AppShell 内スクロールなので、判定・下端位置は window ではなく scroller 基準。
    */
   const updateViewportGuides = useCallback(
     (blockLeftX: number, blockTopInStage: number, g: PlayGeometry) => {
       const guide = guideRef.current;
       const groundGuide = groundGuideRef.current;
       const column = columnRef.current;
-      if (!column) return;
+      const stage = stageRef.current;
+      if (!column || !stage) return;
 
-      const stageDocTop =
-        (stageRef.current?.getBoundingClientRect().top ?? 0) + window.scrollY;
-      const blockDocTop = stageDocTop + blockTopInStage;
-      const blockDocBottom = blockDocTop + g.groundHeight;
-      const groundDocTop = stageDocTop + g.groundTopY;
-      const viewTop = window.scrollY;
-      const viewBottom = window.scrollY + window.innerHeight;
+      const scroller = getScrollParent(stage);
+      const view = getVisibleViewRect(scroller);
+      const stageViewTop = stage.getBoundingClientRect().top;
+      const blockViewTop = stageViewTop + blockTopInStage;
+      const blockViewBottom = blockViewTop + g.groundHeight;
+      const groundViewTop = stageViewTop + g.groundTopY;
       const activePhase =
         phaseRef.current === "patrolling" || phaseRef.current === "falling";
 
       // --- 上方：落ちる棒のX位置 ---
       if (guide) {
-        const blockAboveViewport = blockDocBottom < viewTop + 8;
+        const blockAboveViewport = blockViewBottom < view.top + 8;
         const showBlock = blockAboveViewport && activePhase;
 
         if (!showBlock) {
@@ -439,7 +444,7 @@ export default function PlayField({
 
       // --- 下方：盤面（溝含む上辺）の位置 ---
       if (groundGuide) {
-        const groundBelowView = groundDocTop > viewBottom - 6;
+        const groundBelowView = groundViewTop > view.bottom - 6;
         const showGround = groundBelowView && activePhase;
 
         if (!showGround) {
@@ -447,10 +452,14 @@ export default function PlayField({
           groundGuide.style.visibility = "hidden";
         } else {
           const colRect = column.getBoundingClientRect();
+          const guideH = groundGuide.offsetHeight || 26;
           groundGuide.style.visibility = "visible";
           groundGuide.style.opacity = "1";
           groundGuide.style.left = `${colRect.left}px`;
           groundGuide.style.width = `${g.width}px`;
+          // プレイ領域（スクロール箱）の下端へ。window 下端だとヘッダー分ずれて見えない
+          groundGuide.style.top = `${view.bottom - guideH}px`;
+          groundGuide.style.bottom = "auto";
           const gapMarker = groundGuide.querySelector<HTMLElement>(
             "[data-pxd-ground-gap]",
           );
@@ -779,10 +788,16 @@ export default function PlayField({
     };
   }, [phase, basePeriodMs, updateViewportGuides, playBlocked]);
 
-  // 手動スクロール時もビューポートガイドを更新
+  // 手動スクロール／リサイズ時もビューポートガイドを更新（内部スクロール親も含む）
   useEffect(() => {
     if (phase !== "patrolling" && phase !== "falling") return;
-    function onScroll() {
+    const stage = stageRef.current;
+    if (!stage) return;
+    const scroller = getScrollParent(stage);
+    const scrollTarget: HTMLElement | Window =
+      scroller instanceof HTMLElement ? scroller : window;
+
+    function onScrollOrResize() {
       const g = geometryRef.current;
       const block = blockRef.current;
       if (!g || !block) return;
@@ -791,8 +806,20 @@ export default function PlayField({
       if (!Number.isFinite(left) || !Number.isFinite(top)) return;
       updateViewportGuides(left, top, g);
     }
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+
+    scrollTarget.addEventListener("scroll", onScrollOrResize, {
+      passive: true,
+    });
+    window.addEventListener("resize", onScrollOrResize);
+    const vv = window.visualViewport;
+    vv?.addEventListener("resize", onScrollOrResize);
+    vv?.addEventListener("scroll", onScrollOrResize);
+    return () => {
+      scrollTarget.removeEventListener("scroll", onScrollOrResize);
+      window.removeEventListener("resize", onScrollOrResize);
+      vv?.removeEventListener("resize", onScrollOrResize);
+      vv?.removeEventListener("scroll", onScrollOrResize);
+    };
   }, [phase, updateViewportGuides]);
 
   // 落下演出から呼ぶ確定処理（identity 変化で落下 effect を再起動させない）
@@ -1234,6 +1261,7 @@ export default function PlayField({
           onResetProgress={onResetProgress}
           usingDefaultImage={usingDefaultImage}
           onRestoreDefaultImage={onRestoreDefaultImage}
+          onCompactHudChange={setRailCompactHud}
         />
       ) : null}
 

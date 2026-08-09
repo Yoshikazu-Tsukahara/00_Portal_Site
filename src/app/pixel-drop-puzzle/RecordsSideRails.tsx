@@ -13,6 +13,10 @@ import {
 import type { PixelDropPuzzleDict } from "@/i18n/apps/pixelDropPuzzle";
 import { useCompactLayout } from "@/lib/useCompactLayout";
 import {
+  canPlaceSideRails,
+  panelWidthFromGutter,
+} from "./hudLayout";
+import {
   lifeMaxForStage,
   NEAR_HIT_STAGE_FROM,
   NEAR_HIT_STREAK_TARGET,
@@ -34,12 +38,6 @@ type RailLayout = {
   viewWidth: number;
 };
 
-const PANEL_IDEAL_W = 184; // 11.5rem
-const GUTTER_PAD = 12;
-/** 左右レールを出す最小余白（px） */
-const SIDE_RAIL_MIN_PANEL_W = 96;
-/** コンパクト HUD に切り替えるビューポート幅（px） */
-const COMPACT_HUD_MAX_VIEW_W = 640;
 /** ライフ回復フラッシュの表示時間（ms） */
 const RECOVER_FLASH_MS = 1600;
 /** 縦棒上端と HUD 下端の隙間（px） */
@@ -119,6 +117,7 @@ export default function RecordsSideRails({
   onResetProgress,
   usingDefaultImage,
   onRestoreDefaultImage,
+  onCompactHudChange,
 }: {
   copy: PixelDropPuzzleDict;
   /** 黒いステージ（レールがはみ出さない枠） */
@@ -145,6 +144,8 @@ export default function RecordsSideRails({
   onResetProgress: () => void;
   usingDefaultImage: boolean;
   onRestoreDefaultImage: () => void;
+  /** コンパクト HUD に切り替わったことを親へ通知（ジオメトリ連動用） */
+  onCompactHudChange?: (compact: boolean) => void;
 }) {
   const [layout, setLayout] = useState<RailLayout | null>(null);
   /** ライフ回復フラッシュ中か（PlayField remount 後も残り時間だけ再現） */
@@ -231,15 +232,17 @@ export default function RecordsSideRails({
     : lifePt.toFixed(1);
   const streakUnlocked = stage >= NEAR_HIT_STAGE_FROM;
 
-  const panelW = layout
-    ? Math.min(PANEL_IDEAL_W, Math.max(0, layout.gutter - GUTTER_PAD))
-    : 0;
-  /** AppShell と同じ compact、または実測でサイドレールが足りないとき */
+  const panelW = layout ? panelWidthFromGutter(layout.gutter) : 0;
+  /**
+   * スマホ幅、またはサイドレールをきれいに置けない中間幅はコンパクト HUD。
+   * （タブレットで PC レイアウトを無理に出すとはみ出しやすい）
+   */
   const useCompactHud =
-    !!layout &&
-    (shellCompact ||
-      layout.viewWidth < COMPACT_HUD_MAX_VIEW_W ||
-      panelW < SIDE_RAIL_MIN_PANEL_W);
+    !!layout && (shellCompact || !canPlaceSideRails(layout));
+
+  useEffect(() => {
+    onCompactHudChange?.(useCompactHud);
+  }, [useCompactHud, onCompactHudChange]);
 
   // コンパクト HUD：縦棒の直上に固定し、パトロール／落下と一緒に追従
   useLayoutEffect(() => {

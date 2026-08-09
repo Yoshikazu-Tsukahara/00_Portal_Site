@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import AppShell from "@/components/AppShell";
-import ForceLandscape from "@/components/ForceLandscape";
+import DesktopOnlyGate from "@/components/DesktopOnlyGate";
 import { useI18n } from "@/i18n";
 import { ROBOT_FREETHROW_MIN_STAGE } from "@/lib/minigameStage";
 import { useCompactLayout } from "@/lib/useCompactLayout";
@@ -30,19 +30,6 @@ export default function RobotFreethrowPage() {
   const copy = t.apps.robotFreethrow;
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const { compact } = useCompactLayout();
-  /** 実機の向き。横向きプレイ中はゲームを PC 相当 UI にする */
-  const [landscape, setLandscape] = useState(true);
-
-  useLayoutEffect(() => {
-    const mq = window.matchMedia("(orientation: landscape)");
-    const sync = () => setLandscape(mq.matches);
-    sync();
-    mq.addEventListener("change", sync);
-    return () => mq.removeEventListener("change", sync);
-  }, []);
-
-  // 横向き中は compact を渡さない（メモ／付箋を PC 表示に近づける）
-  const gameCompact = compact && !landscape;
 
   useEffect(() => {
     iframeRef.current?.focus();
@@ -55,14 +42,14 @@ export default function RobotFreethrowPage() {
 
   // スマホ／縦型を iframe へ同期（左右オーバーレイの畳み込み用）
   useEffect(() => {
-    postToGame(iframeRef.current, { type: "setCompact", compact: gameCompact });
-  }, [gameCompact]);
+    postToGame(iframeRef.current, { type: "setCompact", compact });
+  }, [compact]);
 
   function handleIframeLoad() {
     postToGame(iframeRef.current, { type: "setLocale", locale });
     postToGame(iframeRef.current, {
       type: "setCompact",
-      compact: gameCompact,
+      compact,
     });
   }
 
@@ -75,7 +62,7 @@ export default function RobotFreethrowPage() {
       isPwa
       afterDataManager={<InstallAppButton copy={copy.install} />}
     >
-      <ForceLandscape>
+      <DesktopOnlyGate title={copy.shell.title}>
         <div className="relative h-full min-h-0 w-full max-w-full min-w-0 flex-1 overflow-x-hidden overflow-hidden rounded-lg border border-zinc-200 bg-[#f3e6c8]">
           <iframe
             ref={iframeRef}
@@ -87,7 +74,7 @@ export default function RobotFreethrowPage() {
             onLoad={handleIframeLoad}
           />
         </div>
-      </ForceLandscape>
+      </DesktopOnlyGate>
     </AppShell>
   );
 }

@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import AppShell from "@/components/AppShell";
-import ForceLandscape from "@/components/ForceLandscape";
+import DesktopOnlyGate from "@/components/DesktopOnlyGate";
 import { fmt, useI18n } from "@/i18n";
 import { loadLocalJson, useLocalStorageState } from "@/lib/localData";
 import CharacterModal from "./CharacterModal";
@@ -216,9 +216,9 @@ export default function CharacterRelationEditorPage() {
         description={copy.shell.description}
         fillViewport
       >
-        <ForceLandscape>
+        <DesktopOnlyGate title={copy.shell.title}>
           <p className="text-sm text-zinc-400">{copy.loading}</p>
-        </ForceLandscape>
+        </DesktopOnlyGate>
       </AppShell>
     );
   }
@@ -273,104 +273,104 @@ export default function CharacterRelationEditorPage() {
         </>
       }
     >
-      <ForceLandscape>
-        <div className="flex min-h-0 flex-1 flex-col gap-3">
-          <div className="grid min-h-0 flex-1 gap-3 lg:grid-cols-[minmax(0,17.5rem)_minmax(0,1fr)]">
-            <div className="min-h-0 max-h-[min(70vh,40rem)] lg:max-h-none">
-              <Sidebar
-                characters={data.characters}
-                relations={data.relations}
-                selectedCharacterId={selectedCharacterId}
-                selectedRelationId={selectedRelationId}
-                linkFromId={linkFromId}
-                onSelectCharacter={(id) => {
-                  setSelectedCharacterId(id);
-                  setSelectedRelationId(null);
-                }}
-                onSelectRelation={(id) => {
-                  setSelectedRelationId(id);
-                  setSelectedCharacterId(null);
-                }}
-                onAddCharacter={openCreate}
-                onEditCharacter={openDetail}
-                onDeleteCharacter={handleDeleteCharacter}
-                onDeleteRelation={handleDeleteRelation}
-                onStartLink={(fromId) => {
-                  setLinkFromId(fromId);
-                  setSelectedCharacterId(fromId);
-                  setSelectedRelationId(null);
-                  setMainTab("canvas");
-                }}
-                onCancelLink={() => setLinkFromId(null)}
-              />
+      <DesktopOnlyGate title={copy.shell.title}>
+      <div className="flex min-h-0 flex-1 flex-col gap-3">
+        <div className="grid min-h-0 flex-1 gap-3 lg:grid-cols-[minmax(0,17.5rem)_minmax(0,1fr)]">
+          <div className="min-h-0 max-h-[min(70vh,40rem)] lg:max-h-none">
+            <Sidebar
+              characters={data.characters}
+              relations={data.relations}
+              selectedCharacterId={selectedCharacterId}
+              selectedRelationId={selectedRelationId}
+              linkFromId={linkFromId}
+              onSelectCharacter={(id) => {
+                setSelectedCharacterId(id);
+                setSelectedRelationId(null);
+              }}
+              onSelectRelation={(id) => {
+                setSelectedRelationId(id);
+                setSelectedCharacterId(null);
+              }}
+              onAddCharacter={openCreate}
+              onEditCharacter={openDetail}
+              onDeleteCharacter={handleDeleteCharacter}
+              onDeleteRelation={handleDeleteRelation}
+              onStartLink={(fromId) => {
+                setLinkFromId(fromId);
+                setSelectedCharacterId(fromId);
+                setSelectedRelationId(null);
+                setMainTab("canvas");
+              }}
+              onCancelLink={() => setLinkFromId(null)}
+            />
+          </div>
+
+          <div className="flex min-h-[28rem] min-w-0 flex-1 flex-col gap-2">
+            {/* 右側メイン：キャンバス／詳細のタブ */}
+            <div
+              role="tablist"
+              aria-label={copy.tabs.label}
+              className="flex shrink-0 gap-1 rounded-md border border-zinc-200/80 bg-zinc-100/80 p-1"
+            >
+              {(
+                [
+                  ["canvas", copy.tabs.canvas],
+                  ["detail", copy.tabs.detail],
+                ] as const
+              ).map(([id, label]) => {
+                const active = mainTab === id;
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    role="tab"
+                    aria-selected={active}
+                    onClick={() => setMainTab(id)}
+                    className={`flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                      active
+                        ? "bg-white text-zinc-900 shadow-sm"
+                        : "text-zinc-500 hover:text-zinc-800"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
             </div>
 
-            <div className="flex min-h-[28rem] min-w-0 flex-1 flex-col gap-2">
-              {/* 右側メイン：キャンバス／詳細のタブ */}
-              <div
-                role="tablist"
-                aria-label={copy.tabs.label}
-                className="flex shrink-0 gap-1 rounded-md border border-zinc-200/80 bg-zinc-100/80 p-1"
-              >
-                {(
-                  [
-                    ["canvas", copy.tabs.canvas],
-                    ["detail", copy.tabs.detail],
-                  ] as const
-                ).map(([id, label]) => {
-                  const active = mainTab === id;
-                  return (
-                    <button
-                      key={id}
-                      type="button"
-                      role="tab"
-                      aria-selected={active}
-                      onClick={() => setMainTab(id)}
-                      className={`flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
-                        active
-                          ? "bg-white text-zinc-900 shadow-sm"
-                          : "text-zinc-500 hover:text-zinc-800"
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  );
-                })}
-              </div>
-
-              <div className="min-h-0 flex-1" role="tabpanel">
-                {mainTab === "canvas" ? (
-                  <RelationCanvas
-                    characters={data.characters}
-                    relations={data.relations}
-                    selectedCharacterId={selectedCharacterId}
-                    selectedRelationId={selectedRelationId}
-                    linkFromId={linkFromId}
-                    onSelectCharacter={setSelectedCharacterId}
-                    onSelectRelation={setSelectedRelationId}
-                    onMoveCharacter={handleMoveCharacter}
-                    onCompleteLink={handleCompleteLink}
-                    onUpdateRelation={handleUpdateRelation}
-                    onOpenDetail={openDetail}
-                    onLoadSample={handleLoadSample}
-                  />
-                ) : (
-                  <DetailEditor
-                    character={selectedCharacter}
-                    onChange={handleUpdateCharacter}
-                  />
-                )}
-              </div>
+            <div className="min-h-0 flex-1" role="tabpanel">
+              {mainTab === "canvas" ? (
+                <RelationCanvas
+                  characters={data.characters}
+                  relations={data.relations}
+                  selectedCharacterId={selectedCharacterId}
+                  selectedRelationId={selectedRelationId}
+                  linkFromId={linkFromId}
+                  onSelectCharacter={setSelectedCharacterId}
+                  onSelectRelation={setSelectedRelationId}
+                  onMoveCharacter={handleMoveCharacter}
+                  onCompleteLink={handleCompleteLink}
+                  onUpdateRelation={handleUpdateRelation}
+                  onOpenDetail={openDetail}
+                  onLoadSample={handleLoadSample}
+                />
+              ) : (
+                <DetailEditor
+                  character={selectedCharacter}
+                  onChange={handleUpdateCharacter}
+                />
+              )}
             </div>
           </div>
         </div>
+      </div>
+      </DesktopOnlyGate>
 
-        <CharacterModal
-          open={modalOpen}
-          onClose={() => setModalOpen(false)}
-          onSave={handleSaveCharacter}
-        />
-      </ForceLandscape>
+      <CharacterModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSave={handleSaveCharacter}
+      />
     </AppShell>
   );
 }

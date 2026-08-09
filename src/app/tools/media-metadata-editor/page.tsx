@@ -363,7 +363,11 @@ export default function MediaMetadataEditorPage() {
 
   const editorBody = selected ? (
     <>
-      <div className="min-h-0 overflow-y-auto overscroll-auto rounded-md border border-zinc-200/80 bg-white p-3 shadow-sm sm:p-5">
+      <div
+        className={`rounded-md border border-zinc-200/80 bg-white p-3 shadow-sm sm:p-5 ${
+          compact ? "" : "min-h-0 overflow-y-auto overscroll-auto"
+        }`}
+      >
         <MediaStage
           mode={selected.mode}
           mediaUrl={selected.mediaUrl}
@@ -381,7 +385,11 @@ export default function MediaMetadataEditorPage() {
         />
       </div>
 
-      <div className="flex min-h-0 flex-col rounded-md border border-zinc-200/80 bg-white p-3 shadow-sm sm:p-5">
+      <div
+        className={`flex flex-col rounded-md border border-zinc-200/80 bg-white p-3 shadow-sm sm:p-5 ${
+          compact ? "" : "min-h-0"
+        }`}
+      >
         <MetadataForm
           mode={selected.mode}
           fields={selected.fields}
@@ -389,12 +397,13 @@ export default function MediaMetadataEditorPage() {
           labels={copy.form}
           history={inputHistory}
           disabled={busy}
+          expand={compact}
           onChange={updateFields}
           onFileNameChange={updateFileName}
           onRemoveHistoryItem={removeHistoryItem}
         />
 
-        <div className="mt-auto shrink-0 space-y-2 border-t border-zinc-100 pt-4">
+        <div className="mt-4 shrink-0 space-y-2 border-t border-zinc-100 pt-4">
           <p className="text-[11px] leading-relaxed text-zinc-500">
             {copy.export.hint}
           </p>
@@ -429,7 +438,7 @@ export default function MediaMetadataEditorPage() {
     <AppShell
       title={copy.shell.title}
       description={copy.shell.description}
-      fillViewport
+      fillViewport={!compact}
       actions={
         hasItems ? (
           <div className="flex w-full max-w-full flex-nowrap items-center gap-1 sm:gap-2 md:w-auto md:justify-end">
@@ -464,7 +473,11 @@ export default function MediaMetadataEditorPage() {
         ) : undefined
       }
     >
-      <div className="flex min-h-0 w-full max-w-full flex-1 flex-col gap-3 overflow-x-hidden">
+      <div
+        className={`flex w-full max-w-full flex-col gap-3 overflow-x-clip ${
+          compact ? "" : "min-h-0 flex-1 overflow-x-hidden"
+        }`}
+      >
         {!hasItems ? (
           <div
             role="button"
@@ -493,7 +506,9 @@ export default function MediaMetadataEditorPage() {
               setDragging(false);
               void addFiles(e.dataTransfer.files);
             }}
-            className={`flex min-h-0 flex-1 cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed px-4 py-12 text-center transition sm:px-6 sm:py-16 ${
+            className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed px-4 py-12 text-center transition sm:px-6 sm:py-16 ${
+              compact ? "min-h-[50vh]" : "min-h-0 flex-1"
+            } ${
               dragging
                 ? "border-[var(--accent-strong)] bg-[color-mix(in_srgb,var(--accent)_28%,white)]"
                 : "border-zinc-300 bg-white hover:border-zinc-400"
@@ -507,22 +522,22 @@ export default function MediaMetadataEditorPage() {
             </p>
           </div>
         ) : compact ? (
-          <div className="flex h-auto w-full max-w-full flex-col gap-3 pb-3">
+          <div className="flex w-full max-w-full flex-col gap-3 pb-6">
             {showList ? (
-              <div className="min-h-0 w-full">
+              <div className="w-full">
                 <FileRail
                   items={items}
                   selectedId={selectedId}
                   copy={copy.fileList}
                   disabled={busy}
-                  nestedScroll
+                  expand
                   onSelect={selectFile}
                   onRemove={removeItem}
                 />
               </div>
             ) : null}
             {showDetail ? (
-              <div className="flex h-auto w-full min-w-0 flex-col gap-3">
+              <div className="flex w-full min-w-0 flex-col gap-3">
                 {editorBody}
               </div>
             ) : null}

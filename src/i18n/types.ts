@@ -88,12 +88,10 @@ export type Dictionary = {
       /** トグル上の小さな見出し */
       caption: string;
       /** ボタン上の短いラベル */
-      portraitShort: string;
       defaultShort: string;
       wideShort: string;
       fullShort: string;
       /** title / aria-label 用の説明 */
-      portrait: string;
       default: string;
       wide: string;
       full: string;
@@ -112,6 +110,8 @@ export type Dictionary = {
     removeAria: string;
     dragAria: string;
     openAria: string;
+    /** スマホ非対応アプリを縦長でタップしたとき */
+    lockedOnMobileAria: string;
     moveLeft: string;
     moveRight: string;
     reorderedAnnounce: string;

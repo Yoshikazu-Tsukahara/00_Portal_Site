@@ -10,7 +10,7 @@ export const ROBOT_FREETHROW_MANIFEST = {
   start_url: "/robot-freethrow",
   scope: "/robot-freethrow",
   display: "standalone",
-  orientation: "landscape",
+  orientation: "any",
   background_color: "#f3e6c8",
   theme_color: "#f3e6c8",
   lang: "ja",

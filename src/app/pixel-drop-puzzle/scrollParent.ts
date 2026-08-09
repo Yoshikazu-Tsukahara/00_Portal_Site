@@ -27,3 +27,40 @@ export function setScrollTop(target: HTMLElement | Window, top: number): void {
     window.scrollTo({ top: y, behavior: "auto" });
   }
 }
+
+/** スクロール領域の可視範囲（ビューポート座標） */
+export type VisibleViewRect = {
+  top: number;
+  bottom: number;
+  left: number;
+  right: number;
+  height: number;
+};
+
+/**
+ * 実際に見えているプレイ領域の矩形。
+ * AppShell の内部スクロール時は window ではなく overflow 箱を使う。
+ */
+export function getVisibleViewRect(
+  scroller: HTMLElement | Window,
+): VisibleViewRect {
+  if (scroller instanceof HTMLElement) {
+    const r = scroller.getBoundingClientRect();
+    return {
+      top: r.top,
+      bottom: r.bottom,
+      left: r.left,
+      right: r.right,
+      height: r.height,
+    };
+  }
+  const height = window.innerHeight;
+  const width = window.innerWidth;
+  return {
+    top: 0,
+    bottom: height,
+    left: 0,
+    right: width,
+    height,
+  };
+}

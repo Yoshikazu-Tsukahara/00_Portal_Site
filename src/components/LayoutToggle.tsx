@@ -11,45 +11,24 @@ import { useI18n } from "@/i18n";
 import { LAYOUT_MODES, useLayout, type LayoutMode } from "@/lib/layout";
 
 const MODE_INDEX: Record<LayoutMode, number> = {
-  portrait: 0,
-  default: 1,
-  wide: 2,
-  full: 3,
+  default: 0,
+  wide: 1,
+  full: 2,
 };
-
-/** 縦型（スマホ幅）アイコン */
-function PortraitIcon({ className = "size-3.5" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 16 16" className={className} fill="none" aria-hidden>
-      <rect
-        x="4.5"
-        y="1.5"
-        width="7"
-        height="13"
-        rx="1.5"
-        stroke="currentColor"
-        strokeWidth="1.25"
-        opacity="0.35"
-      />
-      <rect x="6" y="3.5" width="4" height="8" rx="0.75" fill="currentColor" />
-    </svg>
-  );
-}
 
 /** 幅の狭さ〜広さを示すシンプルなアイコン（文字なし） */
 function WidthIcon({
   mode,
   className = "size-3.5",
 }: {
-  mode: Exclude<LayoutMode, "portrait">;
+  mode: LayoutMode;
   className?: string;
 }) {
-  const frames: Record<Exclude<LayoutMode, "portrait">, { x: number; w: number }> =
-    {
-      default: { x: 5, w: 6 },
-      wide: { x: 3, w: 10 },
-      full: { x: 1.5, w: 13 },
-    };
+  const frames: Record<LayoutMode, { x: number; w: number }> = {
+    default: { x: 5, w: 6 },
+    wide: { x: 3, w: 10 },
+    full: { x: 1.5, w: 13 },
+  };
   const { x, w } = frames[mode];
 
   return (
@@ -70,19 +49,18 @@ function WidthIcon({
 }
 
 function modeIcon(mode: LayoutMode, className?: string): ReactNode {
-  if (mode === "portrait") return <PortraitIcon className={className} />;
   return <WidthIcon mode={mode} className={className} />;
 }
 
 type LayoutToggleProps = {
-  /** segment: PC 向け4連ボタン / dropdown: スマホ向けコンパクト */
+  /** segment: PC 向け3連ボタン / dropdown: スマホ向けコンパクト */
   variant?: "segment" | "dropdown";
 };
 
 /**
  * 表示幅切替。
  * - segment: PC ヘッダー中央
- * - dropdown: スマホ／縦型ヘッダー直置き
+ * - dropdown: スマホヘッダー直置き
  */
 export default function LayoutToggle({
   variant = "segment",
@@ -96,7 +74,6 @@ export default function LayoutToggle({
   const listId = useId();
 
   const titles: Record<LayoutMode, string> = {
-    portrait: copy.portrait,
     default: copy.default,
     wide: copy.wide,
     full: copy.full,

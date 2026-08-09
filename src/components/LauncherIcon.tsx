@@ -10,6 +10,7 @@ import type {
   Ref,
 } from "react";
 import { useRef } from "react";
+import LauncherLockBadge from "@/components/LauncherLockBadge";
 import ToolGlyph from "@/components/ToolGlyph";
 import type { Tool } from "@/data/tools";
 import { fmt, useI18n } from "@/i18n";
@@ -18,6 +19,7 @@ import {
   readLaunchOrigin,
   shouldSkipLaunchAnimation,
 } from "@/lib/launcher/motion";
+import { useCompactLayout } from "@/lib/useCompactLayout";
 
 type DragListeners = Record<string, unknown> | undefined;
 
@@ -78,9 +80,14 @@ export default function LauncherIcon({
   onLaunchApp,
 }: Props) {
   const { t } = useI18n();
+  const { compact } = useCompactLayout();
   const copy = t.tools[tool.id] ?? { title: tool.id, description: "" };
   const title = copy.title;
-  const openLabel = fmt(t.home.openAria, { title });
+  /** スマホ非対応アプリは縦長（狭い画面）では起動不可 */
+  const lockedOnMobile = compact && tool.isMobileSupported === false;
+  const openLabel = lockedOnMobile
+    ? fmt(t.home.lockedOnMobileAria, { title })
+    : fmt(t.home.openAria, { title });
   const dragLabel = fmt(t.home.dragAria, { title });
   const removeLabel = fmt(t.home.removeAria, { title });
 
@@ -212,9 +219,15 @@ export default function LauncherIcon({
             >
               <span aria-hidden>×</span>
             </button>
-            <span className="launcher-icon__glyph" aria-hidden>
+            <span
+              className={`launcher-icon__glyph${
+                lockedOnMobile ? " launcher-icon__glyph--locked" : ""
+              }`}
+              aria-hidden
+            >
               <ToolGlyph tool={tool} />
             </span>
+            {lockedOnMobile ? <LauncherLockBadge /> : null}
           </span>
           <span className="sr-only">
             {canMoveLeft ? `${t.home.moveLeft}. ` : ""}
@@ -223,6 +236,32 @@ export default function LauncherIcon({
             {removeLabel}
           </span>
         </div>
+      ) : lockedOnMobile ? (
+        <button
+          type="button"
+          className="launcher-icon launcher-icon--locked group"
+          aria-label={openLabel}
+          aria-disabled="true"
+          title={openLabel}
+          onPointerDown={onPointerDownNormal}
+          onPointerUp={onPointerUpNormal}
+          onPointerLeave={onPointerUpNormal}
+          onPointerCancel={onPointerUpNormal}
+          onClick={(e) => {
+            e.preventDefault();
+            if (longPressFired.current) {
+              longPressFired.current = false;
+            }
+          }}
+          onContextMenu={onContextMenu}
+        >
+          <span className="launcher-icon__glyph-wrap">
+            <span className="launcher-icon__glyph launcher-icon__glyph--locked" aria-hidden>
+              <ToolGlyph tool={tool} />
+            </span>
+            <LauncherLockBadge />
+          </span>
+        </button>
       ) : (
         <a
           href={tool.href}

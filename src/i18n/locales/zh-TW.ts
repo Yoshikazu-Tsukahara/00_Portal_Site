@@ -23,11 +23,9 @@ export const zhTW: PartialDictionary = {
     layoutToggle: {
       aria: "切換顯示寬度",
       caption: "Width",
-      portraitShort: "直向",
       defaultShort: "標準",
       wideShort: "較寬",
       fullShort: "全寬",
-      portrait: "以常見直向（手機寬度）顯示",
       default: "以標準寬度顯示",
       wide: "以較寬寬度顯示",
       full: "全螢幕顯示",

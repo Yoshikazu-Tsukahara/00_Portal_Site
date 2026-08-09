@@ -10,6 +10,7 @@ import {
   type MouseEvent,
   type ReactNode,
 } from "react";
+import LauncherLockBadge from "@/components/LauncherLockBadge";
 import ToolGlyph from "@/components/ToolGlyph";
 import type { Tool } from "@/data/tools";
 import { fmt, useI18n } from "@/i18n";
@@ -21,6 +22,7 @@ import {
   readLaunchOrigin,
   shouldSkipLaunchAnimation,
 } from "@/lib/launcher/motion";
+import { useCompactLayout } from "@/lib/useCompactLayout";
 
 type Props = {
   folder: HomeFolderItem;
@@ -64,6 +66,7 @@ export default function LauncherFolderSheet({
   onLaunchApp,
 }: Props) {
   const { t } = useI18n();
+  const { compact } = useCompactLayout();
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -165,7 +168,15 @@ export default function LauncherFolderSheet({
     return () => panel.removeEventListener("keydown", onKeyDown);
   }, []);
 
+  function isLocked(tool: Tool) {
+    return compact && tool.isMobileSupported === false;
+  }
+
   function onAppClick(e: MouseEvent<HTMLAnchorElement>, tool: Tool) {
+    if (isLocked(tool)) {
+      e.preventDefault();
+      return;
+    }
     if (shouldSkipLaunchAnimation(e)) return;
     e.preventDefault();
     const glyph =
@@ -232,6 +243,10 @@ export default function LauncherFolderSheet({
           {tools.map((tool, index) => {
             const copy = t.tools[tool.id] ?? { title: tool.id, description: "" };
             const title = copy.title;
+            const locked = isLocked(tool);
+            const openLabel = locked
+              ? fmt(t.home.lockedOnMobileAria, { title })
+              : fmt(t.home.openAria, { title });
             return (
               <li
                 key={tool.id}
@@ -250,9 +265,15 @@ export default function LauncherFolderSheet({
                       >
                         <span aria-hidden>×</span>
                       </button>
-                      <span className="launcher-icon__glyph" aria-hidden>
+                      <span
+                        className={`launcher-icon__glyph${
+                          locked ? " launcher-icon__glyph--locked" : ""
+                        }`}
+                        aria-hidden
+                      >
                         <ToolGlyph tool={tool} />
                       </span>
+                      {locked ? <LauncherLockBadge /> : null}
                     </span>
                     <span className="launcher-icon__label">{title}</span>
                     <button
@@ -264,11 +285,30 @@ export default function LauncherFolderSheet({
                       {t.home.ejectFromFolder}
                     </button>
                   </div>
+                ) : locked ? (
+                  <button
+                    type="button"
+                    className="launcher-icon launcher-icon--locked group launcher-folder-sheet__app"
+                    aria-label={openLabel}
+                    aria-disabled="true"
+                    title={openLabel}
+                  >
+                    <span className="launcher-icon__glyph-wrap">
+                      <span
+                        className="launcher-icon__glyph launcher-icon__glyph--locked"
+                        aria-hidden
+                      >
+                        <ToolGlyph tool={tool} />
+                      </span>
+                      <LauncherLockBadge />
+                    </span>
+                    <span className="launcher-icon__label">{title}</span>
+                  </button>
                 ) : (
                   <a
                     href={tool.href}
                     className="launcher-icon group launcher-folder-sheet__app"
-                    aria-label={fmt(t.home.openAria, { title })}
+                    aria-label={openLabel}
                     onClick={(e) => onAppClick(e, tool)}
                   >
                     <span className="launcher-icon__glyph-wrap">

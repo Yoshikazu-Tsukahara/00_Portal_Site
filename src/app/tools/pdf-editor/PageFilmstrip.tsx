@@ -28,7 +28,7 @@ type GridLayout = {
   availW: number;
 };
 
-/** コンテナ幅から1行あたりの列数を算出 */
+/** コンテナ幅から1行あたりの列数を算出（左寄せ・カード間ギャップ前提） */
 export function computeGridLayout(
   containerW: number,
   pageCount: number,
@@ -45,7 +45,12 @@ export function computeGridLayout(
   const capped = Math.min(maxCols, pageCount);
 
   for (let cols = capped; cols >= 1; cols--) {
-    const gap = (availW - cols * CARD_WIDTH) / (cols + 1);
+    if (cols === 1) {
+      if (availW >= CARD_WIDTH) return { cols, availW };
+      continue;
+    }
+    // 余りは右に残し、ギャップはカード間だけに分配
+    const gap = (availW - cols * CARD_WIDTH) / (cols - 1);
     if (gap >= MIN_GAP_X) {
       return { cols, availW };
     }
@@ -54,10 +59,13 @@ export function computeGridLayout(
   return { cols: 1, availW };
 }
 
-/** 満行向けの均等ギャップ（左右端＋カード間を同幅） */
-export function computeFullRowGap(availW: number, cols: number): number {
-  if (cols <= 0) return MIN_GAP_X;
-  return Math.max(MIN_GAP_X, (availW - cols * CARD_WIDTH) / (cols + 1));
+/**
+ * 左寄せ行のカード間ギャップ。
+ * ウィンドウ幅を均等に使うため伸び縮み可。左右端には配らない。
+ */
+export function computeRowGap(availW: number, cols: number): number {
+  if (cols <= 1) return MIN_GAP_X;
+  return Math.max(MIN_GAP_X, (availW - cols * CARD_WIDTH) / (cols - 1));
 }
 
 /** カード間の隙間 — ホバー時のみ「＋」（グリッド上に絶対配置・レイアウト非干渉） */
@@ -130,7 +138,7 @@ function toLocalRect(rect: DOMRect, origin: DOMRect) {
 function measureGapOverlays(
   cardEls: (HTMLDivElement | null)[],
   originEl: HTMLDivElement,
-  fullRowGap: number,
+  rowGap: number,
 ): GapOverlay[] {
   const validEls = cardEls.filter(Boolean) as HTMLDivElement[];
   if (validEls.length === 0) return [];
@@ -175,7 +183,7 @@ function measureGapOverlays(
   const last = rects[rects.length - 1];
   overlays.push({
     insertIndex: rects.length,
-    x: last.right + fullRowGap / 2,
+    x: last.right + rowGap / 2,
     y: last.cy,
     orientation: "h",
   });
@@ -240,15 +248,11 @@ export default function PageFilmstrip({
       setGapOverlays([]);
       return;
     }
-    const fullRowGap = computeFullRowGap(gridLayout.availW, gridLayout.cols);
+    const rowGap = computeRowGap(gridLayout.availW, gridLayout.cols);
     requestAnimationFrame(() => {
       if (!contentRef.current) return;
       setGapOverlays(
-        measureGapOverlays(
-          cardRefs.current,
-          contentRef.current,
-          fullRowGap,
-        ),
+        measureGapOverlays(cardRefs.current, contentRef.current, rowGap),
       );
     });
   }, [gridLayout.availW, gridLayout.cols, pages.length]);
@@ -307,35 +311,20 @@ export default function PageFilmstrip({
           items={pages.map((p) => p.id)}
           strategy={rectSortingStrategy}
         >
-          <div className="flex flex-col items-start" style={{ rowGap: GAP_Y }}>
+          <div className="flex w-full flex-col items-stretch" style={{ rowGap: GAP_Y }}>
             {rows.map((row, rowIndex) => {
-              const fullRowGap = computeFullRowGap(
+              // 最終行が欠けていても、満行と同じギャップで左から揃える
+              const rowGap = computeRowGap(
                 gridLayout.availW,
                 gridLayout.cols,
               );
-              const isPartialRow =
-                rowIndex === rows.length - 1 &&
-                row.length < gridLayout.cols;
               const startIndex = rowIndex * gridLayout.cols;
 
               return (
                 <div
                   key={`row-${startIndex}-${row.map((p) => p.id).join("-")}`}
-                  className={`flex shrink-0 justify-start ${
-                    isPartialRow ? "w-fit max-w-full self-start" : "w-full"
-                  }`}
-                  style={
-                    isPartialRow
-                      ? {
-                          columnGap: fullRowGap,
-                          paddingLeft: fullRowGap,
-                        }
-                      : {
-                          columnGap: fullRowGap,
-                          paddingLeft: fullRowGap,
-                          paddingRight: fullRowGap,
-                        }
-                  }
+                  className="flex w-full shrink-0 justify-start"
+                  style={{ columnGap: rowGap }}
                 >
                   {row.map((page, i) => {
                     const globalIndex = startIndex + i;

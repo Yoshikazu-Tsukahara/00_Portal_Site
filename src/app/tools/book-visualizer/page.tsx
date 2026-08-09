@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import AppShell from "@/components/AppShell";
-import ForceLandscape from "@/components/ForceLandscape";
 import { useI18n } from "@/i18n";
 import { useLocalStorageState } from "@/lib/localData";
 import { useCompactLayout } from "@/lib/useCompactLayout";
@@ -35,22 +34,8 @@ export default function BookVisualizerPage() {
   const { t } = useI18n();
   const copy = t.apps.bookVisualizer;
   const { compact } = useCompactLayout();
-  /** 実機の向き。横向き中は PC 相当（編集可）にする */
-  const [landscape, setLandscape] = useState(true);
-
-  useLayoutEffect(() => {
-    const mq = window.matchMedia("(orientation: landscape)");
-    const sync = () => setLandscape(mq.matches);
-    sync();
-    mq.addEventListener("change", sync);
-    return () => mq.removeEventListener("change", sync);
-  }, []);
-
-  /**
-   * 縦向き（または狭い＋非横向き）では閲覧のみ。
-   * 強制横向きプレイ中はフリースロー同様、PC と同じ制作 UI。
-   */
-  const readOnly = compact && !landscape;
+  /** スマホ表示では閲覧のみ（.mybook の読み込み） */
+  const readOnly = compact;
 
   const [data, setData, { hydrated }] = useLocalStorageState<StudioData>(
     STORAGE_KEY,
@@ -65,7 +50,7 @@ export default function BookVisualizerPage() {
   // LocalStorage の古い下書き（余白未設定など）を毎回正規化してから使う
   const studio = useMemo(() => normalizeStudio(data), [data]);
 
-  // 読み込み専用に切り替わったら編集画面に留まらない
+  // 閲覧専用に切り替わったら編集画面に留まらない
   useEffect(() => {
     if (readOnly && mode === "edit") {
       setMode("home");
@@ -162,20 +147,18 @@ export default function BookVisualizerPage() {
 
   if (!hydrated) {
     return (
-      <ForceLandscape>
-        <AppShell
-          title={copy.shell.title}
-          description={copy.shell.description}
-          fillViewport
-        >
-          <p className="text-sm text-zinc-400">{copy.loading}</p>
-        </AppShell>
-      </ForceLandscape>
+      <AppShell
+        title={copy.shell.title}
+        description={copy.shell.description}
+        fillViewport
+      >
+        <p className="text-sm text-zinc-400">{copy.loading}</p>
+      </AppShell>
     );
   }
 
   return (
-    <ForceLandscape>
+    <>
       <AppShell
         title={copy.shell.title}
         description={copy.shell.description}
@@ -272,6 +255,6 @@ export default function BookVisualizerPage() {
           }
         />
       ) : null}
-    </ForceLandscape>
+    </>
   );
 }

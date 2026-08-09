@@ -94,7 +94,7 @@ export default function MediaStage({
   }
 
   return (
-    <section className="flex h-full min-h-0 flex-col gap-4">
+    <section className="flex flex-col gap-4">
       <div className="min-w-0">
         <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-zinc-400">
           {mode === "audio" ? copy.modeAudio : copy.modeVideo}
@@ -109,7 +109,7 @@ export default function MediaStage({
 
       {mode === "audio" ? (
         <>
-          <div className="relative flex min-h-[14rem] flex-1 items-center justify-center overflow-hidden rounded-md border border-zinc-200 bg-zinc-50">
+          <div className="relative flex min-h-[14rem] items-center justify-center overflow-hidden rounded-md border border-zinc-200 bg-zinc-50">
             {artwork.previewUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img

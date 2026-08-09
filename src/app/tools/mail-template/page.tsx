@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import AppShell from "@/components/AppShell";
 import { fmt, useI18n } from "@/i18n";
-import { useLayout } from "@/lib/layout";
 import InstallAppButton from "./InstallAppButton";
 import PreviewPane from "./PreviewPane";
 import TagFilterBar from "./TagFilterBar";
@@ -41,7 +40,6 @@ import {
 
 export default function MailTemplatePage() {
   const { t, ready, locale } = useI18n();
-  const { layoutMode } = useLayout();
   const mt = t.apps.mailTemplate;
   const [templates, setTemplates] = useState<MailTemplate[]>([]);
   const [variables, setVariables] = useState<VariableMasterItem[]>([]);
@@ -70,8 +68,8 @@ export default function MailTemplatePage() {
     return () => mq.removeEventListener("change", sync);
   }, []);
 
-  /** AppShell と同じ: 実機スマホ、または表示幅「縦型」 */
-  const compact = narrowViewport || layoutMode === "portrait";
+  /** AppShell と同じ: 実機スマホ（狭い viewport） */
+  const compact = narrowViewport;
 
   useEffect(() => {
     if (!compact) setMobilePane("list");

@@ -1,21 +1,19 @@
 "use client";
 
 import { useLayoutEffect, useState } from "react";
-import { useLayout } from "@/lib/layout";
 
 /**
- * スマホ／縦型レイアウト判定（AppShell compact と同じ）。
- * viewport の lg: だけに頼らず、表示幅トグル「縦型」も見る。
+ * スマホ／狭い画面の判定（AppShell compact と同じ）。
+ * viewport 幅だけで決める（表示幅トグルの縦型は廃止済み）。
  */
 export function useCompactLayout(): {
-  /** 実機スマホ（〜767）または表示幅「縦型」 */
+  /** 実機スマホ（〜767） */
   compact: boolean;
   /** viewport 幅が十分広い（1024px〜） */
   wideDesktop: boolean;
-  /** 右カラム等を出してよい（広いPCかつ縦型でない） */
+  /** 右カラム等を出してよい（広い PC） */
   showSideColumn: boolean;
 } {
-  const { layoutMode } = useLayout();
   const [narrowViewport, setNarrowViewport] = useState(false);
   const [wideDesktop, setWideDesktop] = useState(false);
 
@@ -36,10 +34,9 @@ export function useCompactLayout(): {
     };
   }, []);
 
-  const compact = narrowViewport || layoutMode === "portrait";
   return {
-    compact,
+    compact: narrowViewport,
     wideDesktop,
-    showSideColumn: wideDesktop && !compact,
+    showSideColumn: wideDesktop,
   };
 }

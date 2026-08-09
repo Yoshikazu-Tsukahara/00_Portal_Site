@@ -23,11 +23,9 @@ export const ko: PartialDictionary = {
     layoutToggle: {
       aria: "표시 너비 전환",
       caption: "Width",
-      portraitShort: "세로",
       defaultShort: "표준",
       wideShort: "넓게",
       fullShort: "전체",
-      portrait: "일반적인 세로(스마트폰 너비)로 표시",
       default: "표준 너비로 표시",
       wide: "넓은 너비로 표시",
       full: "화면 가득 표시",

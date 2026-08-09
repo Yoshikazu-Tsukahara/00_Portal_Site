@@ -52,11 +52,9 @@ export const en: Dictionary = {
     layoutToggle: {
       aria: "Switch content width",
       caption: "Width",
-      portraitShort: "Phone",
       defaultShort: "Std",
       wideShort: "Wide",
       fullShort: "Full",
-      portrait: "Typical portrait (phone width)",
       default: "Default width",
       wide: "Wide layout",
       full: "Full width",
@@ -73,6 +71,8 @@ export const en: Dictionary = {
     removeAria: "Remove {title} from Home",
     dragAria: "{title}. Drag or use arrow keys to reorder. Press G to folder with next",
     openAria: "Open {title}",
+    lockedOnMobileAria:
+      "{title}. Not available on phone or portrait. Please use a computer.",
     moveLeft: "Move left",
     moveRight: "Move right",
     reorderedAnnounce: "Moved {title} to position {n}",

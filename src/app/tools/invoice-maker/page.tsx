@@ -4,7 +4,6 @@ import { useCallback, useEffect, useState } from "react";
 
 import AppShell from "@/components/AppShell";
 import { useI18n } from "@/i18n";
-import { useLayout } from "@/lib/layout";
 import {
   LoadInvoiceDialog,
   SaveInvoiceDialog,
@@ -39,7 +38,6 @@ import {
 
 export default function InvoiceMakerPage() {
   const { t, locale, ready } = useI18n();
-  const { layoutMode } = useLayout();
   const copy = t.apps.invoiceMaker;
   const [data, setData] = useState<InvoiceData | null>(null);
   const [history, setHistory] = useState<SavedInvoice[]>([]);
@@ -49,7 +47,7 @@ export default function InvoiceMakerPage() {
   const [savedToast, setSavedToast] = useState(false);
   /** 新規帳票時にフォームを載せ替え、入力表示の取りこぼしを防ぐ */
   const [formEpoch, setFormEpoch] = useState(0);
-  /** 実機スマホ、または表示幅「縦型」では短いボタンラベル */
+  /** 実機スマホでは短いボタンラベル */
   const [narrowViewport, setNarrowViewport] = useState(false);
 
   useEffect(() => {
@@ -60,7 +58,7 @@ export default function InvoiceMakerPage() {
     return () => mq.removeEventListener("change", sync);
   }, []);
 
-  const compactChrome = narrowViewport || layoutMode === "portrait";
+  const compactChrome = narrowViewport;
 
   // 初回のみ: 空ストアならサイト言語から書類言語・通貨の初期値を推測。
   // 以降ヘッダーでサイト言語を変えても、書類言語（docLocale）は自動では変えない。

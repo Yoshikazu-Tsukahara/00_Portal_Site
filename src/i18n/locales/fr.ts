@@ -23,11 +23,9 @@ export const fr: PartialDictionary = {
     layoutToggle: {
       aria: "Changer la largeur d’affichage",
       caption: "Width",
-      portraitShort: "Portrait",
       defaultShort: "Normal",
       wideShort: "Large",
       fullShort: "Plein",
-      portrait: "Affichage portrait typique (largeur téléphone)",
       default: "Afficher en largeur normale",
       wide: "Afficher plus large",
       full: "Afficher en plein écran",

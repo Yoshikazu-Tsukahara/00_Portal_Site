@@ -50,7 +50,7 @@ import { useStandaloneDisplay } from "@/lib/useStandaloneDisplay";
  * 3. プライバシー案内（PrivacyNotice）
  * 4. アプリ機能ボタン（actions）
  *
- * 判定は viewport 幅だけでなく `layoutMode === "portrait"` も見る
+ * 判定は viewport 幅（〜767px）で行う
  * （表示幅トグルで中身だけ狭いとき用）。
  */
 type AppShellProps = {
@@ -150,7 +150,7 @@ export default function AppShell({
 }: AppShellProps) {
   // wide は deprecated（幅は LayoutToggle が管理）。受け取っても無視する。
   const { isStandalone } = useStandaloneDisplay();
-  const { contentClassName, layoutMode } = useLayout();
+  const { contentClassName } = useLayout();
   const [narrowViewport, setNarrowViewport] = useState(false);
 
   useEffect(() => {
@@ -161,8 +161,8 @@ export default function AppShell({
     return () => mq.removeEventListener("change", sync);
   }, []);
 
-  /** 実機スマホ、または表示幅「縦型」 */
-  const compact = narrowViewport || layoutMode === "portrait";
+  /** 実機スマホ（狭い viewport） */
+  const compact = narrowViewport;
   const displayTitle =
     compact && titleShort?.trim() ? titleShort.trim() : title;
 

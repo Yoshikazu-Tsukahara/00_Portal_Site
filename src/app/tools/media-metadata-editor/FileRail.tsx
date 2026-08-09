@@ -20,7 +20,8 @@ export default function FileRail({
   selectedId,
   copy,
   disabled,
-  nestedScroll = false,
+  /** true: 内側スクロールせず、項目数ぶん縦に伸ばす（スマホのページスクロール用） */
+  expand = false,
   onSelect,
   onRemove,
 }: {
@@ -28,13 +29,16 @@ export default function FileRail({
   selectedId: string | null;
   copy: Copy;
   disabled?: boolean;
-  /** スマホ一覧時: 親スクロールとチェーンする内側スクロール */
-  nestedScroll?: boolean;
+  expand?: boolean;
   onSelect: (id: string) => void;
   onRemove: (id: string) => void;
 }) {
   return (
-    <aside className="flex h-full min-h-0 w-full max-w-full flex-col overflow-hidden rounded-md border border-zinc-200/80 bg-white shadow-sm">
+    <aside
+      className={`flex w-full max-w-full flex-col rounded-md border border-zinc-200/80 bg-white shadow-sm ${
+        expand ? "" : "h-full min-h-0 overflow-hidden"
+      }`}
+    >
       <div className="flex shrink-0 items-center justify-between gap-2 border-b border-zinc-100 bg-zinc-50/80 px-3 py-2.5">
         <h2 className="text-xs font-semibold text-zinc-800">
           {copy.heading}
@@ -50,11 +54,11 @@ export default function FileRail({
         <p className="px-3 py-4 text-xs text-zinc-500">{copy.empty}</p>
       ) : (
         <ul
-          className={`flex min-h-0 flex-1 flex-col gap-1 p-2 ${
-            nestedScroll
-              ? "app-nested-scroll"
-              : "overflow-y-auto overscroll-auto"
-          }`}
+          className={
+            expand
+              ? "flex flex-col gap-1 p-2"
+              : "flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto overscroll-auto p-2"
+          }
         >
           {items.map((item) => {
             const selected = item.id === selectedId;

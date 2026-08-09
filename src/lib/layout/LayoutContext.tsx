@@ -38,12 +38,28 @@ const LayoutContext = createContext<LayoutContextValue | null>(null);
  */
 let memoryLayoutMode: LayoutMode | null = null;
 
+function coerceLayoutMode(value: unknown): LayoutMode {
+  return isLayoutMode(value) ? value : DEFAULT_LAYOUT_MODE;
+}
+
 function readLayoutMode(): LayoutMode {
   if (typeof window === "undefined") return DEFAULT_LAYOUT_MODE;
   try {
     const fromDom = document.documentElement.dataset[LAYOUT_MODE_DATASET_ATTR];
     if (isLayoutMode(fromDom)) return fromDom;
     const raw = window.localStorage.getItem(LAYOUT_MODE_STORAGE_KEY);
+    // 旧「portrait」などは標準幅へ寄せる
+    if (raw === "portrait") {
+      try {
+        window.localStorage.setItem(
+          LAYOUT_MODE_STORAGE_KEY,
+          DEFAULT_LAYOUT_MODE,
+        );
+      } catch {
+        // ignore
+      }
+      return DEFAULT_LAYOUT_MODE;
+    }
     if (isLayoutMode(raw)) return raw;
   } catch {
     // private mode など
@@ -57,20 +73,23 @@ function applyLayoutModeToDom(mode: LayoutMode) {
 }
 
 /**
- * サイト全体の表示幅（portrait / default / wide / full）を共有する。
+ * サイト全体の表示幅（default / wide / full）を共有する。
  *
  * - 初回 SSR / ハイドレーション: DEFAULT（サーバーと一致）
  * - 一度復元したあとの再マウント: memoryLayoutMode を即使う（ページ遷移のチラつき防止）
  * - コンテンツ幅自体は bootstrap の data-layout-mode + CSS が先に決める
+ * - 狭い画面のコンパクト表示は viewport 幅で自動判定（縦型モードは廃止）
  */
 export function LayoutProvider({ children }: { children: ReactNode }) {
-  const [layoutMode, setLayoutModeState] = useState<LayoutMode>(
-    () => memoryLayoutMode ?? DEFAULT_LAYOUT_MODE,
+  const [layoutMode, setLayoutModeState] = useState<LayoutMode>(() =>
+    coerceLayoutMode(memoryLayoutMode),
   );
-  const [ready, setReady] = useState(() => memoryLayoutMode !== null);
+  const [ready, setReady] = useState(
+    () => memoryLayoutMode !== null && isLayoutMode(memoryLayoutMode),
+  );
 
   useEffect(() => {
-    const mode = memoryLayoutMode ?? readLayoutMode();
+    const mode = coerceLayoutMode(memoryLayoutMode ?? readLayoutMode());
     memoryLayoutMode = mode;
     setLayoutModeState(mode);
     applyLayoutModeToDom(mode);

@@ -169,14 +169,13 @@ function HeaderPrimaryNav({
 /**
  * サイト共通ヘッダー。
  * - PC: タイトル・バッジ・ライブラリ・言語・応援・幅トグル（セグメント）
- * - スマホ／縦型: ロゴ・ライブラリ・表示幅DD・言語DD・♡応援
+ * - スマホ: ロゴ・ライブラリ・表示幅DD・言語DD・♡応援
  */
 export default function Header() {
   const { t } = useI18n();
   const { contentClassName, layoutMode } = useLayout();
   const pathname = usePathname();
   const headerRef = useRef<HTMLElement>(null);
-  const isPortrait = layoutMode === "portrait";
 
   useEffect(() => {
     const el = headerRef.current;
@@ -207,16 +206,12 @@ export default function Header() {
   return (
     <header
       ref={headerRef}
-      className={`site-header sticky top-0 z-50 w-full border-b border-zinc-200 bg-[color-mix(in_srgb,var(--background)_92%,white)] backdrop-blur-md${
-        isPortrait ? " site-header--portrait" : ""
-      }`}
+      className="site-header sticky top-0 z-50 w-full border-b border-zinc-200 bg-[color-mix(in_srgb,var(--background)_92%,white)] backdrop-blur-md"
     >
       <div className="relative">
-        {/* スマホ／縦型：コントロールをヘッダー1行に直置き */}
+        {/* スマホ：コントロールをヘッダー1行に直置き */}
         <div
-          className={`site-header__bar site-header__bar--compact items-center gap-1.5 py-2.5 ${
-            isPortrait ? "flex" : "flex lg:hidden"
-          } ${contentClassName}`}
+          className={`site-header__bar site-header__bar--compact flex items-center gap-1.5 py-2.5 lg:hidden ${contentClassName}`}
         >
           <HeaderPrimaryNav
             homeLabel={t.brand}
@@ -248,11 +243,9 @@ export default function Header() {
           </div>
         </div>
 
-        {/* PC（非縦型）：1行ヘッダー */}
+        {/* PC：1行ヘッダー */}
         <div
-          className={`site-header__bar site-header__bar--desktop relative items-center justify-between gap-x-4 py-3 ${
-            isPortrait ? "hidden" : "hidden lg:flex"
-          } ${contentClassName}`}
+          className={`site-header__bar site-header__bar--desktop relative hidden items-center justify-between gap-x-4 py-3 lg:flex ${contentClassName}`}
         >
           <div className="relative z-10 flex min-w-0 flex-1 items-center gap-3.5">
             <HeaderPrimaryNav

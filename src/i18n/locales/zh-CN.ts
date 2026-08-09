@@ -25,11 +25,9 @@ export const zhCN: PartialDictionary = {
     layoutToggle: {
       aria: "切换显示宽度",
       caption: "Width",
-      portraitShort: "竖屏",
       defaultShort: "标准",
       wideShort: "较宽",
       fullShort: "全宽",
-      portrait: "以常见竖屏（手机宽度）显示",
       default: "以标准宽度显示",
       wide: "以较宽宽度显示",
       full: "全屏显示",

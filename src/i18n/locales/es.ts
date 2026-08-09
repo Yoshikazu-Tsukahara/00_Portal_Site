@@ -23,11 +23,9 @@ export const es: PartialDictionary = {
     layoutToggle: {
       aria: "Cambiar ancho de pantalla",
       caption: "Width",
-      portraitShort: "Vertical",
       defaultShort: "Normal",
       wideShort: "Ancho",
       fullShort: "Full",
-      portrait: "Vista vertical típica (ancho de móvil)",
       default: "Mostrar a ancho normal",
       wide: "Mostrar más ancho",
       full: "Mostrar a pantalla completa",
