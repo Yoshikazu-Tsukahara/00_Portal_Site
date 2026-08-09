@@ -9,6 +9,7 @@ import type {
   Ref,
 } from "react";
 import { useRef } from "react";
+import ToolGlyph from "@/components/ToolGlyph";
 import type { Tool } from "@/data/tools";
 import { fmt, useI18n } from "@/i18n";
 import type { HomeFolderItem } from "@/lib/homePins";
@@ -130,7 +131,7 @@ export default function LauncherFolderIcon({
       <span className="launcher-folder__grid">
         {slots.map((tool, i) => (
           <span key={i} className="launcher-folder__cell">
-            {tool ? tool.icon : null}
+            {tool ? <ToolGlyph tool={tool} /> : null}
           </span>
         ))}
       </span>

@@ -46,11 +46,32 @@ export function findToolById(id: string): Tool | undefined {
   return getAllTools().find((t) => t.id === id);
 }
 
+/** 静的アプリアイコン（public/icons/{id}-512.png）を持つツール */
+const TOOLS_WITH_STATIC_ICON = new Set<string>([
+  "invoice-maker",
+  "mail-template",
+  "folder-generator",
+  "ultimate-probability-slot",
+  "pdf-editor",
+  "image-compressor",
+  "text-cleaner",
+  "media-metadata-editor",
+  "character-relation-editor",
+  "book-visualizer",
+  "palette-collector",
+  "robot-freethrow",
+  "pixel-drop-puzzle",
+  "crypto-message",
+  "lunch-savings",
+  "link-stocker",
+]);
+
 /**
- * ライブラリ用カバー／アイコン画像パス。
- * 後日差し替えやすいよう public/icons または public/covers を参照する。
+ * ホーム／ライブラリ用アイコン画像パス。
+ * 無いときは null（絵文字フォールバック）。
  */
-export function getToolIconSrc(toolId: string): string {
+export function getToolIconSrc(toolId: string): string | null {
+  if (!TOOLS_WITH_STATIC_ICON.has(toolId)) return null;
   return `/icons/${toolId}-512.png`;
 }
 

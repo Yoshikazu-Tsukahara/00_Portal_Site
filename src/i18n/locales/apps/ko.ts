@@ -4,7 +4,7 @@ import type { AppsDictionary } from "../../apps";
 export const appsKo: AppsDictionary = {
   bookVisualizer: {
     shell: {
-      title: "Quarto",
+      title: "지면 편집",
       description: "페이지 위에서 바로 조판하는 책 에디터입니다. 용지 크기·자·행을 정하면 글자 크기가 계산되고, 세로·가로로 마무리한 뒤 .mybook 파일로 공유할 수 있습니다.",
     },
     loading: "불러오는 중…",
@@ -48,6 +48,10 @@ export const appsKo: AppsDictionary = {
         western: {
           title: "영어 트레이드 페이퍼백",
           lead: "트레이드 · 가로. 3장 + 코다, 수동 페이지 나누기.",
+        },
+        photo: {
+          title: "정사각 사진집",
+          lead: "스퀘어 판. 풀블리드 도판 5점 + 에세이 3장, 이름 변환 포함.",
         },
       },
       readTitle: ".mybook 파일 읽기",

@@ -1056,7 +1056,7 @@ export const appsZhCN: AppsDictionary = {
   },
   bookVisualizer: {
     shell: {
-      title: "Quarto",
+      title: "纸面编辑",
       description: "在页面上直接排版的书籍编辑器。选择纸张尺寸、设定字数与行数后自动计算字级，再以竖排或横排完成，并以 .mybook 文件分享。",
     },
     loading: "加载中…",
@@ -1100,6 +1100,10 @@ export const appsZhCN: AppsDictionary = {
         western: {
           title: "英文大众平装",
           lead: "贸易判·横排。三章加尾声，含手动分页。",
+        },
+        photo: {
+          title: "方形写真集",
+          lead: "方形开本。5 张满版图版 + 三章随笔，含姓名变量。",
         },
       },
       readTitle: "阅读 .mybook 文件",

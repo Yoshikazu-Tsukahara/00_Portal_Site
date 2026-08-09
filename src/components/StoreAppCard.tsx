@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import AppCover from "@/components/AppCover";
+import ToolGlyph from "@/components/ToolGlyph";
 import type { Tool } from "@/data/tools";
 import { useI18n } from "@/i18n";
 import { useHomePins } from "@/lib/homePins";
@@ -62,7 +63,7 @@ export default function StoreAppCard({ tool, genreId }: Props) {
           aria-labelledby={titleId}
         >
           <span className="store-card__icon" aria-hidden>
-            {tool.icon}
+            <ToolGlyph tool={tool} />
           </span>
           <span className="min-w-0 flex-1 overflow-hidden">
             <span id={titleId} className="store-card__title" title={copy.title}>

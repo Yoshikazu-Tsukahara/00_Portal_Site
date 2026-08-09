@@ -59,71 +59,71 @@ export const es: PartialDictionary = {
   },
   tools: {
     "invoice-maker": {
-      title: "Docs",
+      title: "Formularios",
       description: "Facturas, presupuestos, albaranes y recibos en A4. PDF multi-idioma.",
     },
     "mail-template": {
-      title: "Mail",
+      title: "Plantillas mail",
       description: "Etiquetas y variables para responder correos más rápido.",
     },
     "folder-generator": {
-      title: "Carpetas",
+      title: "Carpetas lote",
       description: "Crea carpetas en lote con fechas, números y listas.",
     },
     "pdf-editor": {
-      title: "PDF",
+      title: "Editor PDF",
       description: "Combina, reordena y elimina páginas en el navegador.",
     },
     "image-compressor": {
-      title: "Imágenes",
+      title: "Compr. imagen",
       description: "Redimensiona y comprime por lotes en el navegador.",
     },
     "text-cleaner": {
-      title: "Texto",
+      title: "Limpieza texto",
       description: "Limpia saltos, espacios y control. Guarda reglas propias.",
     },
     "media-metadata-editor": {
-      title: "Metadatos",
+      title: "Etiquetas media",
       description: "Edita etiquetas y portadas de audio/vídeo en el navegador.",
     },
     "character-relation-editor": {
-      title: "Relaciones",
+      title: "Mapa personajes",
       description: "Organiza relaciones de historia con tarjetas y enlaces.",
     },
     "book-visualizer": {
-      title: "Quarto",
+      title: "Editor página",
       description: "Edita el layout de página y comparte con .mybook.",
     },
     "palette-collector": {
-      title: "Paleta",
+      title: "Paleta colores",
       description: "Extrae paletas de imágenes, con contraste WCAG.",
     },
     "lunch-savings": {
-      title: "Almuerzo",
+      title: "Ahorro almuerzo",
       description: "Registra la diferencia con el presupuesto y ahorra jugando.",
     },
     "link-stocker": {
-      title: "Enlaces",
+      title: "Guardar enlaces",
       description: "Guarda URLs “casi marcadores” como tarjetas con OGP.",
     },
     "ultimate-probability-slot": {
-      title: "Slot",
+      title: "Slot odds",
       description: "Reta a tu propia máquina de baja probabilidad.",
     },
     "pixel-drop-puzzle": {
-      title: "Pixel",
+      title: "Pixel drop",
       description: "Deja caer la foto en la ranura. Precisión subpíxel.",
     },
     "robot-freethrow": {
-      title: "Tiro",
+      title: "Tiro proyectil",
       description: "Apunta el aro con ángulo, velocidad inicial y giro.",
     },
     "crypto-message": {
-      title: "Secreto",
+      title: "Msg secreto",
       description: "Cifra y descifra con una frase. Incluye César.",
     },
     "monster-driver": {
-      title: "Monster",
+      title: "Monster drive",
       description: "Para en rojo, arranca en azul. Acción en primera persona.",
     },
   },

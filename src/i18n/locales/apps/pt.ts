@@ -4,7 +4,7 @@ import type { AppsDictionary } from "../../apps";
 export const appsPt: AppsDictionary = {
   bookVisualizer: {
     shell: {
-      title: "Quarto",
+      title: "Editor página",
       description: "Um editor de livros focado na página. Escolha o tamanho, defina caracteres e linhas — o tamanho da fonte é calculado. Finalize em vertical ou horizontal e compartilhe como .mybook.",
     },
     loading: "Carregando…",
@@ -48,6 +48,10 @@ export const appsPt: AppsDictionary = {
         western: {
           title: "Trade paperback em inglês",
           lead: "Trade · horizontal. Três capítulos mais coda, com quebras manuais.",
+        },
+        photo: {
+          title: "Fotolivro quadrado",
+          lead: "Formato quadrado. Cinco pranchas full-bleed e ensaio em três capítulos.",
         },
       },
       readTitle: "Ler um arquivo .mybook",

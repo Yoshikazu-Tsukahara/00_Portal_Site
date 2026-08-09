@@ -1056,7 +1056,7 @@ export const appsDe: AppsDictionary = {
   },
   bookVisualizer: {
     shell: {
-      title: "Quarto",
+      title: "Seiteneditor",
       description: "Ein seitenzentrierter Buch-Editor. Papierformat, Zeichen und Zeilen festlegen — die Schriftgröße wird berechnet. Vertikal oder horizontal fertigstellen und als .mybook teilen.",
     },
     loading: "Wird geladen…",
@@ -1100,6 +1100,10 @@ export const appsDe: AppsDictionary = {
         western: {
           title: "Englisches Trade-Paperback",
           lead: "Trade · horizontal. Drei Kapitel plus Coda, mit manuellen Umbrüchen.",
+        },
+        photo: {
+          title: "Quadratisches Fotobuch",
+          lead: "Quadratformat. Fünf Vollbild-Tafeln plus dreiteiliger Essay.",
         },
       },
       readTitle: ".mybook-Datei lesen",

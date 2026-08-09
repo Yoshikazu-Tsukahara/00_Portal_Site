@@ -321,7 +321,6 @@ export default function MailTemplatePage() {
       title={mt.shell.title}
       titleShort={mt.shell.titleShort}
       description={mt.shell.description}
-      fillViewport
       isPwa
       afterDataManager={<InstallAppButton copy={mt.install} />}
       dataManager={{
@@ -395,21 +394,20 @@ export default function MailTemplatePage() {
         <div
           className={
             compact
-              ? // スマホ: 親（AppShell 作業領域）がページスクロール。内側は max-h + nested scroll
+              ? // スマホ: 内部スクロールなし。内容に合わせてページが下へ伸びる
                 "flex h-auto w-full max-w-full flex-col gap-2 pb-3"
-              : "grid min-h-0 w-full max-w-full flex-1 grid-cols-1 gap-2 overflow-x-hidden overflow-y-auto overscroll-auto md:grid-cols-[minmax(0,17rem)_minmax(0,1fr)] md:gap-3 md:overflow-hidden lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)]"
+              : // PC: 2カラム。高さ固定せず内容分だけ伸び、ページ全体でスクロール
+                "grid w-full max-w-full grid-cols-1 items-start gap-2 overflow-x-hidden md:grid-cols-[minmax(0,17rem)_minmax(0,1fr)] md:gap-3 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)]"
           }
         >
           {/* 一覧: PCは常時 / スマホは list ペインのとき */}
           {!compact || mobilePane === "list" ? (
             <aside
               className={`flex min-w-0 flex-col rounded-md border border-zinc-200/80 bg-white p-2 shadow-sm ${
-                compact
-                  ? "h-auto"
-                  : "max-h-[min(42dvh,20rem)] min-h-0 overflow-hidden md:max-h-none md:p-3"
+                compact ? "h-auto" : "md:p-3"
               }`}
             >
-              <div className="mb-2 shrink-0 space-y-2 px-0.5 md:px-1">
+              <div className="mb-2 space-y-2 px-0.5 md:px-1">
                 <p className="text-[11px] font-medium text-zinc-500">
                   {mt.list.heading}
                   <span className="ml-1 tabular-nums text-zinc-400">
@@ -428,13 +426,7 @@ export default function MailTemplatePage() {
                   onChange={setFilterTagId}
                 />
               </div>
-              <div
-                className={
-                  compact
-                    ? "app-nested-scroll"
-                    : "min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-auto"
-                }
-              >
+              <div className="min-w-0">
                 <TemplateList
                   templates={filteredTemplates}
                   tags={tags}
@@ -453,14 +445,12 @@ export default function MailTemplatePage() {
           {!compact || mobilePane === "detail" ? (
             <section
               className={`flex min-w-0 flex-col gap-2 rounded-md border border-zinc-200/80 bg-white p-2 shadow-sm ${
-                compact
-                  ? "h-auto pb-3"
-                  : "min-h-[min(50dvh,24rem)] overflow-y-auto overscroll-auto md:min-h-0 md:gap-3 md:p-4 lg:p-6"
+                compact ? "h-auto pb-3" : "md:gap-3 md:p-4 lg:p-6"
               }`}
             >
               {selected ? (
                 <>
-                  <div className="flex min-w-0 shrink-0 items-start gap-2">
+                  <div className="flex min-w-0 items-start gap-2">
                     <h2 className="min-w-0 flex-1 break-words text-sm font-semibold text-zinc-900 md:truncate">
                       {selected.title}
                     </h2>
@@ -474,13 +464,7 @@ export default function MailTemplatePage() {
                       </button>
                     ) : null}
                   </div>
-                  <div
-                    className={
-                      compact
-                        ? "app-nested-scroll app-nested-scroll--short border-b border-zinc-100 pb-2"
-                        : "max-h-[min(38%,14rem)] shrink-0 overflow-x-hidden overflow-y-auto overscroll-auto border-b border-zinc-100 pb-2 md:max-h-[42%] md:pb-3"
-                    }
-                  >
+                  <div className="border-b border-zinc-100 pb-2 md:pb-3">
                     <VariableForm
                       variables={enabledVariables}
                       values={values}
@@ -496,11 +480,10 @@ export default function MailTemplatePage() {
                     body={previewBody}
                     combinedText={finalText}
                     emptyLabels={emptyLabels}
-                    nestedScroll={compact}
                   />
                 </>
               ) : (
-                <div className="flex flex-1 items-center justify-center px-2 py-8">
+                <div className="flex items-center justify-center px-2 py-8">
                   <p className="break-words text-center text-sm text-zinc-400">
                     {mt.list.selectPrompt}
                   </p>

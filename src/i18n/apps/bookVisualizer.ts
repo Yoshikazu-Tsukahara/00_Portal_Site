@@ -38,6 +38,7 @@ export type BookVisualizerDict = {
     samples: {
       novel: { title: string; lead: string };
       western: { title: string; lead: string };
+      photo: { title: string; lead: string };
     };
     readTitle: string;
     readLead: string;
@@ -305,7 +306,7 @@ export type BookVisualizerDict = {
 
 export const bookVisualizerJa: BookVisualizerDict = {
   shell: {
-    title: "Quarto",
+    title: "紙面エディタ",
     description:
       "原稿を本の紙面そのもので組むエディター。用紙サイズと文字数・行数から文字サイズを自動計算し、縦書き／横書きで仕上げて .mybook で共有できます。",
   },
@@ -351,11 +352,15 @@ export const bookVisualizerJa: BookVisualizerDict = {
     samples: {
       novel: {
         title: "日本語・縦書き小説",
-        lead: "文庫判。四章＋節、章末の手動区切り、柱と目次ノンブルが連動するサンプル。",
+        lead: "文庫判。四章＋節、章末の手動区切り、柱と目次ノンブルが連動する重厚サンプル。",
       },
       western: {
         title: "English trade paperback",
-        lead: "トレード判・横書き。名前変換（{{name1}}）付きの三章サンプル。",
+        lead: "トレード判・横書き。名前変換（{{name1}}）付きの四章＋コーダ。",
+      },
+      photo: {
+        title: "正方形・写真集",
+        lead: "スクエア判。フルブリード図版5点＋エッセイ三章、名前変換付き。",
       },
     },
     readTitle: "持っている .mybook ファイルを読む",
@@ -687,7 +692,11 @@ export const bookVisualizerEn: BookVisualizerDict = {
       },
       western: {
         title: "English trade paperback",
-        lead: "Trade trim · horizontal. Includes name placeholders ({{name1}}) and page breaks.",
+        lead: "Trade trim · horizontal. Four chapters + coda with {{name1}} placeholders.",
+      },
+      photo: {
+        title: "Square photo book",
+        lead: "Square trim. Five full-bleed plates plus a three-chapter essay.",
       },
     },
     readTitle: "Read a .mybook file",

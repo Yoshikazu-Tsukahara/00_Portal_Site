@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import ToolGlyph from "@/components/ToolGlyph";
 import { getToolCoverSrc, type Tool } from "@/data/tools";
 
 /** プレビュー用の仮想ビューポート（カード枠に合わせて縮小表示） */
@@ -83,7 +84,9 @@ export default function AppCover({ tool, className = "" }: Props) {
         className={`store-cover store-cover--fallback ${className}`.trim()}
         aria-hidden
       >
-        <span className="store-cover__emoji">{tool.icon}</span>
+        <span className="store-cover__emoji">
+          <ToolGlyph tool={tool} />
+        </span>
       </div>
     );
   }
@@ -96,7 +99,9 @@ export default function AppCover({ tool, className = "" }: Props) {
     >
       {!loaded ? (
         <div className="store-cover store-cover--fallback absolute inset-0">
-          <span className="store-cover__emoji">{tool.icon}</span>
+          <span className="store-cover__emoji">
+            <ToolGlyph tool={tool} />
+          </span>
         </div>
       ) : null}
 

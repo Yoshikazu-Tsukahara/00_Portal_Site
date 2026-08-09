@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import AppCover from "@/components/AppCover";
+import ToolGlyph from "@/components/ToolGlyph";
 import {
   findGenreByToolId,
   findToolById,
@@ -109,10 +110,10 @@ export default function LibraryAppDetailPage() {
           <div className="flex flex-col">
             <div className="flex items-start gap-4">
               <span
-                className="store-app-icon h-[4.5rem] w-[4.5rem] text-3xl sm:h-[5.25rem] sm:w-[5.25rem] sm:text-4xl"
+                className="store-app-icon flex h-[4.5rem] w-[4.5rem] items-center justify-center overflow-hidden text-3xl sm:h-[5.25rem] sm:w-[5.25rem] sm:text-4xl"
                 aria-hidden
               >
-                {tool.icon}
+                <ToolGlyph tool={tool} />
               </span>
               <div className="min-w-0 flex-1 pt-1">
                 <h1

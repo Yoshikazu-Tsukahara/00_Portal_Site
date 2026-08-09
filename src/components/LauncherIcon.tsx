@@ -10,6 +10,7 @@ import type {
   Ref,
 } from "react";
 import { useRef } from "react";
+import ToolGlyph from "@/components/ToolGlyph";
 import type { Tool } from "@/data/tools";
 import { fmt, useI18n } from "@/i18n";
 import {
@@ -131,7 +132,7 @@ export default function LauncherIcon({
       e.currentTarget;
     onLaunchApp({
       href: tool.href,
-      icon: tool.icon,
+      icon: <ToolGlyph tool={tool} />,
       title,
       origin: readLaunchOrigin(glyph),
     });
@@ -212,7 +213,7 @@ export default function LauncherIcon({
               <span aria-hidden>×</span>
             </button>
             <span className="launcher-icon__glyph" aria-hidden>
-              {tool.icon}
+              <ToolGlyph tool={tool} />
             </span>
           </span>
           <span className="sr-only">
@@ -236,7 +237,7 @@ export default function LauncherIcon({
         >
           <span className="launcher-icon__glyph-wrap">
             <span className="launcher-icon__glyph" aria-hidden>
-              {tool.icon}
+              <ToolGlyph tool={tool} />
             </span>
           </span>
         </a>

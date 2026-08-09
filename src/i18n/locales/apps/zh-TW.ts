@@ -4,7 +4,7 @@ import type { AppsDictionary } from "../../apps";
 export const appsZhTW: AppsDictionary = {
   bookVisualizer: {
     shell: {
-      title: "Quarto",
+      title: "紙面編輯",
       description: "直接在頁面上排版的書籍編輯器。選擇紙張尺寸、設定字數與行數後自動計算字級，再以直書或橫書完成，並以 .mybook 檔案分享。",
     },
     loading: "載入中…",
@@ -48,6 +48,10 @@ export const appsZhTW: AppsDictionary = {
         western: {
           title: "英文大眾平裝",
           lead: "貿易判·橫書。三章加尾聲，含手動分頁。",
+        },
+        photo: {
+          title: "方形寫真集",
+          lead: "方形開本。5 張滿版圖版 + 三章隨筆，含姓名變數。",
         },
       },
       readTitle: "閱讀 .mybook 檔案",

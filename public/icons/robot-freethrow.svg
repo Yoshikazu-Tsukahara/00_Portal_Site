@@ -1,10 +1,3 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <rect width="64" height="64" rx="12" fill="#f3e6c8"/>
-  <path d="M8 18h48M8 30h48M8 42h48" stroke="#333" stroke-opacity=".15" stroke-width="1"/>
-  <circle cx="20" cy="22" r="6" stroke="#333" stroke-width="2"/>
-  <rect x="15" y="28" width="10" height="14" rx="2" stroke="#333" stroke-width="2"/>
-  <path d="M25 32l10-8" stroke="#333" stroke-width="2" stroke-linecap="round"/>
-  <circle cx="38" cy="22" r="3" stroke="#333" stroke-width="1.5"/>
-  <ellipse cx="48" cy="28" rx="4" ry="9" stroke="#333" stroke-width="2"/>
-  <path d="M12 50c8-10 20-10 28 2" stroke="#333" stroke-width="1.5" stroke-dasharray="2 3" stroke-linecap="round"/>
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Robot Freethrow">
+  <image href="/icons/robot-freethrow-512.png" width="512" height="512" preserveAspectRatio="xMidYMid slice"/>
 </svg>

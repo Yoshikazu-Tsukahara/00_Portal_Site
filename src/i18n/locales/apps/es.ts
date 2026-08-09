@@ -1056,7 +1056,7 @@ export const appsEs: AppsDictionary = {
   },
   bookVisualizer: {
     shell: {
-      title: "Quarto",
+      title: "Editor página",
       description: "Un editor de libros centrado en la página. Elige el tamaño, define caracteres y líneas, y el tamaño de fuente se calcula solo; termina en vertical u horizontal y comparte como .mybook.",
     },
     loading: "Cargando…",
@@ -1100,6 +1100,10 @@ export const appsEs: AppsDictionary = {
         western: {
           title: "Trade paperback en inglés",
           lead: "Trade · horizontal. Tres capítulos más coda, con saltos manuales.",
+        },
+        photo: {
+          title: "Fotolibro cuadrado",
+          lead: "Formato cuadrado. Cinco láminas a sangre y un ensayo en tres capítulos.",
         },
       },
       readTitle: "Leer un archivo .mybook",

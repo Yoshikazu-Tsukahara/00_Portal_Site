@@ -59,71 +59,71 @@ export const pt: PartialDictionary = {
   },
   tools: {
     "invoice-maker": {
-      title: "Docs",
+      title: "Formulários",
       description: "Faturas, orçamentos, entregas e recibos em A4. PDF multilíngue.",
     },
     "mail-template": {
-      title: "Mail",
+      title: "Modelos mail",
       description: "Tags e variáveis para responder mais rápido.",
     },
     "folder-generator": {
-      title: "Pastas",
+      title: "Pastas lote",
       description: "Crie pastas em lote com datas, números e listas.",
     },
     "pdf-editor": {
-      title: "PDF",
+      title: "Editor PDF",
       description: "Mesclar, reordenar e excluir páginas no navegador.",
     },
     "image-compressor": {
-      title: "Imagens",
+      title: "Compr. imagem",
       description: "Redimensione e comprima em lote no navegador.",
     },
     "text-cleaner": {
-      title: "Texto",
+      title: "Limpeza texto",
       description: "Limpe quebras, espaços e caracteres de controle.",
     },
     "media-metadata-editor": {
-      title: "Metadados",
+      title: "Tags mídia",
       description: "Edite tags e capas de áudio/vídeo no navegador.",
     },
     "character-relation-editor": {
-      title: "Relações",
+      title: "Mapa personagens",
       description: "Organize relações da história com cartões e linhas.",
     },
     "book-visualizer": {
-      title: "Quarto",
+      title: "Editor página",
       description: "Edite o layout da página e compartilhe em .mybook.",
     },
     "palette-collector": {
-      title: "Paleta",
+      title: "Paleta cores",
       description: "Extraia paletas de imagens, com verificação de contraste.",
     },
     "lunch-savings": {
-      title: "Almoço",
+      title: "Poupança almoço",
       description: "Registre a diferença do orçamento e poupe jogando.",
     },
     "link-stocker": {
-      title: "Links",
+      title: "Guardar links",
       description: "Guarde URLs “quase favoritos” como cartões com OGP.",
     },
     "ultimate-probability-slot": {
-      title: "Slot",
+      title: "Slot odds",
       description: "Desafie sua própria máquina de baixa probabilidade.",
     },
     "pixel-drop-puzzle": {
-      title: "Pixel",
+      title: "Pixel drop",
       description: "Solte a foto na fenda. Precisão de subpixel.",
     },
     "robot-freethrow": {
-      title: "Lance",
+      title: "Lance projétil",
       description: "Mire o aro com ângulo, velocidade inicial e spin.",
     },
     "crypto-message": {
-      title: "Segredo",
+      title: "Msg secreta",
       description: "Cifre com uma frase secreta. Desafio César incluso.",
     },
     "monster-driver": {
-      title: "Monster",
+      title: "Monster drive",
       description: "Pare no vermelho, saia no azul. Ação em primeira pessoa.",
     },
   },

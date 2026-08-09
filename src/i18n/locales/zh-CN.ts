@@ -61,71 +61,71 @@ export const zhCN: PartialDictionary = {
   },
   tools: {
     "invoice-maker": {
-      title: "单据",
+      title: "单据制作",
       description: "A4 发票/报价/交货单/收据。多语言多货币 PDF。",
     },
     "mail-template": {
-      title: "邮件",
+      title: "邮件模板",
       description: "用标签分类与变量替换，让日常邮件回复更快。",
     },
     "folder-generator": {
-      title: "文件夹",
+      title: "文件夹生成",
       description: "按命名规则组合日期、编号与列表，一键批量创建。",
     },
     "pdf-editor": {
-      title: "PDF",
+      title: "PDF编辑",
       description: "在浏览器中完成合并、排序与页面删除。",
     },
     "image-compressor": {
-      title: "图片",
+      title: "图片压缩",
       description: "指定最大宽度与画质，在浏览器内批量缩放与压缩。",
     },
     "text-cleaner": {
-      title: "文本",
+      title: "文本清理",
       description: "一键清理换行、空白与控制字符，也可保存自定义替换规则。",
     },
     "media-metadata-editor": {
-      title: "元数据",
+      title: "媒体标签",
       description: "在浏览器内编辑并预览音乐与视频的标签和封面。",
     },
     "character-relation-editor": {
-      title: "关系图",
+      title: "人物关系图",
       description: "用人物卡片与关系线，直观整理故事人物关系。",
     },
     "book-visualizer": {
-      title: "Quarto",
+      title: "纸面编辑",
       description: "指定纸张与排版，直接编辑版面，并用 .mybook 分享。",
     },
     "palette-collector": {
-      title: "调色板",
+      title: "配色板",
       description: "从图片提取配色，支持自动提取与对比度检查。",
     },
     "lunch-savings": {
-      title: "午餐",
+      title: "午餐存钱",
       description: "点按记录与预算的差额，用游戏感攒下省下的钱。",
     },
     "link-stocker": {
-      title: "收藏",
+      title: "链接收藏",
       description: "用不太正式的书签方式，以带 OGP 的卡片收藏 URL。",
     },
     "ultimate-probability-slot": {
-      title: "老虎机",
+      title: "概率老虎机",
       description: "用自制低概率老虎机挑战「直到中奖」或「连续落空」。",
     },
     "pixel-drop-puzzle": {
-      title: "像素",
+      title: "像素落缝",
       description: "把照片落入缝隙即可，亚像素级判定的精度谜题。",
     },
     "robot-freethrow": {
-      title: "罚球",
+      title: "投射罚球",
       description: "用角度、初速与旋转瞄准篮筐的抛体运动小游戏。",
     },
     "crypto-message": {
-      title: "秘密",
+      title: "秘密消息",
       description: "用口令加密解密，附带凯撒密码挑战。",
     },
     "monster-driver": {
-      title: "怪物",
+      title: "怪物驾驶",
       description: "红灯停、蓝灯冲。考验转向灯记忆的第一人称动作。",
     },
   },

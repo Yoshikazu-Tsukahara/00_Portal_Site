@@ -10,6 +10,7 @@ import {
   type MouseEvent,
   type ReactNode,
 } from "react";
+import ToolGlyph from "@/components/ToolGlyph";
 import type { Tool } from "@/data/tools";
 import { fmt, useI18n } from "@/i18n";
 import type { HomeFolderItem } from "@/lib/homePins";
@@ -173,7 +174,7 @@ export default function LauncherFolderSheet({
     const copy = t.tools[tool.id] ?? { title: tool.id, description: "" };
     onLaunchApp({
       href: tool.href,
-      icon: tool.icon,
+      icon: <ToolGlyph tool={tool} />,
       title: copy.title,
       origin: readLaunchOrigin(glyph),
     });
@@ -250,7 +251,7 @@ export default function LauncherFolderSheet({
                         <span aria-hidden>×</span>
                       </button>
                       <span className="launcher-icon__glyph" aria-hidden>
-                        {tool.icon}
+                        <ToolGlyph tool={tool} />
                       </span>
                     </span>
                     <span className="launcher-icon__label">{title}</span>
@@ -272,7 +273,7 @@ export default function LauncherFolderSheet({
                   >
                     <span className="launcher-icon__glyph-wrap">
                       <span className="launcher-icon__glyph" aria-hidden>
-                        {tool.icon}
+                        <ToolGlyph tool={tool} />
                       </span>
                     </span>
                     <span className="launcher-icon__label">{title}</span>

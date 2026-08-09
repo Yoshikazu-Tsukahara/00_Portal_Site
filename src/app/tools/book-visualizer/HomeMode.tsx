@@ -3,6 +3,7 @@
 import { useRef, useState, type DragEvent } from "react";
 
 import { fmt, useI18n } from "@/i18n";
+import { SAMPLE_IDS, type SampleId } from "./samples";
 import { readMyBookFile } from "./storage";
 import { MYBOOK_EXTENSION, type BookData } from "./types";
 
@@ -14,13 +15,21 @@ type HomeModeProps = {
   readOnly?: boolean;
   onCreate: () => void;
   onResume: () => void;
+  /** サンプルを読み込んで編集を開く */
+  onLoadSample: (id: SampleId) => void;
   /** 読み込んだ本を閲覧モードで開く */
   onOpenBook: (book: BookData) => void;
 };
 
+const SAMPLE_ICONS: Record<SampleId, string> = {
+  novel: "📕",
+  western: "📘",
+  photo: "📷",
+};
+
 /**
  * 入口となるポータル画面。
- * 制作・もらった本を読む、の導線をまとめる（サンプルは置かない）。
+ * 制作・サンプル・もらった本を読む、の導線をまとめる。
  */
 export default function HomeMode({
   hasDraft,
@@ -28,6 +37,7 @@ export default function HomeMode({
   readOnly = false,
   onCreate,
   onResume,
+  onLoadSample,
   onOpenBook,
 }: HomeModeProps) {
   const { t } = useI18n();
@@ -101,6 +111,42 @@ export default function HomeMode({
     </section>
   );
 
+  const samplesSection = !readOnly ? (
+    <section className="rounded-2xl border border-[#e6dfd2] bg-white/70 p-4 sm:p-5">
+      <div className="mb-3 space-y-1">
+        <h2 className="bv-serif-jp text-base font-medium tracking-wide text-[#33302c] sm:text-lg">
+          {copy.home.samplesHeading}
+        </h2>
+        <p className="break-words text-xs leading-relaxed text-[#6f665b]">
+          {copy.home.samplesLead}
+        </p>
+      </div>
+      <div className="grid gap-2 sm:grid-cols-3">
+        {SAMPLE_IDS.map((id) => {
+          const sample = copy.home.samples[id];
+          return (
+            <button
+              key={id}
+              type="button"
+              onClick={() => onLoadSample(id)}
+              className="flex min-h-11 min-w-0 flex-col gap-1.5 rounded-xl border border-[#ded5c5] bg-[#f8f5ef] p-3.5 text-left transition-all hover:border-[#c4b8a4] hover:bg-[#f3eee4] active:scale-[0.99]"
+            >
+              <span className="text-lg" aria-hidden>
+                {SAMPLE_ICONS[id]}
+              </span>
+              <span className="break-words text-sm font-semibold text-[#33302c]">
+                {sample.title}
+              </span>
+              <span className="break-words text-[11px] leading-relaxed text-[#6f665b]">
+                {sample.lead}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </section>
+  ) : null;
+
   if (readOnly) {
     return (
       <div className="flex min-h-0 w-full max-w-full flex-col gap-3 overflow-y-auto">
@@ -150,6 +196,8 @@ export default function HomeMode({
         {/* 右：もらった .mybook を読む */}
         {readSection}
       </div>
+
+      {samplesSection}
     </div>
   );
 }

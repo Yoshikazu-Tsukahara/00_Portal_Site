@@ -22,7 +22,9 @@ import { useStandaloneDisplay } from "@/lib/useStandaloneDisplay";
  * - ミニゲームは `fillViewport` + `minStageSize` で、広いときはぴったり埋め、
  *   狭いときは最低サイズを保ったままスクロールする。
  * - LocalStorage を使うなら `dataManager` を渡す。
- * - 例: メールテンプレ管理、PDF編集、テキスト整形。
+ * - 例: PDF編集、テキスト整形。
+ * - ページ全体スクロール前提（内部スクロールなし）なら `fillViewport` を付けない
+ *   （SiteChrome の FILL_VIEWPORT_PATHS からも外す）。例: メールテンプレ。
  *
  * ## Type C: 独立 PWA（ホーム画面から単体起動できるアプリ）
  * - AppShell を `isPwa` 付きで使う。
@@ -197,7 +199,8 @@ export default function AppShell({
           ? "min-h-full overflow-x-auto py-2"
           : fillViewport
             ? "h-full min-h-0 max-h-full overflow-x-hidden overflow-hidden py-2"
-            : "overflow-x-hidden py-4"
+            : // overflow-x: hidden は overflow-y を auto に変えて内部縦スクロールを誘発するため clip を使う
+              "overflow-x-clip py-4"
       }`}
     >
       <header

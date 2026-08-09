@@ -59,71 +59,71 @@ export const fr: PartialDictionary = {
   },
   tools: {
     "invoice-maker": {
-      title: "Docs",
+      title: "Formulaires",
       description: "Factures, devis, bons et reçus en A4. PDF multi-langues et devises.",
     },
     "mail-template": {
-      title: "Mail",
+      title: "Modèles mail",
       description: "Tags et variables pour répondre plus vite.",
     },
     "folder-generator": {
-      title: "Dossiers",
+      title: "Dossiers lot",
       description: "Créez des dossiers en lot avec dates, numéros et listes.",
     },
     "pdf-editor": {
-      title: "PDF",
+      title: "Éditeur PDF",
       description: "Fusionnez, réordonnez et supprimez des pages dans le navigateur.",
     },
     "image-compressor": {
-      title: "Images",
+      title: "Compress. img",
       description: "Redimensionnez et compressez par lots dans le navigateur.",
     },
     "text-cleaner": {
-      title: "Texte",
+      title: "Nettoyage txt",
       description: "Nettoyez retours, espaces et caractères de contrôle.",
     },
     "media-metadata-editor": {
-      title: "Métadonnées",
+      title: "Méta média",
       description: "Éditez tags et pochettes audio/vidéo dans le navigateur.",
     },
     "character-relation-editor": {
-      title: "Relations",
+      title: "Carte liens",
       description: "Organisez les relations d’une histoire avec cartes et liens.",
     },
     "book-visualizer": {
-      title: "Quarto",
+      title: "Éditeur page",
       description: "Éditez la mise en page et partagez en .mybook.",
     },
     "palette-collector": {
-      title: "Palette",
+      title: "Palette couleurs",
       description: "Extrayez des palettes d’images, avec contrôle de contraste.",
     },
     "lunch-savings": {
-      title: "Déjeuner",
+      title: "Épargne déj.",
       description: "Enregistrez l’écart au budget et économisez en jouant.",
     },
     "link-stocker": {
-      title: "Liens",
+      title: "Liens gardés",
       description: "Gardez des URL « presque favoris » en cartes OGP.",
     },
     "ultimate-probability-slot": {
-      title: "Slot",
+      title: "Slot odds",
       description: "Défiez votre propre machine à très faible probabilité.",
     },
     "pixel-drop-puzzle": {
-      title: "Pixel",
+      title: "Pixel drop",
       description: "Laissez tomber la photo dans la fente. Précision subpixel.",
     },
     "robot-freethrow": {
-      title: "Lancer",
+      title: "Lancer projectile",
       description: "Visez l’anneau avec angle, vitesse initiale et spin.",
     },
     "crypto-message": {
-      title: "Secret",
+      title: "Msg secret",
       description: "Chiffrez avec une phrase secrète. Défi César inclus.",
     },
     "monster-driver": {
-      title: "Monster",
+      title: "Monster drive",
       description: "Stop au rouge, partez au bleu. Action à la première personne.",
     },
   },

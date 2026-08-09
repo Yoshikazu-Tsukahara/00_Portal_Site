@@ -37,7 +37,7 @@ const FILL_VIEWPORT_PATHS = [
   "/ultimate-probability-slot",
   "/pixel-drop-puzzle",
   "/crypto-message",
-  "/tools/mail-template",
+  // メールテンプレはページ全体スクロール（内部スクロールなし）
   "/tools/pdf-editor",
   "/tools/image-compressor",
   "/tools/text-cleaner",
@@ -45,6 +45,12 @@ const FILL_VIEWPORT_PATHS = [
   "/tools/character-relation-editor",
   "/tools/book-visualizer",
 ];
+
+/**
+ * 独立 PWA でもビューポート固定せず、ページ全体が伸びてスクロールするルート。
+ * （内部スクロール禁止・コンテンツ縦伸び前提のアプリ）
+ */
+const PAGE_SCROLL_STANDALONE_PATHS = ["/tools/mail-template"];
 
 /**
  * ミニゲーム（AppShell `minStageSize` 併用）。
@@ -113,6 +119,10 @@ export default function SiteChrome({ children }: { children: ReactNode }) {
     pathname,
     MIN_STAGE_PAGE_SCROLL_PATHS,
   );
+  const pageScrollStandalone = matchesAppPath(
+    pathname,
+    PAGE_SCROLL_STANDALONE_PATHS,
+  );
 
   // プレビュー埋め込み：サイト枠を外し、アプリ本体だけを固定サイズで見せる
   if (isPreview) {
@@ -124,8 +134,8 @@ export default function SiteChrome({ children }: { children: ReactNode }) {
   }
 
   if (isolatePwa || isolateFullscreen) {
-    // ミニゲーム PWA: 狭いときはページ全体が伸びる（中だけスクロールしない）
-    if (isolatePwa && minStagePageScroll) {
+    // ミニゲーム PWA / ページスクロール前提 PWA: 狭いときはページ全体が伸びる
+    if (isolatePwa && (minStagePageScroll || pageScrollStandalone)) {
       return (
         <>
           <KeepTabBridge />
@@ -185,8 +195,9 @@ export default function SiteChrome({ children }: { children: ReactNode }) {
       <KeepTabBridge />
       <div className="flex min-h-dvh flex-1 flex-col">
         <Header />
-        {/* Main 舞台はフル幅。幅制限は各ページ / AppShell 内でかける */}
-        <div className="relative flex min-h-0 flex-1 flex-col">{children}</div>
+        {/* Main 舞台はフル幅。幅制限は各ページ / AppShell 内でかける。
+            min-h-0 は高さ固定スクロール用なので付けない（内容に合わせて下へ伸ばす） */}
+        <div className="relative flex w-full flex-1 flex-col">{children}</div>
         <Footer />
       </div>
     </>

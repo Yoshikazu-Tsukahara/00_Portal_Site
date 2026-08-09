@@ -59,71 +59,71 @@ export const de: PartialDictionary = {
   },
   tools: {
     "invoice-maker": {
-      title: "Belege",
+      title: "Formular",
       description: "Rechnungen, Angebote, Lieferscheine und Quittungen im A4-PDF.",
     },
     "mail-template": {
-      title: "Mail",
+      title: "Mailvorlagen",
       description: "Tags und Variablen für schnellere Antworten.",
     },
     "folder-generator": {
-      title: "Ordner",
+      title: "Ordnerbatch",
       description: "Ordner per Regel mit Datum, Nummern und Listen erzeugen.",
     },
     "pdf-editor": {
-      title: "PDF",
+      title: "PDF-Editor",
       description: "Zusammenführen, sortieren und Seiten löschen im Browser.",
     },
     "image-compressor": {
-      title: "Bilder",
+      title: "Bildkompress",
       description: "Stapelweise skalieren und komprimieren im Browser.",
     },
     "text-cleaner": {
-      title: "Text",
+      title: "Textpflege",
       description: "Zeilenumbrüche, Leerzeichen und Steuerzeichen bereinigen.",
     },
     "media-metadata-editor": {
-      title: "Metadaten",
+      title: "Medientags",
       description: "Tags und Cover von Audio/Video im Browser bearbeiten.",
     },
     "character-relation-editor": {
-      title: "Figuren",
+      title: "Figurennetz",
       description: "Beziehungen einer Geschichte mit Karten und Linien ordnen.",
     },
     "book-visualizer": {
-      title: "Quarto",
+      title: "Seiteneditor",
       description: "Seitenlayout bearbeiten und als .mybook teilen.",
     },
     "palette-collector": {
-      title: "Palette",
+      title: "Farbpalette",
       description: "Farbpaletten aus Bildern, inkl. Kontrastprüfung.",
     },
     "lunch-savings": {
-      title: "Mittag",
+      title: "Mittagsparen",
       description: "Differenz zum Budget tippen und spielerisch sparen.",
     },
     "link-stocker": {
-      title: "Links",
+      title: "Linkspeicher",
       description: "URLs als OGP-Karten behalten – nicht ganz Lesezeichen.",
     },
     "ultimate-probability-slot": {
-      title: "Slot",
+      title: "Chance-Slot",
       description: "Eigene Niedrig-Odds-Maschine bis zum Treffer.",
     },
     "pixel-drop-puzzle": {
-      title: "Pixel",
+      title: "Pixelwurf",
       description: "Foto in den Spalt fallen lassen. Subpixel-Präzision.",
     },
     "robot-freethrow": {
-      title: "Wurf",
+      title: "Wurfspiel",
       description: "Mit Winkel, Anfangsgeschwindigkeit und Spin auf den Ring zielen.",
     },
     "crypto-message": {
-      title: "Geheim",
+      title: "Geheimtext",
       description: "Mit Passphrase ver-/entschlüsseln. Caesar-Challenge inklusive.",
     },
     "monster-driver": {
-      title: "Monster",
+      title: "Monsterfahrt",
       description: "Bei Rot stoppen, bei Blau starten. Ego-Action.",
     },
   },

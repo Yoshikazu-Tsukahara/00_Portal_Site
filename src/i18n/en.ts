@@ -126,7 +126,7 @@ export const en: Dictionary = {
   },
   tools: {
     "invoice-maker": {
-      title: "Forms",
+      title: "Form Maker",
       description:
         "A4 invoices, estimates, delivery notes & receipts. Multi-currency PDF.",
       detail: [
@@ -149,7 +149,7 @@ export const en: Dictionary = {
       tip: "Faint placeholder fields are omitted when printing. Export a backup from the header control so important history isn’t lost with browser data.",
     },
     "mail-template": {
-      title: "Mail",
+      title: "Mail Templates",
       description: "Speed up email replies with tags and variable substitution.",
       detail: [
         "Store subject lines and bodies you reuse, find them with tags, and fill names, dates, or project fields with {{variables}} instead of rewriting every time.",
@@ -170,7 +170,7 @@ export const en: Dictionary = {
       tip: "Copying warns you if variables are still empty. Tag your most-used drafts so they’re easy to find later.",
     },
     "folder-generator": {
-      title: "Folders",
+      title: "Folder Batch",
       description:
         "Build naming rules, then batch-create folders and export as ZIP.",
       detail: [
@@ -192,7 +192,7 @@ export const en: Dictionary = {
       tip: "Save frequent layouts as templates. The live tree isn’t persisted—only templates are.",
     },
     "pdf-editor": {
-      title: "PDF",
+      title: "PDF Editor",
       description: "Merge, reorder, and delete pages entirely in the browser.",
       detail: [
         "Merge PDFs, fix page order or rotation, and drop pages you don’t need—entirely in the browser, so light cleanup of sensitive docs doesn’t require an upload.",
@@ -212,7 +212,7 @@ export const en: Dictionary = {
       tip: "Changing page structure can lock file-level actions. Work is session-only—export as soon as you’re done.",
     },
     "image-compressor": {
-      title: "Images",
+      title: "Image Compress",
       description: "Resize and compress images in-browser with width and quality.",
       detail: [
         "Batch-resize and compress images before blog posts, decks, or chat uploads. Set max width and quality (or a preset), process many files at once, and download a ZIP.",
@@ -232,7 +232,7 @@ export const en: Dictionary = {
       tip: "WebP is great for the web; JPEG is safer for compatibility. This tool shrinks—it won’t enlarge beyond the source.",
     },
     "text-cleaner": {
-      title: "Text",
+      title: "Text Cleaner",
       description: "Clean breaks, spaces, and control chars. Save custom rules.",
       detail: [
         "Clean invisible control characters, messy line breaks, and odd spaces that hitch a ride when you paste from spreadsheets, mail, or PDFs. Save replace-rule sets so the same cleanup is one click next time.",
@@ -253,7 +253,7 @@ export const en: Dictionary = {
       tip: "Name and save a rule set for chores you repeat. Keep an original copy before aggressive cleanup.",
     },
     "media-metadata-editor": {
-      title: "Metadata",
+      title: "Media Tags",
       description: "Edit audio/video tags and cover art locally in the browser.",
       detail: [
         "Edit titles, artists, album years, and cover/thumbnails for audio and video in the browser, then download the result back into your library—without uploading files to a server.",
@@ -274,7 +274,7 @@ export const en: Dictionary = {
       tip: "Embedding focuses on MP3 and some video containers; other types may mainly rename. Large videos can take a while to save.",
     },
     "character-relation-editor": {
-      title: "Relations",
+      title: "Character Map",
       description: "Map story ties with character cards and labeled links.",
       detail: [
         "Place characters as cards and connect them with labeled links to map a novel, script, or TTRPG cast. Seeing who ties to whom on one canvas makes gaps and contradictions easier to spot.",
@@ -316,7 +316,7 @@ export const en: Dictionary = {
       tip: "Vertical writing has its own input flow. Large images have a size cap—compress photos before placing them.",
     },
     "palette-collector": {
-      title: "Palette",
+      title: "Color Palette",
       description: "Eyedrop colors from images. Auto-extract and contrast checks.",
       detail: [
         "Eyedrop or region-auto-extract colors from reference images into a living palette. Check HEX/RGB/HSL, copy CSS variables or JSON, and gauge text/background contrast (WCAG) while you explore directions.",
@@ -337,7 +337,7 @@ export const en: Dictionary = {
       tip: "Project saves depend on local storage space. Keep important palettes as CSS/JSON copies too.",
     },
     "lunch-savings": {
-      title: "Lunch",
+      title: "Lunch Savings",
       description: "Tap lunch vs budget and watch savings grow—built for phones.",
       detail: [
         "Log today’s lunch against a budget and watch the gap stack up like a game. Choose steady savings or a countdown-to-zero mode, with periods like this month or until payday.",
@@ -358,7 +358,7 @@ export const en: Dictionary = {
       tip: "Currency is a display unit only—no FX conversion. Start with a realistic budget so the habit sticks.",
     },
     "link-stocker": {
-      title: "Links",
+      title: "Link Keep",
       description: "Keep “maybe later” URLs as visual cards with OGP thumbs.",
       detail: [
         "Park “read later” or “not ready to file” URLs as preview cards—less formal than bookmarks, more glanceable than a raw list.",
@@ -379,7 +379,7 @@ export const en: Dictionary = {
       tip: "Preview fetch can fail; the URL is still kept, and you can fix the title yourself.",
     },
     "ultimate-probability-slot": {
-      title: "Slot",
+      title: "Odds Slot",
       description: "Chase or dodge your own ultra-low-odds jackpot slot.",
       detail: [
         "Build a low-odds slot from reel and symbol counts, then chase a hit—or try to keep missing on purpose. Spin counts and cumulative odds make the streak feel real.",
@@ -399,7 +399,7 @@ export const en: Dictionary = {
       tip: "Switching modes resets the spin count. Extreme odds become a patience game.",
     },
     "pixel-drop-puzzle": {
-      title: "Pixel",
+      title: "Pixel Drop",
       description: "Drop a photo into the gap—judged to a fraction of a pixel.",
       detail: [
         "Drop a bar into a photo gap—simple controls, sub-pixel judging. Play with bundled scenes or your own 16:9 crop.",
@@ -419,7 +419,7 @@ export const en: Dictionary = {
       tip: "It looks easy until it isn’t. Start with wider gaps to learn the timing.",
     },
     "robot-freethrow": {
-      title: "Freethrow",
+      title: "Projectile Shot",
       description: "Aim with angle, initial speed, and spin in a projectile freethrow game.",
       detail: [
         "Aim freethrow-like shots with angle, launch speed, and spin in mind. Fill sticky-note parameters, tap the shooter, and watch the arc—quick physics feel in the browser.",
@@ -439,7 +439,7 @@ export const en: Dictionary = {
       tip: "Keep focus on the game view for input. Miss big first, then walk the arc toward the rim.",
     },
     "crypto-message": {
-      title: "Secret",
+      title: "Secret Message",
       description: "Passphrase encrypt/decrypt, plus a Caesar decoding challenge.",
       detail: [
         "Encrypt a note with a passphrase so only someone who knows it can decrypt—plus HEX/rune/Morse-styled looks and easy copy/share of the ciphertext.",
@@ -459,7 +459,7 @@ export const en: Dictionary = {
       tip: "The passphrase isn’t stored or sent by this app—share it out of band. Use real secure tools for anything truly sensitive.",
     },
     "monster-driver": {
-      title: "Monster",
+      title: "Monster Driver",
       description: "Stop on red, launch on green. Blinkers, memory, reaction.",
       detail: [
         "Stop on red, launch on green, and match remembered lanes with your blinker in a first-person action mini-game. Reaction and short-term memory share the same beat.",

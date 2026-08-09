@@ -59,71 +59,71 @@ export const ko: PartialDictionary = {
   },
   tools: {
     "invoice-maker": {
-      title: "문서",
+      title: "양식 작성",
       description: "청구·견적·납품·영수증을 A4로. 다국어 PDF.",
     },
     "mail-template": {
-      title: "메일",
+      title: "메일 템플릿",
       description: "태그 분류와 변수 치환으로 메일 회신을 빠르게.",
     },
     "folder-generator": {
-      title: "폴더",
+      title: "폴더 생성",
       description: "이름 규칙으로 날짜·번호·목록을 조합해 일괄 생성.",
     },
     "pdf-editor": {
-      title: "PDF",
+      title: "PDF 편집",
       description: "브라우저에서 병합·정렬·페이지 삭제까지.",
     },
     "image-compressor": {
-      title: "이미지",
+      title: "이미지 압축",
       description: "최대 폭과 화질을 지정해 브라우저에서 일괄 리사이즈·압축.",
     },
     "text-cleaner": {
-      title: "텍스트",
+      title: "텍스트 정리",
       description: "줄바꿈·공백·제어 문자를 한 번에. 사용자 규칙도 저장 가능.",
     },
     "media-metadata-editor": {
-      title: "메타데이터",
+      title: "미디어 태그",
       description: "브라우저에서 음악·영상 태그와 커버를 편집.",
     },
     "character-relation-editor": {
-      title: "관계도",
+      title: "인물 관계도",
       description: "인물 카드와 관계선으로 이야기의 관계를 시각적으로 정리.",
     },
     "book-visualizer": {
-      title: "Quarto",
+      title: "지면 편집",
       description: "용지와 조판을 지정해 지면을 직접 편집하고 .mybook으로 공유.",
     },
     "palette-collector": {
-      title: "팔레트",
+      title: "배색 팔레트",
       description: "이미지에서 배색 추출. 자동 추출과 대비 검사 지원.",
     },
     "lunch-savings": {
-      title: "런치",
+      title: "런치 저금",
       description: "예산과의 차이를 탭으로 기록. 게임처럼 아끼며 저금.",
     },
     "link-stocker": {
-      title: "킵",
+      title: "링크 킵",
       description: "북마크까지는 아닌 URL을 OGP 카드로 보관.",
     },
     "ultimate-probability-slot": {
-      title: "슬롯",
+      title: "확률 슬롯",
       description: "직접 만든 저확률 슬롯으로 ‘당첨까지’ 또는 ‘연속 미스’에 도전.",
     },
     "pixel-drop-puzzle": {
-      title: "픽셀",
+      title: "픽셀 드롭",
       description: "사진을 틈에 떨어뜨리기. 서브픽셀 정밀 퍼즐.",
     },
     "robot-freethrow": {
-      title: "프리스로",
+      title: "투사 프리스로",
       description: "각도·초속·스핀으로 림을 노리는 투사 운동 미니게임.",
     },
     "crypto-message": {
-      title: "비밀",
+      title: "비밀 메시지",
       description: "암호로 암호화·복호화. 카이사르 해독 챌린지 포함.",
     },
     "monster-driver": {
-      title: "몬스터",
+      title: "몬스터 운전",
       description: "빨강에 서고 파랑에 출발. 깜빡이 기억의 1인칭 액션.",
     },
   },

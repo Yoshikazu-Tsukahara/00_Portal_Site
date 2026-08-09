@@ -9,6 +9,7 @@ import { useLocalStorageState } from "@/lib/localData";
 import { useCompactLayout } from "@/lib/useCompactLayout";
 import EditMode from "./EditMode";
 import HomeMode from "./HomeMode";
+import { createSampleBook, type SampleId } from "./samples";
 import ViewMode from "./ViewMode";
 import { downloadMyBook } from "./storage";
 import {
@@ -230,6 +231,21 @@ export default function BookVisualizerPage() {
               }}
               onResume={() => {
                 if (readOnly) return;
+                setNotice("");
+                setMode("edit");
+              }}
+              onLoadSample={(id: SampleId) => {
+                if (readOnly) return;
+                if (
+                  hasBookContent(studio.book) &&
+                  !window.confirm(copy.home.sampleConfirm)
+                ) {
+                  return;
+                }
+                setData((prev) => ({
+                  ...normalizeStudio(prev),
+                  book: createSampleBook(id),
+                }));
                 setNotice("");
                 setMode("edit");
               }}

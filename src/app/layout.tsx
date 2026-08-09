@@ -24,6 +24,16 @@ export const metadata: Metadata = {
   title: "Blank Note | デスクトップ型ツールボックス",
   description:
     "外部送信ゼロ・完全ローカル動作の個人開発ツールを、文房具テイストのランチャーでまとめたポータルサイトです。",
+  icons: {
+    icon: [
+      { url: "/icons/blank-note-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icons/blank-note-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/blank-note-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      { url: "/icons/blank-note-180.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
 };
 
 export default function RootLayout({
