@@ -64,6 +64,7 @@ const TOOLS_WITH_STATIC_COVER = new Set<string>([
   "image-compressor",
   "text-cleaner",
   "media-metadata-editor",
+  "character-relation-editor",
   "book-visualizer",
   "palette-collector",
   "robot-freethrow",
@@ -152,6 +153,7 @@ export const genres: Genre[] = [
         id: "text-cleaner",
         icon: "✨",
         href: "/tools/text-cleaner",
+        isMobileSupported: true,
       },
     ],
   },
@@ -163,6 +165,7 @@ export const genres: Genre[] = [
         id: "media-metadata-editor",
         icon: "🎵",
         href: "/tools/media-metadata-editor",
+        isMobileSupported: true,
       },
       {
         id: "character-relation-editor",

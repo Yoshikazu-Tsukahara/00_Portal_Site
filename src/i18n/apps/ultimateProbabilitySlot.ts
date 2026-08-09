@@ -55,9 +55,13 @@ export type UltimateProbabilitySlotDict = {
     stopButton: string;
     spinningLabel: string;
     resetRunButton: string;
+    /** スマホ向け短いラベル */
+    resetRunButtonShort: string;
     resetRunConfirm: string;
     settingsButton: string;
     achievementsButton: string;
+    /** スマホ向け短いラベル */
+    achievementsButtonShort: string;
     lifetimeHeading: string;
     lifetimeAttempts: string;
     lifetimeWins: string;
@@ -204,9 +208,11 @@ export const ultimateProbabilitySlotJa: UltimateProbabilitySlotDict = {
     stopButton: "STOP",
     spinningLabel: "回転中…",
     resetRunButton: "回転数をリセット",
+    resetRunButtonShort: "リセット",
     resetRunConfirm: "回転数をリセットしますか？（生涯統計・実績は残ります）",
     settingsButton: "設定",
     achievementsButton: "🏆 実績",
+    achievementsButtonShort: "実績",
     lifetimeHeading: "生涯統計",
     lifetimeAttempts: "総回転数",
     lifetimeWins: "当たり回数",
@@ -399,10 +405,12 @@ export const ultimateProbabilitySlotEn: UltimateProbabilitySlotDict = {
     stopButton: "STOP",
     spinningLabel: "Spinning…",
     resetRunButton: "Reset spins",
+    resetRunButtonShort: "Reset",
     resetRunConfirm:
       "Reset spin count? (Lifetime stats & achievements are kept.)",
     settingsButton: "Settings",
     achievementsButton: "🏆 Achievements",
+    achievementsButtonShort: "Badges",
     lifetimeHeading: "Lifetime",
     lifetimeAttempts: "Total spins",
     lifetimeWins: "Hits",

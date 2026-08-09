@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import AppShell from "@/components/AppShell";
 import { fmt, useI18n } from "@/i18n";
+import { useCompactLayout } from "@/lib/useCompactLayout";
 import {
   cleanText,
   computeDiffChunks,
@@ -31,6 +32,7 @@ type PreviewTab = "result" | "diff";
 export default function TextCleanerPage() {
   const { t } = useI18n();
   const copy = t.apps.textCleaner;
+  const { showSideColumn } = useCompactLayout();
   const [input, setInput] = useState("");
   const [options, setOptions] = useState<CleanOptions | null>(null);
   const [rules, setRules] = useState<ReplaceRule[]>([]);
@@ -228,9 +230,15 @@ export default function TextCleanerPage() {
         },
       }}
     >
-      <div className="grid min-h-0 flex-1 gap-3 lg:grid-cols-2 lg:gap-4 lg:overflow-hidden">
-        {/* 左：入力＋設定 */}
-        <section className="flex min-h-0 flex-col gap-3 overflow-y-auto rounded-lg border border-zinc-200/80 bg-white p-3 sm:p-4 lg:min-h-0">
+      <div
+        className={`grid min-h-0 flex-1 gap-3 ${
+          showSideColumn
+            ? "grid-cols-2 gap-4 overflow-hidden"
+            : "grid-cols-1"
+        }`}
+      >
+        {/* 入力＋設定（スマホ／縦型は1列で上に） */}
+        <section className="flex min-h-0 flex-col gap-3 overflow-y-auto overscroll-auto rounded-lg border border-zinc-200/80 bg-white p-3 sm:p-4">
           <div className="shrink-0">
             <div className="mb-1.5 flex items-center justify-between gap-2">
               <label
@@ -611,8 +619,12 @@ export default function TextCleanerPage() {
           </div>
         </section>
 
-        {/* 右：プレビュー／差分＋コピー（左カラム高に合わせて自動伸長） */}
-        <section className="flex min-h-0 flex-col gap-3 rounded-lg border border-zinc-200/80 bg-white p-3 sm:p-4 lg:min-h-0 lg:overflow-hidden">
+        {/* プレビュー／差分＋コピー（2列時は右、1列時は下） */}
+        <section
+          className={`flex min-h-0 flex-col gap-3 rounded-lg border border-zinc-200/80 bg-white p-3 sm:p-4 ${
+            showSideColumn ? "overflow-hidden" : ""
+          }`}
+        >
           <div className="flex shrink-0 flex-wrap items-start justify-between gap-2">
             <div>
               <div className="inline-flex w-fit shrink-0 items-center gap-1 rounded-md border border-zinc-200 bg-zinc-50 p-0.5">

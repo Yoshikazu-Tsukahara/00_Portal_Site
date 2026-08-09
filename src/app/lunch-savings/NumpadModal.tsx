@@ -168,7 +168,11 @@ export default function NumpadModal({
           <button
             type="button"
             disabled={!Number.isFinite(amount) || amount < 0}
-            onClick={() => onConfirm(amount, note.trim())}
+            onClick={() => {
+              // 表示中の digits をその場で再パース（古いクロージャ防止）
+              const confirmed = parseMoneyInput(digits || "0", currency);
+              onConfirm(confirmed, note.trim());
+            }}
             className="lunch-confirm-btn !py-4 !text-base"
           >
             {copy.confirm}

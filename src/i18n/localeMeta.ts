@@ -29,6 +29,19 @@ export const LOCALE_NATIVE_LABELS: Record<Locale, string> = {
   pt: "Português",
 };
 
+/** ヘッダー等の短縮表示（jp / en など） */
+export const LOCALE_SHORT_LABELS: Record<Locale, string> = {
+  en: "en",
+  ja: "jp",
+  "zh-CN": "zh",
+  "zh-TW": "tw",
+  ko: "ko",
+  es: "es",
+  fr: "fr",
+  de: "de",
+  pt: "pt",
+};
+
 /** Intl / toLocaleString 用の BCP 47 タグ */
 export const INTL_BY_LOCALE: Record<Locale, string> = {
   en: "en-US",

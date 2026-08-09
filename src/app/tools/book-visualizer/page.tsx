@@ -1,13 +1,14 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import AppShell from "@/components/AppShell";
+import ForceLandscape from "@/components/ForceLandscape";
 import { useI18n } from "@/i18n";
 import { useLocalStorageState } from "@/lib/localData";
+import { useCompactLayout } from "@/lib/useCompactLayout";
 import EditMode from "./EditMode";
 import HomeMode from "./HomeMode";
-import { createSampleBook, type SampleId } from "./samples";
 import ViewMode from "./ViewMode";
 import { downloadMyBook } from "./storage";
 import {
@@ -32,6 +33,10 @@ type ViewSource = "draft" | "imported";
 export default function BookVisualizerPage() {
   const { t } = useI18n();
   const copy = t.apps.bookVisualizer;
+  const { compact } = useCompactLayout();
+  /** スマホ／縦型：編集不可。ファイル読み込み→閲覧のみ */
+  const readOnly = compact;
+
   const [data, setData, { hydrated }] = useLocalStorageState<StudioData>(
     STORAGE_KEY,
     emptyStudio(),
@@ -45,7 +50,15 @@ export default function BookVisualizerPage() {
   // LocalStorage の古い下書き（余白未設定など）を毎回正規化してから使う
   const studio = useMemo(() => normalizeStudio(data), [data]);
 
+  // 読み込み専用に切り替わったら編集画面に留まらない
+  useEffect(() => {
+    if (readOnly && mode === "edit") {
+      setMode("home");
+    }
+  }, [readOnly, mode]);
+
   function updateBook(patch: Partial<BookData>) {
+    if (readOnly) return;
     setData((prev) => {
       const current = normalizeStudio(prev);
       return {
@@ -78,31 +91,15 @@ export default function BookVisualizerPage() {
     setNotice("");
   }
 
-  /** 読み込んだ本を自分の下書きとして取り込む */
+  /** 読み込んだ本を自分の下書きとして取り込む（PC 編集時のみ） */
   function handleAdopt() {
-    if (!importedBook) return;
+    if (readOnly || !importedBook) return;
     if (!window.confirm(copy.view.endEditConfirm)) return;
     setData((prev) => ({
       ...normalizeStudio(prev),
       book: normalizeBook(importedBook),
     }));
     setImportedBook(null);
-    setMode("edit");
-  }
-
-  /** Home のサンプルカードから編集を開く */
-  function handleLoadSample(id: SampleId) {
-    if (
-      hasBookContent(studio.book) &&
-      !window.confirm(copy.home.sampleConfirm)
-    ) {
-      return;
-    }
-    setData((prev) => ({
-      ...normalizeStudio(prev),
-      book: createSampleBook(id),
-    }));
-    setNotice("");
     setMode("edit");
   }
 
@@ -115,7 +112,8 @@ export default function BookVisualizerPage() {
 
   // 下書きを読んでいる間も背後は制作画面のままにし、閉じたらすぐ続きから編集できるようにする
   const showEditor =
-    mode === "edit" || (mode === "view" && viewSource === "draft");
+    !readOnly &&
+    (mode === "edit" || (mode === "view" && viewSource === "draft"));
 
   const actions =
     showEditor ? (
@@ -149,36 +147,41 @@ export default function BookVisualizerPage() {
 
   if (!hydrated) {
     return (
-      <AppShell
-        title={copy.shell.title}
-        description={copy.shell.description}
-        fillViewport
-      >
-        <p className="text-sm text-zinc-400">{copy.loading}</p>
-      </AppShell>
+      <ForceLandscape>
+        <AppShell
+          title={copy.shell.title}
+          description={copy.shell.description}
+          fillViewport
+        >
+          <p className="text-sm text-zinc-400">{copy.loading}</p>
+        </AppShell>
+      </ForceLandscape>
     );
   }
 
   return (
-    <>
+    <ForceLandscape>
       <AppShell
         title={copy.shell.title}
         description={copy.shell.description}
         fillViewport
         actions={actions}
-        dataManager={{
-          appId: APP_ID,
-          fileNamePrefix: "book-visualizer",
-          getData: () => studio,
-          onImport: (raw) => {
-            setData(normalizeStudio(raw));
-            setMode("edit");
-            setNotice("");
-          },
-        }}
+        dataManager={
+          readOnly
+            ? undefined
+            : {
+                appId: APP_ID,
+                fileNamePrefix: "book-visualizer",
+                getData: () => studio,
+                onImport: (raw) => {
+                  setData(normalizeStudio(raw));
+                  setMode("edit");
+                  setNotice("");
+                },
+              }
+        }
       >
         <div className="flex min-h-0 flex-1 flex-col gap-3">
-
           {notice ? (
             <p
               role="alert"
@@ -192,9 +195,11 @@ export default function BookVisualizerPage() {
             <EditMode book={studio.book} onChangeBook={updateBook} />
           ) : (
             <HomeMode
+              readOnly={readOnly}
               hasDraft={hasBookContent(studio.book)}
               draftTitle={studio.book.title}
               onCreate={() => {
+                if (readOnly) return;
                 // 下書きがあるときだけ、破棄してよいか確かめる
                 if (
                   hasBookContent(studio.book) &&
@@ -210,10 +215,10 @@ export default function BookVisualizerPage() {
                 setMode("edit");
               }}
               onResume={() => {
+                if (readOnly) return;
                 setNotice("");
                 setMode("edit");
               }}
-              onLoadSample={handleLoadSample}
               onOpenBook={(book) => {
                 setImportedBook(normalizeBook(book));
                 openReader("imported");
@@ -226,11 +231,17 @@ export default function BookVisualizerPage() {
       {mode === "view" && viewingBook ? (
         <ViewMode
           book={viewingBook}
-          onClose={() => setMode(viewSource === "draft" ? "edit" : "home")}
+          onClose={() =>
+            setMode(
+              readOnly || viewSource === "imported" ? "home" : "edit",
+            )
+          }
           onGoHome={() => setMode("home")}
-          onAdopt={viewSource === "imported" ? handleAdopt : undefined}
+          onAdopt={
+            viewSource === "imported" && !readOnly ? handleAdopt : undefined
+          }
         />
       ) : null}
-    </>
+    </ForceLandscape>
   );
 }

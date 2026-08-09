@@ -51,6 +51,11 @@ export type Dictionary = {
     edit: string;
     delete: string;
     clear: string;
+    /** 縦向き禁止アプリ向け（端末を横に傾ける誘導） */
+    forceLandscape: {
+      title: string;
+      hint: string;
+    };
   };
   header: {
     support: string;

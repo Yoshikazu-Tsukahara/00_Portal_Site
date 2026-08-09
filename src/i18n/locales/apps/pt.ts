@@ -52,6 +52,8 @@ export const appsPt: AppsDictionary = {
       },
       readTitle: "Ler um arquivo .mybook",
       readLead: "Solte um arquivo aqui para abrir o leitor na hora, ou clique para escolher um.",
+      readOnlyLead:
+        "No telemóvel só pode ler. Abra um ficheiro .mybook. A edição está disponível num esquema de ambiente de trabalho mais largo.",
       readButton: "Escolher um arquivo",
       dropActive: "Solte para abrir",
       error: "Não foi possível ler esse arquivo. Escolha um arquivo .mybook.",
@@ -1474,6 +1476,7 @@ export const appsPt: AppsDictionary = {
       audio: "Áudio",
       video: "Vídeo",
       unsaved: "Não salvo",
+      backToList: "Voltar à lista",
     },
     stage: {
       artworkTitle: "Capa",
@@ -1589,11 +1592,15 @@ export const appsPt: AppsDictionary = {
       exportJson: "Copiar como JSON",
       copyAria: "Copiar {value}",
       deleteAria: "Excluir {value}",
+      copyAction: "Copiar",
+      deleteAction: "Excluir",
+      cancelAction: "Fechar",
       suggestionsToggleAria: "Mostrar sugestões de cor para {value}",
       complementaryLabel: "Complementar",
       analogousLabel: "Análogas",
       addSuggestionAria: "Adicionar {value} à paleta",
-      selectForLocation: "Clique em uma amostra ou código para destacar sua localização e áreas correspondentes na imagem",
+      selectForLocation: "Toque numa amostra ou código para destacar a localização e áreas correspondentes na imagem",
+      longPressHint: "Toque longo para copiar ou excluir (clique direito no PC)",
       selectColorAria: "Selecionar {value} e mostrar na imagem",
     },
     autoExtract: {
@@ -1806,6 +1813,7 @@ export const appsPt: AppsDictionary = {
   pixelDropPuzzle: {
     shell: {
       title: "Tiny Pixel Gap Drop Puzzle",
+      titleShort: "Queda no vão",
       description: "Solte a barra alta de bem acima no vão do chão. Julgado até frações de pixel.",
     },
     install: {
@@ -2082,9 +2090,11 @@ export const appsPt: AppsDictionary = {
       stopButton: "STOP",
       spinningLabel: "Girando…",
       resetRunButton: "Zerar giros",
+      resetRunButtonShort: "Zerar",
       resetRunConfirm: "Zerar a contagem de giros? (Estatísticas totais e conquistas são mantidas.)",
       settingsButton: "Configurações",
       achievementsButton: "🏆 Conquistas",
+      achievementsButtonShort: "Conquistas",
       lifetimeHeading: "Total",
       lifetimeAttempts: "Giros totais",
       lifetimeWins: "Acertos",

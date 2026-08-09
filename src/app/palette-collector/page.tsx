@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import AppShell from "@/components/AppShell";
 import { fmt, intlLocale, useI18n } from "@/i18n";
 import { useLocalStorageState } from "@/lib/localData";
+import { useCompactLayout } from "@/lib/useCompactLayout";
 import AutoExtractPanel from "./AutoExtractPanel";
 import {
   normalizeHex,
@@ -35,6 +36,7 @@ import {
 export default function PaletteCollectorPage() {
   const { t, locale } = useI18n();
   const copy = t.apps.paletteCollector;
+  const { showSideColumn } = useCompactLayout();
   const [data, setData, { hydrated }] =
     useLocalStorageState<PaletteCollectorData>(STORAGE_KEY, emptyData());
   const [projects, setProjects, { hydrated: projectsHydrated }] =
@@ -260,8 +262,12 @@ export default function PaletteCollectorPage() {
             {t.common.loading}
           </div>
         ) : (
-          <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
-            <div className="flex flex-col gap-4">
+          <div
+            className={`grid gap-4 ${
+              showSideColumn ? "grid-cols-2 items-start" : "grid-cols-1"
+            }`}
+          >
+            <div className="flex min-w-0 flex-col gap-4">
               <ImageStage
                 image={image}
                 onImageLoaded={handleImageLoaded}
@@ -287,7 +293,7 @@ export default function PaletteCollectorPage() {
               />
             </div>
 
-            <div className="flex flex-col gap-4">
+            <div className="flex min-w-0 flex-col gap-4">
               <AutoExtractPanel
                 image={image}
                 regionSelectMode={regionSelectMode}

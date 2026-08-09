@@ -149,9 +149,6 @@ export function periodMsForStage(stage: number): number {
 /** 着地直後の「惜しい…」溜め（ms）。成功・ギリ惜しい失敗で共通 */
 export const IMPACT_HOLD_MS = 560;
 
-/** 失敗粒子のあと、リザルトを出すまでの待ち（ms） */
-export const FAIL_PARTICLE_BEFORE_RESULT_MS = 760;
-
 /**
  * 着地時に溜め演出を入れるか。
  * 絶対誤差 ±3px 以内は無条件。成功（許容内）も常に対象。

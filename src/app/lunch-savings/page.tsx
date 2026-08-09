@@ -10,12 +10,14 @@ import Dashboard from "./Dashboard";
 import InstallAppButton from "./InstallAppButton";
 import NumpadModal from "./NumpadModal";
 import SetupModal from "./SetupModal";
+import { roundMoney } from "./currency";
 import {
   STORAGE_KEY,
   KNOWN_GOAL_DEFAULTS,
   createId,
   isInPeriod,
   normalizeSettings,
+  refreshRollingPeriod,
   todayIsoDate,
   type LunchAppData,
   type LunchEntry,
@@ -85,10 +87,26 @@ export default function LunchSavingsPage() {
 
   const settings = useMemo(() => {
     if (!data.settings) return null;
-    return normalizeSettings(
+    const normalized = normalizeSettings(
       data.settings as LunchSettings & Record<string, unknown>,
     );
+    if (!normalized) return null;
+    // 今月／給料サイクルは端末の「いま」に合わせる（古い期間だと今日の記録が集計外になる）
+    return refreshRollingPeriod(normalized);
   }, [data.settings]);
+
+  // 相対期間がずれたら LocalStorage 側も書き戻す
+  useEffect(() => {
+    if (!hydrated || !data.settings || !settings) return;
+    if (
+      data.settings.startDate === settings.startDate &&
+      data.settings.endDate === settings.endDate &&
+      data.settings.periodType === settings.periodType
+    ) {
+      return;
+    }
+    setData((prev) => ({ ...prev, settings }));
+  }, [hydrated, settings, data.settings, setData]);
 
   const stats = useMemo(() => {
     if (!settings) return null;
@@ -134,32 +152,39 @@ export default function LunchSavingsPage() {
   }
 
   function upsertToday(amount: number, note: string) {
-    const existing = data.entries.find((e) => e.date === today);
+    const day = todayIsoDate();
+    const currency = settings?.currency ?? "JPY";
+    const rounded = roundMoney(amount, currency);
     const cleanedNote = note.trim().slice(0, 80);
-    if (existing) {
-      setData((prev) => ({
-        ...prev,
-        entries: prev.entries.map((e) => {
-          if (e.id !== existing.id) return e;
-          const next: LunchEntry = { id: e.id, date: e.date, amount };
-          if (cleanedNote) next.note = cleanedNote;
-          return next;
-        }),
-      }));
-      showToast(copy.toast.updated, true);
-    } else {
+
+    setData((prev) => {
+      const existing = prev.entries.find((e) => e.date === day);
+      if (existing) {
+        return {
+          ...prev,
+          entries: prev.entries.map((e) => {
+            if (e.id !== existing.id) return e;
+            const next: LunchEntry = {
+              id: e.id,
+              date: e.date,
+              amount: rounded,
+            };
+            if (cleanedNote) next.note = cleanedNote;
+            return next;
+          }),
+        };
+      }
       const entry: LunchEntry = {
         id: createId(),
-        date: today,
-        amount,
+        date: day,
+        amount: rounded,
         ...(cleanedNote ? { note: cleanedNote } : {}),
       };
-      setData((prev) => ({
-        ...prev,
-        entries: [...prev.entries, entry],
-      }));
-      showToast(copy.toast.saved, true);
-    }
+      return { ...prev, entries: [...prev.entries, entry] };
+    });
+
+    const wasEdit = data.entries.some((e) => e.date === day);
+    showToast(wasEdit ? copy.toast.updated : copy.toast.saved, true);
     setNumpadOpen(false);
   }
 
@@ -194,6 +219,7 @@ export default function LunchSavingsPage() {
     <AppShell
       title={copy.shell.title}
       description={copy.shell.description}
+      fillViewport
       isPwa
       afterDataManager={<InstallAppButton copy={copy.install} />}
       dataManager={{

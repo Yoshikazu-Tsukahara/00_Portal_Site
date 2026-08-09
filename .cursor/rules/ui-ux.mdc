@@ -63,6 +63,20 @@ PC（広い viewport かつ縦型以外）:
 - テキスト: `break-words`（長い件名・パスは `break-all`）
 - 画像: `object-contain`、親は `overflow-hidden`
 
+### スマホの内部スクロール（リスト・長文）
+
+- 長いリスト／長文は **`.app-nested-scroll`**（必要なら `--short`）を使う
+- **`max-h-[60vh]` 程度**で画面を埋め尽くさない（外側に親スクロール用の余白を残す）
+- **`overflow-y-auto` + `overscroll-auto`**（端到達後は親へスクロールチェーン。`overscroll-contain` は使わない）
+- 親のページ／AppShell 作業領域側も `overscroll-auto` を基本とする
+
+### ミニゲーム（fillViewport + minStageSize）
+
+- compact 判定は **`useCompactLayout()`**（`narrowViewport || layoutMode === "portrait"`）
+- スマホ／縦型では AppShell が **minWidth を付けない**（横スクロール防止）
+- ルートに `min-w-0 max-w-full overflow-x-hidden`
+- 右カラム／サイドレールは compact 時に畳む（ボタン＋ドロワー、または下部 HUD）
+
 ### タップ領域とフィードバック
 
 - 主要操作はおおむね **44px**（`min-h-11`）を目安。ただし **ヘッダーの 💾／📱 はコンパクトのまま揃える**（`min-h-11` を付けない）
@@ -92,15 +106,17 @@ PC（広い viewport かつ縦型以外）:
 ## 表示幅
 
 - `useLayout().contentClassName` のみ。`AppShell` の `wide` は使わない
-- LayoutToggle は Header 中央のみ
+- LayoutToggle: PC は Header 中央（segment）、スマホ／縦型は Header 直置きのドロップダウン
 
 ## 言語スイッチャー
 
 | 状況 | 置き場所 |
 |------|----------|
-| ブラウザ | `Header.tsx` のみ |
+| ブラウザ | `Header.tsx` のみ（スマホもヘッダー直置きドロップダウン） |
 | PWA standalone | AppShell が自動表示 |
 | Type D | 独自薄い header 右端のみ |
+
+スマホ／縦型ヘッダー右端: 表示幅 DD → 言語 DD → ♡応援（アイコンのみ）
 
 ## バックアップ / PWA
 

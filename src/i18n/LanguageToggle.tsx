@@ -3,7 +3,7 @@
 import { ChevronDown } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
 import { useI18n } from "./I18nProvider";
-import { LOCALE_NATIVE_LABELS } from "./localeMeta";
+import { LOCALE_NATIVE_LABELS, LOCALE_SHORT_LABELS } from "./localeMeta";
 import type { Locale } from "./types";
 
 type Props = {
@@ -11,6 +11,8 @@ type Props = {
   id?: string;
   /** メニュー内など幅いっぱい用 */
   fullWidth?: boolean;
+  /** jp / en など短縮ラベル（スマホヘッダー向け） */
+  compact?: boolean;
 };
 
 /**
@@ -20,11 +22,16 @@ type Props = {
 export default function LanguageToggle({
   id = "site-lang-select",
   fullWidth = false,
+  compact = false,
 }: Props) {
   const { locale, setLocale, locales, t } = useI18n();
 
   return (
-    <div className={`lang-select${fullWidth ? " lang-select--full" : ""}`}>
+    <div
+      className={`lang-select${fullWidth ? " lang-select--full" : ""}${
+        compact ? " lang-select--compact" : ""
+      }`}
+    >
       <label className="sr-only" htmlFor={id}>
         {t.header.langToggleAria}
       </label>
@@ -32,6 +39,7 @@ export default function LanguageToggle({
         id={id}
         value={locale}
         aria-label={t.header.langToggleAria}
+        title={LOCALE_NATIVE_LABELS[locale]}
         onChange={(e) => {
           const next = e.target.value as Locale;
           setLocale(next);
@@ -40,8 +48,8 @@ export default function LanguageToggle({
         className="lang-select__control"
       >
         {locales.map((code) => (
-          <option key={code} value={code}>
-            {LOCALE_NATIVE_LABELS[code]}
+          <option key={code} value={code} title={LOCALE_NATIVE_LABELS[code]}>
+            {compact ? LOCALE_SHORT_LABELS[code] : LOCALE_NATIVE_LABELS[code]}
           </option>
         ))}
       </select>

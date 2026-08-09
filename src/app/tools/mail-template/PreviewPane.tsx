@@ -9,6 +9,7 @@ export default function PreviewPane({
   body,
   combinedText,
   emptyLabels,
+  nestedScroll = false,
 }: {
   /** 変数置換済みの件名 */
   subject: string;
@@ -17,13 +18,17 @@ export default function PreviewPane({
   /** 件名＋本文の結合テキスト */
   combinedText: string;
   emptyLabels: string[];
+  /**
+   * スマホ向け: 長文を max-h 内でスクロールし、端では親へチェーンする。
+   */
+  nestedScroll?: boolean;
 }) {
   const { t } = useI18n();
   const mt = t.apps.mailTemplate;
 
   return (
     <div className="flex w-full max-w-full flex-col gap-2">
-      <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex min-w-0 shrink-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-[11px] font-medium text-zinc-500">
           {mt.preview.heading}
         </p>
@@ -35,9 +40,14 @@ export default function PreviewPane({
         />
       </div>
 
-      {/* 内部スクロールなし。長さに合わせて親ページが伸びる */}
-      <div className="flex min-w-0 flex-col gap-2">
-        <div className="min-w-0 rounded-md border border-zinc-200/80 bg-white p-2 md:p-3">
+      <div
+        className={
+          nestedScroll
+            ? "app-nested-scroll flex min-w-0 flex-col gap-2"
+            : "flex min-w-0 flex-col gap-2"
+        }
+      >
+        <div className="min-w-0 shrink-0 rounded-md border border-zinc-200/80 bg-white p-2 md:p-3">
           <p className="mb-1.5 text-[10px] font-medium uppercase tracking-wide text-zinc-400">
             {mt.preview.subject}
           </p>
@@ -52,7 +62,7 @@ export default function PreviewPane({
           </p>
         </div>
 
-        <div className="min-w-0 rounded-md border border-zinc-200/80 bg-zinc-50/50 p-2 md:p-3">
+        <div className="min-w-0 shrink-0 rounded-md border border-zinc-200/80 bg-zinc-50/50 p-2 md:p-3">
           <p className="mb-1.5 text-[10px] font-medium uppercase tracking-wide text-zinc-400">
             {mt.preview.body}
           </p>

@@ -52,6 +52,8 @@ export const appsFr: AppsDictionary = {
       },
       readTitle: "Lire un fichier .mybook",
       readLead: "Déposez un fichier ici pour ouvrir le lecteur tout de suite, ou cliquez pour en choisir un.",
+      readOnlyLead:
+        "Sur téléphone, lecture seule. Ouvrez un fichier .mybook. L’édition est disponible sur un affichage bureau plus large.",
       readButton: "Choisir un fichier",
       dropActive: "Relâchez pour ouvrir",
       error: "Ce fichier n’a pas pu être lu. Veuillez choisir un fichier .mybook.",
@@ -1474,6 +1476,7 @@ export const appsFr: AppsDictionary = {
       audio: "Audio",
       video: "Vidéo",
       unsaved: "Non enregistré",
+      backToList: "Retour à la liste",
     },
     stage: {
       artworkTitle: "Pochette",
@@ -1589,11 +1592,15 @@ export const appsFr: AppsDictionary = {
       exportJson: "Copier en JSON",
       copyAria: "Copier {value}",
       deleteAria: "Supprimer {value}",
+      copyAction: "Copier",
+      deleteAction: "Supprimer",
+      cancelAction: "Fermer",
       suggestionsToggleAria: "Afficher les suggestions de couleurs pour {value}",
       complementaryLabel: "Complémentaire",
       analogousLabel: "Analogues",
       addSuggestionAria: "Ajouter {value} à la palette",
-      selectForLocation: "Cliquez un échantillon ou un code pour surligner son emplacement et les zones correspondantes sur l’image",
+      selectForLocation: "Appuyez sur un échantillon ou un code pour surligner son emplacement et les zones correspondantes sur l’image",
+      longPressHint: "Appui long pour copier ou supprimer (clic droit sur PC)",
       selectColorAria: "Sélectionner {value} et afficher sur l’image",
     },
     autoExtract: {
@@ -1806,6 +1813,7 @@ export const appsFr: AppsDictionary = {
   pixelDropPuzzle: {
     shell: {
       title: "Puzzle Tiny Pixel Gap Drop",
+      titleShort: "Écart pixel",
       description: "Laissez tomber la barre haute depuis le ciel dans l’écart au sol. Jugé à la fraction de pixel près.",
     },
     install: {
@@ -2082,9 +2090,11 @@ export const appsFr: AppsDictionary = {
       stopButton: "STOP",
       spinningLabel: "En cours…",
       resetRunButton: "Réinitialiser les tours",
+      resetRunButtonShort: "Reset",
       resetRunConfirm: "Réinitialiser le compteur de tours ? (Les stats à vie et les succès sont conservés.)",
       settingsButton: "Paramètres",
       achievementsButton: "🏆 Succès",
+      achievementsButtonShort: "Succès",
       lifetimeHeading: "À vie",
       lifetimeAttempts: "Tours totaux",
       lifetimeWins: "Touches",

@@ -12,6 +12,10 @@ export const en: Dictionary = {
     edit: "Edit",
     delete: "Delete",
     clear: "Clear",
+    forceLandscape: {
+      title: "Rotate to landscape",
+      hint: "This app is designed for landscape. Please turn your device sideways.",
+    },
   },
   header: {
     support: "Support the developer",

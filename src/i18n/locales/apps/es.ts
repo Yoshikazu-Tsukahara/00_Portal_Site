@@ -867,6 +867,7 @@ export const appsEs: AppsDictionary = {
       audio: "Audio",
       video: "Vídeo",
       unsaved: "Sin guardar",
+      backToList: "Volver a la lista",
     },
     stage: {
       artworkTitle: "Carátula",
@@ -1103,6 +1104,8 @@ export const appsEs: AppsDictionary = {
       },
       readTitle: "Leer un archivo .mybook",
       readLead: "Suelta un archivo aquí para abrir el lector al instante, o haz clic para elegir uno.",
+      readOnlyLead:
+        "En el móvil solo puedes leer. Abre un archivo .mybook. La edición está disponible en un diseño de escritorio más amplio.",
       readButton: "Elegir un archivo",
       dropActive: "Suelta para abrir",
       error: "No se pudo leer ese archivo. Elige un archivo .mybook.",
@@ -1422,11 +1425,15 @@ export const appsEs: AppsDictionary = {
       exportJson: "Copiar como JSON",
       copyAria: "Copiar {value}",
       deleteAria: "Eliminar {value}",
+      copyAction: "Copiar",
+      deleteAction: "Eliminar",
+      cancelAction: "Cerrar",
       suggestionsToggleAria: "Mostrar sugerencias de color para {value}",
       complementaryLabel: "Complementario",
       analogousLabel: "Análogos",
       addSuggestionAria: "Añadir {value} a la paleta",
-      selectForLocation: "Haz clic en una muestra o código para resaltar su ubicación y zonas coincidentes en la imagen",
+      selectForLocation: "Toca una muestra o código para resaltar su ubicación y zonas coincidentes en la imagen",
+      longPressHint: "Mantén pulsado para copiar o eliminar (clic derecho en PC)",
       selectColorAria: "Seleccionar {value} y mostrar en la imagen",
     },
     autoExtract: {
@@ -1822,9 +1829,11 @@ export const appsEs: AppsDictionary = {
       stopButton: "STOP",
       spinningLabel: "Girando…",
       resetRunButton: "Reiniciar giros",
+      resetRunButtonShort: "Reiniciar",
       resetRunConfirm: "¿Reiniciar el contador de giros? (Se conservan estadísticas totales y logros.)",
       settingsButton: "Ajustes",
       achievementsButton: "🏆 Logros",
+      achievementsButtonShort: "Logros",
       lifetimeHeading: "Historial",
       lifetimeAttempts: "Giros totales",
       lifetimeWins: "Aciertos",
@@ -1959,6 +1968,7 @@ export const appsEs: AppsDictionary = {
   pixelDropPuzzle: {
     shell: {
       title: "Tiny Pixel Gap Drop Puzzle",
+      titleShort: "Hueco de píxeles",
       description: "Deja caer la barra alta desde arriba en la rendija del suelo. Se juzga a fracciones de píxel.",
     },
     install: {

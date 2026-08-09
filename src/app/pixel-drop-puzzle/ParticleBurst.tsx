@@ -1,10 +1,14 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 /** 縦長の棒向けに列少なめ・行多めの格子 */
 const COLS = 6;
 const ROWS = 18;
+/** CSS `.pxd-particle--run` の duration と揃える */
+const PARTICLE_FLY_MS = 720;
+/** buildParticles の delay 上限目安 */
+const PARTICLE_MAX_DELAY_MS = 160;
 
 type Particle = {
   key: string;
@@ -16,7 +20,7 @@ type Particle = {
   delayMs: number;
 };
 
-/** 格子状の飛散パラメータを生成する（コンポーネント外の純粋関数として分離） */
+/** 格子状の飛散パラメータを生成する */
 function buildParticles(): Particle[] {
   const list: Particle[] = [];
   const cx = COLS / 2;
@@ -41,7 +45,8 @@ function buildParticles(): Particle[] {
 }
 
 /**
- * 失敗時：縦長の棒をピクセル粒子に分解して「サーッ」と消滅させる。
+ * 失敗時：縦長の棒をピクセル粒子に分解して飛散させる。
+ * background-image ではなく img + overflow で切り出し、初回デコードでも見えやすくする。
  */
 export default function ParticleBurst({
   imageDataUrl,
@@ -52,6 +57,7 @@ export default function ParticleBurst({
   top,
   width,
   height,
+  onComplete,
 }: {
   imageDataUrl: string;
   bgWidth: number;
@@ -61,8 +67,24 @@ export default function ParticleBurst({
   top: number;
   width: number;
   height: number;
+  onComplete?: () => void;
 }) {
   const particles = useMemo<Particle[]>(() => buildParticles(), []);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
+  const doneRef = useRef(false);
+
+  useEffect(() => {
+    doneRef.current = false;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const wait = reduced ? 140 : PARTICLE_FLY_MS + PARTICLE_MAX_DELAY_MS;
+    const timer = window.setTimeout(() => {
+      if (doneRef.current) return;
+      doneRef.current = true;
+      onCompleteRef.current?.();
+    }, wait);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   const cellW = width / COLS;
   const cellH = height / ROWS;
@@ -76,23 +98,36 @@ export default function ParticleBurst({
       {particles.map((p) => (
         <div
           key={p.key}
-          className="pxd-particle absolute"
+          className="pxd-particle pxd-particle--run absolute overflow-hidden"
           style={{
             left: p.col * cellW,
             top: p.row * cellH,
             width: cellW + 0.5,
             height: cellH + 0.5,
-            backgroundImage: `url(${imageDataUrl})`,
-            backgroundSize: `${bgWidth}px ${bgHeight}px`,
-            backgroundPosition: `${-(bgOffsetX + p.col * cellW)}px ${-(p.row * cellH)}px`,
-            backgroundRepeat: "no-repeat",
             animationDelay: `${p.delayMs}ms`,
             // @ts-expect-error CSSカスタムプロパティ
             "--pxd-dx": `${p.dx}px`,
             "--pxd-dy": `${p.dy}px`,
             "--pxd-rot": `${p.rot}deg`,
           }}
-        />
+        >
+          {/* background-image だと初回デコード前にアニメが終わり「消えた」ように見える */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={imageDataUrl}
+            alt=""
+            draggable={false}
+            style={{
+              position: "absolute",
+              width: bgWidth,
+              height: bgHeight,
+              maxWidth: "none",
+              left: -(bgOffsetX + p.col * cellW),
+              top: -(p.row * cellH),
+              pointerEvents: "none",
+            }}
+          />
+        </div>
       ))}
     </div>
   );

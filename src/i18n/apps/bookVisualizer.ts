@@ -41,6 +41,8 @@ export type BookVisualizerDict = {
     };
     readTitle: string;
     readLead: string;
+    /** スマホ等：編集不可で読み込み専用のときの案内 */
+    readOnlyLead: string;
     readButton: string;
     dropActive: string;
     error: string;
@@ -359,6 +361,8 @@ export const bookVisualizerJa: BookVisualizerDict = {
     readTitle: "持っている .mybook ファイルを読む",
     readLead:
       "ここにファイルをドロップすると、すぐに読書画面が開きます。クリックして選ぶこともできます。",
+    readOnlyLead:
+      "スマホでは読書のみ利用できます。.mybook ファイルを開いてお楽しみください。編集はPC（横画面の広い表示）で行えます。",
     readButton: "ファイルを選ぶ",
     dropActive: "ここで離すと開きます",
     error:
@@ -689,6 +693,8 @@ export const bookVisualizerEn: BookVisualizerDict = {
     readTitle: "Read a .mybook file",
     readLead:
       "Drop a file here to open the reader right away, or click to choose one.",
+    readOnlyLead:
+      "On phones you can only read books. Open a .mybook file to enjoy it. Editing is available on a wider desktop layout.",
     readButton: "Choose a file",
     dropActive: "Release to open",
     error: "That file could not be read. Please choose a .mybook file.",

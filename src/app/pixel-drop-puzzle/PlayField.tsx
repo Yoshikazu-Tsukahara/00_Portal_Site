@@ -11,6 +11,7 @@ import {
 import type { PixelDropPuzzleDict } from "@/i18n/apps/pixelDropPuzzle";
 import {
   advancePatrolSpeedState,
+  COMPACT_HUD_RESERVE_PX,
   computeGeometry,
   fallSeatDurationMs,
   fallSeatEase,
@@ -25,12 +26,18 @@ import {
   type PatrolClockState,
   type PlayGeometry,
 } from "./engine";
+import { useCompactLayout } from "@/lib/useCompactLayout";
 import type { LoadedGameImage } from "./imageUtil";
 import ImageChangeOverlay from "./ImageChangeOverlay";
 import LifeDepletedOverlay from "./LifeDepletedOverlay";
 import ParticleBurst from "./ParticleBurst";
 import RecordsSideRails from "./RecordsSideRails";
 import ResultOverlay from "./ResultOverlay";
+import {
+  getScrollParent,
+  getScrollTop,
+  setScrollTop,
+} from "./scrollParent";
 import UploadGate from "./UploadGate";
 import {
   ANTI_CHEAT_LOCKDOWN_MS,
@@ -40,7 +47,6 @@ import {
   type PointerSample,
 } from "./antiCheat";
 import {
-  FAIL_PARTICLE_BEFORE_RESULT_MS,
   IMPACT_HOLD_MS,
   lifeAfterDamage,
   periodMsForStage,
@@ -170,7 +176,10 @@ export default function PlayField({
   onRetry: () => void;
   onNext: () => void;
 }) {
-  const failResultTimerRef = useRef<number | null>(null);
+  /** 粉砕演出完了後に出す失敗ジャッジ（タイマーではなく ParticleBurst.onComplete 待ち） */
+  const pendingFailResultRef = useRef<JudgeResult | null>(null);
+  /** 粉砕中は親へ渡さず、完了後に记忆（初回 null→値 でカメラ復元 effect が粉砕を潰すのを防ぐ） */
+  const pendingFailScrollRef = useRef<number | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
   const columnRef = useRef<HTMLDivElement | null>(null);
   const blockRef = useRef<HTMLDivElement | null>(null);
@@ -191,6 +200,10 @@ export default function PlayField({
     scrollAtDrop: 0,
   });
 
+  const { compact: shellCompact } = useCompactLayout();
+  /** 落下 rAF 中に identity が変わると演出が巻き戻るのを防ぐ */
+  const shellCompactRef = useRef(shellCompact);
+  shellCompactRef.current = shellCompact;
   const [geometry, setGeometry] = useState<PlayGeometry | null>(null);
   const [phase, setPhase] = useState<Phase>("patrolling");
   /** 着地直後の「惜しい」溜め中（棒は地表上端で静止） */
@@ -279,14 +292,36 @@ export default function PlayField({
     phaseRef.current = phase;
   }, [phase]);
 
-  // ステージ幅いっぱいでジオメトリを再計算
+  // 粉砕用ビットマップを先に温め、初回失敗時のデコード待ちを減らす
+  useEffect(() => {
+    const img = new Image();
+    img.src = imageDataUrl;
+    void img.decode?.().catch(() => undefined);
+  }, [imageDataUrl]);
+
+  // ステージ幅いっぱいでジオメトリを再計算（compact 時は HUD 分だけ棒を下げる）
   useEffect(() => {
     const el = stageRef.current;
     if (!el) return;
     function measure() {
       if (!el) return;
       const rect = el.getBoundingClientRect();
-      setGeometry(computeGeometry(rect.width, naturalWidth, naturalHeight));
+      const next = computeGeometry(rect.width, naturalWidth, naturalHeight, {
+        compactHud: shellCompactRef.current,
+      });
+      // 落下〜リザルト中に寸法が変わると着地／粉砕位置がズレるのでロックする
+      setGeometry((prev) => {
+        const phaseNow = phaseRef.current;
+        const lockGeometry =
+          phaseNow === "falling" ||
+          phaseNow === "merging" ||
+          phaseNow === "fail" ||
+          phaseNow === "depleted" ||
+          phaseNow === "success";
+        const applied = prev && lockGeometry ? prev : next;
+        geometryRef.current = applied;
+        return applied;
+      });
     }
     measure();
     const ro = new ResizeObserver(measure);
@@ -296,45 +331,70 @@ export default function PlayField({
       ro.disconnect();
       window.removeEventListener("resize", measure);
     };
-  }, [naturalWidth, naturalHeight]);
+  }, [naturalWidth, naturalHeight, shellCompact]);
 
-  // ラウンド開始時のカメラ:
-  // - 失敗リトライなら前回位置を復元
-  // - それ以外はステージ上端へ
+  // ラウンド開始時のカメラ（patrolling のときだけ）。
+  // 失敗確定で restoreScrollY が null→値になると粉砕中にここが走り、
+  // 初回だけ演出が消える／見えない原因になっていた。
   useLayoutEffect(() => {
     if (!geometry || !stageRef.current) return;
+    if (phaseRef.current !== "patrolling") return;
+    const scroller = getScrollParent(stageRef.current);
     if (restoreScrollY !== null) {
-      window.scrollTo({ top: restoreScrollY, behavior: "auto" });
+      setScrollTop(scroller, restoreScrollY);
       return;
     }
-    const top =
-      stageRef.current.getBoundingClientRect().top + window.scrollY - 80;
-    window.scrollTo({ top: Math.max(0, top), behavior: "auto" });
+    const stageTop = stageRef.current.getBoundingClientRect().top;
+    const current = getScrollTop(scroller);
+    setScrollTop(scroller, current + stageTop - 80);
   }, [geometry, restoreScrollY]);
 
   /**
    * 落下中のカメラ更新。
    * - STOP直後はカメラを一切動かさない
    * - 棒がビューポート中央付近まで降りてきてから、はじめて一緒に追従スクロール
+   * - compact 時は棒上の HUD が画面上端ではみ出さないよう注視点を下げ、
+   *   スクロール上限も HUD 高さ分だけ抑える
+   * - deps を空に保ち、落下 useLayoutEffect の途中再起動を防ぐ
    */
   const updateFallCamera = useCallback(
     (blockTopInStage: number, blockHeight: number) => {
       const stageEl = stageRef.current;
       if (!stageEl) return;
 
-      const stageDocTop = stageEl.getBoundingClientRect().top + window.scrollY;
-      // 棒の「注視点」（やや上寄り＝落下感が伝わりやすい）
-      const focusDocY = stageDocTop + blockTopInStage + blockHeight * 0.28;
-      const viewCenterDocY = window.scrollY + window.innerHeight * 0.42;
+      const compact = shellCompactRef.current;
+      const scroller = getScrollParent(stageEl);
+      const scrollTop = getScrollTop(scroller);
+      const stageViewTop = stageEl.getBoundingClientRect().top;
+      // scroller 内容座標でのステージ上端
+      const stageContentTop =
+        scroller instanceof HTMLElement
+          ? stageViewTop + scrollTop - scroller.getBoundingClientRect().top
+          : stageViewTop + window.scrollY;
+      const viewH =
+        scroller instanceof HTMLElement
+          ? scroller.clientHeight
+          : window.innerHeight;
+      // compact：HUD 分の余白を確保するため注視点を下げる
+      const focusRatio = compact ? 0.58 : 0.42;
+      const blockFocusOffset = compact ? blockHeight * 0.18 : blockHeight * 0.28;
+      const focusContentY = stageContentTop + blockTopInStage + blockFocusOffset;
+      const viewCenterContentY = scrollTop + viewH * focusRatio;
 
       if (!cameraFollowRef.current.active) {
         // 棒がまだカメラ中央より上 → カメラはそのまま待機
-        if (focusDocY < viewCenterDocY) return;
+        if (focusContentY < viewCenterContentY) return;
         cameraFollowRef.current.active = true;
       }
 
-      const target = focusDocY - window.innerHeight * 0.42;
-      window.scrollTo({ top: Math.max(0, target), behavior: "auto" });
+      let target = focusContentY - viewH * focusRatio;
+      if (compact) {
+        // 棒上端 − HUD 予約が画面内に残るよう、追従スクロールを抑える
+        const maxScrollKeepHud =
+          stageContentTop + blockTopInStage - COMPACT_HUD_RESERVE_PX - 8;
+        target = Math.min(target, maxScrollKeepHud);
+      }
+      setScrollTop(scroller, target);
     },
     [],
   );
@@ -437,15 +497,28 @@ export default function PlayField({
     [tolerancePx, lifePt],
   );
 
-  const finalizeFailResult = useCallback(
-    (result: JudgeResult) => {
-      setJudge(result);
-      onSettled(result);
-    },
-    [onSettled],
-  );
+  const onSettledRef = useRef(onSettled);
+  onSettledRef.current = onSettled;
 
-  /** 失敗を確定（カメラ位置を記憶して粒子→リザルト） */
+  const finalizeFailResult = useCallback((result: JudgeResult) => {
+    setJudge(result);
+    onSettledRef.current(result);
+  }, []);
+
+  /** ParticleBurst 完了 → スクロール位置を親へ渡してからリザルト */
+  const handleBurstComplete = useCallback(() => {
+    const result = pendingFailResultRef.current;
+    if (!result) return;
+    pendingFailResultRef.current = null;
+    const scrollY = pendingFailScrollRef.current;
+    pendingFailScrollRef.current = null;
+    if (scrollY !== null) {
+      onRememberFailScroll(scrollY);
+    }
+    finalizeFailResult(result);
+  }, [finalizeFailResult, onRememberFailScroll]);
+
+  /** 失敗を確定（粉砕中は親の restoreScrollY を更新しない） */
   const settleFail = useCallback(
     (
       x: number,
@@ -465,9 +538,8 @@ export default function PlayField({
         impactTopY,
       );
 
-      // リトライ時はDROPした瞬間の画面位置に戻す（落下追従後の位置ではない）
-      onRememberFailScroll(cameraFollowRef.current.scrollAtDrop);
-
+      pendingFailScrollRef.current = cameraFollowRef.current.scrollAtDrop;
+      pendingFailResultRef.current = result;
       setImpactY(impactTopY);
       setLockedX(x);
       setPhase("fail");
@@ -479,22 +551,8 @@ export default function PlayField({
         groundGuideRef.current.style.opacity = "0";
         groundGuideRef.current.style.visibility = "hidden";
       }
-
-      if (shouldDelayFailResult(result.absErrorPx, tolerancePx)) {
-        failResultTimerRef.current = window.setTimeout(() => {
-          failResultTimerRef.current = null;
-          finalizeFailResult(result);
-        }, FAIL_PARTICLE_BEFORE_RESULT_MS);
-      } else {
-        finalizeFailResult(result);
-      }
     },
-    [
-      tolerancePx,
-      presentFail,
-      finalizeFailResult,
-      onRememberFailScroll,
-    ],
+    [presentFail],
   );
 
   /** ライフ枯渇 → 粒子のあと降格警告 */
@@ -513,9 +571,9 @@ export default function PlayField({
         lifeDepleted: true,
       });
 
-      // リトライ時はDROPした瞬間の画面位置に戻す（落下追従後の位置ではない）
-      onRememberFailScroll(cameraFollowRef.current.scrollAtDrop);
+      pendingFailScrollRef.current = cameraFollowRef.current.scrollAtDrop;
       setDepleteFromStage(stage);
+      pendingFailResultRef.current = result;
       setImpactY(impactTopY);
       setLockedX(x);
       setPhase("depleted");
@@ -528,14 +586,8 @@ export default function PlayField({
         groundGuideRef.current.style.opacity = "0";
         groundGuideRef.current.style.visibility = "hidden";
       }
-
-      failResultTimerRef.current = window.setTimeout(() => {
-        failResultTimerRef.current = null;
-        setJudge(result);
-        onSettled(result);
-      }, FAIL_PARTICLE_BEFORE_RESULT_MS);
     },
-    [presentFail, onRememberFailScroll, stage, onSettled],
+    [presentFail, stage],
   );
 
   /** 成功：まず枠溶解→完成絵を見せ、その後オーバーレイ */
@@ -570,14 +622,16 @@ export default function PlayField({
   // リザルト表示中はスクロール位置を固定（フォーカス移動などによるズレを防ぐ）
   useEffect(() => {
     if (!judge) return;
-    const lockedY = window.scrollY;
+    const scroller = getScrollParent(stageRef.current);
+    const lockedY = getScrollTop(scroller);
     function lockScroll() {
-      if (window.scrollY !== lockedY) {
-        window.scrollTo({ top: lockedY, behavior: "auto" });
+      if (getScrollTop(scroller) !== lockedY) {
+        setScrollTop(scroller, lockedY);
       }
     }
-    window.addEventListener("scroll", lockScroll, { passive: true });
-    return () => window.removeEventListener("scroll", lockScroll);
+    const target: EventTarget = scroller === window ? window : scroller;
+    target.addEventListener("scroll", lockScroll, { passive: true });
+    return () => target.removeEventListener("scroll", lockScroll);
   }, [judge]);
 
   // 成功セレブレーション：溶解 → 縁光一周 → シャインスイープ → リザルト
@@ -623,14 +677,29 @@ export default function PlayField({
         setSuccessFx("done");
         setJudge(result);
         setPhase("success");
-        onSettled(result);
+        onSettledRef.current(result);
       }, SUCCESS_MERGE_MS + SUCCESS_SWEEP_MS + SUCCESS_SHINE_MS),
     );
 
     return () => {
       for (const id of timers) window.clearTimeout(id);
     };
-  }, [phase, tolerancePx, onSettled, lifePt]);
+  }, [phase, tolerancePx, lifePt]);
+
+  // 棒の left/top は React 管理外のため、geometry 確定時に位置を載せる
+  useLayoutEffect(() => {
+    if (phase !== "patrolling" || playBlocked || !geometry) return;
+    const block = blockRef.current;
+    if (!block) return;
+    const clock = patrolClockRef.current;
+    const periodMs =
+      clock?.periodMs ??
+      periodMsForPatrolSpeedLevel(basePeriodMsRef.current, 1);
+    const phaseMs = clock?.phaseMs ?? 0;
+    const x = triangleWave(phaseMs, periodMs, geometry.maxX);
+    block.style.left = `${x}px`;
+    block.style.top = `${geometry.blockStartY}px`;
+  }, [phase, playBlocked, geometry]);
 
   // 往復パトロール（専用 rAF。falling 用とは分離してクリーンアップの衝突を防ぐ）
   // 隠し仕様: 10往復ごとに速度を1段階遅くする（最大5段階）。UIには出さない。
@@ -653,12 +722,27 @@ export default function PlayField({
     settledRef.current = false;
     dropPayloadRef.current = null;
 
+    // React は left/top を触らないので、rAF 前に初回位置を載せる
+    if (g && blockRef.current) {
+      const x0 = triangleWave(phaseMs, periodMs, g.maxX);
+      blockRef.current.style.left = `${x0}px`;
+      blockRef.current.style.top = `${g.blockStartY}px`;
+    }
+
     function tick() {
-      const g = geometryRef.current;
+      const gNow = geometryRef.current;
       const clock = patrolClockRef.current;
-      if (g && clock && blockRef.current && phaseRef.current === "patrolling") {
-        const now = performance.now();
-        const dt = Math.min(Math.max(0, now - clock.lastNow), PATROL_MAX_DT_MS);
+      if (
+        gNow &&
+        clock &&
+        blockRef.current &&
+        phaseRef.current === "patrolling"
+      ) {
+        const nowTick = performance.now();
+        const dt = Math.min(
+          Math.max(0, nowTick - clock.lastNow),
+          PATROL_MAX_DT_MS,
+        );
         // 落下と同様、lastNow は壁時計にスナップする（タブ復帰時の追い込みを防ぐ）。
         // STOP 判定の精度は samplePatrolAt が atNowMs - lastNow で担保する。
         advancePatrolSpeedState(
@@ -667,12 +751,12 @@ export default function PlayField({
           basePeriodMsRef.current,
           null,
         );
-        clock.lastNow = now;
+        clock.lastNow = nowTick;
 
-        const x = triangleWave(clock.phaseMs, clock.periodMs, g.maxX);
+        const x = triangleWave(clock.phaseMs, clock.periodMs, gNow.maxX);
         blockRef.current.style.left = `${x}px`;
-        blockRef.current.style.top = `${g.blockStartY}px`;
-        updateViewportGuides(x, g.blockStartY, g);
+        blockRef.current.style.top = `${gNow.blockStartY}px`;
+        updateViewportGuides(x, gNow.blockStartY, gNow);
       }
       patrolRafRef.current = requestAnimationFrame(tick);
     }
@@ -711,11 +795,25 @@ export default function PlayField({
     return () => window.removeEventListener("scroll", onScroll);
   }, [phase, updateViewportGuides]);
 
+  // 落下演出から呼ぶ確定処理（identity 変化で落下 effect を再起動させない）
+  const settleFailRef = useRef(settleFail);
+  settleFailRef.current = settleFail;
+  const settleLifeDepleteRef = useRef(settleLifeDeplete);
+  settleLifeDepleteRef.current = settleLifeDeplete;
+  const beginSuccessMergeRef = useRef(beginSuccessMerge);
+  beginSuccessMergeRef.current = beginSuccessMerge;
+  const lifePtRef = useRef(lifePt);
+  lifePtRef.current = lifePt;
+  const tolerancePxRef = useRef(tolerancePx);
+  tolerancePxRef.current = tolerancePx;
+
   /**
    * 落下演出:
    * 1) 上空 → 地表上端に棒の下端が触れるまで落下
    * 2a) ずれている → 惜しい時は溜めてから粒子化→失敗リザルト
    * 2b) 成功 → 惜しい時は溜めてから隙間へゆっくりハマる
+   *
+   * deps は phase のみ。途中再起動すると棒が開始位置へ巻き戻る。
    */
   useLayoutEffect(() => {
     if (phase !== "falling") return;
@@ -723,8 +821,10 @@ export default function PlayField({
     if (!payload) return;
 
     const { x, phaseMsAtDrop, periodMsAtDrop, geometry: g } = payload;
+    const lifeAtDrop = lifePtRef.current;
+    const tolAtDrop = tolerancePxRef.current;
     const absErrorPx = Math.abs(x - g.gapX);
-    const outcome = resolveDropOutcome(lifePt, absErrorPx, tolerancePx);
+    const outcome = resolveDropOutcome(lifeAtDrop, absErrorPx, tolAtDrop);
     const success = outcome === "success";
     const depleted = outcome === "depleted";
 
@@ -769,7 +869,7 @@ export default function PlayField({
             blockRef.current.style.top = `${seatedTopY}px`;
             blockRef.current.style.left = `${g.gapX}px`;
           }
-          beginSuccessMerge(x, g, phaseMsAtDrop, periodMsAtDrop);
+          beginSuccessMergeRef.current(x, g, phaseMsAtDrop, periodMsAtDrop);
         }
       }
 
@@ -779,11 +879,17 @@ export default function PlayField({
     function afterImpactHold() {
       setImpactHolding(false);
       if (depleted) {
-        settleLifeDeplete(x, g, phaseMsAtDrop, periodMsAtDrop, contactTopY);
+        settleLifeDepleteRef.current(
+          x,
+          g,
+          phaseMsAtDrop,
+          periodMsAtDrop,
+          contactTopY,
+        );
         return;
       }
       if (!success) {
-        settleFail(x, g, phaseMsAtDrop, periodMsAtDrop, contactTopY);
+        settleFailRef.current(x, g, phaseMsAtDrop, periodMsAtDrop, contactTopY);
         return;
       }
       runInsertPhase();
@@ -800,8 +906,8 @@ export default function PlayField({
       fallRafRef.current = null;
 
       const hold =
-        shouldHoldAtImpact(absErrorPx, tolerancePx, success) ||
-        (depleted && shouldDelayFailResult(absErrorPx, tolerancePx));
+        shouldHoldAtImpact(absErrorPx, tolAtDrop, success) ||
+        (depleted && shouldDelayFailResult(absErrorPx, tolAtDrop));
       if (hold) {
         setImpactHolding(true);
         holdTimer = window.setTimeout(afterImpactHold, IMPACT_HOLD_MS);
@@ -845,16 +951,7 @@ export default function PlayField({
         holdTimer = null;
       }
     };
-  }, [
-    phase,
-    tolerancePx,
-    lifePt,
-    updateFallCamera,
-    updateViewportGuides,
-    settleFail,
-    settleLifeDeplete,
-    beginSuccessMerge,
-  ]);
+  }, [phase, updateFallCamera, updateViewportGuides]);
 
   const startFall = useCallback(() => {
     if (phaseRef.current !== "patrolling" || playBlockedRef.current) return;
@@ -882,9 +979,10 @@ export default function PlayField({
     const x = sampled.x;
 
     // DROP瞬間のカメラ位置をロック（この時点ではスクロールしない）
+    const scroller = getScrollParent(stageRef.current);
     cameraFollowRef.current = {
       active: false,
-      scrollAtDrop: window.scrollY,
+      scrollAtDrop: getScrollTop(scroller),
     };
 
     dropPayloadRef.current = {
@@ -992,7 +1090,13 @@ export default function PlayField({
         const cy = pointerCentroidY(map);
         const lastY = lastTwoFingerCentroidYRef.current;
         if (cy !== null && lastY !== null) {
-          window.scrollBy({ top: lastY - cy, left: 0, behavior: "auto" });
+          const scroller = getScrollParent(stageRef.current);
+          const delta = lastY - cy;
+          if (scroller instanceof HTMLElement) {
+            scroller.scrollTop += delta;
+          } else {
+            window.scrollBy({ top: delta, left: 0, behavior: "auto" });
+          }
         }
         lastTwoFingerCentroidYRef.current = cy;
         return;
@@ -1056,10 +1160,7 @@ export default function PlayField({
     return () => {
       if (patrolRafRef.current !== null) cancelAnimationFrame(patrolRafRef.current);
       if (fallRafRef.current !== null) cancelAnimationFrame(fallRafRef.current);
-      if (failResultTimerRef.current !== null) {
-        window.clearTimeout(failResultTimerRef.current);
-        failResultTimerRef.current = null;
-      }
+      pendingFailResultRef.current = null;
       if (lockdownTimerRef.current !== null) {
         window.clearTimeout(lockdownTimerRef.current);
         lockdownTimerRef.current = null;
@@ -1122,6 +1223,7 @@ export default function PlayField({
           copy={copy}
           boundsRef={stageRef}
           boardAnchorRef={columnRef}
+          blockRef={blockRef}
           stage={stage}
           tolerancePx={tolerancePx}
           lifePt={lifePt}
@@ -1255,7 +1357,9 @@ export default function PlayField({
                 ) : null}
               </div>
 
-              {/* 落ちる棒：画像中央帯を切り出した縦長長方形 */}
+              {/* 落ちる棒：画像中央帯を切り出した縦長長方形
+                  patrolling/falling 中の left/top は rAF が DOM 直書きする。
+                  React が top: blockStartY を渡すと着地溜め再レンダーで上空へ巻き戻る */}
               {showBlock ? (
                 <div
                   ref={blockRef}
@@ -1263,14 +1367,9 @@ export default function PlayField({
                     merging || phase === "success" ? "pxd-block--merged" : ""
                   } ${impactHolding ? "pxd-block--impact-hold" : ""}`}
                   style={{
-                    left:
-                      phase === "merging" || phase === "success"
-                        ? g.gapX
-                        : undefined,
-                    top:
-                      phase === "merging" || phase === "success"
-                        ? g.groundTopY
-                        : g.blockStartY,
+                    ...(phase === "merging" || phase === "success"
+                      ? { left: g.gapX, top: g.groundTopY }
+                      : {}),
                     width: g.gapWidth,
                     height: g.groundHeight,
                     backgroundImage: `url(${imageDataUrl})`,
@@ -1292,6 +1391,7 @@ export default function PlayField({
 
               {phase === "fail" || phase === "depleted" ? (
                 <ParticleBurst
+                  key={`burst-${lockedX.toFixed(3)}-${impactY.toFixed(1)}`}
                   imageDataUrl={imageDataUrl}
                   bgWidth={g.width}
                   bgHeight={g.groundHeight}
@@ -1300,6 +1400,7 @@ export default function PlayField({
                   top={impactY}
                   width={g.gapWidth}
                   height={g.groundHeight}
+                  onComplete={handleBurstComplete}
                 />
               ) : null}
             </>

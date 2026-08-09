@@ -1,7 +1,6 @@
 "use client";
 
 import { ClipboardCopy, Trash2 } from "lucide-react";
-import { useLayoutEffect, useRef, useState } from "react";
 import { fmt } from "@/i18n";
 import type { PaletteCollectorDict } from "@/i18n/apps/paletteCollector";
 import type { ColorFormat } from "./colorMath";
@@ -9,8 +8,6 @@ import PaletteCard from "./PaletteCard";
 import type { PaletteColorEntry } from "./types";
 
 const FORMATS: ColorFormat[] = ["hex", "rgb", "hsl"];
-/** 1列あたりに必要なおおよその最小幅（色見本＋コード＋余白） */
-const MIN_COL_WIDTH = 168;
 
 export default function PaletteBoard({
   colors,
@@ -39,23 +36,6 @@ export default function PaletteBoard({
   onExportCss: () => void;
   onExportJson: () => void;
 }) {
-  const listRef = useRef<HTMLDivElement>(null);
-  const [cols, setCols] = useState(1);
-
-  // 枠幅から列数を自動判定
-  useLayoutEffect(() => {
-    const el = listRef.current;
-    if (!el) return;
-    function measure() {
-      const width = listRef.current?.clientWidth ?? 0;
-      setCols(Math.max(1, Math.floor(width / MIN_COL_WIDTH)));
-    }
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [colors.length]);
-
   const formatLabels: Record<ColorFormat, string> = {
     hex: copy.formatHex,
     rgb: copy.formatRgb,
@@ -98,7 +78,10 @@ export default function PaletteBoard({
       </div>
 
       {colors.length > 0 ? (
-        <p className="mt-2 text-[10px] text-gray-400">{copy.selectForLocation}</p>
+        <div className="mt-2 space-y-0.5">
+          <p className="text-[10px] text-gray-400">{copy.selectForLocation}</p>
+          <p className="text-[10px] text-gray-400">{copy.longPressHint}</p>
+        </div>
       ) : null}
 
       {colors.length === 0 ? (
@@ -107,14 +90,7 @@ export default function PaletteBoard({
           <p className="text-xs text-gray-400">{copy.emptyHint}</p>
         </div>
       ) : (
-        <div
-          ref={listRef}
-          className="mt-2 max-h-[22rem] gap-1 overflow-y-auto pr-0.5"
-          style={{
-            display: "grid",
-            gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
-          }}
-        >
+        <div className="mt-2 grid max-h-[22rem] grid-cols-2 gap-1 overflow-y-auto pr-0.5">
           {colors.map((entry) => (
             <PaletteCard
               key={entry.id}

@@ -292,6 +292,7 @@ export default function PixelDropPuzzlePage() {
   return (
     <AppShell
       title={copy.shell.title}
+      titleShort={copy.shell.titleShort}
       description={copy.shell.description}
       fillViewport
       minStageSize={PIXEL_DROP_MIN_STAGE}
@@ -313,10 +314,10 @@ export default function PixelDropPuzzlePage() {
       }}
     >
       <div
-        className="pxd-theme-root flex min-h-0 flex-1 flex-col"
+        className="pxd-theme-root flex min-h-0 w-full max-w-full min-w-0 flex-1 flex-col overflow-x-hidden"
         style={stageThemeStyle(data.stage)}
       >
-        <div className="pxd-console flex w-full flex-1 flex-col rounded-none bg-zinc-950 px-0 pb-6 pt-3">
+        <div className="pxd-console flex w-full max-w-full min-w-0 flex-1 flex-col overflow-x-hidden rounded-none bg-zinc-950 px-0 pb-6 pt-3">
           {!hydrated || imageLoading ? (
             <p className="text-center text-sm text-zinc-500">{t.common.loading}</p>
           ) : !image ? (

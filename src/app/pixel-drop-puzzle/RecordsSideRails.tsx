@@ -4,12 +4,14 @@ import {
   useEffect,
   useLayoutEffect,
   useMemo,
+  useRef,
   useState,
   type CSSProperties,
   type ReactNode,
   type RefObject,
 } from "react";
 import type { PixelDropPuzzleDict } from "@/i18n/apps/pixelDropPuzzle";
+import { useCompactLayout } from "@/lib/useCompactLayout";
 import {
   lifeMaxForStage,
   NEAR_HIT_STAGE_FROM,
@@ -40,6 +42,45 @@ const SIDE_RAIL_MIN_PANEL_W = 96;
 const COMPACT_HUD_MAX_VIEW_W = 640;
 /** ライフ回復フラッシュの表示時間（ms） */
 const RECOVER_FLASH_MS = 1600;
+/** 縦棒上端と HUD 下端の隙間（px） */
+const BLOCK_FOLLOW_GAP_PX = 28;
+/**
+ * 情報欄の上に常に確保する余白（px）。
+ * クリップ上端（サイト Header / スクロール箱）からこの分だけ下げ、上半分の見切れを防ぐ。
+ */
+const HUD_TOP_BREATHING_PX = 14;
+
+/** ステージを囲むスクロール／overflow 箱の上端（ビューポート座標） */
+function resolveClipTop(stageEl: HTMLElement): number {
+  let clipTop = 0;
+  const siteHeader = document.querySelector(".site-header");
+  if (siteHeader instanceof HTMLElement) {
+    clipTop = Math.max(clipTop, siteHeader.getBoundingClientRect().bottom);
+  } else {
+    const headerH = Number.parseFloat(
+      getComputedStyle(document.documentElement)
+        .getPropertyValue("--site-header-height")
+        .trim(),
+    );
+    if (Number.isFinite(headerH) && headerH > 0) {
+      clipTop = Math.max(clipTop, headerH);
+    }
+  }
+
+  let node: HTMLElement | null = stageEl.parentElement;
+  while (node && node !== document.documentElement) {
+    const { overflowY } = getComputedStyle(node);
+    if (
+      overflowY === "auto" ||
+      overflowY === "scroll" ||
+      overflowY === "hidden"
+    ) {
+      clipTop = Math.max(clipTop, node.getBoundingClientRect().top);
+    }
+    node = node.parentElement;
+  }
+  return clipTop;
+}
 
 /** 斜めセグメント式の5段コンボゲージ */
 function StreakGauge({ streak }: { streak: number }) {
@@ -67,6 +108,7 @@ export default function RecordsSideRails({
   copy,
   boundsRef,
   boardAnchorRef,
+  blockRef,
   stage,
   tolerancePx,
   lifePt,
@@ -83,6 +125,8 @@ export default function RecordsSideRails({
   boundsRef: RefObject<HTMLDivElement | null>;
   /** 中央の盤面カラム */
   boardAnchorRef: RefObject<HTMLDivElement | null>;
+  /** 落下する縦棒（コンパクト HUD の追従用） */
+  blockRef: RefObject<HTMLDivElement | null>;
   stage: number;
   tolerancePx: number;
   /** 現在ステージの残りライフ（pt） */
@@ -105,6 +149,9 @@ export default function RecordsSideRails({
   const [layout, setLayout] = useState<RailLayout | null>(null);
   /** ライフ回復フラッシュ中か（PlayField remount 後も残り時間だけ再現） */
   const [recoverFlash, setRecoverFlash] = useState(false);
+  const { compact: shellCompact } = useCompactLayout();
+  /** コンパクト HUD 本体（縦棒上端への追従は DOM 直書き） */
+  const mobileHudRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (lifeRecoveredAtMs === null) return;
@@ -184,12 +231,70 @@ export default function RecordsSideRails({
     : lifePt.toFixed(1);
   const streakUnlocked = stage >= NEAR_HIT_STAGE_FROM;
 
-  if (!layout) return null;
-
-  const panelW = Math.min(PANEL_IDEAL_W, Math.max(0, layout.gutter - GUTTER_PAD));
+  const panelW = layout
+    ? Math.min(PANEL_IDEAL_W, Math.max(0, layout.gutter - GUTTER_PAD))
+    : 0;
+  /** AppShell と同じ compact、または実測でサイドレールが足りないとき */
   const useCompactHud =
-    layout.viewWidth < COMPACT_HUD_MAX_VIEW_W ||
-    panelW < SIDE_RAIL_MIN_PANEL_W;
+    !!layout &&
+    (shellCompact ||
+      layout.viewWidth < COMPACT_HUD_MAX_VIEW_W ||
+      panelW < SIDE_RAIL_MIN_PANEL_W);
+
+  // コンパクト HUD：縦棒の直上に固定し、パトロール／落下と一緒に追従
+  useLayoutEffect(() => {
+    if (!useCompactHud) return;
+
+    let rafId = 0;
+
+    function placeHud() {
+      const hud = mobileHudRef.current;
+      const bounds = boundsRef.current;
+      if (!hud || !bounds) return;
+
+      const bRect = bounds.getBoundingClientRect();
+      hud.style.left = `${bRect.left}px`;
+      hud.style.width = `${Math.max(0, bRect.width)}px`;
+
+      const block = blockRef.current;
+      const hudH = hud.offsetHeight;
+      // ノッチ等：継承された --pxd-safe-top（.pxd-play-surface）を加算
+      const safeInsetRaw = getComputedStyle(hud)
+        .getPropertyValue("--pxd-safe-top")
+        .trim();
+      const safeInset = Number.parseFloat(safeInsetRaw) || 0;
+      // Header／overflow 箱の下端と、ステージ上端の「見える方」から余白を取る
+      const clipTop = resolveClipTop(bounds) + safeInset;
+      const visibleTop = Math.max(bRect.top, clipTop);
+      const minTop = visibleTop + HUD_TOP_BREATHING_PX;
+
+      if (block && hudH > 0) {
+        const blockTop = block.getBoundingClientRect().top;
+        const desiredTop = blockTop - hudH - BLOCK_FOLLOW_GAP_PX;
+        // 上側に余白を残したまま追従（手動スクロールでも上半分が見切れない）
+        hud.style.top = `${Math.max(minTop, desiredTop)}px`;
+        hud.style.visibility = "visible";
+      } else if (hudH > 0) {
+        hud.style.top = `${minTop}px`;
+        hud.style.visibility = "visible";
+      }
+    }
+
+    function tick() {
+      placeHud();
+      rafId = requestAnimationFrame(tick);
+    }
+
+    placeHud();
+    rafId = requestAnimationFrame(tick);
+    window.addEventListener("resize", placeHud);
+    return () => {
+      cancelAnimationFrame(rafId);
+      window.removeEventListener("resize", placeHud);
+    };
+  }, [useCompactHud, boundsRef, boardAnchorRef, blockRef]);
+
+  if (!layout) return null;
 
   const wrapStyle: CSSProperties = {
     left: layout.boundsLeft,
@@ -199,7 +304,11 @@ export default function RecordsSideRails({
 
   if (useCompactHud) {
     return (
-      <div className="pxd-mobile-hud pxd-mobile-hud--footer fixed z-[30]">
+      <div
+        ref={mobileHudRef}
+        className="pxd-mobile-hud pxd-mobile-hud--follow fixed z-[30]"
+        style={{ visibility: "hidden" }}
+      >
         <div className="pxd-mobile-hud__dock">
           <div className="pxd-mobile-hud__shell pointer-events-none">
           <div

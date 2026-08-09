@@ -1,7 +1,12 @@
 // 極小ピクセル隙間落としパズル: アプリ内 UI 辞書（JA / EN）
 
 export type PixelDropPuzzleDict = {
-  shell: { title: string; description: string };
+  shell: {
+    title: string;
+    /** コンパクト時の短いタイトル */
+    titleShort: string;
+    description: string;
+  };
   install: {
     button: string;
     buttonShort: string;
@@ -137,6 +142,7 @@ export type PixelDropPuzzleDict = {
 export const pixelDropPuzzleJa: PixelDropPuzzleDict = {
   shell: {
     title: "極小ピクセル隙間落としパズル",
+    titleShort: "ピクセル隙間落とし",
     description:
       "上空の縦棒をタイミングよく落とし、地表の隙間にハメる。判定は小数点以下のピクセル単位。",
   },
@@ -266,6 +272,7 @@ export const pixelDropPuzzleJa: PixelDropPuzzleDict = {
 export const pixelDropPuzzleEn: PixelDropPuzzleDict = {
   shell: {
     title: "Tiny Pixel Gap Drop Puzzle",
+    titleShort: "Pixel Gap Drop",
     description:
       "Drop the tall bar from high above into the ground gap. Judged to fractions of a pixel.",
   },

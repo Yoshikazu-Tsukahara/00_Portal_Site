@@ -10,6 +10,7 @@ export {
   isLocale,
   LOCALES,
   LOCALE_NATIVE_LABELS,
+  LOCALE_SHORT_LABELS,
   intlLocale,
   matchNavigatorLanguage,
   resolveInitialLocale,

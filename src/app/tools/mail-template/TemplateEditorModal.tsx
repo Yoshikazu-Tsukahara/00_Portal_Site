@@ -125,7 +125,7 @@ export default function TemplateEditorModal({
           </button>
         </div>
 
-        <div className="space-y-4 overflow-x-hidden overflow-y-auto px-3 py-3 sm:px-4">
+        <div className="space-y-4 overflow-x-hidden overflow-y-auto overscroll-auto px-3 py-3 sm:px-4">
           <div className="min-w-0">
             <label
               htmlFor="tpl-title"
@@ -252,7 +252,7 @@ export default function TemplateEditorModal({
                 {mt.editor.variablesEmpty}
               </p>
             ) : (
-              <div className="grid max-h-48 grid-cols-1 gap-1.5 overflow-y-auto sm:grid-cols-2">
+              <div className="grid max-h-48 grid-cols-1 gap-1.5 overflow-y-auto overscroll-auto sm:grid-cols-2">
                 {masterVariables.map((item) => {
                   const checked = enabledSet.has(item.id);
                   return (

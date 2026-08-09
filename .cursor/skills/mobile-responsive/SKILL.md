@@ -73,11 +73,12 @@ i18n に Short ラベルを ja/en 両方追加する。
 | 入力グリッド | `grid-cols-1 sm:grid-cols-2` |
 | 余白 | `p-2 md:p-4` など段階付け |
 | オーバーフロー | 親に `min-w-0 w-full max-w-full overflow-x-hidden` |
+| 長文・多いリスト | `.app-nested-scroll`（`max-h-[60vh]` + `overflow-y-auto` + `overscroll-auto`）。画面を埋め尽くさない |
 | 長文 | `break-words` |
 | リスト操作 | ピン／編集等をスマホでも常時表示 + `active:` |
 | モーダル | `items-end`（スマホ）/ `sm:items-center`、閉じる・保存は `min-h-11` 可 |
 
-`fillViewport` 時: 外側 `overflow-y-auto md:overflow-hidden`、各パネルに `min-h-0`。
+`fillViewport` 時: AppShell 作業領域は `overflow-y-auto overscroll-auto`。内部スクロールは端で親へチェーン（`overscroll-contain` 禁止）。
 
 ## Step 5: PWA インストール（依頼時のみ）
 

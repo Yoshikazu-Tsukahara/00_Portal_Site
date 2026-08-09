@@ -1,7 +1,15 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type MouseEvent, type RefObject } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type MouseEvent,
+  type RefObject,
+} from "react";
 import type { UltimateProbabilitySlotDict } from "@/i18n/apps/ultimateProbabilitySlot";
+import { useCompactLayout } from "@/lib/useCompactLayout";
 import AchievementsDrawer from "./AchievementsDrawer";
 import AchievementsSidebar from "./AchievementsSidebar";
 import ModeSegment from "./ModeSegment";
@@ -109,6 +117,11 @@ export default function Dashboard({
   const [achievementsOpen, setAchievementsOpen] = useState(false);
   const [statusFlash, setStatusFlash] = useState(false);
   const prevTierRef = useRef<string | null>(null);
+  const { showSideColumn: showSidebar } = useCompactLayout();
+
+  useEffect(() => {
+    if (showSidebar) setAchievementsOpen(false);
+  }, [showSidebar]);
 
   const p = useMemo(() => singleSpinProbability(settings), [settings]);
   const cumulative = useMemo(
@@ -159,6 +172,8 @@ export default function Dashboard({
   return (
     <div
       className={`slot-layout ${
+        showSidebar ? "" : "slot-layout--compact"
+      } ${
         isReach ? `slot-layout--reach slot-layout--reach-${reachTone}` : ""
       } ${cheatLocked ? "slot-layout--lockdown" : ""}`}
     >
@@ -204,7 +219,7 @@ export default function Dashboard({
                 </div>
               ) : null}
 
-              <div className="grid shrink-0 grid-cols-3 gap-1 sm:gap-1.5">
+              <div className="grid min-w-0 max-w-full shrink-0 grid-cols-3 gap-1 sm:gap-1.5">
                 <Readout label={copy.attemptsLabel}>
                   <span key={run.attempts} className="slot-tick">
                     {run.attempts.toLocaleString("en-US")}
@@ -306,28 +321,39 @@ export default function Dashboard({
                 </div>
               </div>
 
-              <div className="flex gap-1 sm:gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => setAchievementsOpen(true)}
-                  className="slot-ghost-btn flex-1 !py-1.5 lg:hidden"
-                >
-                  {copy.achievementsButton}
-                </button>
+              {/* スマホ／狭い幅: 設定 / リセット / 実績。広いPC: 設定 / リセット（実績は右カラム） */}
+              <div
+                className={`grid gap-1 sm:gap-1.5 ${
+                  showSidebar ? "grid-cols-2" : "grid-cols-3"
+                }`}
+              >
                 <button
                   type="button"
                   onClick={onOpenSettings}
-                  className="slot-ghost-btn flex-1 !py-1.5"
+                  className="slot-ghost-btn min-w-0 !px-1 !py-1.5 text-[11px] leading-tight sm:text-xs"
                 >
                   {copy.settingsButton}
                 </button>
                 <button
                   type="button"
                   onClick={onResetRun}
-                  className="slot-ghost-btn flex-1 !py-1.5"
+                  className="slot-ghost-btn min-w-0 !px-1 !py-1.5 text-[11px] leading-tight sm:text-xs"
+                  title={copy.resetRunButton}
                 >
-                  {copy.resetRunButton}
+                  {showSidebar
+                    ? copy.resetRunButton
+                    : copy.resetRunButtonShort}
                 </button>
+                {!showSidebar ? (
+                  <button
+                    type="button"
+                    onClick={() => setAchievementsOpen(true)}
+                    className="slot-ghost-btn min-w-0 !px-1 !py-1.5 text-[11px] leading-tight sm:text-xs"
+                    title={copy.achievementsButton}
+                  >
+                    {copy.achievementsButtonShort}
+                  </button>
+                ) : null}
               </div>
 
               <div className="slot-panel slot-console__lifetime px-2 py-1 sm:px-2.5 sm:py-1.5">
@@ -362,23 +388,27 @@ export default function Dashboard({
             </div>
           </div>
 
-          <AchievementsSidebar
-            mode={settings.mode}
-            unlockedBadges={unlockedBadges}
-            badgeCopy={badgeCopy}
-            copy={achievementsCopy}
-          />
+          {showSidebar ? (
+            <AchievementsSidebar
+              mode={settings.mode}
+              unlockedBadges={unlockedBadges}
+              badgeCopy={badgeCopy}
+              copy={achievementsCopy}
+            />
+          ) : null}
         </div>
       </div>
 
-      <AchievementsDrawer
-        open={achievementsOpen}
-        mode={settings.mode}
-        unlockedBadges={unlockedBadges}
-        badgeCopy={badgeCopy}
-        copy={achievementsCopy}
-        onClose={() => setAchievementsOpen(false)}
-      />
+      {!showSidebar ? (
+        <AchievementsDrawer
+          open={achievementsOpen}
+          mode={settings.mode}
+          unlockedBadges={unlockedBadges}
+          badgeCopy={badgeCopy}
+          copy={achievementsCopy}
+          onClose={() => setAchievementsOpen(false)}
+        />
+      ) : null}
     </div>
   );
 }
@@ -391,9 +421,11 @@ function Readout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="slot-panel min-w-0 px-1.5 py-1 sm:px-2.5 sm:py-1.5">
+    <div className="slot-panel min-w-0 max-w-full overflow-hidden px-1.5 py-1 sm:px-2.5 sm:py-1.5">
       <p className="slot-readout-label mb-0.5 truncate">{label}</p>
-      <div className="slot-readout-value min-w-0">{children}</div>
+      <div className="slot-readout-value min-w-0 max-w-full overflow-hidden">
+        {children}
+      </div>
     </div>
   );
 }

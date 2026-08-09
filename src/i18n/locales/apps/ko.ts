@@ -52,6 +52,8 @@ export const appsKo: AppsDictionary = {
       },
       readTitle: ".mybook 파일 읽기",
       readLead: "파일을 여기에 놓으면 바로 리더가 열리거나, 클릭하여 선택하세요.",
+      readOnlyLead:
+        "스마트폰에서는 읽기만 가능합니다. .mybook 파일을 열어 즐기세요. 편집은 PC(넓은 가로 화면)에서 할 수 있습니다.",
       readButton: "파일 선택",
       dropActive: "놓아서 열기",
       error: "파일을 읽을 수 없습니다. .mybook 파일을 선택하세요.",
@@ -1474,6 +1476,7 @@ export const appsKo: AppsDictionary = {
       audio: "오디오",
       video: "비디오",
       unsaved: "미저장",
+      backToList: "목록으로",
     },
     stage: {
       artworkTitle: "커버 아트",
@@ -1589,11 +1592,15 @@ export const appsKo: AppsDictionary = {
       exportJson: "JSON으로 복사",
       copyAria: "{value} 복사",
       deleteAria: "{value} 삭제",
+      copyAction: "복사",
+      deleteAction: "삭제",
+      cancelAction: "닫기",
       suggestionsToggleAria: "{value}의 색 제안 보기",
       complementaryLabel: "보색",
       analogousLabel: "유사색",
       addSuggestionAria: "{value}를 팔레트에 추가",
-      selectForLocation: "스와치나 코드를 클릭하면 이미지에서 위치와 일치 영역을 강조합니다",
+      selectForLocation: "스와치나 코드를 탭하면 이미지에서 위치와 일치 영역을 강조합니다",
+      longPressHint: "길게 눌러 복사·삭제 (PC는 우클릭)",
       selectColorAria: "{value} 선택 및 이미지에 표시",
     },
     autoExtract: {
@@ -1806,6 +1813,7 @@ export const appsKo: AppsDictionary = {
   pixelDropPuzzle: {
     shell: {
       title: "타이니 픽셀 갭 드롭 퍼즐",
+      titleShort: "픽셀 틈새 퍼즐",
       description: "높은 곳에서 긴 막대를 바닥의 틈에 떨어뜨리세요. 픽셀 분율까지 판정합니다.",
     },
     install: {
@@ -2082,9 +2090,11 @@ export const appsKo: AppsDictionary = {
       stopButton: "STOP",
       spinningLabel: "스핀 중…",
       resetRunButton: "스핀 초기화",
+      resetRunButtonShort: "초기화",
       resetRunConfirm: "스핀 횟수를 초기화할까요? (누적 통계·업적은 유지)",
       settingsButton: "설정",
       achievementsButton: "🏆 업적",
+      achievementsButtonShort: "업적",
       lifetimeHeading: "누적",
       lifetimeAttempts: "총 스핀",
       lifetimeWins: "히트",

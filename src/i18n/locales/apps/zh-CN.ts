@@ -867,6 +867,7 @@ export const appsZhCN: AppsDictionary = {
       audio: "音频",
       video: "视频",
       unsaved: "未保存",
+      backToList: "返回列表",
     },
     stage: {
       artworkTitle: "封面图",
@@ -1103,6 +1104,8 @@ export const appsZhCN: AppsDictionary = {
       },
       readTitle: "阅读 .mybook 文件",
       readLead: "将文件拖放到此处立即打开阅读器，或点击选择。",
+      readOnlyLead:
+        "手机上仅可阅读。请打开 .mybook 文件欣赏。编辑请在更宽的桌面布局中进行。",
       readButton: "选择文件",
       dropActive: "松开以打开",
       error: "无法读取该文件。请选择 .mybook 文件。",
@@ -1422,11 +1425,15 @@ export const appsZhCN: AppsDictionary = {
       exportJson: "复制为 JSON",
       copyAria: "复制 {value}",
       deleteAria: "删除 {value}",
+      copyAction: "复制",
+      deleteAction: "删除",
+      cancelAction: "关闭",
       suggestionsToggleAria: "显示 {value} 的配色建议",
       complementaryLabel: "互补色",
       analogousLabel: "类似色",
       addSuggestionAria: "将 {value} 添加到调色板",
-      selectForLocation: "点击色块或色值，在图片上高亮其位置与匹配区域",
+      selectForLocation: "点按色块或色值，在图片上高亮其位置与匹配区域",
+      longPressHint: "长按可复制或删除（电脑可右键）",
       selectColorAria: "选择 {value} 并在图片上显示",
     },
     autoExtract: {
@@ -1822,9 +1829,11 @@ export const appsZhCN: AppsDictionary = {
       stopButton: "停止",
       spinningLabel: "旋转中…",
       resetRunButton: "重置旋转",
+      resetRunButtonShort: "重置",
       resetRunConfirm: "重置旋转次数？（终身统计与成就保留。）",
       settingsButton: "设置",
       achievementsButton: "🏆 成就",
+      achievementsButtonShort: "成就",
       lifetimeHeading: "终身",
       lifetimeAttempts: "总旋转",
       lifetimeWins: "命中",
@@ -1959,6 +1968,7 @@ export const appsZhCN: AppsDictionary = {
   pixelDropPuzzle: {
     shell: {
       title: "像素缝隙投放谜题",
+      titleShort: "像素落缝",
       description: "从高处把长条落入地面缝隙。以像素的几分之一判定。",
     },
     install: {

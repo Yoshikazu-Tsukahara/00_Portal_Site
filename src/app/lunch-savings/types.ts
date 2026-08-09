@@ -189,6 +189,37 @@ export function isInPeriod(
   return isoDate >= startDate && isoDate <= endDate;
 }
 
+/**
+ * 相対期間（今月／給料サイクル）を「いま」に合わせて更新する。
+ * 古い start/end のままだと今日の記録が集計・履歴に出ない。
+ */
+export function refreshRollingPeriod(
+  settings: LunchSettings,
+  ref = new Date(),
+): LunchSettings {
+  if (settings.periodType === "calendar-month") {
+    const r = calendarMonthRange(ref);
+    if (
+      r.startDate === settings.startDate &&
+      r.endDate === settings.endDate
+    ) {
+      return settings;
+    }
+    return { ...settings, startDate: r.startDate, endDate: r.endDate };
+  }
+  if (settings.periodType === "salary-cycle") {
+    const r = salaryCycleRange(settings.salaryDay, ref);
+    if (
+      r.startDate === settings.startDate &&
+      r.endDate === settings.endDate
+    ) {
+      return settings;
+    }
+    return { ...settings, startDate: r.startDate, endDate: r.endDate };
+  }
+  return settings;
+}
+
 /** 過去データ互換付きのデフォルト設定 */
 export function buildDefaultSettings(ref = new Date()): LunchSettings {
   const { startDate, endDate } = calendarMonthRange(ref);

@@ -1,6 +1,12 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { useI18n } from "@/i18n";
 import { LAYOUT_MODES, useLayout, type LayoutMode } from "@/lib/layout";
 
@@ -12,14 +18,9 @@ const MODE_INDEX: Record<LayoutMode, number> = {
 };
 
 /** 縦型（スマホ幅）アイコン */
-function PortraitIcon() {
+function PortraitIcon({ className = "size-3.5" }: { className?: string }) {
   return (
-    <svg
-      viewBox="0 0 16 16"
-      className="size-3.5"
-      fill="none"
-      aria-hidden
-    >
+    <svg viewBox="0 0 16 16" className={className} fill="none" aria-hidden>
       <rect
         x="4.5"
         y="1.5"
@@ -36,8 +37,13 @@ function PortraitIcon() {
 }
 
 /** 幅の狭さ〜広さを示すシンプルなアイコン（文字なし） */
-function WidthIcon({ mode }: { mode: Exclude<LayoutMode, "portrait"> }) {
-  // viewBox 内のコンテンツ枠幅で「標準 / 広め / 全幅」を表現
+function WidthIcon({
+  mode,
+  className = "size-3.5",
+}: {
+  mode: Exclude<LayoutMode, "portrait">;
+  className?: string;
+}) {
   const frames: Record<Exclude<LayoutMode, "portrait">, { x: number; w: number }> =
     {
       default: { x: 5, w: 6 },
@@ -47,12 +53,7 @@ function WidthIcon({ mode }: { mode: Exclude<LayoutMode, "portrait"> }) {
   const { x, w } = frames[mode];
 
   return (
-    <svg
-      viewBox="0 0 16 16"
-      className="size-3.5"
-      fill="none"
-      aria-hidden
-    >
+    <svg viewBox="0 0 16 16" className={className} fill="none" aria-hidden>
       <rect
         x="1"
         y="2.5"
@@ -68,16 +69,31 @@ function WidthIcon({ mode }: { mode: Exclude<LayoutMode, "portrait"> }) {
   );
 }
 
+function modeIcon(mode: LayoutMode, className?: string): ReactNode {
+  if (mode === "portrait") return <PortraitIcon className={className} />;
+  return <WidthIcon mode={mode} className={className} />;
+}
+
+type LayoutToggleProps = {
+  /** segment: PC 向け4連ボタン / dropdown: スマホ向けコンパクト */
+  variant?: "segment" | "dropdown";
+};
+
 /**
- * PC（lg 以上）専用の表示幅切替。
- * ヘッダー中央に置く前提。アイコンのみのシンプルなセグメント。
+ * 表示幅切替。
+ * - segment: PC ヘッダー中央
+ * - dropdown: スマホ／縦型ヘッダー直置き
  */
-export default function LayoutToggle() {
+export default function LayoutToggle({
+  variant = "segment",
+}: LayoutToggleProps) {
   const { t } = useI18n();
   const { layoutMode, setLayoutMode, ready } = useLayout();
   const copy = t.header.layoutToggle;
-  /** ユーザー操作後だけインジケータをスライドさせる（復元時は動かさない） */
   const [animate, setAnimate] = useState(false);
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const listId = useId();
 
   const titles: Record<LayoutMode, string> = {
     portrait: copy.portrait,
@@ -86,12 +102,82 @@ export default function LayoutToggle() {
     full: copy.full,
   };
 
-  const icons: Record<LayoutMode, ReactNode> = {
-    portrait: <PortraitIcon />,
-    default: <WidthIcon mode="default" />,
-    wide: <WidthIcon mode="wide" />,
-    full: <WidthIcon mode="full" />,
-  };
+  useEffect(() => {
+    if (!open) return;
+
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setOpen(false);
+      }
+    }
+
+    function onPointerDown(e: PointerEvent) {
+      if (rootRef.current?.contains(e.target as Node)) return;
+      setOpen(false);
+    }
+
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("pointerdown", onPointerDown);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("pointerdown", onPointerDown);
+    };
+  }, [open]);
+
+  if (variant === "dropdown") {
+    return (
+      <div
+        ref={rootRef}
+        className={`layout-toggle-dd ${ready ? "" : "invisible"}`}
+        aria-hidden={!ready}
+      >
+        <button
+          type="button"
+          disabled={!ready}
+          className="layout-toggle-dd__trigger"
+          aria-haspopup="listbox"
+          aria-expanded={open}
+          aria-controls={listId}
+          aria-label={`${copy.aria}: ${titles[layoutMode]}`}
+          title={titles[layoutMode]}
+          onClick={() => setOpen((v) => !v)}
+        >
+          {modeIcon(layoutMode, "size-3.5")}
+        </button>
+        {open ? (
+          <ul
+            id={listId}
+            role="listbox"
+            aria-label={copy.aria}
+            className="layout-toggle-dd__menu"
+          >
+            {LAYOUT_MODES.map((mode) => {
+              const active = layoutMode === mode;
+              return (
+                <li key={mode} role="option" aria-selected={active}>
+                  <button
+                    type="button"
+                    className={`layout-toggle-dd__option${
+                      active ? " layout-toggle-dd__option--active" : ""
+                    }`}
+                    aria-label={titles[mode]}
+                    title={titles[mode]}
+                    onClick={() => {
+                      setLayoutMode(mode);
+                      setOpen(false);
+                    }}
+                  >
+                    {modeIcon(mode, "size-3.5")}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        ) : null}
+      </div>
+    );
+  }
 
   return (
     <div className={ready ? "" : "invisible"} aria-hidden={!ready}>
@@ -124,7 +210,7 @@ export default function LayoutToggle() {
                   : "layout-toggle__btn--inactive"
               }`}
             >
-              {icons[mode]}
+              {modeIcon(mode)}
             </button>
           );
         })}

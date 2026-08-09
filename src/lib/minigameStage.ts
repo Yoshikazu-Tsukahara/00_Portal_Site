@@ -9,19 +9,28 @@ export type MinStageSize = {
   height: number;
 };
 
-/** 投射フリースロー：左メモ＋コート＋右付箋が破綻しない幅 */
+/**
+ * 投射フリースロー：左メモ＋コート＋右付箋が破綻しない幅（PC 向け）。
+ * スマホ／縦型では AppShell が minWidth を適用しない。
+ */
 export const ROBOT_FREETHROW_MIN_STAGE: MinStageSize = {
   width: 960,
   height: 600,
 };
 
-/** 究極確率スロット：コンソール＋実績が読める幅 */
+/**
+ * 究極確率スロット：コンソール＋実績が読める幅（PC 向け）。
+ * スマホ／縦型では AppShell が minWidth を適用しない（横スクロール防止）。
+ */
 export const SLOT_MIN_STAGE: MinStageSize = {
   width: 900,
   height: 560,
 };
 
-/** 極小ピクセル隙間落とし：ステージ＋操作が窮屈にならない幅 */
+/**
+ * 極小ピクセル隙間落とし：ステージ＋操作が窮屈にならない幅（PC 向け）。
+ * スマホ／縦型では AppShell が minWidth を適用しない。
+ */
 export const PIXEL_DROP_MIN_STAGE: MinStageSize = {
   width: 800,
   height: 560,

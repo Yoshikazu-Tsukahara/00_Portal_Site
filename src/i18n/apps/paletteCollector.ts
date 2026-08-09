@@ -66,11 +66,18 @@ export type PaletteCollectorDict = {
     exportJson: string;
     copyAria: string;
     deleteAria: string;
+    /** 長押しメニューのコピー */
+    copyAction: string;
+    /** 長押しメニューの削除 */
+    deleteAction: string;
+    cancelAction: string;
     suggestionsToggleAria: string;
     complementaryLabel: string;
     analogousLabel: string;
     addSuggestionAria: string;
     selectForLocation: string;
+    /** 長押しで操作できる旨の案内 */
+    longPressHint: string;
     selectColorAria: string;
   };
   autoExtract: {
@@ -203,12 +210,16 @@ export const paletteCollectorJa: PaletteCollectorDict = {
     exportJson: "JSONでコピー",
     copyAria: "{value} をコピー",
     deleteAria: "{value} を削除",
+    copyAction: "コピー",
+    deleteAction: "削除",
+    cancelAction: "閉じる",
     suggestionsToggleAria: "{value} の配色提案を開く",
     complementaryLabel: "補色",
     analogousLabel: "類似色",
     addSuggestionAria: "{value} をパレットに追加",
     selectForLocation:
-      "色見本またはコードをクリックすると、画像上の位置・同色の領域を表示します",
+      "色見本またはコードをタップすると、画像上の位置・同色の領域を表示します",
+    longPressHint: "長押し（PCは右クリック）でコピー・削除",
     selectColorAria: "{value} を選択して画像上に表示",
   },
   autoExtract: {
@@ -346,12 +357,16 @@ export const paletteCollectorEn: PaletteCollectorDict = {
     exportJson: "Copy as JSON",
     copyAria: "Copy {value}",
     deleteAria: "Delete {value}",
+    copyAction: "Copy",
+    deleteAction: "Delete",
+    cancelAction: "Close",
     suggestionsToggleAria: "Show color suggestions for {value}",
     complementaryLabel: "Complementary",
     analogousLabel: "Analogous",
     addSuggestionAria: "Add {value} to palette",
     selectForLocation:
-      "Click a swatch or code to highlight its location and matching areas on the image",
+      "Tap a swatch or code to highlight its location and matching areas on the image",
+    longPressHint: "Long-press (right-click on PC) to copy or delete",
     selectColorAria: "Select {value} and show on image",
   },
   autoExtract: {

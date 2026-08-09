@@ -52,6 +52,8 @@ export const appsZhTW: AppsDictionary = {
       },
       readTitle: "閱讀 .mybook 檔案",
       readLead: "將檔案拖放到此即可立刻開啟閱讀器，或點選以選擇。",
+      readOnlyLead:
+        "手機上僅可閱讀。請開啟 .mybook 檔案欣賞。編輯請在更寬的桌面版面中進行。",
       readButton: "選擇檔案",
       dropActive: "放開以開啟",
       error: "無法讀取該檔案。請選擇 .mybook 檔案。",
@@ -1474,6 +1476,7 @@ export const appsZhTW: AppsDictionary = {
       audio: "音訊",
       video: "影片",
       unsaved: "未儲存",
+      backToList: "返回列表",
     },
     stage: {
       artworkTitle: "封面圖",
@@ -1589,11 +1592,15 @@ export const appsZhTW: AppsDictionary = {
       exportJson: "複製為 JSON",
       copyAria: "複製 {value}",
       deleteAria: "刪除 {value}",
+      copyAction: "複製",
+      deleteAction: "刪除",
+      cancelAction: "關閉",
       suggestionsToggleAria: "顯示 {value} 的顏色建議",
       complementaryLabel: "互補色",
       analogousLabel: "類似色",
       addSuggestionAria: "將 {value} 加入配色盤",
       selectForLocation: "點選色票或色碼，可在圖片上標示其位置與相符區域",
+      longPressHint: "長按可複製或刪除（電腦可右鍵）",
       selectColorAria: "選取 {value} 並在圖片上顯示",
     },
     autoExtract: {
@@ -1806,6 +1813,7 @@ export const appsZhTW: AppsDictionary = {
   pixelDropPuzzle: {
     shell: {
       title: "極小像素縫隙落物謎題",
+      titleShort: "像素落縫",
       description: "從高處把長條落入地面縫隙。以像素的分數級精度判定。",
     },
     install: {
@@ -2082,9 +2090,11 @@ export const appsZhTW: AppsDictionary = {
       stopButton: "STOP",
       spinningLabel: "旋轉中…",
       resetRunButton: "重設旋轉",
+      resetRunButtonShort: "重設",
       resetRunConfirm: "重設旋轉次數？（終身統計與成就會保留。）",
       settingsButton: "設定",
       achievementsButton: "🏆 成就",
+      achievementsButtonShort: "成就",
       lifetimeHeading: "終身",
       lifetimeAttempts: "總旋轉",
       lifetimeWins: "中獎",

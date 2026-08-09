@@ -17,6 +17,8 @@ export type MediaMetadataDict = {
     audio: string;
     video: string;
     unsaved: string;
+    /** スマホ／縦型: 編集画面から一覧へ戻る */
+    backToList: string;
   };
   stage: {
     artworkTitle: string;
@@ -87,6 +89,7 @@ export const mediaMetadataJa: MediaMetadataDict = {
     audio: "音楽",
     video: "動画",
     unsaved: "未保存",
+    backToList: "一覧へ",
   },
   stage: {
     artworkTitle: "カバーアート",
@@ -136,7 +139,7 @@ export const mediaMetadataJa: MediaMetadataDict = {
     fail: "保存に失敗しました。別のファイルで試すか、サムネイル／カバーを外して再試行してください。",
   },
   clearAll: "すべてクリア",
-  selectPrompt: "左の一覧からファイルを選んで編集を開始してください",
+  selectPrompt: "一覧からファイルを選んで編集を開始してください",
 };
 
 export const mediaMetadataEn: MediaMetadataDict = {
@@ -161,6 +164,7 @@ export const mediaMetadataEn: MediaMetadataDict = {
     audio: "Audio",
     video: "Video",
     unsaved: "Unsaved",
+    backToList: "Back to list",
   },
   stage: {
     artworkTitle: "Cover art",

@@ -99,6 +99,7 @@ type AppShellProps = {
    * - ウィンドウがこれより大きい → 残り領域いっぱいにきっちり表示
    * - これより小さい → 無理に縮小せず、Header〜Footer を含むページ全体が伸びてスクロール
    * （アプリ枠内だけのスクロールにはしない。`fillViewport` と併用）
+   * - スマホ／縦型（compact）では minWidth を適用しない（横スクロール防止）
    */
   minStageSize?: MinStageSize;
   /**
@@ -183,14 +184,19 @@ export default function AppShell({
 
   // 背景はフル幅のまま、中身の列だけ layoutMode の幅に揃える
   const fillWithMinStage = Boolean(fillViewport && minStageSize);
+  /**
+   * 最低ステージ幅は PC 向け。スマホ／縦型では minWidth を付けない
+   * （900px 固定だと横スクロールが発生する）
+   */
+  const enforceMinStage = Boolean(minStageSize) && !compact;
 
   return (
     <main
-      className={`flex w-full flex-1 flex-col ${contentClassName} ${
-        fillWithMinStage
+      className={`flex w-full max-w-full flex-1 flex-col ${contentClassName} ${
+        fillWithMinStage && enforceMinStage
           ? "min-h-full overflow-x-auto py-2"
           : fillViewport
-            ? "h-full min-h-0 max-h-full overflow-hidden py-2"
+            ? "h-full min-h-0 max-h-full overflow-x-hidden overflow-hidden py-2"
             : "overflow-x-hidden py-4"
       }`}
     >
@@ -254,7 +260,7 @@ export default function AppShell({
           </div>
         ) : null}
       </header>
-      {minStageSize ? (
+      {minStageSize && enforceMinStage ? (
         <div
           className={
             fillViewport
@@ -274,7 +280,7 @@ export default function AppShell({
             fillViewport
               ? // ヘッダー直下の作業領域。子が伸びる場合はここでスクロール、
                 // 子が flex-1+内部スクロールなら高さを渡す（min-h-0 が重要）
-                "flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto overscroll-contain [touch-action:pan-y]"
+                "flex min-h-0 w-full max-w-full flex-1 flex-col overflow-x-hidden overflow-y-auto overscroll-auto [touch-action:pan-y]"
               : undefined
           }
         >

@@ -13,6 +13,12 @@ export const STAGE_MIN_VH = 260;
 export const BLOCK_START_VH = 10;
 /** 地表の下に残す余白（px）。盤面はステージ最下端に揃える */
 export const GROUND_BOTTOM_PAD_PX = 0;
+/**
+ * コンパクト HUD（ステージ情報＋操作ボタン）分の縦棒オフセット（px）。
+ * 黒いグリッド枠内の上端に HUD を収めるため、棒開始Yを下げる。
+ */
+/** HUD 本体＋棒との隙間ぶん（RecordsSideRails の追従ギャップと揃える） */
+export const COMPACT_HUD_RESERVE_PX = 228;
 
 /**
  * 等加速度落下の重力（px / ms²）。
@@ -94,14 +100,17 @@ export function computeGeometry(
   containerWidth: number,
   _imageWidth: number,
   _imageHeight: number,
+  options?: {
+    /** スマホ HUD を枠内上端に置くため、縦棒開始位置を下げる */
+    compactHud?: boolean;
+  },
 ): PlayGeometry {
   const vh = viewportHeight();
 
-  // 盤面は画面いっぱいにせず、見やすい幅に抑えて中央寄せ
-  const MIN_BOARD_WIDTH = 280;
+  // 盤面は親幅に収める（最低幅で親より広げない＝横スクロール防止）
   const width = Math.min(
     MAX_BOARD_WIDTH,
-    Math.max(MIN_BOARD_WIDTH, Math.floor(containerWidth)),
+    Math.max(1, Math.floor(containerWidth)),
   );
   const groundHeight = width / GAME_GROUND_ASPECT;
 
@@ -110,7 +119,9 @@ export function computeGeometry(
   const gapX = (width - gapWidth) / 2;
   const maxX = width - gapWidth;
 
-  const blockStartY = (BLOCK_START_VH / 100) * vh;
+  const blockStartY =
+    (BLOCK_START_VH / 100) * vh +
+    (options?.compactHud ? COMPACT_HUD_RESERVE_PX : 0);
   const minStage = (STAGE_MIN_VH / 100) * vh;
   // 上空〜地表まで十分な落下距離を確保
   const fallGap = Math.max(vh * 1.35, minStage - groundHeight - blockStartY - GROUND_BOTTOM_PAD_PX);

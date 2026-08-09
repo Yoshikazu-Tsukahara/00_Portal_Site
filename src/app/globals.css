@@ -172,6 +172,59 @@ html[data-layout-mode="portrait"] .launcher-icon__glyph {
     @apply text-xs opacity-90;
   }
 
+  /* 縦向き禁止：横画面へ誘導する全面ゲート */
+  .force-landscape-gate {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1.5rem;
+    box-sizing: border-box;
+    background: rgba(9, 9, 11, 0.96);
+    color: #f4f4f5;
+    text-align: center;
+  }
+
+  .force-landscape-gate__phone {
+    width: 2.25rem;
+    height: 3.5rem;
+    margin-bottom: 0.35rem;
+    border: 2px solid #a1a1aa;
+    border-radius: 0.4rem;
+    animation: force-landscape-tilt 1.6s ease-in-out infinite;
+  }
+
+  .force-landscape-gate__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
+  .force-landscape-gate__hint {
+    margin: 0;
+    max-width: 18rem;
+    font-size: 0.8rem;
+    line-height: 1.55;
+    color: #a1a1aa;
+  }
+
+  @keyframes force-landscape-tilt {
+    0%,
+    100% {
+      transform: rotate(0deg);
+    }
+    40%,
+    60% {
+      transform: rotate(90deg);
+    }
+  }
+
   /* ポータル：控えめなフェード（文房具ランチャー向け） */
   .portal-fade-up {
     animation: portal-fade-up 0.35s ease-out both;
@@ -771,35 +824,59 @@ html[data-layout-mode="portrait"] .launcher-icon__glyph {
     @apply bg-orange-50 text-orange-700 border-orange-200;
   }
 
-  /* ヘッダー：メニューボタン／パネル（表示切替は JSX の lg:hidden 等で制御） */
-  .site-header__menu-btn {
-    @apply inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-zinc-200 bg-white text-zinc-700 transition-colors hover:border-[var(--accent-border)] hover:bg-[color-mix(in_srgb,var(--accent)_18%,white)];
+  /* ヘッダー（スマホ／縦型）：1行にコントロールを直置き */
+  .site-header__bar--compact {
+    min-width: 0;
   }
-  .site-header__menu-btn[aria-expanded="true"] {
+
+  /* ホーム／ライブラリ：スライドするアクセント・アンダーバー */
+  .site-header__nav {
+    @apply items-center pb-1;
+  }
+  .site-header__nav-link--active {
+    @apply text-zinc-900;
+  }
+  .site-header__nav-link--idle {
+    @apply text-zinc-500 hover:text-zinc-800;
+  }
+  .site-header__nav-link--idle.site-header__brand {
+    @apply text-zinc-900/70 hover:text-zinc-900;
+  }
+  .site-header__nav-indicator {
+    @apply pointer-events-none absolute bottom-0 left-0 h-0.5 rounded-full;
+    /* 既存の decoration-[var(--accent)] に近い見え方 */
+    background-color: var(--accent);
+    box-shadow: 0 0 0 0.5px color-mix(in srgb, var(--accent) 80%, #64748b);
+  }
+  .site-header__nav-indicator--animate {
+    transition:
+      transform 0.2s ease,
+      width 0.2s ease;
+  }
+
+  /* 表示幅：マークのみのドロップダウン */
+  .layout-toggle-dd {
+    @apply relative shrink-0;
+  }
+  .layout-toggle-dd__trigger {
+    @apply inline-flex h-9 w-9 items-center justify-center gap-0 rounded-md border border-zinc-200 bg-white text-zinc-700 transition-colors hover:border-[var(--accent-border)] hover:bg-[color-mix(in_srgb,var(--accent)_18%,white)] active:scale-[0.98] disabled:opacity-40;
+  }
+  .layout-toggle-dd__trigger[aria-expanded="true"] {
     border-color: var(--accent-border);
     background-color: color-mix(in srgb, var(--accent) 22%, white);
   }
-  .site-header__menu {
-    @apply border-t border-zinc-200 pb-3 pt-1;
+  .layout-toggle-dd__menu {
+    @apply absolute right-0 z-[60] mt-1.5 m-0 flex list-none items-center gap-0.5 rounded-md border border-zinc-200 bg-white p-1 shadow-sm;
   }
-  .site-header__menu-list {
-    @apply m-0 flex list-none flex-col gap-1 p-0;
+  .layout-toggle-dd__menu > li {
+    @apply m-0 p-0;
   }
-  .site-header__menu-link {
-    @apply flex min-h-11 items-center rounded-md px-3 py-2.5 font-display text-sm font-bold text-zinc-800 transition-colors hover:bg-[color-mix(in_srgb,var(--accent)_20%,white)];
+  .layout-toggle-dd__option {
+    @apply inline-flex size-8 items-center justify-center rounded-md text-zinc-600 transition-colors hover:bg-[color-mix(in_srgb,var(--accent)_20%,white)] active:bg-[color-mix(in_srgb,var(--accent)_28%,white)];
   }
-  .site-header__menu-link--active {
+  .layout-toggle-dd__option--active {
     background-color: color-mix(in srgb, var(--accent) 28%, white);
-    color: #18181b;
-  }
-  .site-header__menu-item {
-    @apply flex flex-col gap-1.5 rounded-md px-3 py-2.5;
-  }
-  .site-header__menu-label {
-    @apply text-[11px] font-medium text-zinc-500;
-  }
-  .site-header__menu-note {
-    @apply mt-1 flex items-start gap-2 rounded-md border border-[var(--accent-border)] bg-[color-mix(in_srgb,var(--accent)_22%,white)] px-3 py-2.5 text-[11px] leading-relaxed text-zinc-700;
+    @apply text-zinc-900;
   }
 
   /* ヘッダー：開発者支援ボタン（ガラス調・グラデーションアクセント） */
@@ -815,9 +892,20 @@ html[data-layout-mode="portrait"] .launcher-icon__glyph {
   }
 
   @media (min-width: 640px) {
-    .btn-support {
+    .btn-support:not(.btn-support--icon-only) {
       min-width: 15.5rem;
     }
+  }
+
+  /* PC と同じ見た目の♡のみコンパクト版 */
+  .btn-support--icon-only {
+    min-width: 2.5rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+  }
+  .btn-support--icon-only .btn-support__label-slot {
+    display: none;
   }
 
   .btn-support::before {
@@ -892,6 +980,16 @@ html[data-layout-mode="portrait"] .launcher-icon__glyph {
     }
   }
 
+  /* jp / en など短縮表示 */
+  .lang-select--compact .lang-select__control {
+    max-width: 3.25rem;
+    min-width: 3.25rem;
+    @apply py-1.5 pl-2 pr-5 text-[11px] font-semibold uppercase tracking-wide;
+  }
+  .lang-select--compact .lang-select__chevron {
+    @apply right-1 size-3;
+  }
+
   .lang-select__chevron {
     @apply pointer-events-none absolute right-2.5 size-3.5 text-zinc-400;
   }
@@ -922,6 +1020,80 @@ html[data-layout-mode="portrait"] .launcher-icon__glyph {
   /* ---------- ランチ貯金アプリ ---------- */
   .lunch-confirm-btn {
     @apply inline-flex items-center justify-center rounded-2xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-[background-color,transform,box-shadow] hover:bg-emerald-500 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-emerald-600;
+  }
+
+  /* 1画面：サマリー＋下部ボタンを固定し、履歴だけ内側スクロール */
+  .lunch-dash {
+    gap: 0;
+    padding-bottom: max(0.25rem, env(safe-area-inset-bottom, 0px));
+  }
+
+  .lunch-dash__summary {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .lunch-dash__period {
+    margin-top: 0.35rem;
+    padding: 0 0.25rem;
+    text-align: center;
+    font-size: 10px;
+    line-height: 1.4;
+    color: #a1a1aa;
+  }
+
+  .lunch-dash__hero {
+    padding: 0.85rem 1rem 0.9rem;
+  }
+
+  .lunch-dash__hero-value {
+    font-size: 1.85rem;
+    line-height: 1.15;
+  }
+
+  .lunch-dash__hero-sub {
+    margin-top: 0.35rem;
+    font-size: 0.75rem;
+    line-height: 1.35;
+  }
+
+  .lunch-dash__progress {
+    padding: 0.65rem 0.85rem 0.7rem;
+  }
+
+  .lunch-dash__recent .app-nested-scroll {
+    max-height: none;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .lunch-dash__actions {
+    padding-top: 0.15rem;
+  }
+
+  /* スマホ／縦型：さらに詰めて下部ボタンまで見せる */
+  .lunch-dash--compact .lunch-dash__summary {
+    gap: 0.4rem;
+  }
+
+  .lunch-dash--compact .lunch-dash__hero {
+    padding: 0.65rem 0.85rem 0.7rem;
+    border-radius: 1rem;
+  }
+
+  .lunch-dash--compact .lunch-dash__hero-value {
+    font-size: 1.55rem;
+  }
+
+  .lunch-dash--compact .lunch-mode-segment__btn {
+    padding-top: 0.45rem;
+    padding-bottom: 0.45rem;
+    font-size: 11px;
+  }
+
+  .lunch-dash--compact .lunch-dash__stats .text-xl {
+    font-size: 1.15rem;
   }
 
   /* モード切替：iOS 風スライディング・セグメント */
@@ -999,6 +1171,21 @@ html[data-layout-mode="portrait"] .launcher-icon__glyph {
   .app-shell-header--compact .app-shell-title {
     @apply min-w-0 flex-1 text-[13px] leading-snug tracking-tight;
   }
+
+  /*
+   * スマホ向け内部スクロール領域（リスト・長文プレビューなど）
+   * - max-h で画面を埋め尽くさない（外側＝親スクロール用の余白を残す）
+   * - overscroll-auto で端到達後に親へスクロールチェーン
+   * - はみ出しは overflow-y-auto で内側だけスクロール
+   */
+  .app-nested-scroll {
+    @apply max-h-[60vh] min-h-0 overflow-x-hidden overflow-y-auto overscroll-auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+  }
+  .app-nested-scroll--short {
+    @apply max-h-[40vh];
+  }
   .app-shell-header--compact .app-shell-actions {
     @apply w-full max-w-full overflow-x-hidden;
   }
@@ -1036,12 +1223,24 @@ html[data-layout-mode="portrait"] .launcher-icon__glyph {
    * スマホでもスクロールなしで収める（実績はドロワーへ退避）。
    */
   .slot-layout {
-    @apply relative flex min-h-0 w-full flex-1 flex-col overflow-hidden;
+    @apply relative flex min-h-0 w-full max-w-full min-w-0 flex-1 flex-col overflow-x-hidden overflow-hidden;
     --slot-achievements-width: 21rem;
     /* AppShell(fillViewport) の残り高さいっぱい。dvh は親が伸びない時の下限 */
     height: 100%;
     max-height: 100%;
     min-height: min(100%, calc(100dvh - 9rem));
+  }
+
+  .slot-layout--compact {
+    @apply max-w-full min-w-0 overflow-x-hidden;
+  }
+
+  .slot-layout--compact .slot-console,
+  .slot-layout--compact .slot-console__columns,
+  .slot-layout--compact .slot-console__inner,
+  .slot-layout--compact .slot-console__main,
+  .slot-layout--compact .slot-console__stats {
+    @apply max-w-full min-w-0;
   }
 
   html.slot-pwa-standalone .slot-layout {
@@ -1062,36 +1261,29 @@ html[data-layout-mode="portrait"] .launcher-icon__glyph {
     @apply flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-zinc-800 bg-[radial-gradient(ellipse_at_top,rgb(39,39,42,0.55),rgba(9,9,11,0.98))] shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_20px_60px_-24px_rgba(0,0,0,0.9)] sm:rounded-2xl;
   }
 
-  @media (min-width: 1024px) {
-    .slot-console__columns {
-      @apply relative flex min-h-0 flex-1 flex-col;
-    }
-
-    .slot-console__inner {
-      /* 実績欄分の余白を確保し、高さはこのパネルだけが決める */
-      margin-right: calc(var(--slot-achievements-width) + 0.75rem);
-    }
+  /* PC（非コンパクト）: 右に実績サイドバー分の余白 */
+  .slot-layout:not(.slot-layout--compact) .slot-console__columns {
+    @apply relative flex min-h-0 flex-1 flex-col;
+  }
+  .slot-layout:not(.slot-layout--compact) .slot-console__inner {
+    margin-right: calc(var(--slot-achievements-width) + 0.75rem);
+  }
+  /* スマホ／縦型: 右カラム余白なし */
+  .slot-layout--compact .slot-console__inner {
+    margin-right: 0;
   }
 
   .slot-achievements {
-    /* スマホでは必ず非表示（ドロワーへ）。PCのみ右サイドバー */
-    display: none;
-    @apply min-h-0 shrink-0 flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-[radial-gradient(ellipse_at_top,rgba(39,39,42,0.45),rgba(9,9,11,0.96))] font-mono text-zinc-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)];
-  }
-
-  @media (min-width: 1024px) {
-    .slot-achievements {
-      display: flex;
-      /* スロット本体の高さに合わせる（実績リストは内部スクロール） */
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      width: var(--slot-achievements-width);
-      min-width: var(--slot-achievements-width);
-      min-height: 0;
-      max-height: none;
-    }
+    @apply flex min-h-0 shrink-0 flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-[radial-gradient(ellipse_at_top,rgba(39,39,42,0.45),rgba(9,9,11,0.96))] font-mono text-zinc-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)];
+    /* 本体の高さに合わせる（実績リストは内部スクロール） */
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: var(--slot-achievements-width);
+    min-width: var(--slot-achievements-width);
+    min-height: 0;
+    max-height: none;
   }
 
   .slot-achievements__body {
@@ -1115,12 +1307,12 @@ html[data-layout-mode="portrait"] .launcher-icon__glyph {
   }
 
   .slot-achievements__list {
-    @apply flex min-h-0 min-w-0 flex-1 flex-col gap-1.5 overflow-y-auto overscroll-contain p-2.5;
+    @apply flex min-h-0 min-w-0 flex-1 flex-col gap-1.5 overflow-y-auto overscroll-auto p-2.5;
   }
 
-  /* スマホ実績ドロワー（下からスライドイン） */
+  /* スマホ／縦型の実績ドロワー（下からスライドイン）。表示有無は JSX 側で制御 */
   .slot-achievements-drawer {
-    @apply fixed inset-0 z-[70] flex flex-col justify-end lg:hidden;
+    @apply fixed inset-0 z-[70] flex flex-col justify-end;
   }
 
   .slot-achievements-drawer__backdrop {
@@ -2137,10 +2329,15 @@ body.pwa-standalone {
 .pxd-theme-root {
   --pxd-accent: #22c55e;
   --pxd-accent-rgb: 34 197 94;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
 }
 
 .pxd-console {
   box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.55);
+  max-width: 100%;
+  min-width: 0;
 }
 
 /* 縦長ステージ：NASAコンソール風の極薄1pxグリッド */
@@ -2151,23 +2348,8 @@ body.pwa-standalone {
 /* プレイ面：1本指は JS で DROP、2本指で手動スクロール */
 .pxd-play-surface {
   touch-action: none;
-}
-
-/* スマホフッター分の高さ（ステージ余白・アシスト位置で共通） */
-@media (max-width: 639px) {
-  .pxd-play-surface {
-    --pxd-mobile-footer-reserve: calc(7.75rem + env(safe-area-inset-bottom, 0px));
-  }
-
-  .pxd-play-surface .pxd-stage {
-    box-sizing: border-box;
-    padding-bottom: var(--pxd-mobile-footer-reserve);
-  }
-
-  /* 盤面アシスト：NOW/ARCHIVE フッターの直上 */
-  .pxd-play-surface .pxd-ground-guide {
-    bottom: var(--pxd-mobile-footer-reserve);
-  }
+  /* HUD 追従の上端クランプ用（RecordsSideRails が参照） */
+  --pxd-safe-top: env(safe-area-inset-top, 0px);
 }
 
 .pxd-grid {
@@ -2704,22 +2886,15 @@ html.pxd-pwa-standalone .pxd-block-guide {
   white-space: nowrap;
 }
 
-/* スマホ：NOW / ARCHIVE を画面下のコンパクトフッターに表示 */
-.pxd-mobile-hud--footer {
-  right: 0;
-  bottom: 0;
-  left: 0;
+/* スマホ：NOW / ARCHIVE を縦棒直上に固定（落下追従は JS で top/left 更新）
+   背景は付けず、グリッドがそのまま透けて見えるようにする */
+.pxd-mobile-hud--follow {
   box-sizing: border-box;
   display: flex;
   justify-content: center;
-  padding: 0.35rem 0.65rem max(0.5rem, env(safe-area-inset-bottom, 0px));
+  padding: 0.15rem 0.5rem 0;
   pointer-events: none;
-  background: linear-gradient(
-    to top,
-    rgba(9, 9, 11, 0.97) 0%,
-    rgba(9, 9, 11, 0.82) 42%,
-    rgba(9, 9, 11, 0) 100%
-  );
+  background: transparent;
 }
 
 .pxd-mobile-hud__dock {
@@ -3598,8 +3773,15 @@ html.pxd-pwa-standalone .pxd-block-guide {
   }
 }
 
-/* 失敗演出：ブロックがピクセル粒子となって飛散・消滅する */
+/* 失敗演出：ブロックがピクセル粒子となって飛散・消滅する
+   --run 付与前は静止（画像デコード待ち）。初回スキップ防止 */
 .pxd-particle {
+  opacity: 1;
+  transform: translate(0, 0) rotate(0deg) scale(1);
+  will-change: transform, opacity;
+}
+
+.pxd-particle--run {
   animation: pxd-particle-fly 720ms cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
 }
 
@@ -4073,6 +4255,7 @@ html.pxd-pwa-standalone .pxd-block-guide {
   .pxd-overlay,
   .pxd-glitch,
   .pxd-particle,
+  .pxd-particle--run,
   .pxd-success-ring,
   .pxd-success-ring--active,
   .pxd-success-ring__spin,

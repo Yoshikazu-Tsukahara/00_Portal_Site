@@ -867,6 +867,7 @@ export const appsDe: AppsDictionary = {
       audio: "Audio",
       video: "Video",
       unsaved: "Nicht gespeichert",
+      backToList: "Zur Liste",
     },
     stage: {
       artworkTitle: "Cover",
@@ -1103,6 +1104,8 @@ export const appsDe: AppsDictionary = {
       },
       readTitle: ".mybook-Datei lesen",
       readLead: "Datei hier ablegen, um den Reader sofort zu öffnen, oder klicken zum Auswählen.",
+      readOnlyLead:
+        "Auf dem Smartphone können Sie Bücher nur lesen. Öffnen Sie eine .mybook-Datei. Bearbeiten geht im breiteren Desktop-Layout.",
       readButton: "Datei wählen",
       dropActive: "Loslassen zum Öffnen",
       error: "Diese Datei konnte nicht gelesen werden. Bitte eine .mybook-Datei wählen.",
@@ -1422,11 +1425,15 @@ export const appsDe: AppsDictionary = {
       exportJson: "Als JSON kopieren",
       copyAria: "{value} kopieren",
       deleteAria: "{value} löschen",
+      copyAction: "Kopieren",
+      deleteAction: "Löschen",
+      cancelAction: "Schließen",
       suggestionsToggleAria: "Farbvorschläge für {value} anzeigen",
       complementaryLabel: "Komplementär",
       analogousLabel: "Analog",
       addSuggestionAria: "{value} zur Palette hinzufügen",
-      selectForLocation: "Farbfeld oder Code anklicken, um Position und passende Bereiche im Bild hervorzuheben",
+      selectForLocation: "Farbfeld oder Code antippen, um Position und passende Bereiche im Bild hervorzuheben",
+      longPressHint: "Lange drücken zum Kopieren/Löschen (am PC Rechtsklick)",
       selectColorAria: "{value} wählen und im Bild anzeigen",
     },
     autoExtract: {
@@ -1822,9 +1829,11 @@ export const appsDe: AppsDictionary = {
       stopButton: "STOP",
       spinningLabel: "Dreht…",
       resetRunButton: "Spins zurücksetzen",
+      resetRunButtonShort: "Reset",
       resetRunConfirm: "Spin-Zähler zurücksetzen? (Lebenszeit-Statistiken & Erfolge bleiben erhalten.)",
       settingsButton: "Einstellungen",
       achievementsButton: "🏆 Erfolge",
+      achievementsButtonShort: "Erfolge",
       lifetimeHeading: "Lebenszeit",
       lifetimeAttempts: "Spins gesamt",
       lifetimeWins: "Treffer",
@@ -1959,6 +1968,7 @@ export const appsDe: AppsDictionary = {
   pixelDropPuzzle: {
     shell: {
       title: "Tiny Pixel Gap Drop Puzzle",
+      titleShort: "Pixel-Lücken-Puzzle",
       description: "Lass den hohen Balken von oben in die Bodenlücke fallen. Bewertung auf Bruchteile eines Pixels.",
     },
     install: {

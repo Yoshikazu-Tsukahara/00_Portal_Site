@@ -365,6 +365,22 @@
       font-size: 12px;
     }
 
+    /* スマホ／縦型: 左右パネルをさらに抑え、横はみ出しを防ぐ */
+    .canvas-wrap.ui-phone .margin-memo {
+      max-width: min(42vw, 11.5rem);
+      font-size: 14px;
+    }
+
+    .canvas-wrap.ui-phone .hud {
+      max-width: min(38vw, 9.5rem);
+      white-space: normal;
+    }
+
+    .canvas-wrap.ui-phone .hud .given-list li {
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+
     .margin-memo .memo-head {
       display: flex;
       align-items: flex-start;
@@ -1976,6 +1992,8 @@
 
       let W = 800;
       let H = 480;
+      /** 親 AppShell からの compact（スマホ／縦型）。幅判定と OR して ui-compact にする */
+      let portalCompact = false;
       /**
        * 絶対原点 O(0,0)：ボール初期発射位置＝手先＝方眼の交差点。
        * 画面ピクセル座標でこの点を保持し、物理量はここからの相対（右＋x、上＋y）で測る。
@@ -2379,15 +2397,16 @@
         if (H < 460) scale = Math.min(scale, 0.88);
         if (H < 380) scale = Math.min(scale, 0.78);
 
-        const compact = W < 760 || H < 420;
+        const compact = portalCompact || W < 760 || H < 420;
         wrap.classList.toggle("ui-compact", compact);
+        wrap.classList.toggle("ui-phone", portalCompact || W < 520);
 
         // 実寸は scale=1・既定位置のときだけたまに測る（毎フレ DOM 計測しない）
         const camQ = Math.round(state.cameraX / 4) * 4;
         const hudContentKey = state.stage
           ? `${state.level}:${Math.round(state.stage.dist)}:${state.stage.env}`
           : "none";
-        const measureKey = `${W}x${H}|c${compact ? 1 : 0}|${hudContentKey}`;
+        const measureKey = `${W}x${H}|c${compact ? 1 : 0}|p${portalCompact ? 1 : 0}|${hudContentKey}`;
         if (uiLayoutMeasure.key !== measureKey) {
           wrap.style.setProperty("--ui-scale", "1");
           wrap.style.setProperty("--memo-left", "12px");
@@ -2487,8 +2506,9 @@
 
       function resize() {
         const rect = wrap.getBoundingClientRect();
-        W = Math.max(320, Math.floor(rect.width));
-        H = Math.max(280, Math.floor(rect.height));
+        // 親より広い固定下限を付けない（横スクロール防止）
+        W = Math.max(1, Math.floor(rect.width));
+        H = Math.max(1, Math.floor(rect.height));
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
         canvas.width = Math.floor(W * dpr);
         canvas.height = Math.floor(H * dpr);
@@ -2497,8 +2517,9 @@
 
         // 左メモ用の安全領域を見積もってから発射点を決める
         const cell = GRID_CELL_PX;
-        const compact = W < 760 || H < 420;
+        const compact = portalCompact || W < 760 || H < 420;
         wrap.classList.toggle("ui-compact", compact);
+        wrap.classList.toggle("ui-phone", portalCompact || W < 520);
         // 計測前に既定へ戻す
         wrap.style.setProperty("--ui-scale", "1");
         wrap.style.setProperty("--memo-left", "12px");
@@ -5426,13 +5447,20 @@
         }
       });
 
-      // 親ページ（ポータル）からの言語同期
+      // 親ページ（ポータル）からの言語／compact 同期
       window.addEventListener("message", (e) => {
         const data = e.data;
-        if (!data || data.source !== "portal-rft" || data.type !== "setLocale") {
+        if (!data || data.source !== "portal-rft") return;
+        if (data.type === "setLocale") {
+          setUiLocale(data.locale);
           return;
         }
-        setUiLocale(data.locale);
+        if (data.type === "setCompact") {
+          portalCompact = Boolean(data.compact);
+          syncUiLayout();
+          // レイアウト閾値が変わったとき発射点も見直す
+          if (typeof resize === "function") resize();
+        }
       });
 
       setUiLocale(readInitialLocale());

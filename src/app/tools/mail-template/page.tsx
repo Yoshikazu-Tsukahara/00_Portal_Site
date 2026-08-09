@@ -395,10 +395,9 @@ export default function MailTemplatePage() {
         <div
           className={
             compact
-              ? // スマホ: 内側に overflow を置かない（中央パネルがタッチスクロールを飲み込むのを防ぐ）
-                // スクロールは AppShell 作業領域の1箇所だけ
-                "flex h-auto w-full max-w-full flex-col gap-2 pb-2"
-              : "grid min-h-0 w-full max-w-full flex-1 grid-cols-1 gap-2 overflow-x-hidden overflow-y-auto md:grid-cols-[minmax(0,17rem)_minmax(0,1fr)] md:gap-3 md:overflow-hidden lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)]"
+              ? // スマホ: 親（AppShell 作業領域）がページスクロール。内側は max-h + nested scroll
+                "flex h-auto w-full max-w-full flex-col gap-2 pb-3"
+              : "grid min-h-0 w-full max-w-full flex-1 grid-cols-1 gap-2 overflow-x-hidden overflow-y-auto overscroll-auto md:grid-cols-[minmax(0,17rem)_minmax(0,1fr)] md:gap-3 md:overflow-hidden lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)]"
           }
         >
           {/* 一覧: PCは常時 / スマホは list ペインのとき */}
@@ -432,8 +431,8 @@ export default function MailTemplatePage() {
               <div
                 className={
                   compact
-                    ? "min-w-0"
-                    : "min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain"
+                    ? "app-nested-scroll"
+                    : "min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-auto"
                 }
               >
                 <TemplateList
@@ -456,7 +455,7 @@ export default function MailTemplatePage() {
               className={`flex min-w-0 flex-col gap-2 rounded-md border border-zinc-200/80 bg-white p-2 shadow-sm ${
                 compact
                   ? "h-auto pb-3"
-                  : "min-h-[min(50dvh,24rem)] overflow-y-auto md:min-h-0 md:gap-3 md:p-4 lg:p-6"
+                  : "min-h-[min(50dvh,24rem)] overflow-y-auto overscroll-auto md:min-h-0 md:gap-3 md:p-4 lg:p-6"
               }`}
             >
               {selected ? (
@@ -476,11 +475,11 @@ export default function MailTemplatePage() {
                     ) : null}
                   </div>
                   <div
-                    className={`shrink-0 border-b border-zinc-100 pb-2 ${
+                    className={
                       compact
-                        ? ""
-                        : "max-h-[min(38%,14rem)] overflow-x-hidden overflow-y-auto md:max-h-[42%] md:pb-3"
-                    }`}
+                        ? "app-nested-scroll app-nested-scroll--short border-b border-zinc-100 pb-2"
+                        : "max-h-[min(38%,14rem)] shrink-0 overflow-x-hidden overflow-y-auto overscroll-auto border-b border-zinc-100 pb-2 md:max-h-[42%] md:pb-3"
+                    }
                   >
                     <VariableForm
                       variables={enabledVariables}
@@ -497,6 +496,7 @@ export default function MailTemplatePage() {
                     body={previewBody}
                     combinedText={finalText}
                     emptyLabels={emptyLabels}
+                    nestedScroll={compact}
                   />
                 </>
               ) : (

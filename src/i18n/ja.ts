@@ -12,6 +12,10 @@ export const ja: Dictionary = {
     edit: "編集",
     delete: "削除",
     clear: "クリア",
+    forceLandscape: {
+      title: "横向きにしてください",
+      hint: "このアプリは横画面での利用を前提としています。端末を横に傾けてください。",
+    },
   },
   header: {
     support: "開発者を応援する",
