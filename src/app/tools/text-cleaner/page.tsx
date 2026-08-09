@@ -28,11 +28,13 @@ import {
 } from "./types";
 
 type PreviewTab = "result" | "diff";
+/** スマホ：入力・設定 / 結果の2ページ */
+type MobilePane = "edit" | "preview";
 
 export default function TextCleanerPage() {
   const { t } = useI18n();
   const copy = t.apps.textCleaner;
-  const { showSideColumn } = useCompactLayout();
+  const { compact, showSideColumn } = useCompactLayout();
   const [input, setInput] = useState("");
   const [options, setOptions] = useState<CleanOptions | null>(null);
   const [rules, setRules] = useState<ReplaceRule[]>([]);
@@ -42,6 +44,7 @@ export default function TextCleanerPage() {
   const [copied, setCopied] = useState(false);
   const [previewTab, setPreviewTab] = useState<PreviewTab>("result");
   const [presetNameDraft, setPresetNameDraft] = useState("");
+  const [mobilePane, setMobilePane] = useState<MobilePane>("edit");
 
   useEffect(() => {
     const data = loadTextCleanerData();
@@ -51,6 +54,11 @@ export default function TextCleanerPage() {
     setActivePresetId(data.activePresetId);
     setHydrated(true);
   }, []);
+
+  // PC に戻ったら常に両カラム表示へ
+  useEffect(() => {
+    if (!compact) setMobilePane("edit");
+  }, [compact]);
 
   const persist = useCallback(
     (next: {
@@ -203,18 +211,21 @@ export default function TextCleanerPage() {
       <AppShell
         title={copy.shell.title}
         description={copy.loading}
-        fillViewport
+        fillViewport={!compact}
       >
         <p className="text-sm text-zinc-400">{copy.loading}</p>
       </AppShell>
     );
   }
 
+  const showEdit = !compact || mobilePane === "edit";
+  const showPreview = !compact || mobilePane === "preview";
+
   return (
     <AppShell
       title={copy.shell.title}
       description={copy.shell.description}
-      fillViewport
+      fillViewport={!compact}
       dataManager={{
         appId: "text-cleaner",
         fileNamePrefix: "text-cleaner",
@@ -231,14 +242,24 @@ export default function TextCleanerPage() {
       }}
     >
       <div
-        className={`grid min-h-0 flex-1 gap-3 ${
-          showSideColumn
-            ? "grid-cols-2 gap-4 overflow-hidden"
-            : "grid-cols-1"
-        }`}
+        className={
+          compact
+            ? // スマホ: 1ペインのみ。内部スクロールなし（ページ全体でスクロール）
+              "flex h-auto w-full max-w-full flex-col gap-3 pb-3"
+            : showSideColumn
+              ? "grid min-h-0 flex-1 grid-cols-2 gap-4 overflow-hidden"
+              : "grid w-full max-w-full grid-cols-1 gap-3"
+        }
       >
-        {/* 入力＋設定（スマホ／縦型は1列で上に） */}
-        <section className="flex min-h-0 flex-col gap-3 overflow-y-auto overscroll-auto rounded-lg border border-zinc-200/80 bg-white p-3 sm:p-4">
+        {/* 入力＋設定（スマホは edit ペイン） */}
+        {showEdit ? (
+        <section
+          className={`flex flex-col gap-3 rounded-lg border border-zinc-200/80 bg-white p-3 sm:p-4 ${
+            compact
+              ? "h-auto"
+              : "min-h-0 overflow-y-auto overscroll-auto"
+          }`}
+        >
           <div className="shrink-0">
             <div className="mb-1.5 flex items-center justify-between gap-2">
               <label
@@ -617,16 +638,47 @@ export default function TextCleanerPage() {
               </ul>
             )}
           </div>
-        </section>
 
-        {/* プレビュー／差分＋コピー（2列時は右、1列時は下） */}
+          {compact ? (
+            <button
+              type="button"
+              onClick={() => {
+                setMobilePane("preview");
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+              className="btn-primary min-h-11 w-full active:scale-[0.98] active:brightness-95"
+            >
+              {copy.mobile.viewResult}
+            </button>
+          ) : null}
+        </section>
+        ) : null}
+
+        {/* プレビュー／差分＋コピー（スマホは preview ペイン） */}
+        {showPreview ? (
         <section
-          className={`flex min-h-0 flex-col gap-3 rounded-lg border border-zinc-200/80 bg-white p-3 sm:p-4 ${
-            showSideColumn ? "overflow-hidden" : ""
+          className={`flex flex-col gap-3 rounded-lg border border-zinc-200/80 bg-white p-3 sm:p-4 ${
+            compact
+              ? "h-auto pb-3"
+              : showSideColumn
+                ? "min-h-0 overflow-hidden"
+                : "min-h-0"
           }`}
         >
           <div className="flex shrink-0 flex-wrap items-start justify-between gap-2">
-            <div>
+            <div className="min-w-0 flex-1">
+              {compact ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobilePane("edit");
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                  className="btn-secondary mb-2 !px-2 !py-1 text-[11px] leading-tight active:scale-[0.98] active:bg-zinc-100"
+                >
+                  {copy.mobile.backToEdit}
+                </button>
+              ) : null}
               <div className="inline-flex w-fit shrink-0 items-center gap-1 rounded-md border border-zinc-200 bg-zinc-50 p-0.5">
                 {(
                   [
@@ -665,13 +717,19 @@ export default function TextCleanerPage() {
               type="button"
               onClick={handleCopy}
               disabled={!cleaned}
-              className="btn-primary !px-3 !py-1.5 text-xs"
+              className="btn-primary shrink-0 !px-3 !py-1.5 text-xs active:scale-[0.98] active:brightness-95"
             >
               {copied ? copy.preview.copied : copy.preview.copy}
             </button>
           </div>
 
-          <div className="min-h-[16rem] flex-1 overflow-auto rounded-md border border-zinc-100 bg-zinc-50/60 p-3 lg:min-h-0">
+          <div
+            className={`rounded-md border border-zinc-100 bg-zinc-50/60 p-3 ${
+              compact
+                ? "h-auto min-h-[12rem]"
+                : "min-h-[16rem] flex-1 overflow-auto overscroll-auto lg:min-h-0"
+            }`}
+          >
             {previewTab === "result" ? (
               cleaned ? (
                 <pre className="whitespace-pre-wrap break-words font-mono text-[13px] leading-relaxed text-zinc-800">
@@ -679,7 +737,9 @@ export default function TextCleanerPage() {
                 </pre>
               ) : (
                 <p className="text-sm text-zinc-400">
-                  {copy.preview.emptyLeft}
+                  {compact
+                    ? copy.preview.emptyReady
+                    : copy.preview.emptyLeft}
                 </p>
               )
             ) : input || cleaned ? (
@@ -700,6 +760,7 @@ export default function TextCleanerPage() {
             </p>
           ) : null}
         </section>
+        ) : null}
       </div>
     </AppShell>
   );

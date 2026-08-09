@@ -62,6 +62,11 @@ export type TextCleanerDict = {
     emptyReady: string;
     toastCopied: string;
   };
+  /** スマホ：入力／結果の2ページ切替 */
+  mobile: {
+    viewResult: string;
+    backToEdit: string;
+  };
   diff: {
     none: string;
     removed: string;
@@ -137,6 +142,10 @@ export const textCleanerJa: TextCleanerDict = {
     emptyReady: "入力があると、ここにクレンジング結果が表示されます。",
     toastCopied: "クリップボードにコピーしました",
   },
+  mobile: {
+    viewResult: "結果を見る",
+    backToEdit: "← 入力・設定へ",
+  },
   diff: {
     none: "差分はありません（入力と結果が同じです）。",
     removed: "削除",
@@ -211,6 +220,10 @@ export const textCleanerEn: TextCleanerDict = {
     emptyLeft: "Enter text on the left to see results here.",
     emptyReady: "Results will appear here when you have input.",
     toastCopied: "Copied to clipboard",
+  },
+  mobile: {
+    viewResult: "View result",
+    backToEdit: "← Edit",
   },
   diff: {
     none: "No differences (input matches result).",
