@@ -1,8 +1,9 @@
 /* PDF編集専用 Service Worker（scope: /tools/pdf-editor） */
-const CACHE_NAME = "pdf-editor-v3";
+const CACHE_NAME = "pdf-editor-v4";
 const PRECACHE = [
   "/tools/pdf-editor",
   "/tools/pdf-editor/manifest.webmanifest",
+  "/tools/pdf-editor/pdf.worker.min.mjs",
   "/icons/pdf-editor-192.png",
   "/icons/pdf-editor-512.png",
 ];

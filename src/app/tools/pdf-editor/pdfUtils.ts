@@ -2,10 +2,13 @@ import type { PDFDocumentProxy } from "pdfjs-dist";
 import type { PdfPageItem, PdfSource } from "./types";
 import { createId } from "./types";
 
+/** 同梱ワーカー（CDN 非依存。scripts/copy-pdfjs-worker.mjs で配置） */
+const PDFJS_WORKER_SRC = "/tools/pdf-editor/pdf.worker.min.mjs";
+
 /** pdfjs のワーカーを初期化（クライアントのみ） */
 async function getPdfjs() {
   const pdfjs = await import("pdfjs-dist");
-  pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+  pdfjs.GlobalWorkerOptions.workerSrc = PDFJS_WORKER_SRC;
   return pdfjs;
 }
 
