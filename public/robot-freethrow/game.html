@@ -1994,6 +1994,22 @@
       let H = 480;
       /** 親 AppShell からの compact（スマホ／縦型）。幅判定と OR して ui-compact にする */
       let portalCompact = false;
+
+      /**
+       * 横向き（強制 landscape 前提）では PC 寄りの UI。
+       * スマホ横向きは高さが低くても（H < 420）畳まない。
+       */
+      function shouldUseCompactUi() {
+        const landscape = W >= H;
+        if (landscape) return false;
+        return portalCompact || W < 760 || H < 420;
+      }
+
+      function shouldUsePhoneUi() {
+        const landscape = W >= H;
+        if (landscape) return false;
+        return portalCompact || W < 520;
+      }
       /**
        * 絶対原点 O(0,0)：ボール初期発射位置＝手先＝方眼の交差点。
        * 画面ピクセル座標でこの点を保持し、物理量はここからの相対（右＋x、上＋y）で測る。
@@ -2397,9 +2413,9 @@
         if (H < 460) scale = Math.min(scale, 0.88);
         if (H < 380) scale = Math.min(scale, 0.78);
 
-        const compact = portalCompact || W < 760 || H < 420;
+        const compact = shouldUseCompactUi();
         wrap.classList.toggle("ui-compact", compact);
-        wrap.classList.toggle("ui-phone", portalCompact || W < 520);
+        wrap.classList.toggle("ui-phone", shouldUsePhoneUi());
 
         // 実寸は scale=1・既定位置のときだけたまに測る（毎フレ DOM 計測しない）
         const camQ = Math.round(state.cameraX / 4) * 4;
@@ -2517,9 +2533,9 @@
 
         // 左メモ用の安全領域を見積もってから発射点を決める
         const cell = GRID_CELL_PX;
-        const compact = portalCompact || W < 760 || H < 420;
+        const compact = shouldUseCompactUi();
         wrap.classList.toggle("ui-compact", compact);
-        wrap.classList.toggle("ui-phone", portalCompact || W < 520);
+        wrap.classList.toggle("ui-phone", shouldUsePhoneUi());
         // 計測前に既定へ戻す
         wrap.style.setProperty("--ui-scale", "1");
         wrap.style.setProperty("--memo-left", "12px");

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 
 import AppShell from "@/components/AppShell";
 import ForceLandscape from "@/components/ForceLandscape";
@@ -34,8 +34,22 @@ export default function BookVisualizerPage() {
   const { t } = useI18n();
   const copy = t.apps.bookVisualizer;
   const { compact } = useCompactLayout();
-  /** スマホ／縦型：編集不可。ファイル読み込み→閲覧のみ */
-  const readOnly = compact;
+  /** 実機の向き。横向き中は PC 相当（編集可）にする */
+  const [landscape, setLandscape] = useState(true);
+
+  useLayoutEffect(() => {
+    const mq = window.matchMedia("(orientation: landscape)");
+    const sync = () => setLandscape(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  /**
+   * 縦向き（または狭い＋非横向き）では閲覧のみ。
+   * 強制横向きプレイ中はフリースロー同様、PC と同じ制作 UI。
+   */
+  const readOnly = compact && !landscape;
 
   const [data, setData, { hydrated }] = useLocalStorageState<StudioData>(
     STORAGE_KEY,

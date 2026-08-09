@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import AppShell from "@/components/AppShell";
 import ForceLandscape from "@/components/ForceLandscape";
 import { useI18n } from "@/i18n";
@@ -30,6 +30,19 @@ export default function RobotFreethrowPage() {
   const copy = t.apps.robotFreethrow;
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const { compact } = useCompactLayout();
+  /** 実機の向き。横向きプレイ中はゲームを PC 相当 UI にする */
+  const [landscape, setLandscape] = useState(true);
+
+  useLayoutEffect(() => {
+    const mq = window.matchMedia("(orientation: landscape)");
+    const sync = () => setLandscape(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  // 横向き中は compact を渡さない（メモ／付箋を PC 表示に近づける）
+  const gameCompact = compact && !landscape;
 
   useEffect(() => {
     iframeRef.current?.focus();
@@ -42,12 +55,15 @@ export default function RobotFreethrowPage() {
 
   // スマホ／縦型を iframe へ同期（左右オーバーレイの畳み込み用）
   useEffect(() => {
-    postToGame(iframeRef.current, { type: "setCompact", compact });
-  }, [compact]);
+    postToGame(iframeRef.current, { type: "setCompact", compact: gameCompact });
+  }, [gameCompact]);
 
   function handleIframeLoad() {
     postToGame(iframeRef.current, { type: "setLocale", locale });
-    postToGame(iframeRef.current, { type: "setCompact", compact });
+    postToGame(iframeRef.current, {
+      type: "setCompact",
+      compact: gameCompact,
+    });
   }
 
   return (
