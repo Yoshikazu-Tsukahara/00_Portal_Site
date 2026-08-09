@@ -23,9 +23,11 @@ export const pt: PartialDictionary = {
     layoutToggle: {
       aria: "Alterar largura da tela",
       caption: "Width",
+      portraitShort: "Retrato",
       defaultShort: "Padrão",
       wideShort: "Largo",
       fullShort: "Full",
+      portrait: "Retrato típico (largura de celular)",
       default: "Exibir na largura padrão",
       wide: "Exibir mais largo",
       full: "Exibir em tela cheia",
@@ -155,6 +157,8 @@ export const pt: PartialDictionary = {
     safetyShort: "Dados só no navegador; nada é enviado ao servidor.",
     privacyBanner:
       "Tudo é processado neste navegador. Nada é enviado para fora.",
+    privacyBannerShort:
+      "Tudo roda neste navegador. Nada é enviado para fora.",
   },
   dataManager: {
     buttonTitle: "Dados (backup e restauração)",

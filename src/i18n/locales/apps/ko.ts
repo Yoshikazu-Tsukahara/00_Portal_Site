@@ -745,7 +745,7 @@ export const appsKo: AppsDictionary = {
   invoiceMaker: {
     shell: {
       title: "서식 메이커",
-      description: "청구서·견적서·납품서·영수증용 2열 양식을 채운 뒤 PDF로 저장합니다. 과거 문서는 브라우저에 보관됩니다.",
+      description: "청구서·견적서·납품서·영수증을 작성한 뒤 PDF로 저장합니다. 과거 문서는 브라우저에 보관됩니다.",
     },
     loading: "불러오는 중…",
     actions: {
@@ -755,7 +755,7 @@ export const appsKo: AppsDictionary = {
     },
     toolbar: {
       save: "💾 현재 문서 저장",
-      saveShort: "💾 저장",
+      saveShort: "저장",
       load: "📂 이전 문서 불러오기",
       loadShort: "📂 불러오기",
       preview: "미리보기",
@@ -813,10 +813,19 @@ export const appsKo: AppsDictionary = {
     preview: {
       modalTitle: "미리보기",
       hint: "인쇄 대화상자에서 “PDF로 저장”을 선택하면 파일로 보관할 수 있습니다.",
+      hintShort: "사용 팁",
       emptyHint: "※ 빈 필드의 연한 플레이스홀더 텍스트는 PDF / 인쇄에 나타나지 않으며, 해당 칸은 비어 있습니다.",
       docLanguageNote: "PDF／인쇄 언어: {language}",
       print: "PDF 내보내기 (인쇄)",
+      printShort: "📄 PDF",
       close: "닫기",
+    },
+    mobileWizard: {
+      stepOf: "{current} / {total}",
+      page1Label: "상대·기본",
+      page2Label: "설정·품목",
+      next: "다음",
+      back: "이전",
     },
     install: {
       button: "이 앱을 홈 화면에 추가",
@@ -1122,6 +1131,7 @@ export const appsKo: AppsDictionary = {
   mailTemplate: {
     shell: {
       title: "스마트 메일 템플릿 관리",
+      titleShort: "메일 템플릿",
       description: "변수와 라벨로 답장을 바로 만드세요. 데이터는 브라우저에만 저장됩니다.",
     },
     combinedText: {
@@ -1318,6 +1328,7 @@ export const appsKo: AppsDictionary = {
       empty: "템플릿 없음",
       noSubject: "제목 없음",
       selectPrompt: "템플릿을 선택하세요",
+      backToList: "←목록",
     },
     search: {
       placeholder: "템플릿 검색...",

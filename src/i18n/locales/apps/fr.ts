@@ -745,7 +745,7 @@ export const appsFr: AppsDictionary = {
   invoiceMaker: {
     shell: {
       title: "Créateur de formulaires",
-      description: "Remplissez le formulaire en deux colonnes pour factures, devis, bons de livraison ou reçus, puis enregistrez en PDF. Les documents passés restent dans votre navigateur.",
+      description: "Créez factures, devis, bons de livraison ou reçus, puis enregistrez en PDF. Les documents passés restent dans le navigateur.",
     },
     loading: "Chargement…",
     actions: {
@@ -755,7 +755,7 @@ export const appsFr: AppsDictionary = {
     },
     toolbar: {
       save: "💾 Enregistrer le document actuel",
-      saveShort: "💾 Enregistrer",
+      saveShort: "Enreg.",
       load: "📂 Charger un document passé",
       loadShort: "📂 Charger",
       preview: "Aperçu",
@@ -813,10 +813,19 @@ export const appsFr: AppsDictionary = {
     preview: {
       modalTitle: "Aperçu",
       hint: "Dans la boîte de dialogue d’impression, choisissez « Enregistrer au format PDF » pour garder un fichier.",
+      hintShort: "Astuces et notes",
       emptyHint: "※ Le texte d’espace réservé pâle des champs vides n’apparaîtra pas sur le PDF / l’impression — ces emplacements restent vides.",
       docLanguageNote: "Langue PDF／impression : {language}",
       print: "Exporter PDF (Imprimer)",
+      printShort: "📄 PDF",
       close: "Fermer",
+    },
+    mobileWizard: {
+      stepOf: "{current} / {total}",
+      page1Label: "Parties et bases",
+      page2Label: "Réglages et lignes",
+      next: "Suivant",
+      back: "Retour",
     },
     install: {
       button: "Ajouter cette appli à l’écran d’accueil",
@@ -1122,6 +1131,7 @@ export const appsFr: AppsDictionary = {
   mailTemplate: {
     shell: {
       title: "Gestionnaire intelligent de modèles d’e-mail",
+      titleShort: "Modèles d’e-mail",
       description: "Rédigez des réponses instantanément avec variables et libellés. Les données restent dans votre navigateur.",
     },
     combinedText: {
@@ -1318,6 +1328,7 @@ export const appsFr: AppsDictionary = {
       empty: "Aucun modèle",
       noSubject: "Pas d’objet",
       selectPrompt: "Sélectionnez un modèle",
+      backToList: "← Liste",
     },
     search: {
       placeholder: "Rechercher des modèles...",

@@ -1,8 +1,9 @@
 "use client";
 
-import { isValidElement, type ReactNode } from "react";
+import { isValidElement, useEffect, useState, type ReactNode } from "react";
 
 import DataManager from "@/components/DataManager";
+import PrivacyNotice from "@/components/PrivacyNotice";
 import type { DataManagerConfig } from "@/lib/localData";
 import { LanguageToggle } from "@/i18n";
 import { useLayout } from "@/lib/layout";
@@ -40,21 +41,34 @@ import { useStandaloneDisplay } from "@/lib/useStandaloneDisplay";
  * - **AppShell は使わない**。独自ヘッダー + iframe で完全に隔離する。
  * - `SiteChrome` の `ALWAYS_ISOLATE_PATHS` に登録し、常時 Header / Footer なし。
  * - 例: モンスタードライバー。
+ *
+ * ## モバイル／縦型プレビュー時のヘッダー（全アプリ共通）
+ * 1. アプリ名（表示優先。長い場合は `titleShort`）＋ バックアップ ＋ インストール（**文字なし・アイコンのみ**）
+ * 2. 説明文
+ * 3. プライバシー案内（PrivacyNotice）
+ * 4. アプリ機能ボタン（actions）
+ *
+ * 判定は viewport 幅だけでなく `layoutMode === "portrait"` も見る
+ * （表示幅トグルで中身だけ狭いとき用）。
  */
 type AppShellProps = {
   /** アプリ名（ヘッダー1行目に表示） */
   title: string;
   /**
-   * 短い説明（タイトル下に1行で表示）。
+   * コンパクト時の短いアプリ名（長い正式名の省略用）。
+   * 未指定時は `title` をそのまま使う。
+   */
+  titleShort?: string;
+  /**
+   * 短い説明（タイトル下に表示）。
    * どのアプリでも出す前提なので必須。
    */
   description: string;
   /** タイトル直後のコンパクト表示（件数バッジなど） */
   titleAddon?: ReactNode;
   /**
-   * 機能アクション（例: ラベル管理、ZIP生成）。
-   * スマホではタイトル行の下に折り返し、md 以上ではタイトル行右端に並ぶ。
-   * `isPwa` の standalone 時は、ここに言語トグルが自動で並ぶ。
+   * 機能アクション（例: 保存、ラベル管理、ZIP生成）。
+   * コンパクト時は説明・プライバシー案内の下。PC ではタイトル行右端。
    */
   actions?: ReactNode;
   /**
@@ -68,6 +82,13 @@ type AppShellProps = {
    * （PWA の「ホーム画面に追加」など）
    */
   afterDataManager?: ReactNode;
+  /**
+   * ヘッダー内のプライバシー案内。
+   * - true / 省略: 標準帯を表示（ページ側で PrivacyNotice を置かない）
+   * - "plain": 暗いテーマ向け
+   * - false: 非表示（ページ独自の案内を出す場合）
+   */
+  privacyNotice?: boolean | "plain";
   /**
    * true のとき、作業領域を親の残り高さ（Header 直下〜画面下端）いっぱいにする。
    * SiteChrome が Footer をその外に置くため、初期表示ではフッターが見えない。
@@ -108,20 +129,17 @@ function isDataManagerConfig(
 /**
  * Type B / Type C 共通のアプリシェル。
  *
- * スマホ:
- * 1行目 = タイトル + バックアップ + インストール
- * 2行目 = その他アクション（ある場合）
- *
- * PC（md+）: タイトル行右端にアクションを横並び
  * ポータルへの戻りはサイト Header の「Blank Note」ロゴで行う。
  */
 export default function AppShell({
   title,
+  titleShort,
   description,
   titleAddon,
   actions,
   dataManager,
   afterDataManager,
+  privacyNotice = true,
   fillViewport = false,
   minStageSize,
   isPwa = false,
@@ -129,7 +147,21 @@ export default function AppShell({
 }: AppShellProps) {
   // wide は deprecated（幅は LayoutToggle が管理）。受け取っても無視する。
   const { isStandalone } = useStandaloneDisplay();
-  const { contentClassName } = useLayout();
+  const { contentClassName, layoutMode } = useLayout();
+  const [narrowViewport, setNarrowViewport] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    const sync = () => setNarrowViewport(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  /** 実機スマホ、または表示幅「縦型」 */
+  const compact = narrowViewport || layoutMode === "portrait";
+  const displayTitle =
+    compact && titleShort?.trim() ? titleShort.trim() : title;
 
   // standalone 起動中はサイト Header が消えるため、シェル側で代替する
   const isStandaloneApp = isPwa && isStandalone;
@@ -142,9 +174,14 @@ export default function AppShell({
     )
   ) : null;
 
+  const privacyVariant =
+    privacyNotice === "plain"
+      ? "plain"
+      : privacyNotice
+        ? "default"
+        : null;
+
   // 背景はフル幅のまま、中身の列だけ layoutMode の幅に揃える
-  // fillViewport: SiteChrome が確保した「Header 直下〜画面下端」を埋める
-  // minStageSize: アプリ内スクロールではなくページ全体（Footer 含む）が伸びる前提
   const fillWithMinStage = Boolean(fillViewport && minStageSize);
 
   return (
@@ -158,51 +195,66 @@ export default function AppShell({
       }`}
     >
       <header
-        className={`shrink-0 border-b border-zinc-200/70 ${
-          fillViewport ? "mb-2 pb-2" : "mb-4 pb-3"
-        }`}
+        className={`app-shell-header shrink-0 ${
+          compact
+            ? "app-shell-header--compact"
+            : "border-b border-zinc-200/70"
+        } ${fillViewport ? "mb-2 pb-2" : compact ? "mb-3 pb-2" : "mb-4 pb-3"}`}
       >
-        {/* 1行目: タイトル + バックアップ + インストール（＋ PC 時は actions） */}
-        <div className="flex min-h-8 min-w-0 items-center gap-2 sm:gap-3">
-          <div className="flex min-w-0 flex-1 items-center gap-1.5 sm:gap-2">
-            {/* flex-1 を付けない：バックアップ／インストールをタイトル直後に置く */}
-            <h1 className="min-w-0 shrink truncate text-base font-semibold tracking-tight text-zinc-900">
-              {title}
+        {/* 1行目: アプリ名 ＋ バックアップ ＋ インストール（コンパクト時はアイコンのみ） */}
+        <div className="flex min-h-8 min-w-0 items-center gap-2">
+          <div className="flex min-w-0 flex-1 items-center gap-1">
+            <h1
+              className="app-shell-title min-w-0 flex-1 truncate text-base font-semibold tracking-tight text-zinc-900"
+              title={title}
+            >
+              {displayTitle}
             </h1>
             {titleAddon ? <div className="shrink-0">{titleAddon}</div> : null}
             {dataManagerNode ? (
-              <div className="shrink-0">{dataManagerNode}</div>
+              <div className="app-shell-chrome shrink-0">{dataManagerNode}</div>
             ) : null}
             {afterDataManager ? (
-              <div className="shrink-0">{afterDataManager}</div>
+              <div className="app-shell-chrome shrink-0">
+                {afterDataManager}
+              </div>
             ) : null}
           </div>
           {/* PC: 機能ボタンはタイトル行の右端 */}
-          {actions ? (
-            <div className="ml-auto hidden min-w-0 shrink-0 items-center gap-2 md:flex">
+          {!compact && actions ? (
+            <div className="ml-auto flex min-w-0 shrink-0 items-center gap-2">
               {actions}
             </div>
           ) : null}
           {isStandaloneApp ? (
-            <div className="ml-auto flex shrink-0 items-center gap-2 md:ml-2">
+            <div className="ml-auto flex shrink-0 items-center gap-2">
               <LanguageToggle />
             </div>
           ) : null}
         </div>
 
-        {/* 2行目（スマホのみ）: ラベル管理など機能アクション */}
-        {actions ? (
-          <div className="mt-2 flex min-w-0 flex-wrap items-center gap-1.5 md:hidden">
+        {/* 2行目: 説明文 */}
+        <p className="mt-2 break-words text-xs leading-relaxed text-zinc-500">
+          {description}
+        </p>
+
+        {/* 3行目: プライバシー案内（共通） */}
+        {privacyVariant ? (
+          <PrivacyNotice
+            variant={privacyVariant}
+            compact={compact}
+            className="mt-2"
+          />
+        ) : null}
+
+        {/* 4行目（コンパクト時のみ）: アプリ機能ボタン */}
+        {compact && actions ? (
+          <div className="app-shell-actions mt-2 flex min-w-0 flex-nowrap items-center gap-1.5">
             {actions}
           </div>
         ) : null}
-
-        <p className="mt-1 break-words text-xs leading-relaxed text-zinc-500">
-          {description}
-        </p>
       </header>
       {minStageSize ? (
-        // 最低サイズを確保。狭い窓ではこの分だけページ全体（Footer 含む）が伸びる
         <div
           className={
             fillViewport
@@ -220,7 +272,9 @@ export default function AppShell({
         <div
           className={
             fillViewport
-              ? "flex min-h-0 flex-1 flex-col overflow-hidden"
+              ? // ヘッダー直下の作業領域。子が伸びる場合はここでスクロール、
+                // 子が flex-1+内部スクロールなら高さを渡す（min-h-0 が重要）
+                "flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto overscroll-contain [touch-action:pan-y]"
               : undefined
           }
         >

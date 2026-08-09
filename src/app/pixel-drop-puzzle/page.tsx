@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import AppShell from "@/components/AppShell";
-import PrivacyNotice from "@/components/PrivacyNotice";
 import { useI18n } from "@/i18n";
 import { useLocalStorageState } from "@/lib/localData";
 import { PIXEL_DROP_MIN_STAGE } from "@/lib/minigameStage";
@@ -317,10 +316,6 @@ export default function PixelDropPuzzlePage() {
         className="pxd-theme-root flex min-h-0 flex-1 flex-col"
         style={stageThemeStyle(data.stage)}
       >
-        <PrivacyNotice
-          variant="plain"
-          className="mb-2 px-1 text-center text-zinc-400"
-        />
         <div className="pxd-console flex w-full flex-1 flex-col rounded-none bg-zinc-950 px-0 pb-6 pt-3">
           {!hydrated || imageLoading ? (
             <p className="text-center text-sm text-zinc-500">{t.common.loading}</p>

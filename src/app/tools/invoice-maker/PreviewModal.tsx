@@ -102,28 +102,38 @@ export default function PreviewModal({
         }`}
       >
         <header className="inv-modal-header print:hidden">
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1 basis-[min(100%,14rem)]">
             <h2 className="inv-modal-title">{copy.modalTitle}</h2>
-            <p className="inv-modal-lead">{copy.hint}</p>
+            <p className="inv-modal-lead hidden sm:block">{copy.hint}</p>
+            <details className="mt-1 sm:hidden">
+              <summary className="cursor-pointer text-[11px] font-medium text-zinc-600">
+                {copy.hintShort}
+              </summary>
+              <p className="inv-modal-lead mt-1">{copy.hint}</p>
+              <p className="mt-1 break-words text-[11px] leading-relaxed text-amber-700/90">
+                {copy.emptyHint}
+              </p>
+            </details>
             <p className="mt-1 text-[11px] font-medium text-sky-800/90 print:hidden">
               {fmt(copy.docLanguageNote, { language: docLanguageLabel })}
             </p>
             <p
-              className="mt-1.5 break-words text-[11px] leading-relaxed text-amber-700/90 print:hidden"
+              className="mt-1.5 hidden break-words text-[11px] leading-relaxed text-amber-700/90 print:hidden sm:block"
               role="note"
             >
               {copy.emptyHint}
             </p>
           </div>
-          <div className="flex shrink-0 flex-wrap items-center gap-2">
-            <button type="button" onClick={onPrint} className="inv-print-btn">
+          <div className="flex w-full min-w-0 shrink-0 flex-nowrap items-center gap-2 sm:w-auto">
+            <button type="button" onClick={onPrint} className="inv-print-btn min-w-0 flex-1 sm:flex-none">
               <Printer className="size-3.5 shrink-0" strokeWidth={2} aria-hidden />
-              {copy.print}
+              <span className="sm:hidden">{copy.printShort}</span>
+              <span className="hidden sm:inline">{copy.print}</span>
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="inv-modal-close"
+              className="inv-modal-close min-w-0 flex-1 sm:flex-none"
             >
               {copy.close}
             </button>

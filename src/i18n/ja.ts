@@ -19,6 +19,9 @@ export const ja: Dictionary = {
     supportAria: "開発者を応援する（Stripe決済ページを開く）",
     supportTitle: "支援ページを開く",
     langToggleAria: "表示言語を切り替える",
+    menuAria: "サイトメニュー",
+    menuOpen: "メニューを開く",
+    menuClose: "メニューを閉じる",
     homeNav: "ホーム",
     libraryNav: "ライブラリ",
     localOnlyBadge: "外部送信ゼロ・完全ローカル動作",
@@ -26,9 +29,11 @@ export const ja: Dictionary = {
     layoutToggle: {
       aria: "表示幅を切り替える",
       caption: "Width",
+      portraitShort: "縦型",
       defaultShort: "標準",
       wideShort: "広め",
       fullShort: "全幅",
+      portrait: "平均的な縦型（スマホ幅）で表示",
       default: "標準幅で表示",
       wide: "広めの幅で表示",
       full: "画面いっぱいに表示",
@@ -42,10 +47,6 @@ export const ja: Dictionary = {
     openLibrary: "ライブラリを開く",
     emptyPins: "ホームはまだ空です",
     emptyPinsHint: "ライブラリでピン留めすると、ここにアプリが並びます。",
-    editHome: "編集",
-    doneEditing: "完了",
-    editHint:
-      "長押しまたは「編集」で操作。アプリ同士を重ねるとフォルダ作成、フォルダに重ねると追加。左右にずらすと並べ替え。×で外せます。",
     removeAria: "{title} をホームから削除",
     dragAria: "{title}。ドラッグまたは矢印キーで並べ替え。G で次とフォルダ化",
     openAria: "{title} を開く",
@@ -54,7 +55,7 @@ export const ja: Dictionary = {
     reorderedAnnounce: "{title} を {n} 番目に移動しました",
     removedAnnounce: "{title} をホームから削除しました",
     editingAnnounce:
-      "ホーム編集モードです。重ねてフォルダ作成、ドラッグで並べ替え、×で削除。完了または Esc で終了します。",
+      "ホーム編集モードです。重ねてフォルダ作成、ドラッグで並べ替え、×で削除。余白タップまたは Esc で終了します。",
     gridLabel: "ホームのアプリ",
     folderDefaultName: "フォルダ",
     openFolderAria: "{title} を開く",
@@ -505,6 +506,8 @@ export const ja: Dictionary = {
       "データはブラウザ内のみに保存され、サーバーへは送信されません。",
     privacyBanner:
       "処理はすべてこのブラウザ内で完結します。ファイルや入力内容が外部に送られることはありません。",
+    privacyBannerShort:
+      "ブラウザ内完結。入力やファイルは外部に送られません。",
   },
   dataManager: {
     buttonTitle: "データ管理（バックアップ・復元）",

@@ -44,13 +44,17 @@ body {
 }
 
 /*
- * 表示幅（標準 / 広め / 全幅）
+ * 表示幅（縦型 / 標準 / 広め / 全幅）
  * React の class 切替ではなく html[data-layout-mode] で決める。
  * ページ遷移時に RSC が標準幅で描画しても、既に付いている data 属性で幅が維持される。
+ * portrait ≈ 390px（一般的なスマホ幅）
  * （max-w-5xl = 64rem / max-w-7xl = 80rem と同等）
  */
 .layout-content {
   max-width: 64rem;
+}
+html[data-layout-mode="portrait"] .layout-content {
+  max-width: 24.375rem; /* 390px */
 }
 html[data-layout-mode="wide"] .layout-content {
   max-width: 80rem;
@@ -59,6 +63,22 @@ html[data-layout-mode="full"] .layout-content {
   max-width: none;
 }
 
+/*
+ * 縦型プレビュー（PC でスマホ幅に絞ったとき）
+ * viewport の sm/lg ではなく data-layout-mode でコンパクト化する
+ */
+html[data-layout-mode="portrait"] .launcher-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem 0.5rem;
+}
+html[data-layout-mode="portrait"] .launcher-icon {
+  padding: 0.2rem;
+}
+html[data-layout-mode="portrait"] .launcher-icon__glyph {
+  width: 3.5rem;
+  height: 3.5rem;
+  font-size: 1.45rem;
+}
 /* ---------- 共通コンポーネント（全アプリ共通ルール） ---------- */
 @layer components {
   /* プライマリボタン：アクセント塗り＋シャープな境界 */
@@ -116,6 +136,27 @@ html[data-layout-mode="full"] .layout-content {
 
   .privacy-notice__text {
     @apply relative z-[1] min-w-0 flex-1 text-[11px] leading-relaxed text-zinc-600 sm:text-xs;
+  }
+
+  /* スマホ／縦型: 余白・文字を抑え、本文は最大2行 */
+  .privacy-notice--compact {
+    @apply gap-2 px-2.5 py-1.5;
+  }
+  .privacy-notice--compact .privacy-notice__badge {
+    @apply h-5 w-5;
+  }
+  .privacy-notice--compact .privacy-notice__emoji {
+    @apply text-[11px];
+  }
+  .privacy-notice--compact .privacy-notice__text {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    @apply text-[10px] leading-snug sm:text-[10px];
+  }
+  .privacy-notice--compact.privacy-notice--plain .privacy-notice__text {
+    @apply text-left;
   }
 
   .privacy-notice--plain {
@@ -182,23 +223,25 @@ html[data-layout-mode="full"] .layout-content {
 
   /* ホーム：デスクトップ風アプリアイコン */
   .launcher-grid {
-    @apply grid flex-1 content-start grid-cols-3 gap-4 sm:grid-cols-4 sm:gap-6 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8;
+    @apply grid flex-1 content-start grid-cols-4 gap-2 sm:grid-cols-4 sm:gap-6 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8;
     list-style: none;
     margin: 0;
     padding: 0;
   }
   .launcher-icon-item {
-    @apply relative min-w-0 touch-manipulation;
+    @apply relative flex min-w-0 flex-col items-center touch-manipulation;
   }
   .launcher-icon-item--dragging {
     @apply opacity-40;
   }
+  /* クリック／ホバー範囲はアイコン本体だけ（セル幅いっぱいに広げない） */
   .launcher-icon {
-    @apply flex w-full min-w-0 flex-col items-center gap-3 rounded-md border border-transparent p-4 text-center transition-all duration-150 sm:p-5;
+    @apply inline-flex shrink-0 flex-col items-center justify-center rounded-md border border-transparent p-1 text-center transition-all duration-150 sm:p-1.5;
     -webkit-user-select: none;
     user-select: none;
     -webkit-touch-callout: none;
-    /* button でも a と同じくセル幅いっぱいにし、列の中央揃えを揃える */
+    width: auto;
+    max-width: 100%;
     margin: 0;
     appearance: none;
     background: transparent;
@@ -223,15 +266,15 @@ html[data-layout-mode="full"] .layout-content {
     cursor: grabbing;
   }
   .launcher-icon__glyph-wrap {
-    @apply relative mx-auto inline-flex shrink-0;
+    @apply relative inline-flex shrink-0;
   }
   .launcher-icon__glyph {
-    @apply flex h-16 w-16 shrink-0 items-center justify-center rounded-md border border-zinc-200 bg-[var(--background)] text-[1.75rem] shadow-none sm:h-20 sm:w-20 sm:text-[2.1rem];
+    @apply flex h-14 w-14 shrink-0 items-center justify-center rounded-md border border-zinc-200 bg-[var(--background)] text-[1.5rem] shadow-none sm:h-20 sm:w-20 sm:text-[2.1rem];
     box-sizing: border-box;
   }
   .launcher-icon__label {
-    @apply w-full px-0.5 text-center font-display text-[11px] font-bold leading-snug text-zinc-800 sm:text-xs;
-    overflow-wrap: anywhere;
+    @apply mt-1.5 w-full max-w-[4.5rem] truncate px-0.5 text-center font-display text-[10px] font-bold leading-snug text-zinc-800 sm:mt-2 sm:max-w-[5.5rem] sm:text-xs;
+    pointer-events: none;
   }
   .launcher-icon__remove {
     @apply absolute -left-1.5 -top-1.5 z-10 flex h-6 w-6 items-center justify-center rounded-full border border-zinc-300 bg-zinc-100 text-sm font-bold leading-none text-zinc-700 shadow-sm transition-colors;
@@ -305,12 +348,78 @@ html[data-layout-mode="full"] .layout-content {
     @apply flex min-h-0 min-w-0 items-center justify-center overflow-hidden rounded-[3px] bg-zinc-100 text-[0.7rem] leading-none sm:text-[0.85rem];
   }
 
-  /* ホーム：フォルダシート */
+  /*
+   * ホーム：フォルダ／アプリ起動中の背後だけ沈める。
+   * filter は親につけると fixed のフォルダシートまでボカされるので、グリッドに限定する。
+   */
+  .launcher-home__stage {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    transition:
+      transform 0.38s cubic-bezier(0.32, 0.72, 0, 1),
+      filter 0.38s cubic-bezier(0.32, 0.72, 0, 1),
+      opacity 0.38s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .launcher-home--folder-open .launcher-home__stage {
+    transform: scale(0.97);
+    filter: blur(1.5px);
+    opacity: 0.92;
+    pointer-events: none;
+  }
+  .launcher-home--launching .launcher-home__stage {
+    transform: scale(1.02);
+    filter: blur(2px);
+    pointer-events: none;
+  }
+
+  /* ホーム：フォルダシート（アイコン起点の拡大／縮小） */
   .launcher-folder-sheet {
-    @apply fixed inset-0 z-50 flex items-center justify-center bg-[color-mix(in_srgb,#1c1c1e_28%,transparent)] p-4;
+    @apply fixed inset-0 z-50 flex items-center justify-center p-4;
+    background-color: color-mix(in srgb, #1c1c1e 0%, transparent);
+    backdrop-filter: blur(0);
+    -webkit-backdrop-filter: blur(0);
+    transition:
+      background-color 0.32s cubic-bezier(0.32, 0.72, 0, 1),
+      backdrop-filter 0.32s cubic-bezier(0.32, 0.72, 0, 1),
+      -webkit-backdrop-filter 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .launcher-folder-sheet--open {
+    background-color: color-mix(in srgb, #1c1c1e 32%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  .launcher-folder-sheet--enter {
+    background-color: color-mix(in srgb, #1c1c1e 0%, transparent);
+  }
+  .launcher-folder-sheet--exit {
+    background-color: color-mix(in srgb, #1c1c1e 0%, transparent);
+    backdrop-filter: blur(0);
+    -webkit-backdrop-filter: blur(0);
+    pointer-events: none;
   }
   .launcher-folder-sheet__panel {
     @apply flex max-h-[min(85vh,36rem)] w-full max-w-lg flex-col gap-4 overflow-hidden rounded-md border border-zinc-200 bg-[var(--background)] p-4 shadow-none sm:p-5;
+    transform: translate(var(--launcher-from-x, 0px), var(--launcher-from-y, 0px))
+      scale(var(--launcher-from-scale, 0.88));
+    opacity: 0.55;
+    transition:
+      transform 0.38s cubic-bezier(0.32, 0.72, 0, 1),
+      opacity 0.28s ease-out;
+    will-change: transform, opacity;
+  }
+  .launcher-folder-sheet--open .launcher-folder-sheet__panel {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  .launcher-folder-sheet--exit .launcher-folder-sheet__panel {
+    transform: translate(var(--launcher-from-x, 0px), var(--launcher-from-y, 0px))
+      scale(var(--launcher-from-scale, 0.88));
+    opacity: 0;
+    transition:
+      transform 0.28s cubic-bezier(0.4, 0, 1, 1),
+      opacity 0.22s ease-in;
   }
   .launcher-folder-sheet__header {
     @apply flex items-center gap-2;
@@ -330,12 +439,100 @@ html[data-layout-mode="full"] .layout-content {
   }
   .launcher-folder-sheet__item {
     @apply min-w-0;
+    opacity: 0;
+    transform: translateY(8px) scale(0.92);
+  }
+  .launcher-folder-sheet--open .launcher-folder-sheet__item {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 0.28s ease-out,
+      transform 0.34s cubic-bezier(0.32, 0.72, 0, 1);
+    transition-delay: var(--launcher-stagger, 0ms);
+  }
+  .launcher-folder-sheet--exit .launcher-folder-sheet__item {
+    opacity: 0;
+    transition: opacity 0.12s ease-in;
+    transition-delay: 0ms;
   }
   .launcher-folder-sheet__app {
     @apply !p-2 sm:!p-3;
   }
   .launcher-folder-sheet__eject {
     @apply mt-1 rounded border border-zinc-200 bg-white px-2 py-0.5 text-[10px] font-medium text-zinc-600 transition-colors hover:border-zinc-300 hover:bg-zinc-50;
+  }
+
+  /* ホーム：アプリ起動の全画面ズーム */
+  .launcher-app-launch {
+    @apply fixed inset-0 z-[60] flex items-center justify-center;
+    pointer-events: none;
+  }
+  .launcher-app-launch__surface {
+    @apply flex flex-col items-center justify-center gap-3;
+    width: var(--launcher-start-size, 4.5rem);
+    height: var(--launcher-start-size, 4.5rem);
+    border-radius: 0.75rem;
+    border: 1px solid var(--border);
+    background: var(--background);
+    transform: translate(var(--launcher-from-x, 0px), var(--launcher-from-y, 0px));
+    opacity: 0.98;
+    transition:
+      transform 0.42s cubic-bezier(0.32, 0.72, 0, 1),
+      width 0.42s cubic-bezier(0.32, 0.72, 0, 1),
+      height 0.42s cubic-bezier(0.32, 0.72, 0, 1),
+      border-radius 0.42s cubic-bezier(0.32, 0.72, 0, 1),
+      opacity 0.2s ease-out;
+    will-change: transform, width, height;
+    overflow: hidden;
+  }
+  .launcher-app-launch--expand .launcher-app-launch__surface {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    border-color: transparent;
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  .launcher-app-launch__glyph {
+    @apply flex items-center justify-center text-[2.4rem] leading-none sm:text-[3rem];
+    transition:
+      transform 0.42s cubic-bezier(0.32, 0.72, 0, 1),
+      opacity 0.28s ease-out 0.12s;
+  }
+  .launcher-app-launch--expand .launcher-app-launch__glyph {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+  .launcher-app-launch__title {
+    @apply m-0 font-display text-xs font-bold text-zinc-700 sm:text-sm;
+    transition: opacity 0.2s ease-out;
+  }
+  .launcher-app-launch--expand .launcher-app-launch__title {
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .launcher-home__stage,
+    .launcher-home--folder-open .launcher-home__stage,
+    .launcher-home--launching .launcher-home__stage,
+    .launcher-folder-sheet,
+    .launcher-folder-sheet__panel,
+    .launcher-folder-sheet__item,
+    .launcher-app-launch__surface,
+    .launcher-app-launch__glyph,
+    .launcher-app-launch__title {
+      transition: none !important;
+      animation: none !important;
+      filter: none !important;
+      transform: none !important;
+    }
+    .launcher-folder-sheet--enter .launcher-folder-sheet__panel,
+    .launcher-folder-sheet--exit .launcher-folder-sheet__panel {
+      opacity: 1;
+    }
+    .launcher-folder-sheet__item {
+      opacity: 1;
+    }
   }
 
   /* 安心バッジ（ヘッダー常駐） */
@@ -574,11 +771,42 @@ html[data-layout-mode="full"] .layout-content {
     @apply bg-orange-50 text-orange-700 border-orange-200;
   }
 
+  /* ヘッダー：メニューボタン／パネル（表示切替は JSX の lg:hidden 等で制御） */
+  .site-header__menu-btn {
+    @apply inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-zinc-200 bg-white text-zinc-700 transition-colors hover:border-[var(--accent-border)] hover:bg-[color-mix(in_srgb,var(--accent)_18%,white)];
+  }
+  .site-header__menu-btn[aria-expanded="true"] {
+    border-color: var(--accent-border);
+    background-color: color-mix(in srgb, var(--accent) 22%, white);
+  }
+  .site-header__menu {
+    @apply border-t border-zinc-200 pb-3 pt-1;
+  }
+  .site-header__menu-list {
+    @apply m-0 flex list-none flex-col gap-1 p-0;
+  }
+  .site-header__menu-link {
+    @apply flex min-h-11 items-center rounded-md px-3 py-2.5 font-display text-sm font-bold text-zinc-800 transition-colors hover:bg-[color-mix(in_srgb,var(--accent)_20%,white)];
+  }
+  .site-header__menu-link--active {
+    background-color: color-mix(in srgb, var(--accent) 28%, white);
+    color: #18181b;
+  }
+  .site-header__menu-item {
+    @apply flex flex-col gap-1.5 rounded-md px-3 py-2.5;
+  }
+  .site-header__menu-label {
+    @apply text-[11px] font-medium text-zinc-500;
+  }
+  .site-header__menu-note {
+    @apply mt-1 flex items-start gap-2 rounded-md border border-[var(--accent-border)] bg-[color-mix(in_srgb,var(--accent)_22%,white)] px-3 py-2.5 text-[11px] leading-relaxed text-zinc-700;
+  }
+
   /* ヘッダー：開発者支援ボタン（ガラス調・グラデーションアクセント） */
   .btn-support {
-    @apply relative inline-flex min-h-[2.5rem] items-center justify-center overflow-hidden rounded-full border border-zinc-200/90 px-3.5 py-2 text-sm font-medium text-zinc-600 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-4px_rgba(24,24,27,0.06)] backdrop-blur-md transition-[box-shadow,opacity] duration-300;
-    /* 日英切替で幅が変わらないよう、長い文言に合わせて固定 */
-    min-width: 6.875rem;
+    @apply relative inline-flex min-h-9 items-center justify-center overflow-hidden rounded-full border border-zinc-200/90 px-2.5 py-1.5 text-sm font-medium text-zinc-600 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-4px_rgba(24,24,27,0.06)] backdrop-blur-md transition-[box-shadow,opacity] duration-300 sm:min-h-[2.5rem] sm:px-3.5 sm:py-2;
+    /* 狭い画面はアイコンのみ、広い画面は文言幅を固定 */
+    min-width: 2.5rem;
     background: linear-gradient(
       165deg,
       rgba(255, 255, 255, 0.96) 0%,
@@ -644,25 +872,37 @@ html[data-layout-mode="full"] .layout-content {
   .lang-select {
     @apply relative inline-flex items-center;
   }
+  .lang-select--full {
+    @apply w-full;
+  }
+  .lang-select--full .lang-select__control {
+    max-width: none;
+    width: 100%;
+  }
 
   .lang-select__control {
-    @apply appearance-none rounded-full border border-zinc-200/90 bg-white/80 py-2 pl-3 pr-8 text-[11px] font-medium leading-normal tracking-wide text-zinc-700 shadow-[0_1px_2px_rgba(0,0,0,0.04)] backdrop-blur-sm transition-colors hover:border-[var(--accent-border)] hover:text-zinc-900 focus:border-[var(--accent-strong)] focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,var(--accent)_45%,transparent)] sm:text-xs;
-    max-width: 9.5rem;
+    @apply appearance-none rounded-full border border-zinc-200/90 bg-white/80 py-1.5 pl-2.5 pr-7 text-[11px] font-medium leading-normal tracking-wide text-zinc-700 shadow-[0_1px_2px_rgba(0,0,0,0.04)] backdrop-blur-sm transition-colors hover:border-[var(--accent-border)] hover:text-zinc-900 focus:border-[var(--accent-strong)] focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,var(--accent)_45%,transparent)] sm:py-2 sm:pl-3 sm:pr-8 sm:text-xs;
+    max-width: 7.5rem;
     /* select + leading-none だと g などの下端が見切れやすい */
     overflow: visible;
+  }
+  @media (min-width: 640px) {
+    .lang-select__control {
+      max-width: 9.5rem;
+    }
   }
 
   .lang-select__chevron {
     @apply pointer-events-none absolute right-2.5 size-3.5 text-zinc-400;
   }
 
-  /* 表示幅トグル：アイコンのみ・シンプルなセグメント */
+  /* 表示幅トグル：アイコンのみ・シンプルなセグメント（縦型含む 4 択） */
   .layout-toggle {
-    @apply relative inline-grid grid-cols-3 items-center rounded-md border border-zinc-200 bg-[var(--background)] p-0.5 shadow-none;
+    @apply relative inline-grid grid-cols-4 items-center rounded-md border border-zinc-200 bg-[var(--background)] p-0.5 shadow-none;
   }
 
   .layout-toggle__indicator {
-    @apply pointer-events-none absolute inset-y-0.5 left-0.5 w-[calc((100%-4px)/3)] rounded shadow-none;
+    @apply pointer-events-none absolute inset-y-0.5 left-0.5 w-[calc((100%-4px)/4)] rounded shadow-none;
     background-color: var(--accent);
     transition: transform 0.15s ease;
   }
@@ -739,6 +979,46 @@ html[data-layout-mode="full"] .layout-content {
   /* PWA インストール誘導（バックアップと同系のコンパクトカプセル） */
   .lunch-install-btn {
     @apply inline-flex items-center gap-1.5 rounded-full border border-emerald-200/80 bg-emerald-50/70 px-2.5 py-1 text-[11px] font-medium tracking-tight text-emerald-800 shadow-[0_1px_0_rgba(16,185,129,0.08)] transition-all duration-200 ease-out hover:-translate-y-px hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-900 hover:shadow-sm active:translate-y-0 active:shadow-none disabled:cursor-wait disabled:opacity-60 sm:gap-1.5 sm:px-3 sm:py-1 sm:text-xs;
+  }
+
+  /*
+   * AppShell コンパクト（実機スマホ／表示幅「縦型」）
+   * バックアップ・インストールはアイコンのみ。タイトル表示を優先。
+   */
+  .app-shell-header--compact .app-shell-chrome-label {
+    display: none !important;
+  }
+  /* バックアップ／インストール内の文言をすべて隠す（クラス有無を問わない） */
+  .app-shell-header--compact .app-shell-chrome button > span:not([aria-hidden]) {
+    display: none !important;
+  }
+  .app-shell-header--compact .app-shell-chrome button {
+    @apply gap-0 justify-center px-1.5 py-1;
+    min-width: 1.75rem;
+  }
+  .app-shell-header--compact .app-shell-title {
+    @apply min-w-0 flex-1 text-[13px] leading-snug tracking-tight;
+  }
+  .app-shell-header--compact .app-shell-actions {
+    @apply w-full max-w-full overflow-x-hidden;
+  }
+  .app-shell-header--compact .app-shell-actions > * {
+    @apply min-w-0;
+  }
+  /* 機能ボタン: コンパクト時は短いラベル（viewport の sm: に依存しない） */
+  .app-shell-header--compact .app-shell-action-label--full {
+    display: none !important;
+  }
+  .app-shell-header:not(.app-shell-header--compact) .app-shell-action-label--short {
+    display: none !important;
+  }
+  .app-shell-header--compact .app-shell-actions .btn-primary,
+  .app-shell-header--compact .app-shell-actions .btn-secondary {
+    @apply min-w-0 flex-1 truncate !px-1.5 !py-1 text-[10px] leading-tight;
+  }
+  /* 右端固定ボタン（一覧へ など）は伸縮させない */
+  .app-shell-header--compact .app-shell-actions .app-shell-action-end {
+    flex: none !important;
   }
 
   .lunch-install-modal {
@@ -3830,6 +4110,74 @@ html.pxd-pwa-standalone .pxd-block-guide {
     @apply min-w-0 overflow-x-hidden rounded-xl border border-zinc-200/80 bg-white p-3 shadow-sm sm:p-4 md:p-5;
   }
 
+  /*
+   * コンパクト（パネル実幅が狭い／縦型プレビュー／実機スマホ）
+   * ※ viewport の md: ではなく JS の data-compact / --compact クラスで切り替える
+   */
+  .inv-panel--compact .inv-cols-2 {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .inv-mobile-wizard {
+    @apply mb-4 border-b border-zinc-100 pb-3;
+  }
+  .inv-mobile-wizard__tabs {
+    @apply grid grid-cols-2 gap-1.5;
+  }
+  .inv-mobile-wizard__tab {
+    @apply inline-flex min-h-11 min-w-0 items-center justify-center gap-1.5 rounded-md border border-zinc-200 bg-white px-2 py-2 text-[11px] font-medium leading-tight text-zinc-600 transition-all active:scale-[0.98];
+  }
+  .inv-mobile-wizard__tab--on {
+    @apply border-[var(--accent-strong)] text-zinc-900;
+    background-color: color-mix(in srgb, var(--accent) 42%, white);
+  }
+  .inv-mobile-wizard__step {
+    @apply inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-[10px] font-bold text-zinc-700;
+  }
+  .inv-mobile-wizard__tab--on .inv-mobile-wizard__step {
+    background-color: var(--accent);
+    color: #27272a;
+  }
+  .inv-mobile-wizard__progress {
+    @apply mt-2 text-center text-[10px] font-medium tracking-wide text-zinc-400;
+  }
+  .inv-form-page--hidden {
+    display: none !important;
+  }
+  .inv-form-page--active {
+    display: block;
+    animation: inv-page-in 0.18s ease-out;
+  }
+  .inv-panel:not(.inv-panel--compact) .inv-form-page--active {
+    animation: none;
+  }
+  @keyframes inv-page-in {
+    from {
+      opacity: 0.35;
+      transform: translateX(0.5rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  .inv-wizard-nav-btn {
+    @apply inline-flex min-h-11 w-full items-center justify-center gap-1 rounded-md border px-3 py-2 text-xs font-medium transition-all active:scale-[0.98];
+  }
+  .inv-wizard-nav-btn--next {
+    @apply border-[var(--accent-strong)] text-zinc-900;
+    background-color: var(--accent);
+  }
+  .inv-wizard-nav-btn--back {
+    @apply border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .inv-form-page--active {
+      animation: none;
+    }
+  }
+
   .inv-section + .inv-section {
     @apply mt-4 border-t border-zinc-100 pt-4;
   }
@@ -3887,11 +4235,82 @@ html.pxd-pwa-standalone .pxd-block-guide {
 
   /* 品目行：パディングを抑えてコンパクトに */
   .inv-item-row {
-    @apply rounded-md border border-zinc-100 bg-zinc-50/60 px-2 py-1.5;
+    @apply min-w-0 max-w-full overflow-hidden rounded-md border border-zinc-100 bg-zinc-50/60 px-2 py-1.5;
   }
 
+  /*
+   * 品目レイアウト
+   * 通常幅: 品名(伸縮) / 単価 / 数量 / 金額 / 削除
+   * コンパクト: 1行目=品名+削除、2行目=単価・数量・金額（各欄の必要幅を自動配分）
+   */
+  .inv-item-row__layout {
+    display: grid;
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(4.75rem, 5.75rem)
+      minmax(2.75rem, 3.5rem)
+      minmax(3.75rem, 5rem)
+      auto;
+    align-items: center;
+    gap: 0.375rem 0.5rem;
+  }
+  .inv-item-row__name {
+    @apply !py-1;
+    grid-column: 1;
+    width: 100%;
+    min-width: 0;
+  }
+  .inv-item-row__price {
+    @apply !py-1 text-right;
+    grid-column: 2;
+    width: 100%;
+    min-width: 0;
+  }
+  .inv-item-row__qty {
+    @apply !py-1 text-right;
+    grid-column: 3;
+    width: 100%;
+    min-width: 0;
+  }
   .inv-item-row__amount {
-    @apply tabular-nums text-[12px] font-medium text-zinc-800;
+    @apply min-w-0 truncate text-right tabular-nums text-[12px] font-medium text-zinc-800;
+    grid-column: 4;
+  }
+  .inv-item-row__remove {
+    grid-column: 5;
+  }
+
+  .inv-panel--compact .inv-item-row__layout {
+    /* 単価・数量・金額の必要幅を確保しつつ、余りを品名／金額へ */
+    grid-template-columns:
+      minmax(4.75rem, 1.35fr)
+      minmax(2.75rem, 0.7fr)
+      minmax(3.5rem, 1.15fr)
+      2rem;
+    grid-template-areas:
+      "name name name remove"
+      "price qty amount amount";
+    column-gap: 0.375rem;
+    row-gap: 0.375rem;
+  }
+  .inv-panel--compact .inv-item-row__name {
+    grid-area: name;
+  }
+  .inv-panel--compact .inv-item-row__remove {
+    grid-area: remove;
+    width: 2rem;
+    height: 2rem;
+  }
+  .inv-panel--compact .inv-item-row__price {
+    grid-area: price;
+  }
+  .inv-panel--compact .inv-item-row__qty {
+    grid-area: qty;
+  }
+  .inv-panel--compact .inv-item-row__amount {
+    grid-area: amount;
+    align-self: center;
+    padding-inline: 0.125rem;
   }
 
   /* プレビュー／PDF ボタン（入力パネル内） */
@@ -3959,23 +4378,30 @@ html.pxd-pwa-standalone .pxd-block-guide {
   }
 
   .inv-modal-header {
-    @apply flex shrink-0 flex-wrap items-start justify-between gap-3 border-b border-zinc-100 px-4 py-3 sm:px-5;
+    @apply flex shrink-0 flex-wrap items-start justify-between gap-3 border-b border-zinc-100 px-3 py-2.5 sm:px-5 sm:py-3;
   }
 
   .inv-modal-title {
-    @apply text-sm font-semibold tracking-tight text-zinc-900;
+    @apply break-words text-sm font-semibold tracking-tight text-zinc-900;
   }
 
   .inv-modal-lead {
     @apply mt-0.5 break-words text-[11px] leading-relaxed text-zinc-500;
   }
 
+  .inv-modal-header details > summary {
+    list-style: none;
+  }
+  .inv-modal-header details > summary::-webkit-details-marker {
+    display: none;
+  }
+
   .inv-modal-close {
-    @apply inline-flex min-h-11 items-center rounded-md border border-zinc-200 bg-white px-3 text-xs font-medium text-zinc-600 transition-colors hover:bg-zinc-50 hover:text-zinc-900 active:scale-[0.98] sm:min-h-9 sm:px-3;
+    @apply inline-flex min-h-11 items-center justify-center rounded-md border border-zinc-200 bg-white px-3 text-xs font-medium text-zinc-600 transition-colors hover:bg-zinc-50 hover:text-zinc-900 active:scale-[0.98] sm:min-h-9 sm:px-3;
   }
 
   .inv-modal-preview-frame {
-    @apply min-h-0 flex-1 overflow-auto bg-zinc-100/80 p-3 sm:p-5;
+    @apply min-h-0 w-full min-w-0 max-w-full flex-1 overflow-x-auto overflow-y-auto bg-zinc-100/80 p-2 sm:p-5;
   }
 }
 
@@ -6815,9 +7241,10 @@ select.bv-ui-field optgroup {
 /* ご請求金額：シート内で唯一の強調ブロック（縦棒はアクセントカラー連動） */
 .inv-sheet__due {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 8mm;
+  gap: 4mm 8mm;
   margin-top: 10mm;
   padding: 4mm 5mm;
   border-left: 3px solid var(--accent-color, #18181b);
@@ -6893,7 +7320,8 @@ select.bv-ui-field optgroup {
 }
 
 .inv-sheet__totals dl {
-  width: 72mm;
+  width: min(72mm, 100%);
+  max-width: 100%;
 }
 
 .inv-sheet__totals-row {
@@ -6966,12 +7394,6 @@ select.bv-ui-field optgroup {
 
 .inv-sheet__pay-box-body {
   overflow-wrap: anywhere;
-}
-
-@media (max-width: 640px) {
-  .inv-sheet__footer-blocks {
-    grid-template-columns: 1fr;
-  }
 }
 
 /* 印刷レイヤー：画面では出さない（印刷時だけ body 直下から実寸で出る） */

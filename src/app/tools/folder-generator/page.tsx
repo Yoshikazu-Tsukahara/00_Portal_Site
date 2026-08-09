@@ -17,7 +17,6 @@ import {
 import { arrayMove } from "@dnd-kit/sortable";
 
 import AppShell from "@/components/AppShell";
-import PrivacyNotice from "@/components/PrivacyNotice";
 import { fmt, useI18n } from "@/i18n";
 import Toolbox from "./Toolbox";
 import FormatBuilder, { DragOverlayBadge } from "./FormatBuilder";
@@ -411,7 +410,6 @@ export default function FolderGeneratorPage() {
         </button>
       }
     >
-      <PrivacyNotice className="mb-2" />
       <DndContext
         id={dndId}
         sensors={sensors}

@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import AppShell from "@/components/AppShell";
-import PrivacyNotice from "@/components/PrivacyNotice";
 import { useI18n } from "@/i18n";
 import CreatePanel from "./CreatePanel";
 import DecodePanel from "./DecodePanel";
@@ -20,6 +19,7 @@ export default function CryptoMessagePage() {
 
   return (
     <AppShell
+      privacyNotice="plain"
       title={copy.shell.title}
       description={copy.shell.description}
       fillViewport
@@ -60,7 +60,6 @@ export default function CryptoMessagePage() {
           </div>
         </div>
 
-        <PrivacyNotice variant="plain" className="mt-2 px-1 text-center text-zinc-500" />
       </div>
     </AppShell>
   );

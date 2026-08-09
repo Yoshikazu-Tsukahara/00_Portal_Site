@@ -23,9 +23,11 @@ export const es: PartialDictionary = {
     layoutToggle: {
       aria: "Cambiar ancho de pantalla",
       caption: "Width",
+      portraitShort: "Vertical",
       defaultShort: "Normal",
       wideShort: "Ancho",
       fullShort: "Full",
+      portrait: "Vista vertical típica (ancho de móvil)",
       default: "Mostrar a ancho normal",
       wide: "Mostrar más ancho",
       full: "Mostrar a pantalla completa",
@@ -155,6 +157,8 @@ export const es: PartialDictionary = {
     safetyShort: "Los datos quedan en el navegador; no se envían al servidor.",
     privacyBanner:
       "Todo se procesa en este navegador. Nada se envía fuera.",
+    privacyBannerShort:
+      "Todo ocurre en este navegador. Nada se envía al exterior.",
   },
   dataManager: {
     buttonTitle: "Datos (copia y restauración)",

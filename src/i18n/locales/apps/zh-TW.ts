@@ -745,7 +745,7 @@ export const appsZhTW: AppsDictionary = {
   invoiceMaker: {
     shell: {
       title: "單據製作",
-      description: "填寫兩欄式表單建立發票、報價單、交貨單或收據，再儲存為 PDF。過往文件保存在瀏覽器內。",
+      description: "填寫發票、報價單、交貨單或收據，並從預覽儲存為 PDF。過往文件保存在瀏覽器內。",
     },
     loading: "載入中…",
     actions: {
@@ -755,7 +755,7 @@ export const appsZhTW: AppsDictionary = {
     },
     toolbar: {
       save: "💾 儲存目前文件",
-      saveShort: "💾 儲存",
+      saveShort: "儲存",
       load: "📂 載入過往文件",
       loadShort: "📂 載入",
       preview: "預覽",
@@ -813,10 +813,19 @@ export const appsZhTW: AppsDictionary = {
     preview: {
       modalTitle: "預覽",
       hint: "在列印對話框中選擇「另存為 PDF」即可保存檔案。",
+      hintShort: "用法與注意",
       emptyHint: "※ 空白欄位的淡色佔位文字不會出現在 PDF／列印上——那些位置會保持空白。",
       docLanguageNote: "PDF／列印語言：{language}",
       print: "匯出 PDF（列印）",
+      printShort: "📄 PDF",
       close: "關閉",
+    },
+    mobileWizard: {
+      stepOf: "{current} / {total}",
+      page1Label: "對方與基本",
+      page2Label: "設定與明細",
+      next: "下一步",
+      back: "返回",
     },
     install: {
       button: "將此應用程式加到主畫面",
@@ -1122,6 +1131,7 @@ export const appsZhTW: AppsDictionary = {
   mailTemplate: {
     shell: {
       title: "智慧郵件範本管理",
+      titleShort: "郵件範本",
       description: "用變數與標籤立刻撰寫回覆。資料保存在瀏覽器內。",
     },
     combinedText: {
@@ -1318,6 +1328,7 @@ export const appsZhTW: AppsDictionary = {
       empty: "尚無範本",
       noSubject: "無主旨",
       selectPrompt: "選擇範本",
+      backToList: "←列表",
     },
     search: {
       placeholder: "搜尋範本...",

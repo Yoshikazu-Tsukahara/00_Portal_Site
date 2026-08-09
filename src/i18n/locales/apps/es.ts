@@ -5,6 +5,7 @@ export const appsEs: AppsDictionary = {
   mailTemplate: {
     shell: {
       title: "Gestor inteligente de plantillas de correo",
+      titleShort: "Plantillas de correo",
       description: "Redacta respuestas al instante con variables y etiquetas. Los datos se quedan en tu navegador.",
     },
     combinedText: {
@@ -201,6 +202,7 @@ export const appsEs: AppsDictionary = {
       empty: "Sin plantillas",
       noSubject: "Sin asunto",
       selectPrompt: "Selecciona una plantilla",
+      backToList: "← Lista",
     },
     search: {
       placeholder: "Buscar plantillas...",
@@ -590,7 +592,7 @@ export const appsEs: AppsDictionary = {
   invoiceMaker: {
     shell: {
       title: "Generador de documentos",
-      description: "Completa el formulario de dos columnas para facturas, presupuestos, albaranes o recibos, y guarda como PDF. Los documentos anteriores permanecen en tu navegador.",
+      description: "Crea facturas, presupuestos, albaranes o recibos y guárdalos en PDF. Los documentos anteriores permanecen en el navegador.",
     },
     loading: "Cargando…",
     actions: {
@@ -600,7 +602,7 @@ export const appsEs: AppsDictionary = {
     },
     toolbar: {
       save: "💾 Guardar documento actual",
-      saveShort: "💾 Guardar",
+      saveShort: "Guardar",
       load: "📂 Cargar documento anterior",
       loadShort: "📂 Cargar",
       preview: "Vista previa",
@@ -658,10 +660,19 @@ export const appsEs: AppsDictionary = {
     preview: {
       modalTitle: "Vista previa",
       hint: "En el diálogo de impresión, elige “Guardar como PDF” para conservar un archivo.",
+      hintShort: "Consejos y notas",
       emptyHint: "※ El texto tenue de marcador de posición en campos vacíos no aparecerá en PDF / impresión — esos espacios quedan en blanco.",
       docLanguageNote: "Idioma del PDF／impresión: {language}",
       print: "Exportar PDF (Imprimir)",
+      printShort: "📄 PDF",
       close: "Cerrar",
+    },
+    mobileWizard: {
+      stepOf: "{current} / {total}",
+      page1Label: "Partes y básicos",
+      page2Label: "Ajustes y partidas",
+      next: "Siguiente",
+      back: "Atrás",
     },
     install: {
       button: "Añadir esta app a la pantalla de inicio",

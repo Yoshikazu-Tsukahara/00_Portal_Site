@@ -745,7 +745,7 @@ export const appsPt: AppsDictionary = {
   invoiceMaker: {
     shell: {
       title: "Gerador de Documentos",
-      description: "Preencha o formulário de duas colunas para faturas, orçamentos, notas de entrega ou recibos e salve como PDF. Documentos anteriores ficam no seu navegador.",
+      description: "Crie faturas, orçamentos, notas de entrega ou recibos e salve como PDF. Documentos anteriores ficam no navegador.",
     },
     loading: "Carregando…",
     actions: {
@@ -755,7 +755,7 @@ export const appsPt: AppsDictionary = {
     },
     toolbar: {
       save: "💾 Salvar documento atual",
-      saveShort: "💾 Salvar",
+      saveShort: "Salvar",
       load: "📂 Carregar documento anterior",
       loadShort: "📂 Carregar",
       preview: "Pré-visualizar",
@@ -813,10 +813,19 @@ export const appsPt: AppsDictionary = {
     preview: {
       modalTitle: "Pré-visualização",
       hint: "No diálogo de impressão, escolha “Salvar como PDF” para guardar um arquivo.",
+      hintShort: "Dicas e notas",
       emptyHint: "※ O texto fraco de placeholder dos campos vazios não aparece no PDF / impressão — esses espaços ficam em branco.",
       docLanguageNote: "Idioma do PDF／impressão: {language}",
       print: "Exportar PDF (Imprimir)",
+      printShort: "📄 PDF",
       close: "Fechar",
+    },
+    mobileWizard: {
+      stepOf: "{current} / {total}",
+      page1Label: "Partes e básicos",
+      page2Label: "Config. e itens",
+      next: "Próximo",
+      back: "Voltar",
     },
     install: {
       button: "Adicionar este app à Tela Inicial",
@@ -1122,6 +1131,7 @@ export const appsPt: AppsDictionary = {
   mailTemplate: {
     shell: {
       title: "Gerenciador Inteligente de Modelos de E-mail",
+      titleShort: "Modelos de e-mail",
       description: "Crie respostas na hora com variáveis e rótulos. Os dados ficam no seu navegador.",
     },
     combinedText: {
@@ -1318,6 +1328,7 @@ export const appsPt: AppsDictionary = {
       empty: "Nenhum modelo",
       noSubject: "Sem assunto",
       selectPrompt: "Selecione um modelo",
+      backToList: "← Lista",
     },
     search: {
       placeholder: "Buscar modelos...",

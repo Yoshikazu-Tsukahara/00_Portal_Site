@@ -29,7 +29,7 @@ export default function Home() {
 
   return (
     <main className="relative flex h-full min-h-0 flex-1 flex-col overflow-y-auto">
-      <div className={`${contentClassName} flex min-h-full flex-1 flex-col py-6 sm:py-8`}>
+      <div className={`${contentClassName} flex min-h-full flex-1 flex-col py-3 sm:py-8`}>
         {!hydrated ? (
           <p className="text-sm text-zinc-400">{t.common.loading}</p>
         ) : items.length === 0 ? (

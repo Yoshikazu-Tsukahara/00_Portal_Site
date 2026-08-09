@@ -50,8 +50,8 @@ export default function InstallAppButton({
         <span aria-hidden className="text-[12px] leading-none sm:text-[13px]">
           📱
         </span>
-        <span className="hidden sm:inline">{copy.buttonShort}</span>
-        <span className="sm:hidden">{copy.buttonTiny}</span>
+        <span className="app-shell-chrome-label hidden sm:inline">{copy.buttonShort}</span>
+        <span className="app-shell-chrome-label sm:hidden">{copy.buttonTiny}</span>
       </button>
 
       <InstallGuideModal

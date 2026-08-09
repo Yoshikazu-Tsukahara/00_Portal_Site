@@ -75,11 +75,23 @@ export type InvoiceMakerDict = {
   preview: {
     modalTitle: string;
     hint: string;
+    /** 狭い画面で折りたたみサマリー用 */
+    hintShort: string;
     emptyHint: string;
     /** {language} = 書類言語の自称 */
     docLanguageNote: string;
     print: string;
+    printShort: string;
     close: string;
+  };
+  /** スマホ：2カラムの代わりにページ遷移 */
+  mobileWizard: {
+    /** {current} / {total} */
+    stepOf: string;
+    page1Label: string;
+    page2Label: string;
+    next: string;
+    back: string;
   };
 };
 
@@ -87,7 +99,7 @@ export const invoiceMakerJa: InvoiceMakerDict = {
   shell: {
     title: "帳票メーカー",
     description:
-      "請求書・見積書・納品書・領収書を2カラムで入力し、プレビューからそのままPDF保存。過去の帳票もブラウザ内に残せます。",
+      "請求書・見積書・納品書・領収書を入力し、プレビューからそのままPDF保存。過去の帳票もブラウザ内に残せます。",
   },
   loading: "読込中…",
   actions: {
@@ -98,9 +110,9 @@ export const invoiceMakerJa: InvoiceMakerDict = {
   },
   toolbar: {
     save: "💾 現在の帳票を保存",
-    saveShort: "💾 保存",
+    saveShort: "保存",
     load: "📂 過去の帳票を呼び出す",
-    loadShort: "📂 呼出",
+    loadShort: "呼出",
     preview: "プレビュー確認",
     previewShort: "確認",
     print: "📄 PDF出力 / 印刷",
@@ -159,11 +171,20 @@ export const invoiceMakerJa: InvoiceMakerDict = {
   preview: {
     modalTitle: "プレビュー確認",
     hint: "印刷ダイアログで「PDFに保存」を選ぶとファイルとして残せます。",
+    hintShort: "使い方・注意",
     emptyHint:
       "※薄く表示されている未入力項目は、PDF出力・印刷時には印字されず空白になります。",
     docLanguageNote: "PDF／印刷の言語: {language}",
     print: "PDF出力（印刷）",
+    printShort: "📄 PDF",
     close: "閉じる",
+  },
+  mobileWizard: {
+    stepOf: "{current} / {total}",
+    page1Label: "相手・基本",
+    page2Label: "設定・品目",
+    next: "次へ",
+    back: "戻る",
   },
   install: {
     button: "このアプリをインストール",
@@ -194,7 +215,7 @@ export const invoiceMakerEn: InvoiceMakerDict = {
   shell: {
     title: "Form Maker",
     description:
-      "Fill the two-column form for invoices, estimates, delivery notes, or receipts, then save as PDF. Past documents stay in your browser.",
+      "Create invoices, estimates, delivery notes, or receipts, then save as PDF from preview. Past documents stay in your browser.",
   },
   loading: "Loading…",
   actions: {
@@ -205,9 +226,9 @@ export const invoiceMakerEn: InvoiceMakerDict = {
   },
   toolbar: {
     save: "💾 Save current document",
-    saveShort: "💾 Save",
+    saveShort: "Save",
     load: "📂 Load past document",
-    loadShort: "📂 Load",
+    loadShort: "Load",
     preview: "Preview",
     previewShort: "Preview",
     print: "📄 Export PDF / Print",
@@ -267,11 +288,20 @@ export const invoiceMakerEn: InvoiceMakerDict = {
   preview: {
     modalTitle: "Preview",
     hint: "In the print dialog, choose “Save as PDF” to keep a file.",
+    hintShort: "Tips & notes",
     emptyHint:
       "※ Faint placeholder text for empty fields will not appear on PDF / print — those spots stay blank.",
     docLanguageNote: "PDF / print language: {language}",
     print: "Export PDF (Print)",
+    printShort: "📄 PDF",
     close: "Close",
+  },
+  mobileWizard: {
+    stepOf: "{current} / {total}",
+    page1Label: "Parties & basics",
+    page2Label: "Settings & items",
+    next: "Next",
+    back: "Back",
   },
   install: {
     button: "Install this app",

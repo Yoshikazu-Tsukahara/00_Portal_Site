@@ -5,6 +5,7 @@ export const appsDe: AppsDictionary = {
   mailTemplate: {
     shell: {
       title: "Smart Mail Template Manager",
+      titleShort: "Mail-Vorlagen",
       description: "Antworten sofort mit Variablen und Labels erstellen. Daten bleiben in deinem Browser.",
     },
     combinedText: {
@@ -201,6 +202,7 @@ export const appsDe: AppsDictionary = {
       empty: "Keine Vorlagen",
       noSubject: "Kein Betreff",
       selectPrompt: "Vorlage auswählen",
+      backToList: "← Liste",
     },
     search: {
       placeholder: "Vorlagen suchen...",
@@ -590,7 +592,7 @@ export const appsDe: AppsDictionary = {
   invoiceMaker: {
     shell: {
       title: "Form Maker",
-      description: "Zweispaltiges Formular für Rechnungen, Angebote, Lieferscheine oder Quittungen ausfüllen und als PDF speichern. Frühere Dokumente bleiben im Browser.",
+      description: "Erstellen Sie Rechnungen, Angebote, Lieferscheine oder Quittungen und speichern Sie sie als PDF. Frühere Dokumente bleiben im Browser.",
     },
     loading: "Wird geladen…",
     actions: {
@@ -600,7 +602,7 @@ export const appsDe: AppsDictionary = {
     },
     toolbar: {
       save: "💾 Aktuelles Dokument speichern",
-      saveShort: "💾 Speichern",
+      saveShort: "Speichern",
       load: "📂 Früheres Dokument laden",
       loadShort: "📂 Laden",
       preview: "Vorschau",
@@ -658,10 +660,19 @@ export const appsDe: AppsDictionary = {
     preview: {
       modalTitle: "Vorschau",
       hint: "Im Druckdialog „Als PDF speichern“ wählen, um eine Datei zu behalten.",
+      hintShort: "Tipps & Hinweise",
       emptyHint: "※ Schwach sichtbarer Platzhaltertext in leeren Feldern erscheint nicht im PDF / Druck — diese Stellen bleiben leer.",
       docLanguageNote: "PDF-/Drucksprache: {language}",
       print: "PDF exportieren (Drucken)",
+      printShort: "📄 PDF",
       close: "Schließen",
+    },
+    mobileWizard: {
+      stepOf: "{current} / {total}",
+      page1Label: "Parteien & Basis",
+      page2Label: "Einstellungen & Positionen",
+      next: "Weiter",
+      back: "Zurück",
     },
     install: {
       button: "Diese App zum Home-Bildschirm hinzufügen",

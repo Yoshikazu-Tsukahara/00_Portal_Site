@@ -100,13 +100,13 @@ export default function TemplateList({
   }
 
   return (
-    <ul className="h-full space-y-1.5 overflow-x-hidden overflow-y-auto overscroll-contain pr-0.5">
+    <ul className="space-y-1.5 touch-pan-y pr-0.5">
       {templates.map((tpl) => {
         const selected = tpl.id === selectedId;
         const tplTags = resolveTags(tags, tpl.tagIds ?? []);
         const pinned = Boolean(tpl.pinned);
         return (
-          <li key={tpl.id} className="min-w-0">
+          <li key={tpl.id} className="min-w-0 touch-pan-y">
             <div
               role="button"
               tabIndex={0}
@@ -117,7 +117,7 @@ export default function TemplateList({
                   onSelect(tpl.id);
                 }
               }}
-              className={`group relative min-h-11 cursor-pointer rounded-md border px-3 py-2.5 transition-colors active:scale-[0.99] ${
+              className={`group relative min-h-11 touch-pan-y cursor-pointer rounded-md border px-3 py-2.5 transition-colors active:scale-[0.99] ${
                 selected
                   ? "border-[var(--accent-strong)] bg-[var(--accent)] text-zinc-900 active:brightness-95"
                   : pinned

@@ -23,9 +23,11 @@ export const ko: PartialDictionary = {
     layoutToggle: {
       aria: "표시 너비 전환",
       caption: "Width",
+      portraitShort: "세로",
       defaultShort: "표준",
       wideShort: "넓게",
       fullShort: "전체",
+      portrait: "일반적인 세로(스마트폰 너비)로 표시",
       default: "표준 너비로 표시",
       wide: "넓은 너비로 표시",
       full: "화면 가득 표시",
@@ -155,6 +157,8 @@ export const ko: PartialDictionary = {
     safetyShort: "데이터는 브라우저에만 저장되며 서버로 전송되지 않습니다.",
     privacyBanner:
       "처리는 모두 이 브라우저에서 끝납니다. 파일이나 입력 내용이 외부로 전송되지 않습니다.",
+    privacyBannerShort:
+      "브라우저 안에서만 처리됩니다. 외부로 전송되지 않습니다.",
   },
   dataManager: {
     buttonTitle: "데이터 관리(백업·복원)",

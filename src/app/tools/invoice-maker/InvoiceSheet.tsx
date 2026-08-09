@@ -88,18 +88,18 @@ export default function InvoiceSheet({ data, labels }: InvoiceSheetProps) {
     >
       {/* .inv-sheet は flex 縦並び。この列が伸びることでフッターが用紙下端に付く */}
       <div className="flex flex-1 flex-col">
-        {/* ヘッダー：タイトルと発行情報 */}
-        <header className="flex items-start justify-between gap-8">
-          <div className="flex items-center gap-4">
+        {/* ヘッダー：タイトルと発行情報（画面は縦積み可・印刷は横並び維持） */}
+        <header className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-8 print:flex-row print:items-start print:justify-between print:gap-8">
+          <div className="flex min-w-0 items-center gap-3 sm:gap-4">
             {data.logoImageBase64 && (
               <img
                 src={data.logoImageBase64}
                 alt="Logo"
-                className="h-12 w-auto max-w-[140px] object-contain print:color-adjust-exact"
+                className="h-12 w-auto max-w-[min(140px,40%)] object-contain print:color-adjust-exact"
               />
             )}
-            <div>
-              <h2 className="inv-sheet__title">{documentTitle}</h2>
+            <div className="min-w-0">
+              <h2 className="inv-sheet__title break-words">{documentTitle}</h2>
               <span
                 aria-hidden
                 className="inv-sheet__rule"
@@ -108,11 +108,11 @@ export default function InvoiceSheet({ data, labels }: InvoiceSheetProps) {
             </div>
           </div>
           {metaRows.length > 0 ? (
-            <dl className="grid shrink-0 grid-cols-[auto_auto] gap-x-4 gap-y-1 text-[11px]">
+            <dl className="grid min-w-0 shrink-0 grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1 text-[11px] sm:grid-cols-[auto_auto] print:grid-cols-[auto_auto]">
               {metaRows.map((row) => (
                 <div key={row.label} className="contents">
                   <dt className="text-zinc-500">{row.label}</dt>
-                  <dd className="text-right font-medium text-zinc-900">
+                  <dd className="min-w-0 break-words text-right font-medium text-zinc-900">
                     {row.value}
                   </dd>
                 </div>
@@ -121,9 +121,9 @@ export default function InvoiceSheet({ data, labels }: InvoiceSheetProps) {
           ) : null}
         </header>
 
-        {/* 宛先と発行者 */}
-        <section className="mt-10 grid grid-cols-2 gap-8">
-          <div>
+        {/* 宛先と発行者（狭い画面では縦積み・印刷は2列） */}
+        <section className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 print:grid-cols-2 print:gap-8">
+          <div className="min-w-0">
             <p className="inv-sheet__caption">{toLabel}</p>
             <p className="mt-1.5 break-words text-[15px] font-semibold text-zinc-900">
               {data.to.name.trim() || (
@@ -140,9 +140,9 @@ export default function InvoiceSheet({ data, labels }: InvoiceSheetProps) {
               <MultiLine text={data.to.extra} />
             </div>
           </div>
-          <div className="relative">
+          <div className="relative min-w-0 overflow-hidden">
             <p className="inv-sheet__caption">{fromLabel}</p>
-            <div className="relative">
+            <div className="relative pr-14 print:pr-16">
               <p className="mt-1.5 break-words text-[13px] font-semibold text-zinc-900">
                 {data.from.name.trim() || (
                   <span className="font-normal text-zinc-300 print:invisible">
@@ -154,7 +154,7 @@ export default function InvoiceSheet({ data, labels }: InvoiceSheetProps) {
                 <img
                   src={data.stampImageBase64}
                   alt="Stamp"
-                  className="absolute -right-4 -top-2 h-14 w-14 object-contain opacity-90 mix-blend-multiply print:color-adjust-exact"
+                  className="absolute right-0 -top-2 h-14 w-14 max-w-[3.5rem] object-contain opacity-90 mix-blend-multiply print:color-adjust-exact"
                   style={{ mixBlendMode: "multiply" }}
                 />
               )}

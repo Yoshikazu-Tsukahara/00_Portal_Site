@@ -3,7 +3,6 @@
 import { BookmarkPlus, LoaderCircle } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AppShell from "@/components/AppShell";
-import PrivacyNotice from "@/components/PrivacyNotice";
 import { useI18n } from "@/i18n";
 import { loadLocalJson, removeLocalJson, useLocalStorageState } from "@/lib/localData";
 import InstallAppButton from "./InstallAppButton";
@@ -419,7 +418,6 @@ export default function LinkStockerPage() {
     >
       {/* 内部スクロールなし：カード増加に合わせてページ全体とフッターが伸びる */}
       <div className="flex flex-col gap-3 pb-2">
-        <PrivacyNotice />
         <form onSubmit={handleKeep}>
           <div className="flex items-center gap-2">
             <input

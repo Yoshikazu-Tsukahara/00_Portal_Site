@@ -19,6 +19,9 @@ export const en: Dictionary = {
     supportAria: "Support the developer (opens Stripe Checkout)",
     supportTitle: "Open support page",
     langToggleAria: "Switch display language",
+    menuAria: "Site menu",
+    menuOpen: "Open menu",
+    menuClose: "Close menu",
     homeNav: "Home",
     libraryNav: "Library",
     localOnlyBadge: "Zero outbound · fully local",
@@ -26,9 +29,11 @@ export const en: Dictionary = {
     layoutToggle: {
       aria: "Switch content width",
       caption: "Width",
+      portraitShort: "Phone",
       defaultShort: "Std",
       wideShort: "Wide",
       fullShort: "Full",
+      portrait: "Typical portrait (phone width)",
       default: "Default width",
       wide: "Wide layout",
       full: "Full width",
@@ -42,10 +47,6 @@ export const en: Dictionary = {
     openLibrary: "Open Library",
     emptyPins: "Home is empty",
     emptyPinsHint: "Pin apps from the Library to see them here.",
-    editHome: "Edit",
-    doneEditing: "Done",
-    editHint:
-      "Long-press or tap Edit. Stack apps to make a folder, or stack onto a folder to add. Drag sideways to reorder. Tap × to remove.",
     removeAria: "Remove {title} from Home",
     dragAria: "{title}. Drag or use arrow keys to reorder. Press G to folder with next",
     openAria: "Open {title}",
@@ -54,7 +55,7 @@ export const en: Dictionary = {
     reorderedAnnounce: "Moved {title} to position {n}",
     removedAnnounce: "Removed {title} from Home",
     editingAnnounce:
-      "Home editing mode. Stack icons to make folders, drag to reorder, tap × to remove. Done or Esc to finish.",
+      "Home editing mode. Stack icons to make folders, drag to reorder, tap × to remove. Tap empty space or press Esc to finish.",
     gridLabel: "Home apps",
     folderDefaultName: "Folder",
     openFolderAria: "Open {title}",
@@ -507,6 +508,8 @@ export const en: Dictionary = {
       "Data stays in your browser and is never sent to a server.",
     privacyBanner:
       "Everything runs in this browser. Your files and inputs stay on your device.",
+    privacyBannerShort:
+      "Runs in this browser. Nothing is sent elsewhere.",
   },
   dataManager: {
     buttonTitle: "Data management (backup & restore)",

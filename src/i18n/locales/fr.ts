@@ -23,9 +23,11 @@ export const fr: PartialDictionary = {
     layoutToggle: {
       aria: "Changer la largeur d’affichage",
       caption: "Width",
+      portraitShort: "Portrait",
       defaultShort: "Normal",
       wideShort: "Large",
       fullShort: "Plein",
+      portrait: "Affichage portrait typique (largeur téléphone)",
       default: "Afficher en largeur normale",
       wide: "Afficher plus large",
       full: "Afficher en plein écran",
@@ -155,6 +157,8 @@ export const fr: PartialDictionary = {
     safetyShort: "Données locales uniquement ; rien n’est envoyé au serveur.",
     privacyBanner:
       "Tout est traité dans ce navigateur. Rien n’est envoyé à l’extérieur.",
+    privacyBannerShort:
+      "Tout se passe dans ce navigateur. Rien n’est envoyé ailleurs.",
   },
   dataManager: {
     buttonTitle: "Données (sauvegarde et restauration)",

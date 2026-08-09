@@ -12,6 +12,7 @@ import { useRef } from "react";
 import type { Tool } from "@/data/tools";
 import { fmt, useI18n } from "@/i18n";
 import type { HomeFolderItem } from "@/lib/homePins";
+import { type LaunchOrigin, readLaunchOrigin } from "@/lib/launcher/motion";
 
 type DragListeners = Record<string, unknown> | undefined;
 
@@ -27,7 +28,9 @@ type Props = {
   attributes?: DraggableAttributes;
   listeners?: DragListeners;
   onEnterEdit: () => void;
-  onOpen: () => void;
+  /** アイコン以外（セル余白）タップで編集終了 */
+  onExitEdit?: () => void;
+  onOpen: (origin: LaunchOrigin | null) => void;
   onDissolve: () => void;
   onMoveLeft?: () => void;
   onMoveRight?: () => void;
@@ -52,6 +55,7 @@ export default function LauncherFolderIcon({
   attributes,
   listeners,
   onEnterEdit,
+  onExitEdit,
   onOpen,
   onDissolve,
   onMoveLeft,
@@ -67,6 +71,14 @@ export default function LauncherFolderIcon({
 
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const longPressFired = useRef(false);
+  const glyphRef = useRef<HTMLSpanElement | null>(null);
+
+  function openWithOrigin() {
+    const el =
+      glyphRef.current?.querySelector(".launcher-icon__glyph") ??
+      glyphRef.current;
+    onOpen(readLaunchOrigin(el));
+  }
 
   function clearLongPress() {
     if (longPressTimer.current !== null) {
@@ -103,14 +115,18 @@ export default function LauncherFolderIcon({
       onDissolve();
     } else if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
-      onOpen();
+      openWithOrigin();
     }
   }
 
   const slots = [0, 1, 2, 3].map((i) => previewTools[i] ?? null);
 
   const glyph = (
-    <span className="launcher-icon__glyph launcher-folder__glyph" aria-hidden>
+    <span
+      ref={glyphRef}
+      className="launcher-icon__glyph launcher-folder__glyph"
+      aria-hidden
+    >
       <span className="launcher-folder__grid">
         {slots.map((tool, i) => (
           <span key={i} className="launcher-folder__cell">
@@ -133,6 +149,11 @@ export default function LauncherFolderIcon({
       className={`launcher-icon-item${isDragging ? " launcher-icon-item--dragging" : ""}${
         editing ? " launcher-icon-item--editing" : ""
       }${combineTarget ? " launcher-icon-item--combine" : ""}`}
+      onClick={(e) => {
+        if (!editing || !onExitEdit) return;
+        if ((e.target as HTMLElement).closest(".launcher-icon")) return;
+        onExitEdit();
+      }}
     >
       {editing ? (
         <div
@@ -147,7 +168,7 @@ export default function LauncherFolderIcon({
           onKeyDown={onKeyDownEdit}
           onDoubleClick={(e) => {
             e.preventDefault();
-            onOpen();
+            openWithOrigin();
           }}
         >
           <span className="launcher-icon__glyph-wrap">
@@ -168,7 +189,6 @@ export default function LauncherFolderIcon({
             </button>
             {glyph}
           </span>
-          <span className="launcher-icon__label">{title}</span>
         </div>
       ) : (
         <button
@@ -188,7 +208,7 @@ export default function LauncherFolderIcon({
               longPressFired.current = false;
               return;
             }
-            onOpen();
+            openWithOrigin();
           }}
           onContextMenu={(e: MouseEvent) => {
             e.preventDefault();
@@ -196,9 +216,11 @@ export default function LauncherFolderIcon({
           }}
         >
           <span className="launcher-icon__glyph-wrap">{glyph}</span>
-          <span className="launcher-icon__label">{title}</span>
         </button>
       )}
+      <span className="launcher-icon__label" aria-hidden>
+        {title}
+      </span>
     </li>
   );
 }

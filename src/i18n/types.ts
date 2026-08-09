@@ -58,6 +58,10 @@ export type Dictionary = {
     supportAria: string;
     supportTitle: string;
     langToggleAria: string;
+    /** スマホ用ヘッダーメニュー */
+    menuAria: string;
+    menuOpen: string;
+    menuClose: string;
     /** ホーム（ランチャー）ナビ */
     homeNav: string;
     /** ライブラリ（ストア）ナビ */
@@ -72,10 +76,12 @@ export type Dictionary = {
       /** トグル上の小さな見出し */
       caption: string;
       /** ボタン上の短いラベル */
+      portraitShort: string;
       defaultShort: string;
       wideShort: string;
       fullShort: string;
       /** title / aria-label 用の説明 */
+      portrait: string;
       default: string;
       wide: string;
       full: string;
@@ -91,10 +97,6 @@ export type Dictionary = {
     /** ピンが空のとき */
     emptyPins: string;
     emptyPinsHint: string;
-    /** ホーム編集モード */
-    editHome: string;
-    doneEditing: string;
-    editHint: string;
     removeAria: string;
     dragAria: string;
     openAria: string;
@@ -222,6 +224,8 @@ export type Dictionary = {
     safetyShort: string;
     /** データ系ツール上部の共通プライバシー案内（穏やかな一文） */
     privacyBanner: string;
+    /** スマホ／縦型向け（最大2行に収まる短い案内） */
+    privacyBannerShort: string;
   };
   dataManager: {
     buttonTitle: string;

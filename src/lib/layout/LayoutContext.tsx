@@ -57,7 +57,7 @@ function applyLayoutModeToDom(mode: LayoutMode) {
 }
 
 /**
- * サイト全体の表示幅（default / wide / full）を共有する。
+ * サイト全体の表示幅（portrait / default / wide / full）を共有する。
  *
  * - 初回 SSR / ハイドレーション: DEFAULT（サーバーと一致）
  * - 一度復元したあとの再マウント: memoryLayoutMode を即使う（ページ遷移のチラつき防止）

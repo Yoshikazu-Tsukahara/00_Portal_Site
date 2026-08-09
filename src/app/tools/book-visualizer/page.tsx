@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react";
 
 import AppShell from "@/components/AppShell";
-import PrivacyNotice from "@/components/PrivacyNotice";
 import { useI18n } from "@/i18n";
 import { useLocalStorageState } from "@/lib/localData";
 import EditMode from "./EditMode";
@@ -179,7 +178,6 @@ export default function BookVisualizerPage() {
         }}
       >
         <div className="flex min-h-0 flex-1 flex-col gap-3">
-          <PrivacyNotice />
 
           {notice ? (
             <p

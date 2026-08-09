@@ -17,13 +17,22 @@ import {
   useSortable,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import LauncherAppLaunch from "@/components/LauncherAppLaunch";
 import LauncherFolderIcon from "@/components/LauncherFolderIcon";
 import LauncherFolderSheet from "@/components/LauncherFolderSheet";
 import LauncherIcon from "@/components/LauncherIcon";
 import { findToolById, type Tool } from "@/data/tools";
 import { fmt, useI18n } from "@/i18n";
 import type { HomeFolderItem, HomeItem } from "@/lib/homePins";
+import type { LaunchOrigin } from "@/lib/launcher/motion";
+
+type AppLaunchState = {
+  href: string;
+  icon: ReactNode;
+  title: string;
+  origin: LaunchOrigin | null;
+};
 
 type Props = {
   items: HomeItem[];
@@ -96,11 +105,13 @@ function SortableHomeItem({
   combineTarget,
   freezeLayout,
   onEnterEdit,
+  onExitEdit,
   onRemove,
   onMove,
   onGroupWithNext,
   onOpenFolder,
   onDissolveFolder,
+  onLaunchApp,
   total,
 }: {
   item: HomeItem;
@@ -110,11 +121,13 @@ function SortableHomeItem({
   /** 重ね操作中は他アイコンをずらさない（ターゲットが逃げないように） */
   freezeLayout: boolean;
   onEnterEdit: () => void;
+  onExitEdit: () => void;
   onRemove: (id: string) => void;
   onMove: (id: string, toIndex: number) => void;
   onGroupWithNext: (id: string) => void;
-  onOpenFolder: (folderId: string) => void;
+  onOpenFolder: (folderId: string, origin: LaunchOrigin | null) => void;
   onDissolveFolder: (folderId: string) => void;
+  onLaunchApp: (payload: AppLaunchState) => void;
   total: number;
 }) {
   const {
@@ -150,6 +163,7 @@ function SortableHomeItem({
     attributes: editing ? attributes : undefined,
     listeners: editing ? listeners : undefined,
     onEnterEdit,
+    onExitEdit,
     canMoveLeft: index > 0,
     canMoveRight: index < total - 1,
     onMoveLeft: () => onMove(item.id, index - 1),
@@ -162,7 +176,7 @@ function SortableHomeItem({
         {...shared}
         folder={item}
         previewTools={previewToolsForFolder(item)}
-        onOpen={() => onOpenFolder(item.id)}
+        onOpen={(origin) => onOpenFolder(item.id, origin)}
         onDissolve={() => onDissolveFolder(item.id)}
       />
     );
@@ -175,6 +189,7 @@ function SortableHomeItem({
     <LauncherIcon
       {...shared}
       tool={tool}
+      onLaunchApp={onLaunchApp}
       onRemove={() => onRemove(tool.id)}
       onGroupWithNext={
         index < total - 1 ? () => onGroupWithNext(item.id) : undefined
@@ -185,7 +200,7 @@ function SortableHomeItem({
 
 /**
  * ホームのアプリアイコングリッド。
- * 長押し／編集で並べ替え・フォルダ化・削除（スマホのホームに近い操作）。
+ * 長押しで並べ替え・フォルダ化・削除（余白タップまたは Esc で終了）。
  */
 export default function LauncherGrid({
   items,
@@ -206,6 +221,11 @@ export default function LauncherGrid({
   /** 中央ゾーン滞在中（タイマー待ち含む）→ レイアウト固定用 */
   const [combineAimId, setCombineAimId] = useState<string | null>(null);
   const [openFolderId, setOpenFolderId] = useState<string | null>(null);
+  const [openFolderOrigin, setOpenFolderOrigin] =
+    useState<LaunchOrigin | null>(null);
+  /** フォルダ開いているあいだホームを少し沈める（閉じ始めですぐ戻す） */
+  const [folderDimmed, setFolderDimmed] = useState(false);
+  const [appLaunch, setAppLaunch] = useState<AppLaunchState | null>(null);
   const combineTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hoverOverId = useRef<string | null>(null);
   const activeDragId = useRef<string | null>(null);
@@ -237,6 +257,18 @@ export default function LauncherGrid({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [editing, openFolderId]);
+
+  useEffect(() => {
+    if (editing) return;
+    // 編集終了時に合成ハイライトをクリア
+    clearCombineTimer();
+    hoverOverId.current = null;
+    combineReadyRef.current = null;
+    combineAimIdRef.current = null;
+    setCombineTargetId(null);
+    setCombineAimId(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editing]);
 
   useEffect(() => {
     return () => {
@@ -457,73 +489,89 @@ export default function LauncherGrid({
 
   const ids = items.map((item) => item.id);
 
-  return (
-    <div className="flex min-h-0 flex-1 flex-col gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="max-w-xl text-[12px] leading-relaxed text-zinc-500 sm:text-[13px]">
-          {editing && (combineTargetId || combineAimId)
-            ? items.find((item) => item.id === (combineTargetId ?? combineAimId))
-                ?.type === "folder"
-              ? t.home.combineAddHint
-              : t.home.combineHint
-            : t.home.editHint}
-        </p>
-        <button
-          type="button"
-          className={
-            editing
-              ? "btn-primary !px-4 !py-2 text-xs sm:text-sm"
-              : "btn-secondary !px-4 !py-2 text-xs sm:text-sm"
-          }
-          aria-pressed={editing}
-          onClick={() => setEditing((v) => !v)}
-        >
-          {editing ? t.home.doneEditing : t.home.editHome}
-        </button>
-      </div>
+  function exitEdit() {
+    if (!editing) return;
+    setEditing(false);
+    resetCombine();
+  }
 
+  function handleOpenFolder(folderId: string, origin: LaunchOrigin | null) {
+    setOpenFolderOrigin(origin);
+    setOpenFolderId(folderId);
+    setFolderDimmed(true);
+  }
+
+  function handleCloseFolder() {
+    setOpenFolderId(null);
+    setOpenFolderOrigin(null);
+    setFolderDimmed(false);
+  }
+
+  return (
+    <div
+      className={`launcher-home flex min-h-0 flex-1 flex-col${
+        folderDimmed ? " launcher-home--folder-open" : ""
+      }${appLaunch ? " launcher-home--launching" : ""}`}
+      onClick={(e) => {
+        // アイコン以外（余白）をタップしたら編集終了
+        if (editing && e.target === e.currentTarget) exitEdit();
+      }}
+    >
       <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
         {announce}
       </div>
 
-      <DndContext
-        id={dndId}
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragStart={handleDragStart}
-        onDragOver={handleDragOver}
-        onDragEnd={handleDragEnd}
-        onDragCancel={handleDragCancel}
-      >
-        <SortableContext items={ids} strategy={rectSortingStrategy}>
-          <ul className="launcher-grid" aria-label={t.home.gridLabel}>
-            {items.map((item, index) => (
-              <SortableHomeItem
-                key={item.id}
-                item={item}
-                index={index}
-                editing={editing}
-                combineTarget={combineTargetId === item.id}
-                freezeLayout={combineAimId !== null}
-                total={items.length}
-                onEnterEdit={enterEdit}
-                onRemove={handleRemove}
-                onMove={handleMove}
-                onGroupWithNext={handleGroupWithNext}
-                onOpenFolder={setOpenFolderId}
-                onDissolveFolder={handleDissolve}
-              />
-            ))}
-          </ul>
-        </SortableContext>
-      </DndContext>
+      {/* ぼかしは背後グリッドだけ（シートは外に出してモザイク化を防ぐ） */}
+      <div className="launcher-home__stage">
+        <DndContext
+          id={dndId}
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={handleDragStart}
+          onDragOver={handleDragOver}
+          onDragEnd={handleDragEnd}
+          onDragCancel={handleDragCancel}
+        >
+          <SortableContext items={ids} strategy={rectSortingStrategy}>
+            <ul
+              className="launcher-grid"
+              aria-label={t.home.gridLabel}
+              onClick={(e) => {
+                if (editing && e.target === e.currentTarget) exitEdit();
+              }}
+            >
+              {items.map((item, index) => (
+                <SortableHomeItem
+                  key={item.id}
+                  item={item}
+                  index={index}
+                  editing={editing}
+                  combineTarget={combineTargetId === item.id}
+                  freezeLayout={combineAimId !== null}
+                  total={items.length}
+                  onEnterEdit={enterEdit}
+                  onExitEdit={exitEdit}
+                  onRemove={handleRemove}
+                  onMove={handleMove}
+                  onGroupWithNext={handleGroupWithNext}
+                  onOpenFolder={handleOpenFolder}
+                  onDissolveFolder={handleDissolve}
+                  onLaunchApp={setAppLaunch}
+                />
+              ))}
+            </ul>
+          </SortableContext>
+        </DndContext>
+      </div>
 
       {openFolder ? (
         <LauncherFolderSheet
           folder={openFolder}
           tools={openFolderTools}
           editing={editing}
-          onClose={() => setOpenFolderId(null)}
+          origin={openFolderOrigin}
+          onClosing={() => setFolderDimmed(false)}
+          onClose={handleCloseFolder}
           onRename={(name) => onRenameFolder(openFolder.id, name)}
           onEject={(appId) => {
             const title = t.tools[appId]?.title ?? appId;
@@ -533,6 +581,16 @@ export default function LauncherGrid({
           onRemoveFromHome={(appId) => {
             handleRemove(appId);
           }}
+          onLaunchApp={setAppLaunch}
+        />
+      ) : null}
+
+      {appLaunch ? (
+        <LauncherAppLaunch
+          href={appLaunch.href}
+          icon={appLaunch.icon}
+          title={appLaunch.title}
+          origin={appLaunch.origin}
         />
       ) : null}
     </div>

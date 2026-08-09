@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 
 import AppShell from "@/components/AppShell";
-import PrivacyNotice from "@/components/PrivacyNotice";
 import { useI18n } from "@/i18n";
+import { useLayout } from "@/lib/layout";
 import {
   LoadInvoiceDialog,
   SaveInvoiceDialog,
@@ -39,6 +39,7 @@ import {
 
 export default function InvoiceMakerPage() {
   const { t, locale, ready } = useI18n();
+  const { layoutMode } = useLayout();
   const copy = t.apps.invoiceMaker;
   const [data, setData] = useState<InvoiceData | null>(null);
   const [history, setHistory] = useState<SavedInvoice[]>([]);
@@ -46,6 +47,18 @@ export default function InvoiceMakerPage() {
   const [saveOpen, setSaveOpen] = useState(false);
   const [loadOpen, setLoadOpen] = useState(false);
   const [savedToast, setSavedToast] = useState(false);
+  /** 実機スマホ、または表示幅「縦型」では短いボタンラベル */
+  const [narrowViewport, setNarrowViewport] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    const sync = () => setNarrowViewport(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  const compactChrome = narrowViewport || layoutMode === "portrait";
 
   // 初回のみ: 空ストアならサイト言語から書類言語・通貨の初期値を推測。
   // 以降ヘッダーでサイト言語を変えても、書類言語（docLocale）は自動では変えない。
@@ -202,30 +215,41 @@ export default function InvoiceMakerPage() {
       isPwa
       afterDataManager={<InstallAppButton copy={copy.install} />}
       actions={
-        <div className="flex flex-nowrap items-center gap-1.5">
+        <div
+          className={
+            compactChrome
+              ? "grid w-full max-w-full grid-cols-3 gap-1.5"
+              : "flex w-full max-w-full flex-nowrap items-center justify-end gap-2"
+          }
+        >
           <button
             type="button"
             onClick={() => setSaveOpen(true)}
-            className="btn-secondary !px-2 !py-1.5 text-[11px] sm:!px-2.5 sm:text-xs"
+            title={copy.toolbar.save}
+            aria-label={copy.toolbar.save}
+            className="btn-secondary min-w-0 !px-2 !py-1.5 text-center text-[11px] leading-tight active:scale-[0.98] active:bg-zinc-100 md:!px-3 md:text-sm"
           >
-            <span className="sm:hidden">{copy.toolbar.saveShort}</span>
-            <span className="hidden sm:inline">{copy.toolbar.save}</span>
+            {compactChrome ? copy.toolbar.saveShort : copy.toolbar.save}
           </button>
           <button
             type="button"
             onClick={() => setLoadOpen(true)}
-            className="btn-secondary !px-2 !py-1.5 text-[11px] sm:!px-2.5 sm:text-xs"
+            title={copy.toolbar.load}
+            aria-label={copy.toolbar.load}
+            className="btn-secondary min-w-0 !px-2 !py-1.5 text-center text-[11px] leading-tight active:scale-[0.98] active:bg-zinc-100 md:!px-3 md:text-sm"
           >
-            <span className="sm:hidden">{copy.toolbar.loadShort}</span>
-            <span className="hidden sm:inline">{copy.toolbar.load}</span>
+            {compactChrome ? copy.toolbar.loadShort : copy.toolbar.load}
           </button>
           <button
             type="button"
             onClick={startNextInvoice}
-            className="btn-secondary !px-2 !py-1.5 text-[11px] sm:!px-2.5 sm:text-xs"
+            title={copy.actions.newInvoice}
+            aria-label={copy.actions.newInvoice}
+            className="btn-secondary min-w-0 !px-2 !py-1.5 text-center text-[11px] leading-tight active:scale-[0.98] active:bg-zinc-100 md:!px-3 md:text-sm"
           >
-            <span className="sm:hidden">{copy.actions.newInvoiceShort}</span>
-            <span className="hidden sm:inline">{copy.actions.newInvoice}</span>
+            {compactChrome
+              ? copy.actions.newInvoiceShort
+              : copy.actions.newInvoice}
           </button>
         </div>
       }
@@ -241,60 +265,60 @@ export default function InvoiceMakerPage() {
         },
       }}
     >
-      <PrivacyNotice className="mb-3" />
+      <div className="w-full min-w-0 max-w-full overflow-x-hidden">
+        <InvoiceForm
+          data={data}
+          siteLocale={locale}
+          copy={copy}
+          onPatch={patch}
+          onPatchParty={patchParty}
+          onAddItem={addItem}
+          onPatchItem={patchItem}
+          onRemoveItem={removeItem}
+          onPreview={() => setPreviewOpen(true)}
+          onPrint={handlePrint}
+        />
 
-      <InvoiceForm
-        data={data}
-        siteLocale={locale}
-        copy={copy}
-        onPatch={patch}
-        onPatchParty={patchParty}
-        onAddItem={addItem}
-        onPatchItem={patchItem}
-        onRemoveItem={removeItem}
-        onPreview={() => setPreviewOpen(true)}
-        onPrint={handlePrint}
-      />
+        {savedToast ? (
+          <p
+            className="mt-2 text-center text-[11px] font-medium text-emerald-600"
+            role="status"
+          >
+            {copy.history.savedToast}
+          </p>
+        ) : null}
 
-      {savedToast ? (
-        <p
-          className="mt-2 text-center text-[11px] font-medium text-emerald-600"
-          role="status"
+        <PreviewModal
+          open={previewOpen}
+          copy={copy.preview}
+          docLanguageLabel={docLocaleLabel(data.docLocale)}
+          onClose={() => setPreviewOpen(false)}
+          onPrint={handlePrint}
         >
-          {copy.history.savedToast}
-        </p>
-      ) : null}
+          {sheet}
+        </PreviewModal>
 
-      <PreviewModal
-        open={previewOpen}
-        copy={copy.preview}
-        docLanguageLabel={docLocaleLabel(data.docLocale)}
-        onClose={() => setPreviewOpen(false)}
-        onPrint={handlePrint}
-      >
-        {sheet}
-      </PreviewModal>
+        <SaveInvoiceDialog
+          open={saveOpen}
+          copy={copy.history}
+          suggestedName={suggestSaveName(data)}
+          onClose={() => setSaveOpen(false)}
+          onSave={handleSave}
+        />
 
-      <SaveInvoiceDialog
-        open={saveOpen}
-        copy={copy.history}
-        suggestedName={suggestSaveName(data)}
-        onClose={() => setSaveOpen(false)}
-        onSave={handleSave}
-      />
+        <LoadInvoiceDialog
+          open={loadOpen}
+          copy={copy.history}
+          history={history}
+          locale={locale}
+          onClose={() => setLoadOpen(false)}
+          onLoad={handleLoad}
+          onDelete={handleDelete}
+          onLoadSample={handleLoadSample}
+        />
 
-      <LoadInvoiceDialog
-        open={loadOpen}
-        copy={copy.history}
-        history={history}
-        locale={locale}
-        onClose={() => setLoadOpen(false)}
-        onLoad={handleLoad}
-        onDelete={handleDelete}
-        onLoadSample={handleLoadSample}
-      />
-
-      <PrintLayer>{sheet}</PrintLayer>
+        <PrintLayer>{sheet}</PrintLayer>
+      </div>
     </AppShell>
   );
 }

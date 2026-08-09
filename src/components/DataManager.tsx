@@ -98,7 +98,7 @@ export default function DataManager({
         title={dm.buttonTitle}
         aria-haspopup="dialog"
         aria-label={dm.buttonAria}
-        className="group inline-flex items-center gap-1.5 rounded-full border border-zinc-200/90 bg-zinc-100/80 px-2.5 py-1 text-[11px] font-medium tracking-tight text-zinc-600 shadow-[0_1px_0_rgba(24,24,27,0.04)] transition-all duration-200 ease-out hover:-translate-y-px hover:border-zinc-300 hover:bg-white hover:text-zinc-900 hover:shadow-sm active:translate-y-0 active:shadow-none sm:gap-1.5 sm:px-3 sm:py-1 sm:text-xs"
+        className="app-shell-chrome-btn group inline-flex items-center gap-1.5 rounded-full border border-zinc-200/90 bg-zinc-100/80 px-2.5 py-1 text-[11px] font-medium tracking-tight text-zinc-600 shadow-[0_1px_0_rgba(24,24,27,0.04)] transition-all duration-200 ease-out hover:-translate-y-px hover:border-zinc-300 hover:bg-white hover:text-zinc-900 hover:shadow-sm active:translate-y-0 active:shadow-none sm:gap-1.5 sm:px-3 sm:py-1 sm:text-xs"
       >
         <span
           aria-hidden
@@ -106,8 +106,12 @@ export default function DataManager({
         >
           💾
         </span>
-        <span className="hidden sm:inline">{dm.buttonLabel}</span>
-        <span className="sm:hidden">{dm.buttonLabelShort}</span>
+        <span className="app-shell-chrome-label hidden sm:inline">
+          {dm.buttonLabel}
+        </span>
+        <span className="app-shell-chrome-label sm:hidden">
+          {dm.buttonLabelShort}
+        </span>
       </button>
 
       {open ? (

@@ -23,9 +23,11 @@ export const zhTW: PartialDictionary = {
     layoutToggle: {
       aria: "切換顯示寬度",
       caption: "Width",
+      portraitShort: "直向",
       defaultShort: "標準",
       wideShort: "較寬",
       fullShort: "全寬",
+      portrait: "以常見直向（手機寬度）顯示",
       default: "以標準寬度顯示",
       wide: "以較寬寬度顯示",
       full: "全螢幕顯示",
@@ -155,6 +157,8 @@ export const zhTW: PartialDictionary = {
     safetyShort: "資料僅保存在瀏覽器內，不會傳送到伺服器。",
     privacyBanner:
       "處理全部在此瀏覽器內完成。檔案與輸入內容不會傳送到外部。",
+    privacyBannerShort:
+      "全部在瀏覽器內完成，不會向外傳送。",
   },
   dataManager: {
     buttonTitle: "資料管理（備份與還原）",

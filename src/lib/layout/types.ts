@@ -1,7 +1,12 @@
 /** サイト全体の表示幅モード（PC 向け。狭い画面では実質フル幅） */
-export type LayoutMode = "default" | "wide" | "full";
+export type LayoutMode = "portrait" | "default" | "wide" | "full";
 
-export const LAYOUT_MODES: LayoutMode[] = ["default", "wide", "full"];
+export const LAYOUT_MODES: LayoutMode[] = [
+  "portrait",
+  "default",
+  "wide",
+  "full",
+];
 
 /** localStorage に保存するキー */
 export const LAYOUT_MODE_STORAGE_KEY = "blank-note:layout-mode";
@@ -13,7 +18,12 @@ export const LAYOUT_MODE_DATASET_ATTR = "layoutMode";
 export const DEFAULT_LAYOUT_MODE: LayoutMode = "default";
 
 export function isLayoutMode(value: unknown): value is LayoutMode {
-  return value === "default" || value === "wide" || value === "full";
+  return (
+    value === "portrait" ||
+    value === "default" ||
+    value === "wide" ||
+    value === "full"
+  );
 }
 
 /**
@@ -30,4 +40,4 @@ export function layoutContentClass(_mode?: LayoutMode): string {
  * 初回ペイント前に localStorage から data-layout-mode を復元するインラインスクリプト。
  * React ハイドレーションより先に幅を確定させ、チラつきを防ぐ。
  */
-export const LAYOUT_MODE_BOOTSTRAP_SCRIPT = `(function(){try{var k=${JSON.stringify(LAYOUT_MODE_STORAGE_KEY)};var m=localStorage.getItem(k);if(m==="default"||m==="wide"||m==="full"){document.documentElement.dataset.${LAYOUT_MODE_DATASET_ATTR}=m;}else{document.documentElement.dataset.${LAYOUT_MODE_DATASET_ATTR}="default";}}catch(e){document.documentElement.dataset.${LAYOUT_MODE_DATASET_ATTR}="default";}})();`;
+export const LAYOUT_MODE_BOOTSTRAP_SCRIPT = `(function(){try{var k=${JSON.stringify(LAYOUT_MODE_STORAGE_KEY)};var m=localStorage.getItem(k);if(m==="portrait"||m==="default"||m==="wide"||m==="full"){document.documentElement.dataset.${LAYOUT_MODE_DATASET_ATTR}=m;}else{document.documentElement.dataset.${LAYOUT_MODE_DATASET_ATTR}="default";}}catch(e){document.documentElement.dataset.${LAYOUT_MODE_DATASET_ATTR}="default";}})();`;

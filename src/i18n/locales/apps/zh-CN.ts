@@ -5,6 +5,7 @@ export const appsZhCN: AppsDictionary = {
   mailTemplate: {
     shell: {
       title: "智能邮件模板管理",
+      titleShort: "邮件模板",
       description: "用变量与标签即时撰写回复。数据保留在浏览器中。",
     },
     combinedText: {
@@ -201,6 +202,7 @@ export const appsZhCN: AppsDictionary = {
       empty: "暂无模板",
       noSubject: "无主题",
       selectPrompt: "选择一个模板",
+      backToList: "←列表",
     },
     search: {
       placeholder: "搜索模板...",
@@ -590,7 +592,7 @@ export const appsZhCN: AppsDictionary = {
   invoiceMaker: {
     shell: {
       title: "单据制作",
-      description: "用双栏表单填写发票、报价单、送货单或收据，然后保存为 PDF。过往单据保留在浏览器中。",
+      description: "填写发票、报价单、送货单或收据，并从预览保存为 PDF。过往单据保留在浏览器中。",
     },
     loading: "加载中…",
     actions: {
@@ -600,7 +602,7 @@ export const appsZhCN: AppsDictionary = {
     },
     toolbar: {
       save: "💾 保存当前单据",
-      saveShort: "💾 保存",
+      saveShort: "保存",
       load: "📂 加载过往单据",
       loadShort: "📂 加载",
       preview: "预览",
@@ -658,10 +660,19 @@ export const appsZhCN: AppsDictionary = {
     preview: {
       modalTitle: "预览",
       hint: "在打印对话框中选择“另存为 PDF”即可保存文件。",
+      hintShort: "用法与注意",
       emptyHint: "※ 空字段的淡色占位文字不会出现在 PDF / 打印中——这些位置将保持空白。",
       docLanguageNote: "PDF／打印语言：{language}",
       print: "导出 PDF（打印）",
+      printShort: "📄 PDF",
       close: "关闭",
+    },
+    mobileWizard: {
+      stepOf: "{current} / {total}",
+      page1Label: "对方与基本",
+      page2Label: "设置与明细",
+      next: "下一步",
+      back: "返回",
     },
     install: {
       button: "将此应用添加到主屏幕",

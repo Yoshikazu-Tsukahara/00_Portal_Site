@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import LayoutToggle from "@/components/LayoutToggle";
 import LocalOnlyBadge from "@/components/LocalOnlyBadge";
 import { LanguageToggle, useI18n } from "@/i18n";
@@ -16,14 +16,19 @@ const SITE_HEADER_HEIGHT_VAR = "--site-header-height";
 
 /**
  * サイト共通ヘッダー。
- * - タイトル・安心バッジ・ライブラリを1行に並べる（ホームはロゴ兼用）
- * - 表示幅スイッチはヘッダー中央（ビューポート中央）に固定
+ * - PC: タイトル・バッジ・ライブラリ・言語・応援・幅トグル
+ * - スマホ／縦型プレビュー: ロゴ＋メニュー。項目はリストにまとめる
  */
 export default function Header() {
-  const { t, locale } = useI18n();
-  const { contentClassName } = useLayout();
+  const { t } = useI18n();
+  const { contentClassName, layoutMode } = useLayout();
   const pathname = usePathname();
   const headerRef = useRef<HTMLElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const menuPanelId = useId();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const isPortrait = layoutMode === "portrait";
 
   useEffect(() => {
     const el = headerRef.current;
@@ -45,7 +50,38 @@ export default function Header() {
       ro.disconnect();
       window.removeEventListener("resize", syncHeight);
     };
-  }, []);
+  }, [layoutMode, menuOpen]);
+
+  // ページ遷移でメニューを閉じる
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setMenuOpen(false);
+        menuButtonRef.current?.focus();
+      }
+    }
+
+    function onPointerDown(e: PointerEvent) {
+      const target = e.target as Node;
+      if (menuRef.current?.contains(target)) return;
+      if (menuButtonRef.current?.contains(target)) return;
+      setMenuOpen(false);
+    }
+
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("pointerdown", onPointerDown);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("pointerdown", onPointerDown);
+    };
+  }, [menuOpen]);
 
   const libraryActive =
     pathname === "/library" || Boolean(pathname?.startsWith("/library/"));
@@ -53,29 +89,131 @@ export default function Header() {
   return (
     <header
       ref={headerRef}
-      className="sticky top-0 z-50 w-full border-b border-zinc-200 bg-[color-mix(in_srgb,var(--background)_92%,white)] backdrop-blur-md"
+      className={`site-header sticky top-0 z-50 w-full border-b border-zinc-200 bg-[color-mix(in_srgb,var(--background)_92%,white)] backdrop-blur-md${
+        isPortrait ? " site-header--portrait" : ""
+      }`}
     >
       <div className="relative">
+        {/* スマホ／縦型：ロゴ＋メニューボタンのみ（PC 通常表示では出さない） */}
         <div
-          className={`flex items-center justify-between gap-x-4 gap-y-2 py-3 ${contentClassName}`}
+          className={`site-header__bar site-header__bar--compact items-center justify-between gap-3 py-2.5 ${
+            isPortrait ? "flex" : "flex lg:hidden"
+          } ${contentClassName}`}
         >
-          {/* 左：タイトル → 安心バッジ → ライブラリ（1行） */}
-          <div className="relative z-10 flex min-w-0 items-center gap-2.5 sm:gap-3.5">
+          <Link
+            href="/"
+            className="site-header__brand font-display shrink-0 text-base font-bold leading-none tracking-tight text-zinc-900 transition-opacity hover:opacity-70"
+          >
+            {t.brand}
+          </Link>
+
+          <button
+            ref={menuButtonRef}
+            type="button"
+            className="site-header__menu-btn"
+            aria-expanded={menuOpen}
+            aria-controls={menuPanelId}
+            aria-label={menuOpen ? t.header.menuClose : t.header.menuOpen}
+            onClick={() => setMenuOpen((v) => !v)}
+          >
+            <span className="site-header__menu-icon" aria-hidden>
+              {menuOpen ? (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M6 6l12 12M18 6L6 18"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              ) : (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M4 7h16M4 12h16M4 17h16"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              )}
+            </span>
+          </button>
+        </div>
+
+        {menuOpen ? (
+          <div
+            ref={menuRef}
+            id={menuPanelId}
+            className={`site-header__menu ${
+              isPortrait ? "" : "lg:hidden"
+            } ${contentClassName}`}
+            role="region"
+            aria-label={t.header.menuAria}
+          >
+            <ul className="site-header__menu-list">
+              <li>
+                <Link
+                  href="/library"
+                  className={`site-header__menu-link${
+                    libraryActive ? " site-header__menu-link--active" : ""
+                  }`}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {t.header.libraryNav}
+                </Link>
+              </li>
+              <li className="site-header__menu-item">
+                <span className="site-header__menu-label">
+                  {t.header.langToggleAria}
+                </span>
+                <LanguageToggle id="site-lang-select-mobile" fullWidth />
+              </li>
+              {isPortrait ? (
+                <li className="site-header__menu-item">
+                  <span className="site-header__menu-label">
+                    {t.header.layoutToggle.aria}
+                  </span>
+                  <LayoutToggle />
+                </li>
+              ) : null}
+              <li>
+                <a
+                  href={SUPPORT_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="site-header__menu-link"
+                  aria-label={t.header.supportAria}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {t.header.support}
+                </a>
+              </li>
+              <li className="site-header__menu-note" role="note">
+                <span aria-hidden>🔒</span>
+                <span>{t.header.localOnlyBadge}</span>
+              </li>
+            </ul>
+          </div>
+        ) : null}
+
+        {/* PC（非縦型）：1行ヘッダー（縦型プレビュー／スマホでは出さない） */}
+        <div
+          className={`site-header__bar site-header__bar--desktop relative items-center justify-between gap-x-4 py-3 ${
+            isPortrait ? "hidden" : "hidden lg:flex"
+          } ${contentClassName}`}
+        >
+          <div className="relative z-10 flex min-w-0 flex-1 items-center gap-3.5">
             <Link
               href="/"
-              className="font-display shrink-0 text-lg font-bold leading-none tracking-tight text-zinc-900 transition-all duration-150 hover:opacity-70 sm:text-xl"
+              className="font-display shrink-0 text-xl font-bold leading-none tracking-tight text-zinc-900 transition-opacity hover:opacity-70"
             >
               {t.brand}
             </Link>
             <LocalOnlyBadge className="local-only-badge--beside-title" />
-
-            <nav
-              aria-label="Blank Note"
-              className="ml-0.5 flex items-center sm:ml-1"
-            >
+            <nav aria-label="Blank Note" className="ml-1 flex items-center">
               <Link
                 href="/library"
-                className={`font-display text-[11px] font-bold uppercase tracking-[0.12em] transition-all duration-150 sm:text-xs ${
+                className={`font-display whitespace-nowrap text-xs font-bold uppercase tracking-[0.12em] transition-colors ${
                   libraryActive
                     ? "text-zinc-900 underline decoration-[var(--accent)] decoration-2 underline-offset-4"
                     : "text-zinc-500 hover:text-zinc-800"
@@ -86,10 +224,8 @@ export default function Header() {
             </nav>
           </div>
 
-          {/* 右：言語・応援（縦中央） */}
-          <div className="relative z-10 flex shrink-0 items-center gap-2 sm:gap-3">
-            <LanguageToggle />
-
+          <div className="relative z-10 flex shrink-0 items-center gap-3">
+            <LanguageToggle id="site-lang-select-desktop" />
             <a
               href={SUPPORT_URL}
               target="_blank"
@@ -115,28 +251,16 @@ export default function Header() {
                   </svg>
                 </span>
                 <span className="btn-support__label-slot">
-                  <span
-                    key={`support-${locale}`}
-                    className="btn-support__label hidden sm:inline"
-                  >
-                    {t.header.support}
-                  </span>
-                  <span
-                    key={`support-short-${locale}`}
-                    className="btn-support__label sm:hidden"
-                  >
-                    {t.header.supportShort}
-                  </span>
+                  <span className="btn-support__label">{t.header.support}</span>
                 </span>
               </span>
             </a>
           </div>
-        </div>
 
-        {/* 表示幅スイッチ：ヘッダー中央に固定（縦も中央） */}
-        <div className="pointer-events-none absolute inset-0 hidden items-center justify-center lg:flex">
-          <div className="pointer-events-auto">
-            <LayoutToggle />
+          <div className="pointer-events-none absolute inset-0 hidden items-center justify-center lg:flex">
+            <div className="pointer-events-auto">
+              <LayoutToggle />
+            </div>
           </div>
         </div>
       </div>

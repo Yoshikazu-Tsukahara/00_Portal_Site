@@ -1,9 +1,10 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Eye, Upload, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ChevronRight, Eye, Upload, X } from "lucide-react";
 
-import type { Locale } from "@/i18n";
+import { fmt, type Locale } from "@/i18n";
 import type { InvoiceMakerDict } from "@/i18n/apps/invoiceMaker";
 import {
   computeTotals,
@@ -107,16 +108,18 @@ function Section({
 }) {
   return (
     <section className="inv-section">
-      <div className="mb-2.5 flex items-start justify-between gap-2">
-        <div className="min-w-0">
-          <h2 className="inv-section__title">{title}</h2>
+      <div className="mb-2.5 flex flex-wrap items-start justify-between gap-2">
+        <div className="min-w-0 flex-1 basis-[min(100%,12rem)]">
+          <h2 className="inv-section__title break-words">{title}</h2>
           {hint ? (
             <p className="mt-0.5 break-words text-[10px] leading-relaxed text-zinc-500">
               {hint}
             </p>
           ) : null}
         </div>
-        {action ? <div className="shrink-0">{action}</div> : null}
+        {action ? (
+          <div className="max-w-full shrink-0">{action}</div>
+        ) : null}
       </div>
       {children}
     </section>
@@ -200,7 +203,7 @@ function PartyFields({
           className="inv-input resize-y"
         />
       </Field>
-      <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+      <div className="inv-cols-2 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
         <Field label={fields.email}>
           <input
             type="email"
@@ -272,12 +275,96 @@ export default function InvoiceForm({
   const toNamePlaceholder = form.toNamePlaceholderByType[data.documentType];
   const fromHeading = byType.from[data.documentType];
   const moneyLocale = uiDocLocale;
+  /**
+   * コンパクト判定は「パネルの実幅」。
+   * 表示幅トグル（縦型）では viewport が広くても中身だけ狭いため、
+   * Tailwind の md: では切り替わらない。
+   */
+  const COMPACT_MAX_PX = 680;
+  const panelRef = useRef<HTMLDivElement>(null);
+  const [compact, setCompact] = useState(true);
+  const [mobilePage, setMobilePage] = useState<0 | 1>(0);
+  const wizard = copy.mobileWizard;
+
+  useEffect(() => {
+    const el = panelRef.current;
+    if (!el) return;
+    const sync = () => {
+      setCompact(el.clientWidth < COMPACT_MAX_PX);
+    };
+    sync();
+    const ro = new ResizeObserver(sync);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  function goMobilePage(next: 0 | 1) {
+    setMobilePage(next);
+    window.requestAnimationFrame(() => {
+      panelRef.current?.scrollIntoView({ block: "start", behavior: "smooth" });
+    });
+  }
+
+  const showPage1 = !compact || mobilePage === 0;
+  const showPage2 = !compact || mobilePage === 1;
 
   return (
-    <div className="inv-panel">
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8">
-        {/* ---------- 左列 ---------- */}
-        <div className="min-w-0 space-y-0">
+    <div
+      ref={panelRef}
+      className={`inv-panel${compact ? " inv-panel--compact" : ""}`}
+      data-compact={compact ? "true" : "false"}
+    >
+      {/* 狭い幅：2カラムの代わりにページ切替 */}
+      {compact ? (
+        <div className="inv-mobile-wizard" aria-label={wizard.page1Label}>
+          <div className="inv-mobile-wizard__tabs" role="tablist">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={mobilePage === 0}
+              className={`inv-mobile-wizard__tab${
+                mobilePage === 0 ? " inv-mobile-wizard__tab--on" : ""
+              }`}
+              onClick={() => goMobilePage(0)}
+            >
+              <span className="inv-mobile-wizard__step">1</span>
+              {wizard.page1Label}
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={mobilePage === 1}
+              className={`inv-mobile-wizard__tab${
+                mobilePage === 1 ? " inv-mobile-wizard__tab--on" : ""
+              }`}
+              onClick={() => goMobilePage(1)}
+            >
+              <span className="inv-mobile-wizard__step">2</span>
+              {wizard.page2Label}
+            </button>
+          </div>
+          <p className="inv-mobile-wizard__progress">
+            {fmt(wizard.stepOf, {
+              current: String(mobilePage + 1),
+              total: "2",
+            })}
+          </p>
+        </div>
+      ) : null}
+
+      <div
+        className={
+          compact
+            ? "inv-form-pages grid grid-cols-1 gap-6"
+            : "inv-form-pages grid grid-cols-2 gap-8"
+        }
+      >
+        {/* ---------- ページ1 / PC左列：相手・基本 ---------- */}
+        <div
+          className={`inv-form-page min-w-0 space-y-0${
+            showPage1 ? " inv-form-page--active" : " inv-form-page--hidden"
+          }`}
+        >
           <Section title={form.basicsHeading}>
             <div className="space-y-2.5">
               <Field label={numberLabel}>
@@ -300,7 +387,7 @@ export default function InvoiceForm({
               <div
                 className={
                   showDueDate
-                    ? "grid grid-cols-1 gap-2.5 sm:grid-cols-2"
+                    ? "inv-cols-2 grid grid-cols-1 gap-2.5 sm:grid-cols-2"
                     : "grid grid-cols-1 gap-2.5"
                 }
               >
@@ -356,10 +443,30 @@ export default function InvoiceForm({
               onPatchParty={onPatchParty}
             />
           </Section>
+
+          {compact ? (
+            <div className="mt-5 border-t border-zinc-100 pt-4">
+              <button
+                type="button"
+                className="inv-wizard-nav-btn inv-wizard-nav-btn--next"
+                onClick={() => goMobilePage(1)}
+              >
+                {wizard.next}
+                <span className="font-normal text-zinc-500">
+                  · {wizard.page2Label}
+                </span>
+                <ChevronRight className="size-4 shrink-0" aria-hidden />
+              </button>
+            </div>
+          ) : null}
         </div>
 
-        {/* ---------- 右列 ---------- */}
-        <div className="min-w-0 space-y-0">
+        {/* ---------- ページ2 / PC右列：設定・品目 ---------- */}
+        <div
+          className={`inv-form-page min-w-0 space-y-0${
+            showPage2 ? " inv-form-page--active" : " inv-form-page--hidden"
+          }`}
+        >
           <Section
             title={copy.settings.heading}
             hint={copy.settings.documentTypeHint}
@@ -372,7 +479,7 @@ export default function InvoiceForm({
                 {copy.settings.languageSeparation}
               </p>
 
-              <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+              <div className="inv-cols-2 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
                 <Field label={copy.settings.documentType}>
                   <select
                     value={data.documentType}
@@ -415,7 +522,7 @@ export default function InvoiceForm({
                 {copy.settings.docLanguageHint}
               </p>
 
-              <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+              <div className="inv-cols-2 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
                 <Field label={copy.settings.currency}>
                   <select
                     value={data.currency}
@@ -523,20 +630,20 @@ export default function InvoiceForm({
               </label>
 
               <Field label={copy.settings.accentColor}>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-2">
                   <input
                     type="color"
                     value={data.accentColor || "#18181b"}
                     onChange={(e) => onPatch({ accentColor: e.target.value })}
-                    className="h-9 w-16 cursor-pointer rounded border border-zinc-200"
+                    className="h-9 w-16 shrink-0 cursor-pointer rounded border border-zinc-200"
                   />
-                  <span className="text-[11px] text-zinc-500">
+                  <span className="min-w-0 break-words text-[11px] text-zinc-500">
                     {copy.settings.accentColorHint}
                   </span>
                 </div>
               </Field>
 
-              <div className="grid grid-cols-2 gap-2.5">
+              <div className="inv-cols-2 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
                 <Field label={copy.settings.logo}>
                   <div className="flex flex-col gap-1.5">
                     {data.logoImageBase64 ? (
@@ -635,98 +742,86 @@ export default function InvoiceForm({
               {data.items.map((item) => (
                 <li key={item.id} className="inv-item-row">
                   {/*
-                    スマホ: 品名＋削除 / 単価・数量・金額
-                    sm以上: 品名・単価・数量・金額・削除を1行に
+                    コンパクト: 品名＋削除 / 単価・数量・金額（CSS grid で幅を自動配分）
+                    通常幅: 品名・単価・数量・金額・削除を1行に
+                    ※ viewport の sm: ではなく .inv-panel--compact で切替
                   */}
-                  <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-2">
-                    <div className="flex min-w-0 flex-1 items-center gap-1.5">
-                      <input
-                        type="text"
-                        value={item.name}
-                        onChange={(e) =>
-                          onPatchItem(item.id, {
-                            name: clampText(
-                              e.target.value,
-                              FIELD_LIMITS.itemName,
-                            ),
-                          })
-                        }
-                        maxLength={FIELD_LIMITS.itemName}
-                        placeholder={form.items.namePlaceholder}
-                        aria-label={form.items.name}
-                        className="inv-input !py-1 min-w-0 flex-1"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => onRemoveItem(item.id)}
-                        title={form.items.remove}
-                        aria-label={form.items.removeAria}
-                        className="inv-remove-btn sm:hidden"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                    <div className="flex shrink-0 items-center gap-1.5">
-                      <input
-                        type="number"
-                        min={0}
-                        max={FIELD_LIMITS.unitPrice}
-                        step={currencyStep(
-                          data.currency,
-                          data.customCurrencySymbol,
-                        )}
-                        value={numberFieldValue(item.unitPrice)}
-                        onChange={(e) =>
-                          onPatchItem(item.id, {
-                            unitPrice: parseNumberField(
-                              e.target.value,
-                              FIELD_LIMITS.unitPrice,
-                            ),
-                          })
-                        }
-                        placeholder={form.items.unitPrice}
-                        aria-label={form.items.unitPrice}
-                        className="inv-input !py-1 w-[6.5rem] text-right sm:w-[5.5rem]"
-                      />
-                      <input
-                        type="number"
-                        min={0}
-                        max={FIELD_LIMITS.quantity}
-                        step={1}
-                        value={numberFieldValue(item.quantity)}
-                        onChange={(e) =>
-                          onPatchItem(item.id, {
-                            quantity: parseNumberField(
-                              e.target.value,
-                              FIELD_LIMITS.quantity,
-                            ),
-                          })
-                        }
-                        placeholder={form.items.quantity}
-                        aria-label={form.items.quantity}
-                        className="inv-input !py-1 w-14 text-right sm:w-[3.75rem]"
-                      />
-                      <p
-                        className="inv-item-row__amount w-[4.5rem] shrink-0 text-right"
-                        title={form.items.amount}
-                      >
-                        {formatMoney(
-                          itemAmount(item),
-                          data.currency,
-                          moneyLocale,
-                          data.customCurrencySymbol,
-                        )}
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => onRemoveItem(item.id)}
-                        title={form.items.remove}
-                        aria-label={form.items.removeAria}
-                        className="inv-remove-btn hidden sm:flex"
-                      >
-                        ✕
-                      </button>
-                    </div>
+                  <div className="inv-item-row__layout">
+                    <input
+                      type="text"
+                      value={item.name}
+                      onChange={(e) =>
+                        onPatchItem(item.id, {
+                          name: clampText(
+                            e.target.value,
+                            FIELD_LIMITS.itemName,
+                          ),
+                        })
+                      }
+                      maxLength={FIELD_LIMITS.itemName}
+                      placeholder={form.items.namePlaceholder}
+                      aria-label={form.items.name}
+                      className="inv-input inv-item-row__name"
+                    />
+                    <input
+                      type="number"
+                      min={0}
+                      max={FIELD_LIMITS.unitPrice}
+                      step={currencyStep(
+                        data.currency,
+                        data.customCurrencySymbol,
+                      )}
+                      value={numberFieldValue(item.unitPrice)}
+                      onChange={(e) =>
+                        onPatchItem(item.id, {
+                          unitPrice: parseNumberField(
+                            e.target.value,
+                            FIELD_LIMITS.unitPrice,
+                          ),
+                        })
+                      }
+                      placeholder={form.items.unitPrice}
+                      aria-label={form.items.unitPrice}
+                      className="inv-input inv-item-row__price"
+                    />
+                    <input
+                      type="number"
+                      min={0}
+                      max={FIELD_LIMITS.quantity}
+                      step={1}
+                      value={numberFieldValue(item.quantity)}
+                      onChange={(e) =>
+                        onPatchItem(item.id, {
+                          quantity: parseNumberField(
+                            e.target.value,
+                            FIELD_LIMITS.quantity,
+                          ),
+                        })
+                      }
+                      placeholder={form.items.quantity}
+                      aria-label={form.items.quantity}
+                      className="inv-input inv-item-row__qty"
+                    />
+                    <p
+                      className="inv-item-row__amount"
+                      title={form.items.amount}
+                    >
+                      {formatMoney(
+                        itemAmount(item),
+                        data.currency,
+                        moneyLocale,
+                        data.customCurrencySymbol,
+                      )}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => onRemoveItem(item.id)}
+                      title={form.items.remove}
+                      aria-label={form.items.removeAria}
+                      className="inv-remove-btn inv-item-row__remove"
+                    >
+                      ✕
+                    </button>
                   </div>
                 </li>
               ))}
@@ -786,24 +881,22 @@ export default function InvoiceForm({
         </div>
       </div>
 
-      {/* メイン枠の右下：別枠は作らずパネル内に配置 */}
-      <div className="mt-5 flex flex-wrap items-center justify-end gap-2 border-t border-zinc-100 pt-4">
+      {/* 確認／PDF：ページ1・2どちらでも同じ位置に表示 */}
+      <div className="mt-5 flex w-full max-w-full flex-wrap items-center justify-stretch gap-2 border-t border-zinc-100 pt-4 sm:justify-end">
         <button
           type="button"
           onClick={onPreview}
           className="inv-action-btn inv-action-btn--secondary"
         >
           <Eye className="size-3.5 shrink-0" strokeWidth={2} aria-hidden />
-          <span className="sm:hidden">{copy.toolbar.previewShort}</span>
-          <span className="hidden sm:inline">{copy.toolbar.preview}</span>
+          {compact ? copy.toolbar.previewShort : copy.toolbar.preview}
         </button>
         <button
           type="button"
           onClick={onPrint}
           className="inv-action-btn inv-action-btn--primary"
         >
-          <span className="sm:hidden">{copy.toolbar.printShort}</span>
-          <span className="hidden sm:inline">{copy.toolbar.print}</span>
+          {compact ? copy.toolbar.printShort : copy.toolbar.print}
         </button>
       </div>
     </div>

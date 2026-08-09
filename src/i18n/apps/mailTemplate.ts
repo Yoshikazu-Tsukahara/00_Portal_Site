@@ -25,7 +25,12 @@ export type MailTemplateDefaults = {
 };
 
 export type MailTemplateDict = {
-  shell: { title: string; description: string };
+  shell: {
+    title: string;
+    /** コンパクト時の短いタイトル */
+    titleShort: string;
+    description: string;
+  };
   defaults: MailTemplateDefaults;
   combinedText: {
     subjectOnly: string;
@@ -59,6 +64,8 @@ export type MailTemplateDict = {
     empty: string;
     noSubject: string;
     selectPrompt: string;
+    /** スマホ詳細→一覧へ戻る（ヘッダー右端） */
+    backToList: string;
   };
   search: { placeholder: string; aria: string };
   tags: { filterAria: string; all: string };
@@ -181,6 +188,7 @@ export type MailTemplateDict = {
 export const mailTemplateJa: MailTemplateDict = {
   shell: {
     title: "スマートメールテンプレ管理",
+    titleShort: "スマートメールテンプレ",
     description: "変数・ラベルで返信を即作成。データはブラウザ内に保存。",
   },
   combinedText: {
@@ -347,6 +355,7 @@ export const mailTemplateJa: MailTemplateDict = {
     empty: "テンプレートなし",
     noSubject: "件名なし",
     selectPrompt: "テンプレートを選択",
+    backToList: "←一覧",
   },
   search: {
     placeholder: "テンプレートを検索...",
@@ -481,6 +490,7 @@ export const mailTemplateJa: MailTemplateDict = {
 export const mailTemplateEn: MailTemplateDict = {
   shell: {
     title: "Smart Mail Template Manager",
+    titleShort: "Mail Templates",
     description:
       "Craft replies instantly with variables and labels. Data stays in your browser.",
   },
@@ -643,6 +653,7 @@ Thank you,`,
     empty: "No templates",
     noSubject: "No subject",
     selectPrompt: "Select a template",
+    backToList: "← List",
   },
   search: {
     placeholder: "Search templates...",

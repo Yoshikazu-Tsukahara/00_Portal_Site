@@ -6,11 +6,17 @@ import type {
   KeyboardEvent,
   MouseEvent,
   PointerEvent,
+  ReactNode,
   Ref,
 } from "react";
 import { useRef } from "react";
 import type { Tool } from "@/data/tools";
 import { fmt, useI18n } from "@/i18n";
+import {
+  type LaunchOrigin,
+  readLaunchOrigin,
+  shouldSkipLaunchAnimation,
+} from "@/lib/launcher/motion";
 
 type DragListeners = Record<string, unknown> | undefined;
 
@@ -27,12 +33,21 @@ type Props = {
   attributes?: DraggableAttributes;
   listeners?: DragListeners;
   onEnterEdit: () => void;
+  /** アイコン以外（セル余白）タップで編集終了 */
+  onExitEdit?: () => void;
   onRemove: () => void;
   onGroupWithNext?: () => void;
   onMoveLeft?: () => void;
   onMoveRight?: () => void;
   canMoveLeft?: boolean;
   canMoveRight?: boolean;
+  /** 起動アニメ付きでアプリを開く */
+  onLaunchApp?: (payload: {
+    href: string;
+    icon: ReactNode;
+    title: string;
+    origin: LaunchOrigin | null;
+  }) => void;
 };
 
 const LONG_PRESS_MS = 420;
@@ -52,12 +67,14 @@ export default function LauncherIcon({
   attributes,
   listeners,
   onEnterEdit,
+  onExitEdit,
   onRemove,
   onGroupWithNext,
   onMoveLeft,
   onMoveRight,
   canMoveLeft = false,
   canMoveRight = false,
+  onLaunchApp,
 }: Props) {
   const { t } = useI18n();
   const copy = t.tools[tool.id] ?? { title: tool.id, description: "" };
@@ -100,12 +117,24 @@ export default function LauncherIcon({
     clearLongPress();
   }
 
-  function onClickNormal(e: MouseEvent) {
+  function onClickNormal(e: MouseEvent<HTMLAnchorElement>) {
     // 長押しで編集に入ったあとの誤タップで遷移しない
     if (longPressFired.current) {
       e.preventDefault();
       longPressFired.current = false;
+      return;
     }
+    if (!onLaunchApp || shouldSkipLaunchAnimation(e)) return;
+    e.preventDefault();
+    const glyph =
+      (e.currentTarget.querySelector(".launcher-icon__glyph") as Element | null) ??
+      e.currentTarget;
+    onLaunchApp({
+      href: tool.href,
+      icon: tool.icon,
+      title,
+      origin: readLaunchOrigin(glyph),
+    });
   }
 
   function onContextMenu(e: MouseEvent) {
@@ -147,6 +176,12 @@ export default function LauncherIcon({
       className={`launcher-icon-item${isDragging ? " launcher-icon-item--dragging" : ""}${
         editing ? " launcher-icon-item--editing" : ""
       }${combineTarget ? " launcher-icon-item--combine" : ""}`}
+      onClick={(e) => {
+        if (!editing || !onExitEdit) return;
+        // アイコン本体以外（セル余白・ラベル下）なら編集終了
+        if ((e.target as HTMLElement).closest(".launcher-icon")) return;
+        onExitEdit();
+      }}
     >
       {editing ? (
         <div
@@ -180,7 +215,6 @@ export default function LauncherIcon({
               {tool.icon}
             </span>
           </span>
-          <span className="launcher-icon__label">{title}</span>
           <span className="sr-only">
             {canMoveLeft ? `${t.home.moveLeft}. ` : ""}
             {canMoveRight ? `${t.home.moveRight}. ` : ""}
@@ -205,9 +239,11 @@ export default function LauncherIcon({
               {tool.icon}
             </span>
           </span>
-          <span className="launcher-icon__label">{title}</span>
         </a>
       )}
+      <span className="launcher-icon__label" aria-hidden>
+        {title}
+      </span>
     </li>
   );
 }

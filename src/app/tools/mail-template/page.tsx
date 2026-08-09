@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import AppShell from "@/components/AppShell";
-import PrivacyNotice from "@/components/PrivacyNotice";
 import { fmt, useI18n } from "@/i18n";
+import { useLayout } from "@/lib/layout";
 import InstallAppButton from "./InstallAppButton";
 import PreviewPane from "./PreviewPane";
 import TagFilterBar from "./TagFilterBar";
@@ -41,6 +41,7 @@ import {
 
 export default function MailTemplatePage() {
   const { t, ready, locale } = useI18n();
+  const { layoutMode } = useLayout();
   const mt = t.apps.mailTemplate;
   const [templates, setTemplates] = useState<MailTemplate[]>([]);
   const [variables, setVariables] = useState<VariableMasterItem[]>([]);
@@ -49,6 +50,9 @@ export default function MailTemplatePage() {
   const [values, setValues] = useState<Record<string, string>>({});
   const [inputHistory, setInputHistory] = useState<InputHistoryMap>({});
   const [hydrated, setHydrated] = useState(false);
+  /** スマホ／縦型: 一覧と本文をページ切替 */
+  const [mobilePane, setMobilePane] = useState<"list" | "detail">("list");
+  const [narrowViewport, setNarrowViewport] = useState(false);
 
   const [editorOpen, setEditorOpen] = useState(false);
   const [editorMode, setEditorMode] = useState<"create" | "edit">("create");
@@ -57,6 +61,21 @@ export default function MailTemplatePage() {
   const [tagMasterOpen, setTagMasterOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterTagId, setFilterTagId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    const sync = () => setNarrowViewport(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  /** AppShell と同じ: 実機スマホ、または表示幅「縦型」 */
+  const compact = narrowViewport || layoutMode === "portrait";
+
+  useEffect(() => {
+    if (!compact) setMobilePane("list");
+  }, [compact]);
 
   useEffect(() => {
     if (!ready) return;
@@ -194,6 +213,15 @@ export default function MailTemplatePage() {
     setEditorOpen(true);
   }
 
+  function selectTemplate(id: string) {
+    setSelectedId(id);
+    if (compact) setMobilePane("detail");
+  }
+
+  function backToList() {
+    setMobilePane("list");
+  }
+
   function handleSave(draft: Draft) {
     const now = Date.now();
     if (editorMode === "create") {
@@ -210,6 +238,7 @@ export default function MailTemplatePage() {
       };
       persistAll([created, ...templates], variables, tags);
       setSelectedId(created.id);
+      if (compact) setMobilePane("detail");
     } else if (editingId) {
       const next = templates.map((t) =>
         t.id === editingId
@@ -226,6 +255,7 @@ export default function MailTemplatePage() {
       );
       persistAll(next, variables, tags);
       setSelectedId(editingId);
+      if (compact) setMobilePane("detail");
     }
     setEditorOpen(false);
   }
@@ -238,7 +268,9 @@ export default function MailTemplatePage() {
     const next = templates.filter((t) => t.id !== id);
     persistAll(next, variables, tags);
     if (selectedId === id) {
-      setSelectedId(next[0]?.id ?? null);
+      const fallback = next[0]?.id ?? null;
+      setSelectedId(fallback);
+      if (compact && !fallback) setMobilePane("list");
     }
   }
 
@@ -287,6 +319,7 @@ export default function MailTemplatePage() {
   return (
     <AppShell
       title={mt.shell.title}
+      titleShort={mt.shell.titleShort}
       description={mt.shell.description}
       fillViewport
       isPwa
@@ -320,103 +353,161 @@ export default function MailTemplatePage() {
           <button
             type="button"
             onClick={() => setTagMasterOpen(true)}
-            className="btn-secondary min-w-0 flex-1 !px-2 !py-1.5 text-[11px] leading-tight active:scale-[0.98] active:bg-zinc-100 sm:flex-none sm:!px-3 sm:!py-1.5 sm:text-sm"
+            className="btn-secondary min-w-0 flex-1 active:scale-[0.98] active:bg-zinc-100 sm:flex-none sm:!px-3 sm:!py-1.5 sm:text-sm"
           >
-            <span className="sm:hidden">{mt.actions.tagMasterShort}</span>
-            <span className="hidden sm:inline">{mt.actions.tagMaster}</span>
+            <span className="app-shell-action-label--short">
+              {mt.actions.tagMasterShort}
+            </span>
+            <span className="app-shell-action-label--full">
+              {mt.actions.tagMaster}
+            </span>
           </button>
           <button
             type="button"
             onClick={() => setMasterOpen(true)}
-            className="btn-secondary min-w-0 flex-1 !px-2 !py-1.5 text-[11px] leading-tight active:scale-[0.98] active:bg-zinc-100 sm:flex-none sm:!px-3 sm:!py-1.5 sm:text-sm"
+            className="btn-secondary min-w-0 flex-1 active:scale-[0.98] active:bg-zinc-100 sm:flex-none sm:!px-3 sm:!py-1.5 sm:text-sm"
           >
-            <span className="sm:hidden">{mt.actions.variableMasterShort}</span>
-            <span className="hidden sm:inline">{mt.actions.variableMaster}</span>
+            <span className="app-shell-action-label--short">
+              {mt.actions.variableMasterShort}
+            </span>
+            <span className="app-shell-action-label--full">
+              {mt.actions.variableMaster}
+            </span>
           </button>
           <button
             type="button"
             onClick={openCreate}
-            className="btn-primary min-w-0 flex-1 !px-2 !py-1.5 text-[11px] leading-tight active:scale-[0.98] active:brightness-95 sm:flex-none sm:!px-3 sm:!py-1.5 sm:text-sm"
+            className="btn-primary min-w-0 flex-1 active:scale-[0.98] active:brightness-95 sm:flex-none sm:!px-3 sm:!py-1.5 sm:text-sm"
           >
-            <span className="sm:hidden">{mt.actions.newTemplateShort}</span>
-            <span className="hidden sm:inline">{mt.actions.newTemplate}</span>
+            <span className="app-shell-action-label--short">
+              {mt.actions.newTemplateShort}
+            </span>
+            <span className="app-shell-action-label--full">
+              {mt.actions.newTemplate}
+            </span>
           </button>
         </div>
       }
     >
-      <PrivacyNotice className="mb-2" />
       {!hydrated ? (
         <p className="text-sm text-zinc-400">{mt.loading}</p>
       ) : (
-        <div className="grid min-h-0 w-full max-w-full flex-1 grid-cols-1 gap-2 overflow-x-hidden overflow-y-auto md:grid-cols-[minmax(0,17rem)_minmax(0,1fr)] md:gap-3 md:overflow-hidden lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)]">
-          <aside className="flex max-h-[min(42dvh,20rem)] min-h-0 min-w-0 flex-col overflow-hidden rounded-md border border-zinc-200/80 bg-white p-2 shadow-sm md:max-h-none md:p-3">
-            <div className="mb-2 shrink-0 space-y-2 px-0.5 md:px-1">
-              <p className="text-[11px] font-medium text-zinc-500">
-                {mt.list.heading}
-                <span className="ml-1 tabular-nums text-zinc-400">
-                  {isFilterActive
-                    ? `${filteredTemplates.length} / ${templates.length}`
-                    : templates.length}
-                </span>
-              </p>
-              <TemplateSearchBar
-                value={searchQuery}
-                onChange={setSearchQuery}
-              />
-              <TagFilterBar
-                tags={tags}
-                selectedTagId={filterTagId}
-                onChange={setFilterTagId}
-              />
-            </div>
-            <div className="min-h-0 min-w-0 flex-1 overflow-hidden">
-              <TemplateList
-                templates={filteredTemplates}
-                tags={tags}
-                selectedId={selectedId}
-                isFilterActive={isFilterActive}
-                onSelect={setSelectedId}
-                onEdit={openEdit}
-                onDelete={handleDelete}
-                onTogglePin={handleTogglePin}
-              />
-            </div>
-          </aside>
-
-          <section className="flex min-h-[min(50dvh,24rem)] min-w-0 flex-col gap-2 overflow-hidden rounded-md border border-zinc-200/80 bg-white p-2 shadow-sm md:min-h-0 md:gap-3 md:p-4 lg:p-6">
-            {selected ? (
-              <>
-                <div className="min-w-0 shrink-0">
-                  <h2 className="break-words text-sm font-semibold text-zinc-900 md:truncate">
-                    {selected.title}
-                  </h2>
-                </div>
-                <div className="max-h-[min(38%,14rem)] shrink-0 overflow-x-hidden overflow-y-auto border-b border-zinc-100 pb-2 md:max-h-[42%] md:pb-3">
-                  <VariableForm
-                    variables={enabledVariables}
-                    values={values}
-                    history={inputHistory}
-                    onChange={(key, value) =>
-                      setValues((prev) => ({ ...prev, [key]: value }))
-                    }
-                    onHistoryChange={setInputHistory}
-                  />
-                </div>
-                <PreviewPane
-                  subject={previewSubject}
-                  body={previewBody}
-                  combinedText={finalText}
-                  emptyLabels={emptyLabels}
-                />
-              </>
-            ) : (
-              <div className="flex flex-1 items-center justify-center px-2">
-                <p className="break-words text-center text-sm text-zinc-400">
-                  {mt.list.selectPrompt}
+        <div
+          className={
+            compact
+              ? // スマホ: 内側に overflow を置かない（中央パネルがタッチスクロールを飲み込むのを防ぐ）
+                // スクロールは AppShell 作業領域の1箇所だけ
+                "flex h-auto w-full max-w-full flex-col gap-2 pb-2"
+              : "grid min-h-0 w-full max-w-full flex-1 grid-cols-1 gap-2 overflow-x-hidden overflow-y-auto md:grid-cols-[minmax(0,17rem)_minmax(0,1fr)] md:gap-3 md:overflow-hidden lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)]"
+          }
+        >
+          {/* 一覧: PCは常時 / スマホは list ペインのとき */}
+          {!compact || mobilePane === "list" ? (
+            <aside
+              className={`flex min-w-0 flex-col rounded-md border border-zinc-200/80 bg-white p-2 shadow-sm ${
+                compact
+                  ? "h-auto"
+                  : "max-h-[min(42dvh,20rem)] min-h-0 overflow-hidden md:max-h-none md:p-3"
+              }`}
+            >
+              <div className="mb-2 shrink-0 space-y-2 px-0.5 md:px-1">
+                <p className="text-[11px] font-medium text-zinc-500">
+                  {mt.list.heading}
+                  <span className="ml-1 tabular-nums text-zinc-400">
+                    {isFilterActive
+                      ? `${filteredTemplates.length} / ${templates.length}`
+                      : templates.length}
+                  </span>
                 </p>
+                <TemplateSearchBar
+                  value={searchQuery}
+                  onChange={setSearchQuery}
+                />
+                <TagFilterBar
+                  tags={tags}
+                  selectedTagId={filterTagId}
+                  onChange={setFilterTagId}
+                />
               </div>
-            )}
-          </section>
+              <div
+                className={
+                  compact
+                    ? "min-w-0"
+                    : "min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain"
+                }
+              >
+                <TemplateList
+                  templates={filteredTemplates}
+                  tags={tags}
+                  selectedId={selectedId}
+                  isFilterActive={isFilterActive}
+                  onSelect={selectTemplate}
+                  onEdit={openEdit}
+                  onDelete={handleDelete}
+                  onTogglePin={handleTogglePin}
+                />
+              </div>
+            </aside>
+          ) : null}
+
+          {/* 本文: PCは常時 / スマホは detail ペインのとき */}
+          {!compact || mobilePane === "detail" ? (
+            <section
+              className={`flex min-w-0 flex-col gap-2 rounded-md border border-zinc-200/80 bg-white p-2 shadow-sm ${
+                compact
+                  ? "h-auto pb-3"
+                  : "min-h-[min(50dvh,24rem)] overflow-y-auto md:min-h-0 md:gap-3 md:p-4 lg:p-6"
+              }`}
+            >
+              {selected ? (
+                <>
+                  <div className="flex min-w-0 shrink-0 items-start gap-2">
+                    <h2 className="min-w-0 flex-1 break-words text-sm font-semibold text-zinc-900 md:truncate">
+                      {selected.title}
+                    </h2>
+                    {compact ? (
+                      <button
+                        type="button"
+                        onClick={backToList}
+                        className="btn-secondary shrink-0 !px-2 !py-1 text-[11px] leading-tight active:scale-[0.98] active:bg-zinc-100"
+                      >
+                        {mt.list.backToList}
+                      </button>
+                    ) : null}
+                  </div>
+                  <div
+                    className={`shrink-0 border-b border-zinc-100 pb-2 ${
+                      compact
+                        ? ""
+                        : "max-h-[min(38%,14rem)] overflow-x-hidden overflow-y-auto md:max-h-[42%] md:pb-3"
+                    }`}
+                  >
+                    <VariableForm
+                      variables={enabledVariables}
+                      values={values}
+                      history={inputHistory}
+                      onChange={(key, value) =>
+                        setValues((prev) => ({ ...prev, [key]: value }))
+                      }
+                      onHistoryChange={setInputHistory}
+                    />
+                  </div>
+                  <PreviewPane
+                    subject={previewSubject}
+                    body={previewBody}
+                    combinedText={finalText}
+                    emptyLabels={emptyLabels}
+                  />
+                </>
+              ) : (
+                <div className="flex flex-1 items-center justify-center px-2 py-8">
+                  <p className="break-words text-center text-sm text-zinc-400">
+                    {mt.list.selectPrompt}
+                  </p>
+                </div>
+              )}
+            </section>
+          ) : null}
         </div>
       )}
 

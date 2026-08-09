@@ -40,7 +40,7 @@ src/
 - **言語スイッチ**: サイト Header のみ（PWA standalone 時は AppShell が代行）
 - **バックアップ**: `AppShell` の `dataManager`（タイトル横 💾）
 - **PWA インストール**: `AppShell` の `afterDataManager`（バックアップ右隣 📱）
-- **スマホ AppShell**: 1行目=タイトル+💾+📱／2行目=機能ボタン。ポータルへ戻るのはサイト Header のロゴ
+- **スマホ／縦型 AppShell**: 1行目=タイトル+💾+📱（アイコンのみ）→ 説明 → プライバシー案内 → 機能ボタン。ポータルへ戻るのはサイト Header のロゴ
 - **スマホ対応完了アプリ**: `src/data/tools.ts` で `isMobileSupported: true`
 - **ホームピン留め**: LocalStorage `blank-note:home-pins`
 
