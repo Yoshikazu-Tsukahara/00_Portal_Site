@@ -2024,6 +2024,10 @@ export const appsKo: AppsDictionary = {
       emptyReady: "입력이 있으면 결과가 여기에 표시됩니다.",
       toastCopied: "클립보드에 복사됨",
     },
+    mobile: {
+      viewResult: "결과 보기",
+      backToEdit: "← 입력·설정",
+    },
     diff: {
       none: "차이 없음 (입력과 결과가 같습니다).",
       removed: "삭제됨",

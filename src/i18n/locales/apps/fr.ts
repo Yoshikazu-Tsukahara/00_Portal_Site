@@ -2024,6 +2024,10 @@ export const appsFr: AppsDictionary = {
       emptyReady: "Les résultats apparaîtront ici dès que vous aurez saisi du texte.",
       toastCopied: "Copié dans le presse-papiers",
     },
+    mobile: {
+      viewResult: "Voir le résultat",
+      backToEdit: "← Modifier",
+    },
     diff: {
       none: "Aucune différence (l’entrée correspond au résultat).",
       removed: "Supprimé",

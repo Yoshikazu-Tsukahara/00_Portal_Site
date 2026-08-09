@@ -2024,6 +2024,10 @@ export const appsPt: AppsDictionary = {
       emptyReady: "Os resultados aparecerão aqui quando houver entrada.",
       toastCopied: "Copiado para a área de transferência",
     },
+    mobile: {
+      viewResult: "Ver resultado",
+      backToEdit: "← Editar",
+    },
     diff: {
       none: "Sem diferenças (a entrada é igual ao resultado).",
       removed: "Removido",

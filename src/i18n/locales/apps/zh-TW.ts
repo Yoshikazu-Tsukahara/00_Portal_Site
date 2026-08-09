@@ -2024,6 +2024,10 @@ export const appsZhTW: AppsDictionary = {
       emptyReady: "有輸入後結果會顯示在這裡。",
       toastCopied: "已複製到剪貼簿",
     },
+    mobile: {
+      viewResult: "查看結果",
+      backToEdit: "← 輸入與設定",
+    },
     diff: {
       none: "無差異（輸入與結果一致）。",
       removed: "已移除",

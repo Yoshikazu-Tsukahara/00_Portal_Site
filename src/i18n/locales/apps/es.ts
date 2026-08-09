@@ -389,6 +389,10 @@ export const appsEs: AppsDictionary = {
       emptyReady: "El resultado aparecerá aquí cuando haya texto de entrada.",
       toastCopied: "Copiado al portapapeles",
     },
+    mobile: {
+      viewResult: "Ver resultado",
+      backToEdit: "← Editar",
+    },
     diff: {
       none: "Sin diferencias (la entrada coincide con el resultado).",
       removed: "Eliminado",

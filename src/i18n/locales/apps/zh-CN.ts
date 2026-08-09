@@ -389,6 +389,10 @@ export const appsZhCN: AppsDictionary = {
       emptyReady: "有输入后结果将显示在这里。",
       toastCopied: "已复制到剪贴板",
     },
+    mobile: {
+      viewResult: "查看结果",
+      backToEdit: "← 输入与设置",
+    },
     diff: {
       none: "无差异（输入与结果一致）。",
       removed: "已移除",
