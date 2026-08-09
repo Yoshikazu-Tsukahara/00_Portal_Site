@@ -63,7 +63,7 @@ function isFullBleed(frame: FreeFrame): boolean {
 /**
  * 用紙上を自由に動かせる画像ブロック。
  * 選択中だけドラッグ＆リサイズ。スナップ対応。
- * interactive 切替でも常に Rnd（再マウントしない）。
+ * 非 interactive（サムネ等）は left/top の絶対配置（親 CSS scale と一致）。
  */
 export default function FreeImage({
   block,
@@ -109,6 +109,33 @@ export default function FreeImage({
     .filter(Boolean)
     .join(" ");
 
+  const body = (
+    <ImageBody
+      dataUrl={block.dataUrl}
+      alt={alt}
+      caption={block.caption}
+      cover={cover}
+    />
+  );
+
+  // サムネ／閲覧：Rnd を使わず left/top で置く（親の CSS scale とずれない）
+  if (!interactive) {
+    return (
+      <div
+        className={boxClass}
+        style={{
+          left: px.x,
+          top: px.y,
+          width: px.width,
+          height: px.height,
+          ...zStyle,
+        }}
+      >
+        {body}
+      </div>
+    );
+  }
+
   return (
     <Rnd
       size={{ width: px.width, height: px.height }}
@@ -120,95 +147,66 @@ export default function FreeImage({
       disableDragging={!interactive || !selected}
       enableResizing={interactive && selected}
       style={zStyle}
-      onDrag={
-        interactive
-          ? (_event, data) => {
-              previewSnap(
-                pixelsToFrame(
-                  data.x,
-                  data.y,
-                  px.width,
-                  px.height,
-                  sheetWidth,
-                  sheetHeight,
-                ),
-              );
-            }
-          : undefined
-      }
-      onDragStop={
-        interactive
-          ? (_event, data) => {
-              commitFrame(
-                pixelsToFrame(
-                  data.x,
-                  data.y,
-                  px.width,
-                  px.height,
-                  sheetWidth,
-                  sheetHeight,
-                ),
-              );
-            }
-          : undefined
-      }
-      onResize={
-        interactive
-          ? (_event, dir, element, _delta, position) => {
-              previewSnap(
-                pixelsToFrame(
-                  position.x,
-                  position.y,
-                  element.offsetWidth,
-                  element.offsetHeight,
-                  sheetWidth,
-                  sheetHeight,
-                ),
-                dir,
-              );
-            }
-          : undefined
-      }
-      onResizeStop={
-        interactive
-          ? (_event, dir, element, _delta, position) => {
-              commitFrame(
-                pixelsToFrame(
-                  position.x,
-                  position.y,
-                  element.offsetWidth,
-                  element.offsetHeight,
-                  sheetWidth,
-                  sheetHeight,
-                ),
-                dir,
-              );
-            }
-          : undefined
-      }
+      onDrag={(_event, data) => {
+        previewSnap(
+          pixelsToFrame(
+            data.x,
+            data.y,
+            px.width,
+            px.height,
+            sheetWidth,
+            sheetHeight,
+          ),
+        );
+      }}
+      onDragStop={(_event, data) => {
+        commitFrame(
+          pixelsToFrame(
+            data.x,
+            data.y,
+            px.width,
+            px.height,
+            sheetWidth,
+            sheetHeight,
+          ),
+        );
+      }}
+      onResize={(_event, dir, element, _delta, position) => {
+        previewSnap(
+          pixelsToFrame(
+            position.x,
+            position.y,
+            element.offsetWidth,
+            element.offsetHeight,
+            sheetWidth,
+            sheetHeight,
+          ),
+          dir,
+        );
+      }}
+      onResizeStop={(_event, dir, element, _delta, position) => {
+        commitFrame(
+          pixelsToFrame(
+            position.x,
+            position.y,
+            element.offsetWidth,
+            element.offsetHeight,
+            sheetWidth,
+            sheetHeight,
+          ),
+          dir,
+        );
+      }}
       className={boxClass}
-      onMouseDown={
-        interactive
-          ? (event) => {
-              event.stopPropagation();
-              onSelect();
-            }
-          : undefined
-      }
-      onClick={
-        interactive
-          ? (event: MouseEvent) => {
-              event.stopPropagation();
-            }
-          : undefined
-      }
+      onMouseDown={(event) => {
+        event.stopPropagation();
+        onSelect();
+      }}
+      onClick={(event: MouseEvent) => {
+        event.stopPropagation();
+      }}
     >
-      <ImageBody
-        dataUrl={block.dataUrl}
-        alt={alt}
-        caption={block.caption}
-        cover={cover}
-      />
+      {body}
     </Rnd>
   );
 }

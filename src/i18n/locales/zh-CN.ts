@@ -5,7 +5,7 @@ import { appsZhCN } from "./apps/zh-CN";
  * 簡体中文 — ポータル共通 UI ＋ アプリ内 UI（legal は英語フォールバック）
  */
 export const zhCN: PartialDictionary = {
-  brand: "My Tool Box",
+  brand: "Blank Note",
   common: {
     backToPortal: "← 返回门户",
     loading: "加载中…",
@@ -59,71 +59,71 @@ export const zhCN: PartialDictionary = {
   },
   tools: {
     "invoice-maker": {
-      title: "单据制作",
+      title: "单据",
       description: "A4 发票/报价/交货单/收据。多语言多货币 PDF。",
     },
     "mail-template": {
-      title: "邮件模板整理",
+      title: "邮件",
       description: "用标签分类与变量替换，让日常邮件回复更快。",
     },
     "folder-generator": {
-      title: "文件夹批量生成",
+      title: "文件夹",
       description: "按命名规则组合日期、编号与列表，一键批量创建。",
     },
     "pdf-editor": {
-      title: "简易 PDF 编辑",
+      title: "PDF",
       description: "在浏览器中完成合并、排序与页面删除。",
     },
     "image-compressor": {
-      title: "图片批量压缩",
+      title: "图片",
       description: "指定最大宽度与画质，在浏览器内批量缩放与压缩。",
     },
     "text-cleaner": {
-      title: "文本清理",
+      title: "文本",
       description: "一键清理换行、空白与控制字符，也可保存自定义替换规则。",
     },
     "media-metadata-editor": {
-      title: "媒体元数据编辑器",
+      title: "元数据",
       description: "在浏览器内编辑并预览音乐与视频的标签和封面。",
     },
     "character-relation-editor": {
-      title: "小说人物关系图",
+      title: "关系图",
       description: "用人物卡片与关系线，直观整理故事人物关系。",
     },
     "book-visualizer": {
-      title: "AI Book Studio",
+      title: "Quarto",
       description: "指定纸张与排版，直接编辑版面，并用 .mybook 分享。",
     },
     "palette-collector": {
-      title: "Palette Collector",
+      title: "调色板",
       description: "从图片提取配色，支持自动提取与对比度检查。",
     },
     "lunch-savings": {
-      title: "午餐存钱",
+      title: "午餐",
       description: "点按记录与预算的差额，用游戏感攒下省下的钱。",
     },
     "link-stocker": {
-      title: "临时收藏链接",
+      title: "收藏",
       description: "用不太正式的书签方式，以带 OGP 的卡片收藏 URL。",
     },
     "ultimate-probability-slot": {
-      title: "终极概率老虎机",
+      title: "老虎机",
       description: "用自制低概率老虎机挑战「直到中奖」或「连续落空」。",
     },
     "pixel-drop-puzzle": {
-      title: "极小像素缝隙落物谜题",
+      title: "像素",
       description: "把照片落入缝隙即可，亚像素级判定的精度谜题。",
     },
     "robot-freethrow": {
-      title: "抛射罚球",
-      description: "用角度、推力与旋转瞄准篮筐的抛体运动小游戏。",
+      title: "罚球",
+      description: "用角度、初速与旋转瞄准篮筐的抛体运动小游戏。",
     },
     "crypto-message": {
-      title: "秘密消息",
+      title: "秘密",
       description: "用口令加密解密，附带凯撒密码挑战。",
     },
     "monster-driver": {
-      title: "怪物司机",
+      title: "怪物",
       description: "红灯停、蓝灯冲。考验转向灯记忆的第一人称动作。",
     },
   },
@@ -201,7 +201,7 @@ export const zhCN: PartialDictionary = {
     emailHint: "可选 — 如需回复请填写",
     messageLabel: "消息内容",
     messagePlaceholder: "请填写问题、建议或故障详情",
-    subjectPrefix: "【My Tool Box】咨询",
+    subjectPrefix: "【Blank Note】咨询",
     bodyLabels: {
       category: "咨询类型",
       app: "相关应用",

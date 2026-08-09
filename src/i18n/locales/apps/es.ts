@@ -308,7 +308,7 @@ export const appsEs: AppsDictionary = {
     },
     install: {
       button: "Añadir esta app a la pantalla de inicio",
-      buttonShort: "Añadir a inicio",
+      buttonShort: "Instalar",
       buttonTiny: "Añadir",
       buttonAria: "Añadir Plantillas de correo a tu pantalla de inicio como app independiente",
       modalTitle: "Añadir a la pantalla de inicio",
@@ -569,7 +569,7 @@ export const appsEs: AppsDictionary = {
     },
     install: {
       button: "Añadir esta app a la pantalla de inicio",
-      buttonShort: "Añadir a inicio",
+      buttonShort: "Instalar",
       buttonTiny: "Añadir",
       buttonAria: "Añadir Compresor de imágenes por lotes a tu pantalla de inicio como app",
       modalTitle: "Añadir a la pantalla de inicio",
@@ -665,7 +665,7 @@ export const appsEs: AppsDictionary = {
     },
     install: {
       button: "Añadir esta app a la pantalla de inicio",
-      buttonShort: "Añadir a inicio",
+      buttonShort: "Instalar",
       buttonTiny: "Añadir",
       buttonAria: "Añadir Generador de documentos a tu pantalla de inicio como app independiente",
       modalTitle: "Añadir a la pantalla de inicio",
@@ -714,7 +714,7 @@ export const appsEs: AppsDictionary = {
     },
     install: {
       button: "Añadir esta app a la pantalla de inicio",
-      buttonShort: "Añadir a inicio",
+      buttonShort: "Instalar",
       buttonTiny: "Añadir",
       buttonAria: "Añadir Editor PDF a tu pantalla de inicio como app",
       modalTitle: "Añadir a la pantalla de inicio",
@@ -1032,8 +1032,8 @@ export const appsEs: AppsDictionary = {
   },
   bookVisualizer: {
     shell: {
-      title: "AI Book Studio",
-      description: "Un editor DTP que maqueta el trabajo de IA directamente en la página. Elige un tamaño de papel, define caracteres y líneas, y el tamaño de fuente se calcula por ti—luego termina en estilo vertical, horizontal o fotolibro y comparte como archivo .mybook.",
+      title: "Quarto",
+      description: "Un editor de libros centrado en la página. Elige el tamaño, define caracteres y líneas, y el tamaño de fuente se calcula solo; termina en vertical u horizontal y comparte como .mybook.",
     },
     loading: "Cargando…",
     paper: {
@@ -1070,16 +1070,12 @@ export const appsEs: AppsDictionary = {
       sampleConfirm: "¿Reemplazar tu borrador actual con esta muestra?",
       samples: {
         novel: {
-          title: "Novela japonesa",
-          lead: "Bunko · vertical. Cuatro capítulos con secciones, saltos y folios de índice en vivo.",
+          title: "Novela japonesa vertical",
+          lead: "Bunko. Cuatro capítulos con secciones, saltos y TOC en vivo.",
         },
         western: {
-          title: "Paperback occidental",
-          lead: "Trade · horizontal. Tres capítulos más coda, con saltos de página manuales.",
-        },
-        photo: {
-          title: "Libro ilustrado / fotolibro",
-          lead: "Cuadrado. Cinco capítulos cortos, láminas fotográficas, portadilla e índice.",
+          title: "Trade paperback en inglés",
+          lead: "Trade · horizontal. Tres capítulos más coda, con saltos manuales.",
         },
       },
       readTitle: "Leer un archivo .mybook",
@@ -1157,7 +1153,7 @@ export const appsEs: AppsDictionary = {
         tabFormat: "Formato",
         tabPage: "Página",
         tabBlock: "Bloque",
-        tabPrompts: "IA",
+        tabVariables: "Nombres",
         openLabel: "Ajustes",
         closeLabel: "Cerrar",
       },
@@ -1296,19 +1292,21 @@ export const appsEs: AppsDictionary = {
         sizeError: "Esa imagen es demasiado grande (máx. 3MB). Comprime primero.",
         readError: "No se pudo leer la imagen.",
       },
-      prompts: {
-        heading: "Notas de prompt",
-        lead: "Guarda aquí tus instrucciones habituales y notas de referencia. Nunca se incluyen en los archivos compartidos.",
-        add: "+ Añadir nota",
-        empty: "Aún no hay notas.",
-        titlePlaceholder: "Nombre de la nota (p. ej. Tono de voz)",
-        bodyPlaceholder: "Escribe las instrucciones que das a la IA.",
-        copy: "Copiar",
-        copied: "Copiado",
-        copyFailed: "No se pudo copiar. Selecciona el texto manualmente.",
-        remove: "Eliminar esta nota",
-        confirmRemove: "¿Eliminar esta nota?",
-      },
+    variables: {
+      heading: "Marcadores de nombre",
+      lead: "Define palabras que el lector pueda cambiar. Escribe {{name1}} en el texto.",
+      tokenHint:
+        "Usa llaves dobles (p. ej. {{name1}}). La paginación se calcula tras sustituir.",
+      add: "+ Añadir variable",
+      empty: "Aún no hay variables. Si añades una, habrá una pantalla antes de leer.",
+      idLabel: "Código (ID en el texto)",
+      labelLabel: "Etiqueta (para el lector)",
+      labelPlaceholder: "p. ej. Nombre del protagonista",
+      defaultLabel: "Valor por defecto",
+      defaultPlaceholder: "p. ej. Alicia",
+      remove: "Eliminar esta variable",
+      confirmRemove: "¿Eliminar esta variable?",
+    },
     },
     view: {
       close: "Cerrar",
@@ -1324,6 +1322,12 @@ export const appsEs: AppsDictionary = {
       endRestart: "Leer de nuevo",
       endEdit: "Hacer este mi borrador",
       endEditConfirm: "Esto reemplaza el borrador que estás editando. ¿Continuar?",
+    variables: {
+      title: "Antes de leer",
+      lead: "Introduce nombres o palabras. Los campos vacíos usan el valor por defecto.",
+      confirm: "Leer con estos nombres",
+    },
+
     },
   },
   paletteCollector: {
@@ -1333,7 +1337,7 @@ export const appsEs: AppsDictionary = {
     },
     install: {
       button: "Añadir esta app a la pantalla de inicio",
-      buttonShort: "Añadir a inicio",
+      buttonShort: "Instalar",
       buttonTiny: "Añadir",
       buttonAria: "Añadir Recolector de paletas a tu pantalla de inicio como app independiente",
       modalTitle: "Añadir a la pantalla de inicio",
@@ -1625,7 +1629,7 @@ export const appsEs: AppsDictionary = {
     },
     install: {
       button: "Añadir esta app a la pantalla de inicio",
-      buttonShort: "Añadir a inicio",
+      buttonShort: "Instalar",
       buttonTiny: "Añadir",
       buttonAria: "Añadir Ahorro del almuerzo a tu pantalla de inicio como app independiente",
       modalTitle: "Añadir a la pantalla de inicio",
@@ -1678,7 +1682,7 @@ export const appsEs: AppsDictionary = {
     },
     install: {
       button: "Añadir esta app a la pantalla de inicio",
-      buttonShort: "Añadir a inicio",
+      buttonShort: "Instalar",
       buttonTiny: "Añadir",
       buttonAria: "Añadir Link Stocker a tu pantalla de inicio como app independiente",
       modalTitle: "Añadir a la pantalla de inicio",
@@ -1713,7 +1717,7 @@ export const appsEs: AppsDictionary = {
     },
     bookmarklet: {
       title: "💻 Escritorio: arrastra a la barra de favoritos",
-      hint: "Arrastra el botón a tu barra de favoritos (reemplázalo tras las actualizaciones). Transfiere a cualquier pestaña abierta de My Tool Box y guarda automáticamente; la pestaña auxiliar se cierra al momento.",
+      hint: "Arrastra el botón a tu barra de favoritos (reemplázalo tras las actualizaciones). Transfiere a cualquier pestaña abierta de Blank Note y guarda automáticamente; la pestaña auxiliar se cierra al momento.",
       dragLabel: "Enviar a Guardar",
     },
     share: {
@@ -1744,7 +1748,7 @@ export const appsEs: AppsDictionary = {
     },
     install: {
       button: "📱 Añadir a la pantalla de inicio",
-      buttonShort: "Añadir a inicio",
+      buttonShort: "Instalar",
       buttonTiny: "Añadir",
       buttonAria: "Añadir esta app a tu pantalla de inicio",
       modalTitle: "Añadir a la pantalla de inicio",
@@ -1936,7 +1940,7 @@ export const appsEs: AppsDictionary = {
     },
     install: {
       button: "📱 Añadir a la pantalla de inicio",
-      buttonShort: "Añadir a inicio",
+      buttonShort: "Instalar",
       buttonTiny: "Añadir",
       buttonAria: "Añadir a la pantalla de inicio",
       modalTitle: "Añadir a la pantalla de inicio",
@@ -2102,7 +2106,7 @@ export const appsEs: AppsDictionary = {
       shareX: "Compartir en X",
       shareXShort: "X",
       shareIntro: "🔐 ¡Tienes un mensaje secreto!",
-      shareOutro: "Solo quienes tengan la frase secreta pueden descifrarlo en la app de cifrado de My Tool Box 👇",
+      shareOutro: "Solo quienes tengan la frase secreta pueden descifrarlo en la app de cifrado de Blank Note 👇",
     },
     decrypt: {
       cipherLabel: "Texto cifrado (pegar)",
@@ -2147,7 +2151,7 @@ export const appsEs: AppsDictionary = {
     },
     install: {
       button: "Añadir esta app a la pantalla de inicio",
-      buttonShort: "Añadir a inicio",
+      buttonShort: "Instalar",
       buttonTiny: "Añadir",
       buttonAria: "Añadir Mensaje secreto a tu pantalla de inicio como app independiente",
       modalTitle: "Añadir a la pantalla de inicio",
@@ -2168,11 +2172,11 @@ export const appsEs: AppsDictionary = {
   robotFreethrow: {
     shell: {
       title: "Tiro libre de proyectiles",
-      description: "Ajusta ángulo, impulso y giro para encestar en este minijuego de física de proyectiles.",
+      description: "Ajusta ángulo, velocidad inicial y giro para encestar en este minijuego de física de proyectiles.",
     },
     install: {
       button: "Añadir esta app a la pantalla de inicio",
-      buttonShort: "Añadir a inicio",
+      buttonShort: "Instalar",
       buttonTiny: "Añadir",
       buttonAria: "Añadir Tiro libre de proyectiles a tu pantalla de inicio como app independiente",
       modalTitle: "Añadir a la pantalla de inicio",

@@ -396,7 +396,7 @@ export default function MediaMetadataEditorPage() {
             }}
             className={`flex min-h-0 flex-1 cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed px-6 py-16 text-center transition ${
               dragging
-                ? "border-zinc-900 bg-zinc-100"
+                ? "border-[var(--accent-strong)] bg-[color-mix(in_srgb,var(--accent)_28%,white)]"
                 : "border-zinc-300 bg-white hover:border-zinc-400"
             }`}
           >

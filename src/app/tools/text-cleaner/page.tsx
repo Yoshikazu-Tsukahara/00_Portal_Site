@@ -287,7 +287,7 @@ export default function TextCleanerPage() {
                   aria-pressed={on}
                   className={`rounded-full border px-2.5 py-1 text-[11px] font-medium transition-all duration-200 ${
                     on
-                      ? "border-zinc-800 bg-zinc-900 text-zinc-50 shadow-sm"
+                      ? "border-[var(--accent-strong)] bg-[var(--accent)] text-zinc-900 shadow-none"
                       : "border-zinc-200 bg-zinc-50 text-zinc-600 hover:border-zinc-300 hover:bg-white"
                   }`}
                 >
@@ -469,7 +469,7 @@ export default function TextCleanerPage() {
                       onClick={() => switchPreset(p.id)}
                       className={`rounded-full border px-2.5 py-1 text-[11px] font-medium transition-colors ${
                         activePresetId === p.id
-                          ? "border-zinc-800 bg-zinc-900 text-zinc-50"
+                          ? "border-[var(--accent-strong)] bg-[var(--accent)] text-zinc-900"
                           : "border-zinc-200 bg-white text-zinc-600 hover:border-zinc-300"
                       }`}
                     >

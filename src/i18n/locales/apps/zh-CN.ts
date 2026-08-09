@@ -308,7 +308,7 @@ export const appsZhCN: AppsDictionary = {
     },
     install: {
       button: "将此应用添加到主屏幕",
-      buttonShort: "添加到主屏幕",
+      buttonShort: "安装",
       buttonTiny: "添加",
       buttonAria: "将邮件模板作为独立应用添加到主屏幕",
       modalTitle: "添加到主屏幕",
@@ -569,7 +569,7 @@ export const appsZhCN: AppsDictionary = {
     },
     install: {
       button: "将此应用添加到主屏幕",
-      buttonShort: "添加到主屏幕",
+      buttonShort: "安装",
       buttonTiny: "添加",
       buttonAria: "将批量图片压缩作为应用添加到主屏幕",
       modalTitle: "添加到主屏幕",
@@ -665,7 +665,7 @@ export const appsZhCN: AppsDictionary = {
     },
     install: {
       button: "将此应用添加到主屏幕",
-      buttonShort: "添加到主屏幕",
+      buttonShort: "安装",
       buttonTiny: "添加",
       buttonAria: "将单据制作作为独立应用添加到主屏幕",
       modalTitle: "添加到主屏幕",
@@ -714,7 +714,7 @@ export const appsZhCN: AppsDictionary = {
     },
     install: {
       button: "将此应用添加到主屏幕",
-      buttonShort: "添加到主屏幕",
+      buttonShort: "安装",
       buttonTiny: "添加",
       buttonAria: "将 PDF 编辑器作为应用添加到主屏幕",
       modalTitle: "添加到主屏幕",
@@ -1032,8 +1032,8 @@ export const appsZhCN: AppsDictionary = {
   },
   bookVisualizer: {
     shell: {
-      title: "AI 书籍工作室",
-      description: "在页面上直接排版 AI 作品的 DTP 编辑器。选择纸张尺寸，设定字数与行数，字号会自动计算——再以竖排、横排或照片风格完成，并以 .mybook 文件分享。",
+      title: "Quarto",
+      description: "在页面上直接排版的书籍编辑器。选择纸张尺寸、设定字数与行数后自动计算字级，再以竖排或横排完成，并以 .mybook 文件分享。",
     },
     loading: "加载中…",
     paper: {
@@ -1070,16 +1070,12 @@ export const appsZhCN: AppsDictionary = {
       sampleConfirm: "用此示例替换当前草稿？",
       samples: {
         novel: {
-          title: "日式小说",
-          lead: "文库本 · 竖排。四章含小节、分段，实时目录页码。",
+          title: "日文竖排小说",
+          lead: "文库判。四章含节、手动分页与联动目录页码。",
         },
         western: {
-          title: "西式平装",
-          lead: "贸易本 · 横排。三章加尾声，含手动分页。",
-        },
-        photo: {
-          title: "绘本 / 照片书",
-          lead: "方形。五短章、照片插页、标题页与目录。",
+          title: "英文大众平装",
+          lead: "贸易判·横排。三章加尾声，含手动分页。",
         },
       },
       readTitle: "阅读 .mybook 文件",
@@ -1157,7 +1153,7 @@ export const appsZhCN: AppsDictionary = {
         tabFormat: "格式",
         tabPage: "页面",
         tabBlock: "块",
-        tabPrompts: "AI",
+        tabVariables: "名字替换",
         openLabel: "设置",
         closeLabel: "关闭",
       },
@@ -1296,19 +1292,21 @@ export const appsZhCN: AppsDictionary = {
         sizeError: "图片过大（最大 3MB）。请先压缩。",
         readError: "无法读取图片。",
       },
-      prompts: {
-        heading: "提示备注",
-        lead: "在此保存常用指令与参考备注。它们绝不会包含在分享文件中。",
-        add: "+ 添加备注",
-        empty: "尚无备注。",
-        titlePlaceholder: "备注名称（例如：语气风格）",
-        bodyPlaceholder: "写下交给 AI 的指令。",
-        copy: "复制",
-        copied: "已复制",
-        copyFailed: "无法复制。请手动选择文字。",
-        remove: "删除此备注",
-        confirmRemove: "删除此备注？",
-      },
+    variables: {
+      heading: "名字替换",
+      lead: "定义读者可自定义的词语。在正文中写 {{name1}}。",
+      tokenHint:
+        "使用双花括号（如 {{name1}}）。替换后再分页，版面不会乱。",
+      add: "+ 添加变量",
+      empty: "还没有变量。添加后，阅读前会显示输入界面。",
+      idLabel: "代码（正文中的 ID）",
+      labelLabel: "显示名（给读者看）",
+      labelPlaceholder: "例如：主角名字",
+      defaultLabel: "默认值",
+      defaultPlaceholder: "例如：爱丽丝",
+      remove: "删除此变量",
+      confirmRemove: "要删除此变量吗？",
+    },
     },
     view: {
       close: "关闭",
@@ -1324,6 +1322,12 @@ export const appsZhCN: AppsDictionary = {
       endRestart: "再读一遍",
       endEdit: "将其设为我的草稿",
       endEditConfirm: "这将替换您正在编辑的草稿。继续？",
+    variables: {
+      title: "阅读前设置",
+      lead: "请输入名字或称呼。留空则使用默认值。",
+      confirm: "按此设置阅读",
+    },
+
     },
   },
   paletteCollector: {
@@ -1333,7 +1337,7 @@ export const appsZhCN: AppsDictionary = {
     },
     install: {
       button: "将此应用添加到主屏幕",
-      buttonShort: "添加到主屏幕",
+      buttonShort: "安装",
       buttonTiny: "添加",
       buttonAria: "将调色板收集器作为独立应用添加到主屏幕",
       modalTitle: "添加到主屏幕",
@@ -1625,7 +1629,7 @@ export const appsZhCN: AppsDictionary = {
     },
     install: {
       button: "将此应用添加到主屏幕",
-      buttonShort: "添加到主屏幕",
+      buttonShort: "安装",
       buttonTiny: "添加",
       buttonAria: "将午餐储蓄作为独立应用添加到主屏幕",
       modalTitle: "添加到主屏幕",
@@ -1678,7 +1682,7 @@ export const appsZhCN: AppsDictionary = {
     },
     install: {
       button: "将此应用添加到主屏幕",
-      buttonShort: "添加到主屏幕",
+      buttonShort: "安装",
       buttonTiny: "添加",
       buttonAria: "将链接收藏作为独立应用添加到主屏幕",
       modalTitle: "添加到主屏幕",
@@ -1713,7 +1717,7 @@ export const appsZhCN: AppsDictionary = {
     },
     bookmarklet: {
       title: "💻 桌面：拖到书签栏",
-      hint: "将按钮拖到书签栏（更新后请替换）。它会交接给任意已打开的 My Tool Box 标签页并自动保存；辅助标签页会立即关闭。",
+      hint: "将按钮拖到书签栏（更新后请替换）。它会交接给任意已打开的 Blank Note 标签页并自动保存；辅助标签页会立即关闭。",
       dragLabel: "发送到收藏",
     },
     share: {
@@ -1744,7 +1748,7 @@ export const appsZhCN: AppsDictionary = {
     },
     install: {
       button: "📱 添加到主屏幕",
-      buttonShort: "添加到主屏幕",
+      buttonShort: "安装",
       buttonTiny: "添加",
       buttonAria: "将此应用添加到主屏幕",
       modalTitle: "添加到主屏幕",
@@ -1936,7 +1940,7 @@ export const appsZhCN: AppsDictionary = {
     },
     install: {
       button: "📱 添加到主屏幕",
-      buttonShort: "添加到主屏幕",
+      buttonShort: "安装",
       buttonTiny: "添加",
       buttonAria: "添加到主屏幕",
       modalTitle: "添加到主屏幕",
@@ -2102,7 +2106,7 @@ export const appsZhCN: AppsDictionary = {
       shareX: "分享到 X",
       shareXShort: "X",
       shareIntro: "🔐 你收到一条秘密消息！",
-      shareOutro: "只有知道口令的人才能在 My Tool Box 的密文应用中解密 👇",
+      shareOutro: "只有知道口令的人才能在 Blank Note 的密文应用中解密 👇",
     },
     decrypt: {
       cipherLabel: "密文（粘贴）",
@@ -2147,7 +2151,7 @@ export const appsZhCN: AppsDictionary = {
     },
     install: {
       button: "将此应用添加到主屏幕",
-      buttonShort: "添加到主屏幕",
+      buttonShort: "安装",
       buttonTiny: "添加",
       buttonAria: "将秘密消息作为独立应用添加到主屏幕",
       modalTitle: "添加到主屏幕",
@@ -2168,11 +2172,11 @@ export const appsZhCN: AppsDictionary = {
   robotFreethrow: {
     shell: {
       title: "抛射罚球",
-      description: "调节角度、推力与旋转，在抛射物理小游戏中命中篮筐。",
+      description: "调节角度、初速与旋转，在抛射物理小游戏中命中篮筐。",
     },
     install: {
       button: "将此应用添加到主屏幕",
-      buttonShort: "添加到主屏幕",
+      buttonShort: "安装",
       buttonTiny: "添加",
       buttonAria: "将抛射罚球作为独立应用添加到主屏幕",
       modalTitle: "添加到主屏幕",

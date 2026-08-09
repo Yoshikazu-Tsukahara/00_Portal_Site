@@ -14,11 +14,11 @@ export default function Footer() {
   const { contentClassName } = useLayout();
 
   return (
-    <footer className="mt-auto w-full border-t border-zinc-200">
-      <div className={`flex flex-col gap-6 py-10 sm:py-12 ${contentClassName}`}>
+    <footer className="mt-auto w-full border-t border-zinc-200 bg-[var(--background)]">
+      <div className={`flex flex-col gap-8 py-12 sm:py-14 ${contentClassName}`}>
         {/* コンセプト */}
-        <div className="flex flex-col gap-1.5">
-          <p className="text-sm font-medium tracking-tight text-zinc-800">
+        <div className="flex flex-col gap-2">
+          <p className="font-display text-sm font-bold tracking-tight text-zinc-800">
             {t.brand}
           </p>
           <p className="text-sm leading-relaxed text-zinc-500">
@@ -33,28 +33,28 @@ export default function Footer() {
         >
           <Link
             href="/contact"
-            className="text-zinc-600 transition-colors hover:text-zinc-900"
+            className="text-zinc-600 transition-all duration-150 hover:text-zinc-900"
           >
             {t.footer.contact}
           </Link>
           <span aria-hidden className="hidden h-3 w-px bg-zinc-200 sm:block" />
           <Link
             href="/terms"
-            className="text-zinc-600 transition-colors hover:text-zinc-900"
+            className="text-zinc-600 transition-all duration-150 hover:text-zinc-900"
           >
             {t.footer.terms}
           </Link>
           <span aria-hidden className="hidden h-3 w-px bg-zinc-200 sm:block" />
           <Link
             href="/privacy"
-            className="text-zinc-600 transition-colors hover:text-zinc-900"
+            className="text-zinc-600 transition-all duration-150 hover:text-zinc-900"
           >
             {t.footer.privacy}
           </Link>
         </nav>
 
         {/* 動作環境・注意事項・ローカル処理の安心メッセージ */}
-        <div className="space-y-3 rounded-md border border-zinc-200/80 bg-zinc-100/60 px-3.5 py-3.5">
+        <div className="space-y-3 rounded-md border border-zinc-200 px-4 py-4">
           <div>
             <p className="mb-1 text-[11px] font-medium tracking-tight text-zinc-700">
               {t.footer.environmentLabel}

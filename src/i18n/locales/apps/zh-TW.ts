@@ -4,8 +4,8 @@ import type { AppsDictionary } from "../../apps";
 export const appsZhTW: AppsDictionary = {
   bookVisualizer: {
     shell: {
-      title: "AI Book Studio",
-      description: "直接在頁面上排版 AI 作品的 DTP 編輯器。選擇紙張尺寸、設定字數與行數後自動計算字級——再以直書、橫書或相片風格完成，並以 .mybook 檔案分享。",
+      title: "Quarto",
+      description: "直接在頁面上排版的書籍編輯器。選擇紙張尺寸、設定字數與行數後自動計算字級，再以直書或橫書完成，並以 .mybook 檔案分享。",
     },
     loading: "載入中…",
     paper: {
@@ -42,16 +42,12 @@ export const appsZhTW: AppsDictionary = {
       sampleConfirm: "用此範例取代目前的草稿？",
       samples: {
         novel: {
-          title: "日式小說",
-          lead: "文庫 · 直書。四章含小節、分頁、即時目錄頁碼。",
+          title: "日文直書小說",
+          lead: "文庫判。四章含節、手動分頁與連動目錄頁碼。",
         },
         western: {
-          title: "西式平裝",
-          lead: "貿易 · 橫書。三章加尾聲，含手動分頁。",
-        },
-        photo: {
-          title: "繪本／相片書",
-          lead: "方形。五個短章、相片版、標題頁與目錄。",
+          title: "英文大眾平裝",
+          lead: "貿易判·橫書。三章加尾聲，含手動分頁。",
         },
       },
       readTitle: "閱讀 .mybook 檔案",
@@ -129,7 +125,7 @@ export const appsZhTW: AppsDictionary = {
         tabFormat: "格式",
         tabPage: "頁面",
         tabBlock: "區塊",
-        tabPrompts: "AI",
+        tabVariables: "名字替換",
         openLabel: "設定",
         closeLabel: "關閉",
       },
@@ -268,19 +264,21 @@ export const appsZhTW: AppsDictionary = {
         sizeError: "圖片過大（上限 3MB）。請先壓縮。",
         readError: "無法讀取圖片。",
       },
-      prompts: {
-        heading: "提示備註",
-        lead: "在此保存常用指示與參考筆記。絕不會包含在分享檔案中。",
-        add: "+ 新增備註",
-        empty: "尚無備註。",
-        titlePlaceholder: "備註名稱（例如：語氣）",
-        bodyPlaceholder: "寫下要交給 AI 的指示。",
-        copy: "複製",
-        copied: "已複製",
-        copyFailed: "無法複製。請手動選取文字。",
-        remove: "刪除此備註",
-        confirmRemove: "刪除此備註？",
-      },
+    variables: {
+      heading: "名字替換",
+      lead: "定義讀者可自訂的詞語。在正文中寫 {{name1}}。",
+      tokenHint:
+        "使用雙花括號（如 {{name1}}）。替換後再分頁，版面不會亂。",
+      add: "+ 新增變數",
+      empty: "還沒有變數。新增後，閱讀前會顯示輸入畫面。",
+      idLabel: "代碼（正文中的 ID）",
+      labelLabel: "顯示名（給讀者看）",
+      labelPlaceholder: "例如：主角名字",
+      defaultLabel: "預設值",
+      defaultPlaceholder: "例如：愛麗絲",
+      remove: "刪除此變數",
+      confirmRemove: "要刪除此變數嗎？",
+    },
     },
     view: {
       close: "關閉",
@@ -296,6 +294,11 @@ export const appsZhTW: AppsDictionary = {
       endRestart: "再讀一次",
       endEdit: "設為我的草稿",
       endEditConfirm: "這會取代您正在編輯的草稿。要繼續嗎？",
+      variables: {
+        title: "閱讀前設定",
+        lead: "請輸入名字或稱呼。留空則使用預設值。",
+        confirm: "依此設定閱讀",
+      },
     },
   },
   characterRelation: {
@@ -476,7 +479,7 @@ export const appsZhTW: AppsDictionary = {
       shareX: "分享到 X",
       shareXShort: "X",
       shareIntro: "🔐 你收到一則秘密訊息！",
-      shareOutro: "只有知道口令的人，才能在 My Tool Box 的密碼工具中解碼 👇",
+      shareOutro: "只有知道口令的人，才能在 Blank Note 的密碼工具中解碼 👇",
     },
     decrypt: {
       cipherLabel: "密文（貼上）",
@@ -521,7 +524,7 @@ export const appsZhTW: AppsDictionary = {
     },
     install: {
       button: "將此應用程式加到主畫面",
-      buttonShort: "加到主畫面",
+      buttonShort: "安裝",
       buttonTiny: "加入",
       buttonAria: "將秘密訊息作為獨立應用程式加到主畫面",
       modalTitle: "加到主畫面",
@@ -709,7 +712,7 @@ export const appsZhTW: AppsDictionary = {
     },
     install: {
       button: "將此應用程式加到主畫面",
-      buttonShort: "加到主畫面",
+      buttonShort: "安裝",
       buttonTiny: "加入",
       buttonAria: "將圖片批次壓縮作為應用程式加到主畫面",
       modalTitle: "加到主畫面",
@@ -805,7 +808,7 @@ export const appsZhTW: AppsDictionary = {
     },
     install: {
       button: "將此應用程式加到主畫面",
-      buttonShort: "加到主畫面",
+      buttonShort: "安裝",
       buttonTiny: "加入",
       buttonAria: "將單據製作作為獨立應用程式加到主畫面",
       modalTitle: "加到主畫面",
@@ -858,7 +861,7 @@ export const appsZhTW: AppsDictionary = {
     },
     install: {
       button: "將此應用程式加到主畫面",
-      buttonShort: "加到主畫面",
+      buttonShort: "安裝",
       buttonTiny: "加入",
       buttonAria: "將暫時收藏連結作為獨立應用程式加到主畫面",
       modalTitle: "加到主畫面",
@@ -893,7 +896,7 @@ export const appsZhTW: AppsDictionary = {
     },
     bookmarklet: {
       title: "💻 桌面：拖到書籤列",
-      hint: "將按鈕拖到書籤列（更新後請替換）。它會交給任何已開啟的 My Tool Box 分頁並自動儲存；輔助分頁會立刻關閉。",
+      hint: "將按鈕拖到書籤列（更新後請替換）。它會交給任何已開啟的 Blank Note 分頁並自動儲存；輔助分頁會立刻關閉。",
       dragLabel: "傳送到收藏",
     },
     share: {
@@ -1086,7 +1089,7 @@ export const appsZhTW: AppsDictionary = {
     },
     install: {
       button: "將此應用程式加到主畫面",
-      buttonShort: "加到主畫面",
+      buttonShort: "安裝",
       buttonTiny: "加入",
       buttonAria: "將午餐存錢作為獨立應用程式加到主畫面",
       modalTitle: "加到主畫面",
@@ -1410,7 +1413,7 @@ export const appsZhTW: AppsDictionary = {
     },
     install: {
       button: "將此應用程式加到主畫面",
-      buttonShort: "加到主畫面",
+      buttonShort: "安裝",
       buttonTiny: "加入",
       buttonAria: "將郵件範本作為獨立應用程式加到主畫面",
       modalTitle: "加到主畫面",
@@ -1501,7 +1504,7 @@ export const appsZhTW: AppsDictionary = {
     },
     install: {
       button: "將此應用程式加到主畫面",
-      buttonShort: "加到主畫面",
+      buttonShort: "安裝",
       buttonTiny: "加入",
       buttonAria: "將 Palette Collector 作為獨立應用程式加到主畫面",
       modalTitle: "加到主畫面",
@@ -1655,7 +1658,7 @@ export const appsZhTW: AppsDictionary = {
     },
     install: {
       button: "將此應用程式加到主畫面",
-      buttonShort: "加到主畫面",
+      buttonShort: "安裝",
       buttonTiny: "加入",
       buttonAria: "將 PDF 編輯器作為應用程式加到主畫面",
       modalTitle: "加到主畫面",
@@ -1784,7 +1787,7 @@ export const appsZhTW: AppsDictionary = {
     },
     install: {
       button: "📱 加到主畫面",
-      buttonShort: "加到主畫面",
+      buttonShort: "安裝",
       buttonTiny: "加入",
       buttonAria: "加到主畫面",
       modalTitle: "加到主畫面",
@@ -1903,11 +1906,11 @@ export const appsZhTW: AppsDictionary = {
   robotFreethrow: {
     shell: {
       title: "拋射罰球",
-      description: "調整角度、推力與旋轉，在拋射物理小遊戲中命中籃框。",
+      description: "調整角度、初速與旋轉，在拋射物理小遊戲中命中籃框。",
     },
     install: {
       button: "將此應用程式加到主畫面",
-      buttonShort: "加到主畫面",
+      buttonShort: "安裝",
       buttonTiny: "加入",
       buttonAria: "將拋射罰球作為獨立應用程式加到主畫面",
       modalTitle: "加到主畫面",
@@ -2005,7 +2008,7 @@ export const appsZhTW: AppsDictionary = {
     },
     install: {
       button: "📱 加到主畫面",
-      buttonShort: "加到主畫面",
+      buttonShort: "安裝",
       buttonTiny: "加入",
       buttonAria: "將此應用程式加到主畫面",
       modalTitle: "加到主畫面",

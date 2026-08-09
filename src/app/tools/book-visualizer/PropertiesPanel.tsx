@@ -25,7 +25,6 @@ import {
   Rows3,
   Ruler,
   SlidersHorizontal,
-  Sparkles,
   Text,
   Trash2,
   Type,
@@ -47,7 +46,7 @@ import {
   PAPER_SIZE_IDS,
   type PaperSizeId,
 } from "./paper";
-import PromptsPanel from "./PromptsPanel";
+import VariablesPanel from "./VariablesPanel";
 import {
   BOOK_LAYOUTS,
   CHROME_ALIGNS,
@@ -72,13 +71,12 @@ import {
   type FreeTextWritingMode,
   type HeaderMode,
   type PageType,
-  type PromptMemo,
   type SpreadHeaderPlacement,
   type TextLevel,
   type TocDepth,
 } from "./types";
 
-type PanelTab = "format" | "page" | "block" | "prompts";
+type PanelTab = "format" | "page" | "block" | "variables";
 
 type PropertiesPanelProps = {
   book: BookData;
@@ -99,8 +97,6 @@ type PropertiesPanelProps = {
   onLayerAction: (action: LayerAction) => void;
   onMoveBlock: (delta: number) => void;
   onRemoveBlock: () => void;
-  prompts: PromptMemo[];
-  onChangePrompts: (prompts: PromptMemo[]) => void;
 };
 
 /** 設定 1 項目のラベル（アイコン＋文字） */
@@ -507,7 +503,7 @@ function pageTypeLabel(
   }
 }
 
-/** 右側のプロパティパネル：書式 / ページ / ブロック / AI */
+/** 右側のプロパティパネル：書式 / ページ / ブロック / 名前変換 */
 export default function PropertiesPanel({
   book,
   currentPage,
@@ -525,8 +521,6 @@ export default function PropertiesPanel({
   onLayerAction,
   onMoveBlock,
   onRemoveBlock,
-  prompts,
-  onChangePrompts,
 }: PropertiesPanelProps) {
   const { t } = useI18n();
   const copy = t.apps.bookVisualizer;
@@ -593,9 +587,9 @@ export default function PropertiesPanel({
       icon: <Frame className="size-4" aria-hidden />,
     },
     {
-      id: "prompts",
-      label: copy.edit.panel.tabPrompts,
-      icon: <Sparkles className="size-4" aria-hidden />,
+      id: "variables",
+      label: copy.edit.panel.tabVariables,
+      icon: <Replace className="size-4" aria-hidden />,
     },
   ];
 
@@ -638,8 +632,11 @@ export default function PropertiesPanel({
         })}
       </div>
 
-      {tab === "prompts" ? (
-        <PromptsPanel prompts={prompts} onChange={onChangePrompts} />
+      {tab === "variables" ? (
+        <VariablesPanel
+          variables={book.variables}
+          onChange={(variables) => onChangeBook({ variables })}
+        />
       ) : tab === "format" ? (
         <div className="flex h-0 min-h-0 flex-1 flex-col gap-3.5 overflow-x-hidden overflow-y-auto overscroll-contain p-3">
           <label className="flex min-w-0 flex-col gap-1.5">

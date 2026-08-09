@@ -1,4 +1,4 @@
-/** PWA「ホームに追加」ボタン／ガイドモーダル用の共通文言型 */
+/** PWA「インストール」ボタン／ガイドモーダル用の共通文言型 */
 export type PwaInstallCopy = {
   button: string;
   buttonShort: string;

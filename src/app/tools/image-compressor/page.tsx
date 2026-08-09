@@ -292,7 +292,7 @@ export default function ImageCompressorPage() {
             type="button"
             onClick={handleZipDownload}
             disabled={!canDownload}
-            className="btn-primary h-full shrink-0 !px-3 !py-0 text-xs leading-none active:scale-[0.98] active:bg-zinc-800 disabled:active:scale-100 sm:text-sm"
+            className="btn-primary h-full shrink-0 !px-3 !py-0 text-xs leading-none active:scale-[0.98] active:brightness-95 disabled:active:scale-100 sm:text-sm"
             aria-disabled={!canDownload}
           >
             <span className="sm:hidden">

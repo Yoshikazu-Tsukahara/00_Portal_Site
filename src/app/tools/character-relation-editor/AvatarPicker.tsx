@@ -106,7 +106,7 @@ export default function AvatarPicker({
                 onClick={() => selectPreset(id)}
                 className={`flex flex-col items-center gap-1 rounded-md border px-1 py-1.5 transition-colors ${
                   active
-                    ? "border-zinc-900 bg-zinc-50 text-zinc-900"
+                    ? "border-[var(--accent-strong)] bg-[color-mix(in_srgb,var(--accent)_22%,white)] text-zinc-900"
                     : "border-zinc-200 text-zinc-500 hover:border-zinc-300 hover:bg-zinc-50/80"
                 }`}
               >

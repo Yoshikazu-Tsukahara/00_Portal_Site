@@ -1,5 +1,5 @@
 /* 旧ルート互換用。新規インストールは /lunch-savings/sw.js を使用 */
-const CACHE_NAME = "my-toolbox-v1-legacy";
+const CACHE_NAME = "blank-note-v1-legacy";
 
 self.addEventListener("install", (event) => {
   self.skipWaiting();

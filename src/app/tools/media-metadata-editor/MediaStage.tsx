@@ -154,7 +154,7 @@ export default function MediaStage({
             }}
             className={`cursor-pointer rounded-md border border-dashed px-4 py-5 text-center transition ${
               artDragging
-                ? "border-zinc-900 bg-zinc-100"
+                ? "border-[var(--accent-strong)] bg-[color-mix(in_srgb,var(--accent)_28%,white)]"
                 : "border-zinc-300 bg-zinc-50/80 hover:border-zinc-400"
             }`}
           >

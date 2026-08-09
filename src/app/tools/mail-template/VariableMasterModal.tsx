@@ -167,7 +167,7 @@ export default function VariableMasterModal({
               <button
                 type="button"
                 onClick={handleSubmit}
-                className="btn-primary min-h-11 !px-3 !py-2 !text-xs active:scale-[0.98] active:bg-zinc-800 sm:min-h-0 sm:!py-1.5"
+                className="btn-primary min-h-11 !px-3 !py-2 !text-xs active:scale-[0.98] active:brightness-95 sm:min-h-0 sm:!py-1.5"
               >
                 {editingId ? mt.variableMaster.update : mt.variableMaster.add}
               </button>

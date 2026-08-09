@@ -38,7 +38,6 @@ export type BookVisualizerDict = {
     samples: {
       novel: { title: string; lead: string };
       western: { title: string; lead: string };
-      photo: { title: string; lead: string };
     };
     readTitle: string;
     readLead: string;
@@ -119,7 +118,7 @@ export type BookVisualizerDict = {
       tabFormat: string;
       tabPage: string;
       tabBlock: string;
-      tabPrompts: string;
+      tabVariables: string;
       openLabel: string;
       closeLabel: string;
     };
@@ -264,16 +263,17 @@ export type BookVisualizerDict = {
       sizeError: string;
       readError: string;
     };
-    prompts: {
+    variables: {
       heading: string;
       lead: string;
+      tokenHint: string;
       add: string;
       empty: string;
-      titlePlaceholder: string;
-      bodyPlaceholder: string;
-      copy: string;
-      copied: string;
-      copyFailed: string;
+      idLabel: string;
+      labelLabel: string;
+      labelPlaceholder: string;
+      defaultLabel: string;
+      defaultPlaceholder: string;
       remove: string;
       confirmRemove: string;
     };
@@ -293,14 +293,19 @@ export type BookVisualizerDict = {
     endRestart: string;
     endEdit: string;
     endEditConfirm: string;
+    variables: {
+      title: string;
+      lead: string;
+      confirm: string;
+    };
   };
 };
 
 export const bookVisualizerJa: BookVisualizerDict = {
   shell: {
-    title: "AI ブック・スタジオ",
+    title: "Quarto",
     description:
-      "AI 作品を本の紙面そのもので組む DTP エディター。用紙サイズと文字数・行数から文字サイズを自動計算し、縦書き／横書き／写真集で仕上げて .mybook で共有できます。",
+      "原稿を本の紙面そのもので組むエディター。用紙サイズと文字数・行数から文字サイズを自動計算し、縦書き／横書きで仕上げて .mybook で共有できます。",
   },
   loading: "読み込み中…",
   paper: {
@@ -343,16 +348,12 @@ export const bookVisualizerJa: BookVisualizerDict = {
       "制作中の下書きをこのサンプルで置き換えます。よろしいですか？",
     samples: {
       novel: {
-        title: "日本語小説",
-        lead: "文庫・縦書き。四章＋節、章末区切り、柱と目次ノンブル連動の厚めサンプル。",
+        title: "日本語・縦書き小説",
+        lead: "文庫判。四章＋節、章末の手動区切り、柱と目次ノンブルが連動するサンプル。",
       },
       western: {
-        title: "洋書風",
-        lead: "トレード・横書き。三章＋コーダ、手動区切り付きの英語長文サンプル。",
-      },
-      photo: {
-        title: "絵本・写真集",
-        lead: "スクエア。五章の短文と写真ページ、扉・目次付きの構成サンプル。",
+        title: "English trade paperback",
+        lead: "トレード判・横書き。名前変換（{{name1}}）付きの三章サンプル。",
       },
     },
     readTitle: "持っている .mybook ファイルを読む",
@@ -437,7 +438,7 @@ export const bookVisualizerJa: BookVisualizerDict = {
       tabFormat: "書式",
       tabPage: "ページ",
       tabBlock: "ブロック",
-      tabPrompts: "AI",
+      tabVariables: "名前変換",
       openLabel: "設定",
       closeLabel: "閉じる",
     },
@@ -594,18 +595,20 @@ export const bookVisualizerJa: BookVisualizerDict = {
         "画像が大きすぎます（3MB まで）。圧縮してから追加してください。",
       readError: "画像の読み込みに失敗しました。",
     },
-    prompts: {
-      heading: "プロンプト・メモ",
-      lead: "よく使う指示や設定資料をストックしておく場所です。共有ファイルには含まれません。",
-      add: "＋ メモを追加",
-      empty: "まだメモがありません。",
-      titlePlaceholder: "メモの名前（例：文体の指定）",
-      bodyPlaceholder: "AI に渡す指示や設定を書いておきます。",
-      copy: "コピー",
-      copied: "コピーしました",
-      copyFailed: "コピーできませんでした。手動で選択してください。",
-      remove: "このメモを削除",
-      confirmRemove: "このメモを削除します。よろしいですか？",
+    variables: {
+      heading: "名前変換",
+      lead: "閲覧時に差し替える言葉を定義します。本文には {{name1}} のように書いてください。",
+      tokenHint:
+        "プレースホルダーは二重中括弧です（例: {{name1}}）。文字数が変わっても、閲覧時に置換してからページ分割するのでレイアウトが崩れません。",
+      add: "＋変数を追加",
+      empty: "まだ変数がありません。追加すると、読む前に入力画面が出ます。",
+      idLabel: "コード（本文に書く ID）",
+      labelLabel: "表示名（読者への案内）",
+      labelPlaceholder: "例: 主人公の名前",
+      defaultLabel: "初期値",
+      defaultPlaceholder: "例: アリス",
+      remove: "この変数を削除",
+      confirmRemove: "この変数を削除します。よろしいですか？",
     },
   },
   view: {
@@ -622,14 +625,19 @@ export const bookVisualizerJa: BookVisualizerDict = {
     endRestart: "最初から読む",
     endEdit: "この本を自分の下書きにする",
     endEditConfirm: "編集中の下書きをこの本で置き換えます。よろしいですか？",
+    variables: {
+      title: "読む前の設定",
+      lead: "名前や呼び方を入力してください。空欄の項目は初期値で読みます。",
+      confirm: "この設定で読む",
+    },
   },
 };
 
 export const bookVisualizerEn: BookVisualizerDict = {
   shell: {
-    title: "AI Book Studio",
+    title: "Quarto",
     description:
-      "A DTP editor that lays out AI work on the page itself. Pick a paper size, set characters and lines, and the font size is computed for you—then finish in vertical, horizontal, or photo style and share as a .mybook file.",
+      "A page-first book editor. Pick a trim size, set measure and lines, and type size is computed for you—then finish in vertical or horizontal layout and share as a .mybook file.",
   },
   loading: "Loading…",
   paper: {
@@ -670,16 +678,12 @@ export const bookVisualizerEn: BookVisualizerDict = {
     sampleConfirm: "Replace your current draft with this sample?",
     samples: {
       novel: {
-        title: "Japanese novel",
-        lead: "Bunko · vertical. Four chapters with sections, breaks, live TOC folios.",
+        title: "Japanese vertical novel",
+        lead: "Bunko trim. Four chapters with sections, breaks, and live TOC folios.",
       },
       western: {
-        title: "Western paperback",
-        lead: "Trade · horizontal. Three chapters plus coda, with manual page breaks.",
-      },
-      photo: {
-        title: "Picture / photo book",
-        lead: "Square. Five short chapters, photo plates, title page and TOC.",
+        title: "English trade paperback",
+        lead: "Trade trim · horizontal. Includes name placeholders ({{name1}}) and page breaks.",
       },
     },
     readTitle: "Read a .mybook file",
@@ -763,7 +767,7 @@ export const bookVisualizerEn: BookVisualizerDict = {
       tabFormat: "Format",
       tabPage: "Page",
       tabBlock: "Block",
-      tabPrompts: "AI",
+      tabVariables: "Names",
       openLabel: "Settings",
       closeLabel: "Close",
     },
@@ -918,18 +922,20 @@ export const bookVisualizerEn: BookVisualizerDict = {
       sizeError: "That image is too large (3MB max). Compress it first.",
       readError: "Could not read the image.",
     },
-    prompts: {
-      heading: "Prompt notes",
-      lead: "Keep your go-to instructions and reference notes here. They are never included in shared files.",
-      add: "+ Add note",
-      empty: "No notes yet.",
-      titlePlaceholder: "Note name (e.g. Tone of voice)",
-      bodyPlaceholder: "Write the instructions you hand to the AI.",
-      copy: "Copy",
-      copied: "Copied",
-      copyFailed: "Could not copy. Please select the text manually.",
-      remove: "Delete this note",
-      confirmRemove: "Delete this note?",
+    variables: {
+      heading: "Name placeholders",
+      lead: "Define words readers can customize. Write {{name1}} in the body text.",
+      tokenHint:
+        "Use double curly braces (e.g. {{name1}}). Pagination runs after substitution, so longer names still fit the page grid.",
+      add: "+ Add variable",
+      empty: "No variables yet. Add one to show a setup screen before reading.",
+      idLabel: "Code (ID used in the text)",
+      labelLabel: "Label (shown to readers)",
+      labelPlaceholder: "e.g. Protagonist’s name",
+      defaultLabel: "Default value",
+      defaultPlaceholder: "e.g. Alice",
+      remove: "Delete this variable",
+      confirmRemove: "Delete this variable?",
     },
   },
   view: {
@@ -946,5 +952,10 @@ export const bookVisualizerEn: BookVisualizerDict = {
     endRestart: "Read again",
     endEdit: "Make this my draft",
     endEditConfirm: "This replaces the draft you are editing. Continue?",
+    variables: {
+      title: "Before you read",
+      lead: "Enter names or words to use in the story. Empty fields keep their defaults.",
+      confirm: "Read with these names",
+    },
   },
 };

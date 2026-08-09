@@ -308,8 +308,8 @@ export const appsDe: AppsDictionary = {
     },
     install: {
       button: "Diese App zum Home-Bildschirm hinzufügen",
-      buttonShort: "Zum Home",
-      buttonTiny: "Hinzufügen",
+      buttonShort: "Installieren",
+      buttonTiny: "Installieren",
       buttonAria: "Mail-Vorlagen als eigenständige App zum Home-Bildschirm hinzufügen",
       modalTitle: "Zum Home-Bildschirm hinzufügen",
       modalLead: "Füge Mail-Vorlagen über Safari hinzu, um sie als eigene App zu öffnen — nicht über das Portal.",
@@ -569,8 +569,8 @@ export const appsDe: AppsDictionary = {
     },
     install: {
       button: "Diese App zum Home-Bildschirm hinzufügen",
-      buttonShort: "Zum Home",
-      buttonTiny: "Hinzufügen",
+      buttonShort: "Installieren",
+      buttonTiny: "Installieren",
       buttonAria: "Stapel-Bildkompressor als App zum Home-Bildschirm hinzufügen",
       modalTitle: "Zum Home-Bildschirm hinzufügen",
       modalLead: "Über Safari zum Home-Bildschirm hinzufügen, um den Stapel-Bildkompressor als eigenständige App zu öffnen.",
@@ -665,8 +665,8 @@ export const appsDe: AppsDictionary = {
     },
     install: {
       button: "Diese App zum Home-Bildschirm hinzufügen",
-      buttonShort: "Zum Home",
-      buttonTiny: "Hinzufügen",
+      buttonShort: "Installieren",
+      buttonTiny: "Installieren",
       buttonAria: "Form Maker als eigenständige App zum Home-Bildschirm hinzufügen",
       modalTitle: "Zum Home-Bildschirm hinzufügen",
       modalLead: "Füge Form Maker über Safari hinzu, um es als eigene App zu öffnen — nicht über das Portal.",
@@ -714,8 +714,8 @@ export const appsDe: AppsDictionary = {
     },
     install: {
       button: "Diese App zum Home-Bildschirm hinzufügen",
-      buttonShort: "Zum Home",
-      buttonTiny: "Hinzufügen",
+      buttonShort: "Installieren",
+      buttonTiny: "Installieren",
       buttonAria: "PDF-Editor als App zum Home-Bildschirm hinzufügen",
       modalTitle: "Zum Home-Bildschirm hinzufügen",
       modalLead: "Über Safari zum Home-Bildschirm hinzufügen, um den PDF-Editor als eigenständige App zu öffnen.",
@@ -1032,8 +1032,8 @@ export const appsDe: AppsDictionary = {
   },
   bookVisualizer: {
     shell: {
-      title: "AI Book Studio",
-      description: "Ein DTP-Editor, der KI-Arbeit direkt auf der Seite layoutet. Papierformat wählen, Zeichen und Zeilen festlegen — die Schriftgröße wird berechnet. Dann im Vertikal-, Horizontal- oder Foto-Stil fertigstellen und als .mybook teilen.",
+      title: "Quarto",
+      description: "Ein seitenzentrierter Buch-Editor. Papierformat, Zeichen und Zeilen festlegen — die Schriftgröße wird berechnet. Vertikal oder horizontal fertigstellen und als .mybook teilen.",
     },
     loading: "Wird geladen…",
     paper: {
@@ -1070,16 +1070,12 @@ export const appsDe: AppsDictionary = {
       sampleConfirm: "Aktuellen Entwurf durch dieses Beispiel ersetzen?",
       samples: {
         novel: {
-          title: "Japanischer Roman",
-          lead: "Bunko · vertikal. Vier Kapitel mit Abschnitten, Umbrüchen, Live-Inhaltsverzeichnis-Folios.",
+          title: "Japanischer Vertikalroman",
+          lead: "Bunko. Vier Kapitel mit Abschnitten, Umbrüchen und Live-TOC.",
         },
         western: {
-          title: "Westliches Paperback",
-          lead: "Trade · horizontal. Drei Kapitel plus Coda, mit manuellen Seitenumbrüchen.",
-        },
-        photo: {
-          title: "Bilder- / Fotobuch",
-          lead: "Quadrat. Fünf kurze Kapitel, Fototafeln, Titelseite und Inhaltsverzeichnis.",
+          title: "Englisches Trade-Paperback",
+          lead: "Trade · horizontal. Drei Kapitel plus Coda, mit manuellen Umbrüchen.",
         },
       },
       readTitle: ".mybook-Datei lesen",
@@ -1157,7 +1153,7 @@ export const appsDe: AppsDictionary = {
         tabFormat: "Format",
         tabPage: "Seite",
         tabBlock: "Block",
-        tabPrompts: "KI",
+        tabVariables: "Namen",
         openLabel: "Einstellungen",
         closeLabel: "Schließen",
       },
@@ -1296,19 +1292,21 @@ export const appsDe: AppsDictionary = {
         sizeError: "Bild zu groß (max. 3 MB). Zuerst komprimieren.",
         readError: "Bild konnte nicht gelesen werden.",
       },
-      prompts: {
-        heading: "Prompt-Notizen",
-        lead: "Bewährte Anweisungen und Referenznotizen hier behalten. Sie werden nie in geteilte Dateien aufgenommen.",
-        add: "+ Notiz hinzufügen",
-        empty: "Noch keine Notizen.",
-        titlePlaceholder: "Notizname (z. B. Tonfall)",
-        bodyPlaceholder: "Anweisungen schreiben, die du der KI gibst.",
-        copy: "Kopieren",
-        copied: "Kopiert",
-        copyFailed: "Kopieren fehlgeschlagen. Bitte Text manuell auswählen.",
-        remove: "Diese Notiz löschen",
-        confirmRemove: "Diese Notiz löschen?",
-      },
+    variables: {
+      heading: "Namensplatzhalter",
+      lead: "Wörter definieren, die Leser anpassen können. Im Text {{name1}} schreiben.",
+      tokenHint:
+        "Doppelte geschweifte Klammern (z. B. {{name1}}). Die Paginierung läuft nach der Ersetzung.",
+      add: "+ Variable hinzufügen",
+      empty: "Noch keine Variablen. Mit einer erscheint vor dem Lesen ein Setup.",
+      idLabel: "Code (ID im Text)",
+      labelLabel: "Bezeichnung (für Leser)",
+      labelPlaceholder: "z. B. Name der Hauptfigur",
+      defaultLabel: "Standardwert",
+      defaultPlaceholder: "z. B. Alice",
+      remove: "Diese Variable löschen",
+      confirmRemove: "Diese Variable löschen?",
+    },
     },
     view: {
       close: "Schließen",
@@ -1324,6 +1322,12 @@ export const appsDe: AppsDictionary = {
       endRestart: "Nochmal lesen",
       endEdit: "Als meinen Entwurf übernehmen",
       endEditConfirm: "Das ersetzt den Entwurf, den du bearbeitest. Fortfahren?",
+    variables: {
+      title: "Vor dem Lesen",
+      lead: "Namen oder Wörter eingeben. Leere Felder behalten den Standard.",
+      confirm: "Mit diesen Namen lesen",
+    },
+
     },
   },
   paletteCollector: {
@@ -1333,8 +1337,8 @@ export const appsDe: AppsDictionary = {
     },
     install: {
       button: "Diese App zum Home-Bildschirm hinzufügen",
-      buttonShort: "Zum Home",
-      buttonTiny: "Hinzufügen",
+      buttonShort: "Installieren",
+      buttonTiny: "Installieren",
       buttonAria: "Palette Collector als eigenständige App zum Home-Bildschirm hinzufügen",
       modalTitle: "Zum Home-Bildschirm hinzufügen",
       modalLead: "Füge Palette Collector über Safari hinzu, um es als eigene App zu öffnen — nicht über das Portal.",
@@ -1625,8 +1629,8 @@ export const appsDe: AppsDictionary = {
     },
     install: {
       button: "Diese App zum Home-Bildschirm hinzufügen",
-      buttonShort: "Zum Home",
-      buttonTiny: "Hinzufügen",
+      buttonShort: "Installieren",
+      buttonTiny: "Installieren",
       buttonAria: "Mittagessen-Sparen als eigenständige App zum Home-Bildschirm hinzufügen",
       modalTitle: "Zum Home-Bildschirm hinzufügen",
       modalLead: "Füge Mittagessen-Sparen über Safari hinzu, um es als eigene App zu öffnen — nicht über das Portal.",
@@ -1678,8 +1682,8 @@ export const appsDe: AppsDictionary = {
     },
     install: {
       button: "Diese App zum Home-Bildschirm hinzufügen",
-      buttonShort: "Zum Home",
-      buttonTiny: "Hinzufügen",
+      buttonShort: "Installieren",
+      buttonTiny: "Installieren",
       buttonAria: "Link Stocker als eigenständige App zum Home-Bildschirm hinzufügen",
       modalTitle: "Zum Home-Bildschirm hinzufügen",
       modalLead: "Füge Link Stocker über Safari hinzu, um es als eigene App zu öffnen — nicht über das Portal.",
@@ -1713,7 +1717,7 @@ export const appsDe: AppsDictionary = {
     },
     bookmarklet: {
       title: "💻 Desktop: auf Lesezeichenleiste ziehen",
-      hint: "Ziehe die Schaltfläche auf die Lesezeichenleiste (nach Updates ersetzen). Sie übergibt an einen offenen My-Tool-Box-Tab und speichert automatisch; der Hilfs-Tab schließt sich sofort.",
+      hint: "Ziehe die Schaltfläche auf die Lesezeichenleiste (nach Updates ersetzen). Sie übergibt an einen offenen blank-note-Tab und speichert automatisch; der Hilfs-Tab schließt sich sofort.",
       dragLabel: "Zum Merken senden",
     },
     share: {
@@ -1744,8 +1748,8 @@ export const appsDe: AppsDictionary = {
     },
     install: {
       button: "📱 Zum Home-Bildschirm",
-      buttonShort: "Zum Home",
-      buttonTiny: "Hinzufügen",
+      buttonShort: "Installieren",
+      buttonTiny: "Installieren",
       buttonAria: "Diese App zum Home-Bildschirm hinzufügen",
       modalTitle: "Zum Home-Bildschirm hinzufügen",
       modalLead: "Diese App über das Teilen-Menü hinzufügen.",
@@ -1936,8 +1940,8 @@ export const appsDe: AppsDictionary = {
     },
     install: {
       button: "📱 Zum Home-Bildschirm",
-      buttonShort: "Zum Home",
-      buttonTiny: "Hinzufügen",
+      buttonShort: "Installieren",
+      buttonTiny: "Installieren",
       buttonAria: "Zum Home-Bildschirm hinzufügen",
       modalTitle: "Zum Home-Bildschirm hinzufügen",
       modalLead: "Widme dein Leben der Lücke in einem eigenen Fenster.",
@@ -2102,7 +2106,7 @@ export const appsDe: AppsDictionary = {
       shareX: "Auf X teilen",
       shareXShort: "X",
       shareIntro: "🔐 Du hast eine Geheimnachricht!",
-      shareOutro: "Nur Personen mit der Passphrase können sie in der Chiffre-App von My Tool Box entschlüsseln 👇",
+      shareOutro: "Nur Personen mit der Passphrase können sie in der Chiffre-App von Blank Note entschlüsseln 👇",
     },
     decrypt: {
       cipherLabel: "Geheimtext (einfügen)",
@@ -2147,8 +2151,8 @@ export const appsDe: AppsDictionary = {
     },
     install: {
       button: "Diese App zum Home-Bildschirm hinzufügen",
-      buttonShort: "Zum Home",
-      buttonTiny: "Hinzufügen",
+      buttonShort: "Installieren",
+      buttonTiny: "Installieren",
       buttonAria: "Geheimnachricht als eigenständige App zum Home-Bildschirm hinzufügen",
       modalTitle: "Zum Home-Bildschirm hinzufügen",
       modalLead: "Füge Geheimnachricht über Safari hinzu, um sie als eigene App zu öffnen — nicht über das Portal.",
@@ -2168,12 +2172,12 @@ export const appsDe: AppsDictionary = {
   robotFreethrow: {
     shell: {
       title: "Projectile Freethrow",
-      description: "Winkel, Schub und Spin einstellen und den Wurf in einem Mini-Spiel mit Wurfphysik versenken.",
+      description: "Winkel, Anfangsgeschwindigkeit und Spin einstellen und den Wurf in einem Mini-Spiel mit Wurfphysik versenken.",
     },
     install: {
       button: "Diese App zum Home-Bildschirm hinzufügen",
-      buttonShort: "Zum Home",
-      buttonTiny: "Hinzufügen",
+      buttonShort: "Installieren",
+      buttonTiny: "Installieren",
       buttonAria: "Projectile Freethrow als eigenständige App zum Home-Bildschirm hinzufügen",
       modalTitle: "Zum Home-Bildschirm hinzufügen",
       modalLead: "Füge Projectile Freethrow über Safari hinzu, um es als eigene App zu öffnen — nicht über das Portal.",

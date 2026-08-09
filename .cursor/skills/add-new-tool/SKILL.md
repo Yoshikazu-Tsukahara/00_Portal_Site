@@ -1,6 +1,6 @@
 ---
 name: add-new-tool
-description: My Tool Box Portal に新規ツールまたは独立 PWA を追加する手順。新規アプリ作成、/tools 配下の追加、ポータル掲載、i18n 辞書登録、AppShell 統合、PWA 設定の依頼時に使用する。
+description: Blank Note Portal に新規ツールまたは独立 PWA を追加する手順。新規アプリ作成、/tools 配下の追加、ポータル掲載、i18n 辞書登録、AppShell 統合、PWA 設定の依頼時に使用する。
 ---
 
 # 新規ツール追加ワークフロー

@@ -158,7 +158,7 @@ export const cryptoMessageJa: CryptoMessageDict = {
     shareXShort: "X",
     shareIntro: "🔐 ひみつメッセージが届いたよ！",
     shareOutro:
-      "合言葉を知ってる人だけ「My Tool Box」の暗号アプリで解読してね👇",
+      "合言葉を知ってる人だけ「Blank Note」の暗号アプリで解読してね👇",
   },
   decrypt: {
     cipherLabel: "暗号文（貼り付け）",
@@ -205,13 +205,13 @@ export const cryptoMessageJa: CryptoMessageDict = {
     shareXShort: "X",
   },
   install: {
-    button: "このアプリをホーム画面に追加",
-    buttonShort: "ホームに追加",
-    buttonTiny: "追加",
-    buttonAria: "ひみつメッセージをホーム画面に追加してアプリとして使う",
-    modalTitle: "ホーム画面に追加",
+    button: "このアプリをインストール",
+    buttonShort: "インストール",
+    buttonTiny: "インストール",
+    buttonAria: "ひみつメッセージをインストールして、個別アプリとして使う",
+    modalTitle: "アプリをインストール",
     modalLead:
-      "Safari からホーム画面に追加すると、ひみつメッセージだけを独立アプリとしてすぐ開けます。",
+      "対応ブラウザからインストールすると、ひみつメッセージだけを個別アプリとしてすぐ開けます。",
     step1Title: "共有をタップ",
     step1Body: "画面下（または上）の共有アイコン［↑］をタップします。",
     step2Title: "「ホーム画面に追加」",
@@ -277,7 +277,7 @@ export const cryptoMessageEn: CryptoMessageDict = {
     shareXShort: "X",
     shareIntro: "🔐 You’ve got a secret message!",
     shareOutro:
-      "Only people with the passphrase can decode it in My Tool Box’s cipher app 👇",
+      "Only people with the passphrase can decode it in Blank Note’s cipher app 👇",
   },
   decrypt: {
     cipherLabel: "Ciphertext (paste)",
@@ -323,13 +323,13 @@ export const cryptoMessageEn: CryptoMessageDict = {
     shareXShort: "X",
   },
   install: {
-    button: "Add this app to Home Screen",
-    buttonShort: "Add to Home",
-    buttonTiny: "Add",
-    buttonAria: "Add Secret Message to your home screen as a standalone app",
-    modalTitle: "Add to Home Screen",
+    button: "Install this app",
+    buttonShort: "Install",
+    buttonTiny: "Install",
+    buttonAria: "Install Secret Message as a standalone app",
+    modalTitle: "Install app",
     modalLead:
-      "Add Secret Message from Safari to open it as its own app — not the portal.",
+      "Install Secret Message from Safari to open it as its own app — not the portal.",
     step1Title: "Tap Share",
     step1Body: "Tap the Share icon [↑] at the bottom (or top) of Safari.",
     step2Title: "Add to Home Screen",

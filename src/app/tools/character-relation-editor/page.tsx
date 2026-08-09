@@ -9,6 +9,7 @@ import { loadLocalJson, useLocalStorageState } from "@/lib/localData";
 import CharacterModal from "./CharacterModal";
 import DetailEditor from "./DetailEditor";
 import RelationCanvas from "./RelationCanvas";
+import { createSampleDiagram } from "./sample";
 import Sidebar from "./Sidebar";
 import {
   APP_ID,
@@ -28,7 +29,7 @@ const LEGACY_STORAGE_KEY = "character-relation-editor:v1";
 type MainTab = "canvas" | "detail";
 
 export default function CharacterRelationEditorPage() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const copy = t.apps.characterRelation;
   const [data, setData, { hydrated }] = useLocalStorageState<DiagramData>(
     STORAGE_KEY,
@@ -184,6 +185,30 @@ export default function CharacterRelationEditorPage() {
     });
   }
 
+  function resetSelection() {
+    setSelectedCharacterId(null);
+    setSelectedRelationId(null);
+    setLinkFromId(null);
+    setMainTab("canvas");
+  }
+
+  /** サンプル相関図を読み込む（既存データがある場合は確認） */
+  function handleLoadSample() {
+    const hasData =
+      data.characters.length > 0 || data.relations.length > 0;
+    if (hasData && !window.confirm(copy.confirmLoadSample)) return;
+    setData(createSampleDiagram(locale));
+    resetSelection();
+  }
+
+  /** キャラクターと関係線をすべて消す */
+  function handleClearAll() {
+    if (data.characters.length === 0 && data.relations.length === 0) return;
+    if (!window.confirm(copy.confirmClearAll)) return;
+    setData(emptyDiagram());
+    resetSelection();
+  }
+
   if (!hydrated) {
     return (
       <AppShell
@@ -215,13 +240,35 @@ export default function CharacterRelationEditorPage() {
         },
       }}
       actions={
-        <button
-          type="button"
-          onClick={openCreate}
-          className="btn-primary !px-3 !py-1.5 text-xs sm:text-sm"
-        >
-          {copy.sidebar.addCharacter}
-        </button>
+        <>
+          <button
+            type="button"
+            onClick={handleLoadSample}
+            className="btn-secondary !px-2 !py-1.5 text-[11px] sm:!px-3 sm:text-sm"
+            title={copy.sample.hint}
+          >
+            <span className="sm:hidden">{copy.sample.loadShort}</span>
+            <span className="hidden sm:inline">{copy.sample.load}</span>
+          </button>
+          <button
+            type="button"
+            onClick={handleClearAll}
+            disabled={
+              data.characters.length === 0 && data.relations.length === 0
+            }
+            className="btn-secondary !px-2 !py-1.5 text-[11px] text-rose-700 disabled:opacity-40 sm:!px-3 sm:text-sm"
+          >
+            <span className="sm:hidden">{copy.sample.clearShort}</span>
+            <span className="hidden sm:inline">{copy.sample.clear}</span>
+          </button>
+          <button
+            type="button"
+            onClick={openCreate}
+            className="btn-primary !px-2 !py-1.5 text-[11px] sm:!px-3 sm:text-sm"
+          >
+            {copy.sidebar.addCharacter}
+          </button>
+        </>
       }
     >
       <div className="flex min-h-0 flex-1 flex-col gap-3">
@@ -304,6 +351,7 @@ export default function CharacterRelationEditorPage() {
                   onCompleteLink={handleCompleteLink}
                   onUpdateRelation={handleUpdateRelation}
                   onOpenDetail={openDetail}
+                  onLoadSample={handleLoadSample}
                 />
               ) : (
                 <DetailEditor

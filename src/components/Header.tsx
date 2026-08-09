@@ -1,7 +1,10 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import LayoutToggle from "@/components/LayoutToggle";
+import LocalOnlyBadge from "@/components/LocalOnlyBadge";
 import { LanguageToggle, useI18n } from "@/i18n";
 import { useLayout } from "@/lib/layout";
 
@@ -13,13 +16,13 @@ const SITE_HEADER_HEIGHT_VAR = "--site-header-height";
 
 /**
  * サイト共通ヘッダー。
- * - 背景・下線は画面いっぱい
- * - ロゴ／言語／支援は contentClassName に乗せ、layoutMode に合わせて動かす
- * - 表示幅スイッチだけヘッダー中央（ビューポート中央）に固定し、切替で動かさない
+ * - タイトル・安心バッジ・ライブラリを1行に並べる（ホームはロゴ兼用）
+ * - 表示幅スイッチはヘッダー中央（ビューポート中央）に固定
  */
 export default function Header() {
   const { t, locale } = useI18n();
   const { contentClassName } = useLayout();
+  const pathname = usePathname();
   const headerRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -44,23 +47,46 @@ export default function Header() {
     };
   }, []);
 
+  const libraryActive =
+    pathname === "/library" || Boolean(pathname?.startsWith("/library/"));
+
   return (
     <header
       ref={headerRef}
-      className="sticky top-0 z-50 w-full border-b border-zinc-200/80 bg-zinc-50/80 backdrop-blur-md"
+      className="sticky top-0 z-50 w-full border-b border-zinc-200 bg-[color-mix(in_srgb,var(--background)_92%,white)] backdrop-blur-md"
     >
       <div className="relative">
-        {/* ロゴと右端操作：Main / Footer と同じコンテンツ幅で動く */}
         <div
-          className={`flex items-center justify-between gap-3 py-3.5 ${contentClassName}`}
+          className={`flex items-center justify-between gap-x-4 gap-y-2 py-3 ${contentClassName}`}
         >
-          <a
-            href="/"
-            className="relative z-10 shrink-0 text-base font-semibold tracking-tight text-zinc-900 transition-opacity hover:opacity-60"
-          >
-            {t.brand}
-          </a>
+          {/* 左：タイトル → 安心バッジ → ライブラリ（1行） */}
+          <div className="relative z-10 flex min-w-0 items-center gap-2.5 sm:gap-3.5">
+            <Link
+              href="/"
+              className="font-display shrink-0 text-lg font-bold leading-none tracking-tight text-zinc-900 transition-all duration-150 hover:opacity-70 sm:text-xl"
+            >
+              {t.brand}
+            </Link>
+            <LocalOnlyBadge className="local-only-badge--beside-title" />
 
+            <nav
+              aria-label="Blank Note"
+              className="ml-0.5 flex items-center sm:ml-1"
+            >
+              <Link
+                href="/library"
+                className={`font-display text-[11px] font-bold uppercase tracking-[0.12em] transition-all duration-150 sm:text-xs ${
+                  libraryActive
+                    ? "text-zinc-900 underline decoration-[var(--accent)] decoration-2 underline-offset-4"
+                    : "text-zinc-500 hover:text-zinc-800"
+                }`}
+              >
+                {t.header.libraryNav}
+              </Link>
+            </nav>
+          </div>
+
+          {/* 右：言語・応援（縦中央） */}
           <div className="relative z-10 flex shrink-0 items-center gap-2 sm:gap-3">
             <LanguageToggle />
 
@@ -83,7 +109,7 @@ export default function Header() {
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    className="text-rose-400/90"
+                    className="text-zinc-500"
                   >
                     <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
                   </svg>
@@ -107,7 +133,7 @@ export default function Header() {
           </div>
         </div>
 
-        {/* 表示幅スイッチ：ヘッダー中央に固定（layoutMode の影響を受けない） */}
+        {/* 表示幅スイッチ：ヘッダー中央に固定（縦も中央） */}
         <div className="pointer-events-none absolute inset-0 hidden items-center justify-center lg:flex">
           <div className="pointer-events-auto">
             <LayoutToggle />

@@ -1,21 +1,29 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Noto_Sans_JP, Space_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import SiteChrome from "@/components/SiteChrome";
 import { I18nProvider } from "@/i18n";
 import { LAYOUT_MODE_BOOTSTRAP_SCRIPT, LayoutProvider } from "@/lib/layout";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
+const spaceMono = Space_Mono({
+  variable: "--font-space-mono",
   subsets: ["latin"],
+  weight: ["400", "700"],
+  display: "swap",
+});
+
+const notoSansJp = Noto_Sans_JP({
+  variable: "--font-noto-sans-jp",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "My Tool Box | 個人開発ツールのポータルサイト",
+  title: "Blank Note | デスクトップ型ツールボックス",
   description:
-    "個人開発した便利ツールをジャンル別にまとめたポータルサイトです。",
+    "外部送信ゼロ・完全ローカル動作の個人開発ツールを、文房具テイストのランチャーでまとめたポータルサイトです。",
 };
 
 export default function RootLayout({
@@ -26,7 +34,7 @@ export default function RootLayout({
   return (
     <html
       lang="ja"
-      className={`${inter.variable} h-full antialiased`}
+      className={`${spaceMono.variable} ${notoSansJp.variable} h-full antialiased`}
       // bootstrap が data-layout-mode を付けるため、属性不一致を許容する
       suppressHydrationWarning
     >
@@ -36,7 +44,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: LAYOUT_MODE_BOOTSTRAP_SCRIPT }}
         />
       </head>
-      <body className="flex min-h-full flex-col bg-zinc-50 font-sans text-zinc-900">
+      <body className="flex min-h-full flex-col bg-[var(--background)] font-sans text-[var(--foreground)]">
         <I18nProvider>
           <LayoutProvider>
             <SiteChrome>{children}</SiteChrome>

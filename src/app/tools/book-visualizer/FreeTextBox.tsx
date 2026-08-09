@@ -18,6 +18,7 @@ import { bookFontCssFamily } from "./fonts";
 import { readEditableText, syncEditableText } from "./editableText";
 import { frameToPixels, pixelsToFrame, snapFrame, type SnapGuide } from "./snap";
 import type { FreeFrame, FreeTextBlock } from "./types";
+import VariableText from "./VariableText";
 
 type FreeTextBoxProps = {
   block: FreeTextBlock;
@@ -189,11 +190,11 @@ export default function FreeTextBox({
     return () => window.clearTimeout(timer);
   }, [editable, block.id]);
 
-  // props の文字を DOM へ載せる（編集フォーカス中だけスキップ）
+  // 編集中だけ props → DOM。非編集時は React の VariableText に任せる
   useLayoutEffect(() => {
     const element = ref.current;
-    if (!element) return;
-    if (editable && document.activeElement === element) return;
+    if (!element || !editable) return;
+    if (document.activeElement === element) return;
     syncEditableText(element, block.text);
   }, [block.text, editable, selected, block.id, interactive]);
 
@@ -215,6 +216,106 @@ export default function FreeTextBox({
 
   const canDrag = interactive && selected && !editing;
   const canResize = interactive && selected;
+
+  const inner = (
+    <div
+      ref={ref}
+      className="bv-free-text__inner"
+      style={writingStyle}
+      contentEditable={editable}
+      suppressContentEditableWarning
+      data-placeholder={placeholder}
+      data-empty={block.text.trim() === "" ? "true" : undefined}
+      title={interactive && selected && !editing ? dragHint : undefined}
+      tabIndex={interactive && selected && !editing ? 0 : undefined}
+      onMouseDown={
+        interactive
+          ? (event) => {
+              // 編集中はドラッグに吸われないよう止める。
+              // 非編集時は伝播させ、Rnd が枠ごと移動できるようにする。
+              if (editing) {
+                event.stopPropagation();
+              }
+              onSelect();
+            }
+          : undefined
+      }
+      onDoubleClick={
+        interactive
+          ? (event) => {
+              beginEditing(event);
+            }
+          : undefined
+      }
+      onClick={interactive ? stopBubble : undefined}
+      onKeyDown={
+        interactive && selected
+          ? (event: KeyboardEvent<HTMLDivElement>) => {
+              if (editing && event.key === "Escape") {
+                event.preventDefault();
+                event.stopPropagation();
+                endEditing(event.currentTarget);
+                return;
+              }
+              // 選択中（非編集）で Enter → 編集開始
+              if (
+                !editing &&
+                (event.key === "Enter" || event.key === "F2")
+              ) {
+                event.preventDefault();
+                beginEditing(event);
+              }
+            }
+          : undefined
+      }
+      onBlur={
+        editable
+          ? (event) => {
+              endEditing(event.currentTarget);
+            }
+          : undefined
+      }
+      onCompositionStart={editable ? handleCompositionStart : undefined}
+      onCompositionEnd={editable ? handleCompositionEnd : undefined}
+      onInput={
+        editable
+          ? (event: FormEvent<HTMLDivElement>) => {
+              const native = event.nativeEvent as InputEvent;
+              if (
+                event.currentTarget.dataset.composing === "1" ||
+                native.isComposing
+              ) {
+                return;
+              }
+              emitText(event.currentTarget);
+            }
+          : undefined
+      }
+      onPaste={editable ? handlePaste : undefined}
+    >
+      {/* 非編集時は {{id}} を強調。編集中は contentEditable が DOM を持つ */}
+      {editable ? null : <VariableText text={block.text} />}
+    </div>
+  );
+
+  // サムネ／閲覧／見開きの非アクティブ面：Rnd を使わず left/top（親 CSS scale と一致）
+  if (!interactive) {
+    return (
+      <div
+        className={boxClass}
+        style={{
+          left: px.x,
+          top: px.y,
+          width: px.width,
+          height: px.height,
+          fontFamily: fontCss,
+          ...zStyle,
+        }}
+      >
+        {inner}
+      </div>
+    );
+  }
 
   return (
     <Rnd
@@ -241,171 +342,67 @@ export default function FreeTextBox({
           : false
       }
       style={{ ...zStyle, fontFamily: fontCss }}
-      onDrag={
-        interactive
-          ? (_event, data) => {
-              previewSnap(
-                pixelsToFrame(
-                  data.x,
-                  data.y,
-                  px.width,
-                  px.height,
-                  sheetWidth,
-                  sheetHeight,
-                ),
-              );
-            }
-          : undefined
-      }
-      onDragStop={
-        interactive
-          ? (_event, data) => {
-              commitFrame(
-                pixelsToFrame(
-                  data.x,
-                  data.y,
-                  px.width,
-                  px.height,
-                  sheetWidth,
-                  sheetHeight,
-                ),
-              );
-            }
-          : undefined
-      }
-      onResize={
-        interactive
-          ? (_event, dir, element, _delta, position) => {
-              previewSnap(
-                pixelsToFrame(
-                  position.x,
-                  position.y,
-                  element.offsetWidth,
-                  element.offsetHeight,
-                  sheetWidth,
-                  sheetHeight,
-                ),
-                dir,
-              );
-            }
-          : undefined
-      }
-      onResizeStop={
-        interactive
-          ? (_event, dir, element, _delta, position) => {
-              commitFrame(
-                pixelsToFrame(
-                  position.x,
-                  position.y,
-                  element.offsetWidth,
-                  element.offsetHeight,
-                  sheetWidth,
-                  sheetHeight,
-                ),
-                dir,
-              );
-            }
-          : undefined
-      }
+      onDrag={(_event, data) => {
+        previewSnap(
+          pixelsToFrame(
+            data.x,
+            data.y,
+            px.width,
+            px.height,
+            sheetWidth,
+            sheetHeight,
+          ),
+        );
+      }}
+      onDragStop={(_event, data) => {
+        commitFrame(
+          pixelsToFrame(
+            data.x,
+            data.y,
+            px.width,
+            px.height,
+            sheetWidth,
+            sheetHeight,
+          ),
+        );
+      }}
+      onResize={(_event, dir, element, _delta, position) => {
+        previewSnap(
+          pixelsToFrame(
+            position.x,
+            position.y,
+            element.offsetWidth,
+            element.offsetHeight,
+            sheetWidth,
+            sheetHeight,
+          ),
+          dir,
+        );
+      }}
+      onResizeStop={(_event, dir, element, _delta, position) => {
+        commitFrame(
+          pixelsToFrame(
+            position.x,
+            position.y,
+            element.offsetWidth,
+            element.offsetHeight,
+            sheetWidth,
+            sheetHeight,
+          ),
+          dir,
+        );
+      }}
       className={boxClass}
-      onMouseDown={
-        interactive
-          ? (event) => {
-              stopBubble(event);
-              onSelect();
-            }
-          : undefined
-      }
-      onDoubleClick={
-        interactive
-          ? (event: ReactMouseEvent) => {
-              beginEditing(event);
-            }
-          : undefined
-      }
-      onClick={interactive ? stopBubble : undefined}
+      onMouseDown={(event) => {
+        stopBubble(event);
+        onSelect();
+      }}
+      onDoubleClick={(event: ReactMouseEvent) => {
+        beginEditing(event);
+      }}
+      onClick={stopBubble}
     >
-      <div
-        ref={ref}
-        className="bv-free-text__inner"
-        style={writingStyle}
-        contentEditable={editable}
-        suppressContentEditableWarning
-        data-placeholder={placeholder}
-        data-empty={block.text.trim() === "" ? "true" : undefined}
-        title={interactive && selected && !editing ? dragHint : undefined}
-        tabIndex={interactive && selected && !editing ? 0 : undefined}
-        onMouseDown={
-          interactive
-            ? (event) => {
-                // 編集中はドラッグに吸われないよう止める。
-                // 非編集時は伝播させ、Rnd が枠ごと移動できるようにする。
-                if (editing) {
-                  event.stopPropagation();
-                }
-                onSelect();
-              }
-            : undefined
-        }
-        onDoubleClick={
-          interactive
-            ? (event) => {
-                beginEditing(event);
-              }
-            : undefined
-        }
-        onClick={interactive ? stopBubble : undefined}
-        onKeyDown={
-          interactive && selected
-            ? (event: KeyboardEvent<HTMLDivElement>) => {
-                if (editing && event.key === "Escape") {
-                  event.preventDefault();
-                  event.stopPropagation();
-                  endEditing(event.currentTarget);
-                  return;
-                }
-                // 選択中（非編集）で Enter → 編集開始
-                if (
-                  !editing &&
-                  (event.key === "Enter" || event.key === "F2")
-                ) {
-                  event.preventDefault();
-                  beginEditing(event);
-                }
-              }
-            : undefined
-        }
-        onBlur={
-          editable
-            ? (event) => {
-                endEditing(event.currentTarget);
-              }
-            : undefined
-        }
-        onCompositionStart={editable ? handleCompositionStart : undefined}
-        onCompositionEnd={editable ? handleCompositionEnd : undefined}
-        onInput={
-          editable
-            ? (event: FormEvent<HTMLDivElement>) => {
-                const native = event.nativeEvent as InputEvent;
-                if (
-                  event.currentTarget.dataset.composing === "1" ||
-                  native.isComposing
-                ) {
-                  return;
-                }
-                emitText(event.currentTarget);
-              }
-            : undefined
-        }
-        onPaste={editable ? handlePaste : undefined}
-      >
-        {/*
-          非編集時は React 子でも文字を持つ。
-          contentEditable 解除や interactive 切替で DOM が空になっても紙面上は残る。
-        */}
-        {editable ? null : block.text}
-      </div>
+      {inner}
     </Rnd>
   );
 }

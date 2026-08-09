@@ -5,7 +5,7 @@ import { ROBOT_FREETHROW_MANIFEST_PATH } from "./manifest";
 export const metadata: Metadata = {
   title: "投射フリースロー",
   description:
-    "角度・推力・スピンを指定してリングを狙う、投射運動のミニゲーム。",
+    "角度・初速・スピンを指定してリングを狙う、投射運動のミニゲーム。",
   applicationName: "投射フリースロー",
   appleWebApp: {
     capable: true,

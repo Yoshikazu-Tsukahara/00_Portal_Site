@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja">
 
 <head>
@@ -826,7 +826,7 @@
       <!-- 答案：未知数（求める変数） -->
       <div class="margin-memo" id="marginMemo">
         <div class="memo-head">
-          <span class="memo-title" id="memoSolveTitle">[解] θ・F・Δy を求め、
+          <span class="memo-title" id="memoSolveTitle">[解] θ・v₀・Δy を求め、
 図で検証せよ</span>
           <span class="memo-tools">
             <button type="button" class="memo-icon analyze-btn" id="btnHint" title="地球標準での模範解答" aria-label="ANALYZE">💡
@@ -844,13 +844,13 @@
           <span class="memo-unit">°</span>
         </div>
         <div class="memo-row">
-          <label class="memo-label" for="power">
-            <span class="memo-sym">F</span> (Thrust)
+          <label class="memo-label" for="v0">
+            <span class="memo-sym">v₀</span> (Initial Speed)
             <span class="memo-eq">=</span>
           </label>
-          <input id="power" type="number" min="10" max="20000" step="5" value="280" inputmode="numeric"
-            aria-label="F Thrust" />
-          <span class="memo-unit">N</span>
+          <input id="v0" type="number" min="0.5" max="28" step="0.1" value="7.8" inputmode="decimal"
+            aria-label="v0 Initial Speed" />
+          <span class="memo-unit">m/s</span>
         </div>
         <div class="memo-row">
           <label class="memo-label" for="dy">
@@ -881,7 +881,7 @@
         <div class="panel">
           <h2 id="startTitle">投射フリースロー</h2>
           <p id="startBody">
-            右上の条件を見て、左上に θ・F・Δy を入力。<br />
+            右上の条件を見て、左上に θ・v₀・Δy を入力。<br />
             射手がたをタップしてシュートし、リングを狙おう。<br />
             各ステージの試行は 3 回まで。
           </p>
@@ -917,7 +917,7 @@
       const canvas = document.getElementById("game");
       const wrap = canvas.parentElement;
       const angleEl = document.getElementById("angle");
-      const powerEl = document.getElementById("power");
+      const v0El = document.getElementById("v0");
       const dyEl = document.getElementById("dy");
       const btnCamHome = document.getElementById("btnCamHome");
       const goalIndicator = document.getElementById("goalIndicator");
@@ -969,7 +969,7 @@
           const mid = ideal.found
             ? parts.recommend +
               `\n  θ  = ${ideal.angle} °\n` +
-              `  F  = ${ideal.F}\n` +
+              `  v₀ = ${ideal.v0} m/s\n` +
               `  Δy = ${ideal.dyCm} cm\n`
             : parts.noSolution + "\n";
           return head + mid + "\n" + parts.note(envName);
@@ -982,7 +982,7 @@
           tries: (n) => `試行 ${n}`,
           clears: (n) => `正答 ${n}`,
           stage: (n) => `問.${n}`,
-          solveTitle: "[解] θ・F・Δy を求め、\n図で検証せよ",
+          solveTitle: "[解] θ・v₀・Δy を求め、\n図で検証せよ",
           memoHint:
             "※ 記入後、図中の射手がたをタップして軌道を検証（Δy≠0 でスピン）",
           windTail: "追い風",
@@ -997,17 +997,17 @@
             current: (env, g, ball, m) =>
               `（本問：${env}  g≈${g} m/s²／${ball} m=${m}kg）`,
             ref: (g) => `（参考：地球標準 g≈${g} m/s², a_x=0 のとき）`,
-            recommend: "推奨解答（目安・推力 F と打点 Δy）：",
+            recommend: "推奨解答（目安・初速 v₀ と打点 Δy）：",
             noSolution: "解なし（この参考条件では到達困難）",
             note: (env) =>
-              `※ F は約 1/60 秒だけ加わる推力 [N]。Δv≈F/m·τ。\n` +
-              `  同じ F でも重い球ほど初速が小さい。Δy でスピン。\n` +
+              `※ v₀ は発射瞬間の初速 [m/s]。質量は軌道の慣性・スピンに効く。\n` +
+              `  Δy≠0 で打点オフセット＝スピン。\n` +
               `  与条件（${env}・g・a_x・m）に合わせて補正せよ。`,
           }),
           debugTitle: "HITBOX DEBUG (H)",
           debugBody: "赤=物理 緑=ネット 橙=開口 水色=抜け",
-          debugSolveOk: (a, F, dy, ax) =>
-            `SOLVE θ=${a} F=${F} Δy=${dy} ax=${ax} sim=OK`,
+          debugSolveOk: (a, v0, dy, ax) =>
+            `SOLVE θ=${a} v0=${v0} Δy=${dy} ax=${ax} sim=OK`,
           debugSolveFail: (ax) => `SOLVE impossible ax=${ax}`,
           debugSolveNone: "SOLVE (計算中…)",
           debugOn: "デバッグ ON",
@@ -1017,7 +1017,7 @@
           livesLeft: (n) => `残り試行 ${n}`,
           startTitle: "投射フリースロー",
           startBodyHtml:
-            "右上の条件を見て、左上に θ・F・Δy を入力。<br />" +
+            "右上の条件を見て、左上に θ・v₀・Δy を入力。<br />" +
             "射手がたをタップしてシュートし、リングを狙おう。<br />" +
             "各ステージの試行は 3 回まで。",
           startButton: "スタート",
@@ -1033,7 +1033,7 @@
           tries: (n) => `Tries ${n}`,
           clears: (n) => `Clears ${n}`,
           stage: (n) => `Q.${n}`,
-          solveTitle: "[Ans] Find θ, F, Δy,\nthen verify on the diagram",
+          solveTitle: "[Ans] Find θ, v₀, Δy,\nthen verify on the diagram",
           memoHint:
             "* After entering values, tap the shooter to verify the path (Δy≠0 adds spin)",
           windTail: "tailwind",
@@ -1048,17 +1048,17 @@
             current: (env, g, ball, m) =>
               `(This Q: ${env}  g≈${g} m/s² / ${ball} m=${m}kg)`,
             ref: (g) => `(Ref: Earth g≈${g} m/s², a_x=0)`,
-            recommend: "Suggested answer (F and Δy):",
+            recommend: "Suggested answer (v₀ and Δy):",
             noSolution: "No solution under this reference",
             note: (env) =>
-              `* F is thrust for ~1/60 s [N]. Δv≈F/m·τ.\n` +
-              `  Heavier balls get less speed at the same F. Spin via Δy.\n` +
+              `* v₀ is launch speed [m/s]. Mass affects inertia and spin.\n` +
+              `  Δy≠0 offsets the hit point (spin).\n` +
               `  Adjust for ${env}, g, a_x, and m.`,
           }),
           debugTitle: "HITBOX DEBUG (H)",
           debugBody: "red=body green=net orange=rim cyan=clear",
-          debugSolveOk: (a, F, dy, ax) =>
-            `SOLVE θ=${a} F=${F} Δy=${dy} ax=${ax} sim=OK`,
+          debugSolveOk: (a, v0, dy, ax) =>
+            `SOLVE θ=${a} v0=${v0} Δy=${dy} ax=${ax} sim=OK`,
           debugSolveFail: (ax) => `SOLVE impossible ax=${ax}`,
           debugSolveNone: "SOLVE (computing…)",
           debugOn: "Debug ON",
@@ -1068,7 +1068,7 @@
           livesLeft: (n) => `${n} tries left`,
           startTitle: "Projectile Free Throw",
           startBodyHtml:
-            "Check the given values (top right), then enter θ, F, and Δy (top left).<br />" +
+            "Check the given values (top right), then enter θ, v₀, and Δy (top left).<br />" +
             "Tap the shooter to launch and aim for the rim.<br />" +
             "You get up to 3 tries per stage.",
           startButton: "Start",
@@ -1084,7 +1084,7 @@
           tries: (n) => `尝试 ${n}`,
           clears: (n) => `通关 ${n}`,
           stage: (n) => `Q.${n}`,
-          solveTitle: "[解] 求 θ、F、Δy，\n并在图上验证",
+          solveTitle: "[解] 求 θ、v₀、Δy，\n并在图上验证",
           memoHint: "※ 填写后，点按图中的投手以验证轨迹（Δy≠0 产生旋转）",
           windTail: "顺风",
           windHead: "逆风",
@@ -1098,17 +1098,17 @@
             current: (env, g, ball, m) =>
               `（本题：${env}  g≈${g} m/s²／${ball} m=${m}kg）`,
             ref: (g) => `（参考：地球标准 g≈${g} m/s², a_x=0）`,
-            recommend: "建议答案（推力 F 与打点 Δy）：",
+            recommend: "建议答案（初速 v₀ 与打点 Δy）：",
             noSolution: "无解（此参考条件下难以到达）",
             note: (env) =>
-              `※ F 为约 1/60 秒的推力 [N]。Δv≈F/m·τ。\n` +
-              `  同样的 F，球越重初速越小。用 Δy 控制旋转。\n` +
+              `※ v₀ 为出手初速 [m/s]。质量影响惯性与旋转。\n` +
+              `  Δy≠0 产生打点偏移（旋转）。\n` +
               `  请按 ${env}、g、a_x、m 修正。`,
           }),
           debugTitle: "HITBOX DEBUG (H)",
           debugBody: "红=物理 绿=网 橙=篮圈 青=穿越",
-          debugSolveOk: (a, F, dy, ax) =>
-            `SOLVE θ=${a} F=${F} Δy=${dy} ax=${ax} sim=OK`,
+          debugSolveOk: (a, v0, dy, ax) =>
+            `SOLVE θ=${a} v0=${v0} Δy=${dy} ax=${ax} sim=OK`,
           debugSolveFail: (ax) => `SOLVE impossible ax=${ax}`,
           debugSolveNone: "SOLVE (计算中…)",
           debugOn: "调试 ON",
@@ -1118,7 +1118,7 @@
           livesLeft: (n) => `剩余 ${n} 次`,
           startTitle: "抛射罚球",
           startBodyHtml:
-            "查看右上条件，在左上输入 θ、F、Δy。<br />" +
+            "查看右上条件，在左上输入 θ、v₀、Δy。<br />" +
             "点击投手投篮，瞄准篮筐。<br />" +
             "每关最多尝试 3 次。",
           startButton: "开始",
@@ -1134,7 +1134,7 @@
           tries: (n) => `嘗試 ${n}`,
           clears: (n) => `過關 ${n}`,
           stage: (n) => `Q.${n}`,
-          solveTitle: "[解] 求 θ、F、Δy，\n並在圖上驗證",
+          solveTitle: "[解] 求 θ、v₀、Δy，\n並在圖上驗證",
           memoHint: "※ 填寫後，點按圖中的投手以驗證軌跡（Δy≠0 產生旋轉）",
           windTail: "順風",
           windHead: "逆風",
@@ -1148,17 +1148,17 @@
             current: (env, g, ball, m) =>
               `（本題：${env}  g≈${g} m/s²／${ball} m=${m}kg）`,
             ref: (g) => `（參考：地球標準 g≈${g} m/s², a_x=0）`,
-            recommend: "建議答案（推力 F 與打點 Δy）：",
+            recommend: "建議答案（初速 v₀ 與打點 Δy）：",
             noSolution: "無解（此參考條件下難以到達）",
             note: (env) =>
-              `※ F 為約 1/60 秒的推力 [N]。Δv≈F/m·τ。\n` +
-              `  同樣的 F，球越重初速越小。用 Δy 控制旋轉。\n` +
+              `※ v₀ 為出手初速 [m/s]。質量影響慣性與旋轉。\n` +
+              `  Δy≠0 產生打點偏移（旋轉）。\n` +
               `  請依 ${env}、g、a_x、m 修正。`,
           }),
           debugTitle: "HITBOX DEBUG (H)",
           debugBody: "紅=物理 綠=網 橙=籃圈 青=穿越",
-          debugSolveOk: (a, F, dy, ax) =>
-            `SOLVE θ=${a} F=${F} Δy=${dy} ax=${ax} sim=OK`,
+          debugSolveOk: (a, v0, dy, ax) =>
+            `SOLVE θ=${a} v0=${v0} Δy=${dy} ax=${ax} sim=OK`,
           debugSolveFail: (ax) => `SOLVE impossible ax=${ax}`,
           debugSolveNone: "SOLVE (計算中…)",
           debugOn: "除錯 ON",
@@ -1168,7 +1168,7 @@
           livesLeft: (n) => `剩餘 ${n} 次`,
           startTitle: "拋射罰球",
           startBodyHtml:
-            "查看右上條件，在左上輸入 θ、F、Δy。<br />" +
+            "查看右上條件，在左上輸入 θ、v₀、Δy。<br />" +
             "點擊投手投籃，瞄準籃筐。<br />" +
             "每關最多嘗試 3 次。",
           startButton: "開始",
@@ -1184,7 +1184,7 @@
           tries: (n) => `시도 ${n}`,
           clears: (n) => `클리어 ${n}`,
           stage: (n) => `Q.${n}`,
-          solveTitle: "[풀이] θ·F·Δy를 구하고\n도형으로 검증하라",
+          solveTitle: "[풀이] θ·v₀·Δy를 구하고\n도형으로 검증하라",
           memoHint:
             "※ 입력 후 그림의 슈터를 탭해 궤적을 검증하세요 (Δy≠0이면 스핀)",
           windTail: "순풍",
@@ -1199,17 +1199,17 @@
             current: (env, g, ball, m) =>
               `(이 문제: ${env}  g≈${g} m/s² / ${ball} m=${m}kg)`,
             ref: (g) => `(참고: 지구 표준 g≈${g} m/s², a_x=0)`,
-            recommend: "권장 답안 (추력 F, 타점 Δy):",
+            recommend: "권장 답안 (초속 v₀, 타점 Δy):",
             noSolution: "해 없음 (이 참고 조건으로는 도달 어려움)",
             note: (env) =>
-              `※ F는 약 1/60초 추력 [N]. Δv≈F/m·τ.\n` +
-              `  같은 F라도 무거운 공일수록 초속이 작다. Δy로 스핀.\n` +
+              `※ v₀는 발사 순간 초속 [m/s]. 질량은 관성·스핀에 영향.\n` +
+              `  Δy≠0이면 타점 오프셋(스핀).\n` +
               `  ${env}·g·a_x·m에 맞춰 보정하라.`,
           }),
           debugTitle: "HITBOX DEBUG (H)",
           debugBody: "빨강=물리 초록=네트 주황=림 청록=통과",
-          debugSolveOk: (a, F, dy, ax) =>
-            `SOLVE θ=${a} F=${F} Δy=${dy} ax=${ax} sim=OK`,
+          debugSolveOk: (a, v0, dy, ax) =>
+            `SOLVE θ=${a} v0=${v0} Δy=${dy} ax=${ax} sim=OK`,
           debugSolveFail: (ax) => `SOLVE impossible ax=${ax}`,
           debugSolveNone: "SOLVE (계산 중…)",
           debugOn: "디버그 ON",
@@ -1219,7 +1219,7 @@
           livesLeft: (n) => `남은 시도 ${n}`,
           startTitle: "투사 프리스로",
           startBodyHtml:
-            "오른쪽 위 조건을 보고, 왼쪽 위에 θ·F·Δy를 입력하세요.<br />" +
+            "오른쪽 위 조건을 보고, 왼쪽 위에 θ·v₀·Δy를 입력하세요.<br />" +
             "슈터를 탭해 슛하고 림을 노리세요.<br />" +
             "스테이지마다 시도는 3회까지.",
           startButton: "시작",
@@ -1235,7 +1235,7 @@
           tries: (n) => `Intentos ${n}`,
           clears: (n) => `Aciertos ${n}`,
           stage: (n) => `Q.${n}`,
-          solveTitle: "[Sol] Hallar θ, F, Δy\ny verificar en el diagrama",
+          solveTitle: "[Sol] Hallar θ, v₀, Δy\ny verificar en el diagrama",
           memoHint:
             "* Tras rellenar, toca al tirador para verificar la trayectoria (Δy≠0 da efecto)",
           windTail: "viento a favor",
@@ -1250,17 +1250,17 @@
             current: (env, g, ball, m) =>
               `(Esta P: ${env}  g≈${g} m/s² / ${ball} m=${m}kg)`,
             ref: (g) => `(Ref: Tierra g≈${g} m/s², a_x=0)`,
-            recommend: "Respuesta sugerida (F y Δy):",
+            recommend: "Respuesta sugerida (v₀ y Δy):",
             noSolution: "Sin solución en esta referencia",
             note: (env) =>
-              `* F es empuje ~1/60 s [N]. Δv≈F/m·τ.\n` +
-              `  A igual F, más masa ⇒ menos velocidad. Spin con Δy.\n` +
+              `* v₀ es la velocidad inicial [m/s]. La masa afecta inercia y efecto.\n` +
+              `  Δy≠0 desplaza el punto de golpe (spin).\n` +
               `  Ajusta a ${env}, g, a_x y m.`,
           }),
           debugTitle: "HITBOX DEBUG (H)",
           debugBody: "rojo=cuerpo verde=red naranja=aro cian=paso",
-          debugSolveOk: (a, F, dy, ax) =>
-            `SOLVE θ=${a} F=${F} Δy=${dy} ax=${ax} sim=OK`,
+          debugSolveOk: (a, v0, dy, ax) =>
+            `SOLVE θ=${a} v0=${v0} Δy=${dy} ax=${ax} sim=OK`,
           debugSolveFail: (ax) => `SOLVE impossible ax=${ax}`,
           debugSolveNone: "SOLVE (calculando…)",
           debugOn: "Depuración ON",
@@ -1270,7 +1270,7 @@
           livesLeft: (n) => `${n} intentos`,
           startTitle: "Tiro libre proyectil",
           startBodyHtml:
-            "Mira las condiciones (arriba derecha) e introduce θ, F y Δy (arriba izquierda).<br />" +
+            "Mira las condiciones (arriba derecha) e introduce θ, v₀ y Δy (arriba izquierda).<br />" +
             "Toca al tirador para lanzar y apunta al aro.<br />" +
             "Hasta 3 intentos por etapa.",
           startButton: "Empezar",
@@ -1286,7 +1286,7 @@
           tries: (n) => `Essais ${n}`,
           clears: (n) => `Réussis ${n}`,
           stage: (n) => `Q.${n}`,
-          solveTitle: "[Sol] Trouver θ, F, Δy\net vérifier sur le schéma",
+          solveTitle: "[Sol] Trouver θ, v₀, Δy\net vérifier sur le schéma",
           memoHint:
             "* Après saisie, touchez le tireur pour vérifier la trajectoire (Δy≠0 = spin)",
           windTail: "vent arrière",
@@ -1301,17 +1301,17 @@
             current: (env, g, ball, m) =>
               `(Cette Q : ${env}  g≈${g} m/s² / ${ball} m=${m}kg)`,
             ref: (g) => `(Réf. : Terre g≈${g} m/s², a_x=0)`,
-            recommend: "Réponse suggérée (F et Δy) :",
+            recommend: "Réponse suggérée (v₀ et Δy) :",
             noSolution: "Pas de solution sous cette référence",
             note: (env) =>
-              `* F = poussée ~1/60 s [N]. Δv≈F/m·τ.\n` +
-              `  À F égal, plus la balle est lourde, plus v₀ baisse. Spin via Δy.\n` +
+              `* v₀ est la vitesse initiale [m/s]. La masse agit sur l’inertie et le spin.\n` +
+              `  Δy≠0 décale le point d’impact (spin).\n` +
               `  Corrige pour ${env}, g, a_x et m.`,
           }),
           debugTitle: "HITBOX DEBUG (H)",
           debugBody: "rouge=corps vert=filet orange=anneau cyan=passage",
-          debugSolveOk: (a, F, dy, ax) =>
-            `SOLVE θ=${a} F=${F} Δy=${dy} ax=${ax} sim=OK`,
+          debugSolveOk: (a, v0, dy, ax) =>
+            `SOLVE θ=${a} v0=${v0} Δy=${dy} ax=${ax} sim=OK`,
           debugSolveFail: (ax) => `SOLVE impossible ax=${ax}`,
           debugSolveNone: "SOLVE (calcul…)",
           debugOn: "Debug ON",
@@ -1321,7 +1321,7 @@
           livesLeft: (n) => `${n} essais`,
           startTitle: "Lancer franc projectile",
           startBodyHtml:
-            "Regardez les données (haut droite), saisissez θ, F et Δy (haut gauche).<br />" +
+            "Regardez les données (haut droite), saisissez θ, v₀ et Δy (haut gauche).<br />" +
             "Touchez le tireur pour lancer vers l’anneau.<br />" +
             "Jusqu’à 3 essais par étape.",
           startButton: "Démarrer",
@@ -1337,7 +1337,7 @@
           tries: (n) => `Versuche ${n}`,
           clears: (n) => `Treffer ${n}`,
           stage: (n) => `Q.${n}`,
-          solveTitle: "[Lös] θ, F, Δy finden\nund am Diagramm prüfen",
+          solveTitle: "[Lös] θ, v₀, Δy finden\nund am Diagramm prüfen",
           memoHint:
             "* Nach Eingabe den Schützen antippen, um die Bahn zu prüfen (Δy≠0 = Spin)",
           windTail: "Rückenwind",
@@ -1352,17 +1352,17 @@
             current: (env, g, ball, m) =>
               `(Diese A: ${env}  g≈${g} m/s² / ${ball} m=${m}kg)`,
             ref: (g) => `(Ref: Erde g≈${g} m/s², a_x=0)`,
-            recommend: "Vorschlag (Schub F und Δy):",
+            recommend: "Vorschlag (v₀ und Δy):",
             noSolution: "Keine Lösung unter dieser Referenz",
             note: (env) =>
-              `* F ist Schub ~1/60 s [N]. Δv≈F/m·τ.\n` +
-              `  Gleich F: schwererer Ball ⇒ kleinere v₀. Spin über Δy.\n` +
+              `* v₀ ist die Anfangsgeschwindigkeit [m/s]. Masse wirkt auf Trägheit und Spin.\n` +
+              `  Δy≠0 versetzt den Treffpunkt (Spin).\n` +
               `  Anpassen an ${env}, g, a_x und m.`,
           }),
           debugTitle: "HITBOX DEBUG (H)",
           debugBody: "rot=Körper grün=Netz orange=Ring cyan=Durchgang",
-          debugSolveOk: (a, F, dy, ax) =>
-            `SOLVE θ=${a} F=${F} Δy=${dy} ax=${ax} sim=OK`,
+          debugSolveOk: (a, v0, dy, ax) =>
+            `SOLVE θ=${a} v0=${v0} Δy=${dy} ax=${ax} sim=OK`,
           debugSolveFail: (ax) => `SOLVE impossible ax=${ax}`,
           debugSolveNone: "SOLVE (berechne…)",
           debugOn: "Debug AN",
@@ -1372,7 +1372,7 @@
           livesLeft: (n) => `${n} Versuche`,
           startTitle: "Wurf-Freistoß",
           startBodyHtml:
-            "Bedingungen oben rechts prüfen, θ, F und Δy links oben eingeben.<br />" +
+            "Bedingungen oben rechts prüfen, θ, v₀ und Δy links oben eingeben.<br />" +
             "Schützen antippen und auf den Ring zielen.<br />" +
             "Bis zu 3 Versuche pro Stufe.",
           startButton: "Start",
@@ -1388,7 +1388,7 @@
           tries: (n) => `Tentativas ${n}`,
           clears: (n) => `Acertos ${n}`,
           stage: (n) => `Q.${n}`,
-          solveTitle: "[Sol] Ache θ, F, Δy\ne verifique no diagrama",
+          solveTitle: "[Sol] Ache θ, v₀, Δy\ne verifique no diagrama",
           memoHint:
             "* Depois de preencher, toque no atirador para verificar a trajetória (Δy≠0 = spin)",
           windTail: "vento a favor",
@@ -1403,17 +1403,17 @@
             current: (env, g, ball, m) =>
               `(Esta Q: ${env}  g≈${g} m/s² / ${ball} m=${m}kg)`,
             ref: (g) => `(Ref: Terra g≈${g} m/s², a_x=0)`,
-            recommend: "Resposta sugerida (F e Δy):",
+            recommend: "Resposta sugerida (v₀ e Δy):",
             noSolution: "Sem solução nesta referência",
             note: (env) =>
-              `* F é impulso ~1/60 s [N]. Δv≈F/m·τ.\n` +
-              `  Mesmo F: bola mais pesada ⇒ menor v₀. Spin com Δy.\n` +
+              `* v₀ é a velocidade inicial [m/s]. A massa afeta inércia e spin.\n` +
+              `  Δy≠0 desloca o ponto de impacto (spin).\n` +
               `  Ajuste para ${env}, g, a_x e m.`,
           }),
           debugTitle: "HITBOX DEBUG (H)",
           debugBody: "vermelho=corpo verde=rede laranja=aro ciano=passagem",
-          debugSolveOk: (a, F, dy, ax) =>
-            `SOLVE θ=${a} F=${F} Δy=${dy} ax=${ax} sim=OK`,
+          debugSolveOk: (a, v0, dy, ax) =>
+            `SOLVE θ=${a} v0=${v0} Δy=${dy} ax=${ax} sim=OK`,
           debugSolveFail: (ax) => `SOLVE impossible ax=${ax}`,
           debugSolveNone: "SOLVE (calculando…)",
           debugOn: "Debug ON",
@@ -1423,7 +1423,7 @@
           livesLeft: (n) => `${n} tentativas`,
           startTitle: "Lance livre projetil",
           startBodyHtml:
-            "Veja as condições (canto superior direito) e digite θ, F e Δy (esquerdo).<br />" +
+            "Veja as condições (canto superior direito) e digite θ, v₀ e Δy (esquerdo).<br />" +
             "Toque no atirador para lançar e mire o aro.<br />" +
             "Até 3 tentativas por etapa.",
           startButton: "Começar",
@@ -1451,7 +1451,7 @@
           /* ignore */
         }
         try {
-          const s = localStorage.getItem("my-tool-box-locale");
+          const s = localStorage.getItem("blank-note-locale");
           if (s) return normalizeUiLocale(s);
         } catch {
           /* ignore */
@@ -1503,16 +1503,18 @@
       const BALL_FRICTION_AIR = 0;
       const BALL_DENSITY = 0.0032;
       /**
-       * 初期推力 F [N] と打点オフセット Δy [cm]。
-       * 接触時間 τ=1/60s の間、一定推力 F を加えるイメージ（Δv = F/m·τ）。
-       * Matter 0.19 は力を (F/m)·Δt² で積分するため、SI→エンジン単位へ換算する。
+       * 初速 v₀ [m/s] と打点オフセット Δy [cm]。
+       * 内部では一瞬の推力 F=m·v₀/τ（τ=1/60s）へ換算して Matter.applyForce する。
        */
-      const F_MIN = 10;
-      const F_MAX = 20000; // Steel 15kg でも 10m 級の放物線が取れるよう解放
-      /** Basketball で典型距離（約 5–8m）を狙える目安（v₀≈7.8 m/s） */
-      const F_DEFAULT = 280;
-      /** シュート時の推力が作用する時間 [s]（1フレーム分） */
+      const V0_MIN = 0.5;
+      const V0_MAX = 28; // 速度上限 BALL_SPEED_CAP と同程度
+      /** Basketball で典型距離（約 5–8m）を狙える目安 */
+      const V0_DEFAULT = 7.8;
+      /** 内部換算用：推力が作用する時間 [s]（1フレーム分） */
       const THRUST_CONTACT_S = 1 / 60;
+      /** 探索・換算用の推力レンジ（UI には出さない） */
+      const F_MIN = 10;
+      const F_MAX = 20000;
       /** Δy：ボール中心からの鉛直オフセット（＋＝下側を打つ → バックスピン気味） */
       const DY_CM_MIN = -8;
       const DY_CM_MAX = 8;
@@ -1871,7 +1873,7 @@
       }
 
       /**
-       * 入力 F [N] → Matter.applyForce 用の力。
+       * 内部推力 F [N] → Matter.applyForce 用の力。
        * Matter 0.19 の Verlet 積分: Δ(位置) += (F_m/m)·Δt²
        * 一方 setVelocity(v) の v はベースフレーム（Δt₀）あたりの移動量。
        * 「τ 秒だけ F を加えた SI 初速」が、次のサブステップ更新で同じ移動量になるよう換算する。
@@ -1887,19 +1889,56 @@
         );
       }
 
+      /** v₀ [m/s] → 内部推力 F [N]（Δv = F/m·τ より） */
+      function thrustFromV0(v0Ms, massKg) {
+        const m = massKg > 0 ? massKg : 0.6;
+        return (v0Ms * m) / THRUST_CONTACT_S;
+      }
+
+      /** 内部推力 F [N] → v₀ [m/s] */
+      function v0FromThrust(Fsi, massKg) {
+        const m = massKg > 0 ? massKg : 0.6;
+        return (Fsi * THRUST_CONTACT_S) / m;
+      }
+
+      function roundV0(v) {
+        return Math.round(v * 10) / 10;
+      }
+
       /**
-       * 7物理量に基づく発射：
-       * F[N]・θ → 力ベクトル、Δy → 作用点オフセット（トルク＝スピン）。
-       * 同じ F でも重い球ほど初速が小さい（Δv = F/m · τ）。
+       * 発射：v₀・θ → 初速、Δy → 作用点オフセット（トルク＝スピン）。
+       * Matter へは等価な一瞬の推力 F=m·v₀/τ として渡す。
        */
-      function applyShotForce(body, thetaRad, Fsi, deltaYPx) {
+      function applyShotVelocity(body, thetaRad, v0Ms, deltaYPx, massKg) {
         if (!body) return;
+        const Fsi = thrustFromV0(v0Ms, massKg);
         const Fm = thrustNewtonsToMatterForce(Fsi);
         const forceX = Fm * Math.cos(thetaRad);
         const forceY = -Fm * Math.sin(thetaRad); // 画面上方向はマイナス
         Body.setVelocity(body, { x: 0, y: 0 });
         Body.setAngularVelocity(body, 0);
         // 重心から Δy ずらした点に力を加え、トルクでスピンを生む
+        Body.applyForce(
+          body,
+          {
+            x: body.position.x,
+            y: body.position.y + deltaYPx,
+          },
+          {
+            x: forceX,
+            y: forceY,
+          },
+        );
+      }
+
+      /** @deprecated 内部探索用。プレイヤー入力は applyShotVelocity を使う */
+      function applyShotForce(body, thetaRad, Fsi, deltaYPx) {
+        if (!body) return;
+        const Fm = thrustNewtonsToMatterForce(Fsi);
+        const forceX = Fm * Math.cos(thetaRad);
+        const forceY = -Fm * Math.sin(thetaRad);
+        Body.setVelocity(body, { x: 0, y: 0 });
+        Body.setAngularVelocity(body, 0);
         Body.applyForce(
           body,
           {
@@ -3476,14 +3515,14 @@
       /** 余白メモの数値を読み取り・正規化（空欄や不正値は直前の値を維持） */
       function readShotParams() {
         const degRaw = parseMemoNumber(angleEl, state.armAngleDeg);
-        const fRaw = parseMemoNumber(powerEl, F_DEFAULT);
+        const v0Raw = parseMemoNumber(v0El, V0_DEFAULT);
         const dyRaw = parseMemoNumber(dyEl, DY_CM_DEFAULT);
         return {
           deg: clamp(Math.round(degRaw.value), 0, 90),
-          F: clamp(Math.round(fRaw.value), F_MIN, F_MAX),
+          v0: clamp(roundV0(v0Raw.value), V0_MIN, V0_MAX),
           dyCm: clamp(Math.round(dyRaw.value * 2) / 2, DY_CM_MIN, DY_CM_MAX),
           degOk: degRaw.ok,
-          fOk: fRaw.ok,
+          v0Ok: v0Raw.ok,
           dyOk: dyRaw.ok,
         };
       }
@@ -3497,16 +3536,17 @@
 
       function shoot() {
         if (!state.playing || state.ballInFlight || !ball || !state.stage) return;
-        const { deg, F, dyCm } = readShotParams();
+        const { deg, v0, dyCm } = readShotParams();
         // 入力欄の表示は書き換えない（クランプ値は挙動にだけ使う）
         state.armAngleDeg = deg;
         const theta = (deg * Math.PI) / 180;
         const deltaYPx = dyCmToPx(dyCm);
+        const mass = getBallType(state.stage).mass;
 
         // 発射は常に絶対原点 O（手先・方眼交差）。見た目のスイングは後から追従
         if (ball.isStatic) Body.setStatic(ball, false);
         // 静的解除後も球種質量を再適用（復元漏れ・density 由来の質量ずれを防ぐ）
-        applyBallMass(ball, getBallType(state.stage).mass);
+        applyBallMass(ball, mass);
         // 反発係数も球種どおり（setStatic 復元後のずれ防止）
         ball.restitution = state.stage.restitution;
         ball.friction = BALL_FRICTION;
@@ -3514,9 +3554,8 @@
         Body.setPosition(ball, { x: origin.x, y: origin.y });
         Body.setAngle(ball, 0);
 
-        // —— 7物理量に基づく applyForce ——
-        // m,e = 球種 / g,Wx = ステージ重力 / θ,F,Δy = 入力
-        applyShotForce(ball, theta, F, deltaYPx);
+        // m,e = 球種 / g,Wx = ステージ重力 / θ,v₀,Δy = 入力
+        applyShotVelocity(ball, theta, v0, deltaYPx, mass);
 
         state.ballInFlight = true;
         state.scoredThisShot = false;
@@ -4041,7 +4080,7 @@
       }
 
       /**
-       * プレイヤー入力と同じ角度範囲（既定 0〜90°）で θ・F を探索。
+       * プレイヤー入力と同じ角度範囲（既定 0〜90°）で θ・v₀ を探索。
        * options.angleStep で粗さ、boardSweep でボード込み直接探索の有無を調整。
        */
       function searchIdealShot(dist, height, env, options) {
@@ -4133,6 +4172,7 @@
         if (!best) {
           return {
             angle: null,
+            v0: null,
             F: null,
             dyCm: 0,
             found: false,
@@ -4151,6 +4191,7 @@
         );
         return {
           angle: best.angle,
+          v0: roundV0(v0FromThrust(best.F, mass)),
           F: best.F,
           dyCm: best.dyCm,
           found: true,
@@ -4187,7 +4228,13 @@
           return;
         }
         angleEl.value = String(sol.angle);
-        powerEl.value = String(sol.F);
+        v0El.value = String(
+          sol.v0 != null
+            ? sol.v0
+            : roundV0(
+                v0FromThrust(sol.F, getBallType(state.stage).mass),
+              ),
+        );
         dyEl.value = String(sol.dyCm);
         syncFromMemo();
       }
@@ -5083,7 +5130,16 @@
           const sol = debugSolveResult;
           const ok = sol.found && sol.verified;
           solveLine = ok
-            ? c.debugSolveOk(sol.angle, sol.F, sol.dyCm, axLabel)
+            ? c.debugSolveOk(
+                sol.angle,
+                sol.v0 != null
+                  ? sol.v0
+                  : roundV0(
+                      v0FromThrust(sol.F, getBallType(state.stage).mass),
+                    ),
+                sol.dyCm,
+                axLabel,
+              )
             : c.debugSolveFail(axLabel);
         } else if (debugSolveBusy) {
           solveLine = c.debugSolveNone;
@@ -5274,7 +5330,7 @@
       }
 
       // 余白メモ入力 → 腕の角度を追従（入力表示は自動で書き換えない）
-      for (const el of [angleEl, powerEl, dyEl]) {
+      for (const el of [angleEl, v0El, dyEl]) {
         el.addEventListener("input", () => syncFromMemo());
         el.addEventListener("change", () => syncFromMemo());
         el.addEventListener("blur", () => syncFromMemo());

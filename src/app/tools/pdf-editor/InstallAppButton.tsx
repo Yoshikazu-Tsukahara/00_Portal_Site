@@ -5,7 +5,7 @@ import type { PdfEditorDict } from "@/i18n/apps/pdfEditor";
 import InstallGuideModal from "./InstallGuideModal";
 import { usePwaInstall } from "./usePwaInstall";
 
-/** バックアップ横に置くコンパクトな「ホームに追加」ボタン */
+/** バックアップ横に置くコンパクトな「インストール」ボタン */
 export default function InstallAppButton({
   copy,
 }: {

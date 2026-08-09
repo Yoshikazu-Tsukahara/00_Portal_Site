@@ -4,8 +4,8 @@ import type { AppsDictionary } from "../../apps";
 export const appsFr: AppsDictionary = {
   bookVisualizer: {
     shell: {
-      title: "AI Book Studio",
-      description: "Un éditeur PAO qui met en page le travail IA directement sur la page. Choisissez un format papier, définissez caractères et lignes, et la taille de police est calculée pour vous — puis terminez en vertical, horizontal ou style photo et partagez en fichier .mybook.",
+      title: "Quarto",
+      description: "Un éditeur de livres centré sur la page. Choisissez le format, définissez caractères et lignes — la taille de police est calculée. Terminez en vertical ou horizontal et partagez en .mybook.",
     },
     loading: "Chargement…",
     paper: {
@@ -42,16 +42,12 @@ export const appsFr: AppsDictionary = {
       sampleConfirm: "Remplacer votre brouillon actuel par cet exemple ?",
       samples: {
         novel: {
-          title: "Roman japonais",
-          lead: "Bunko · vertical. Quatre chapitres avec sections, coupures, folios TOC en direct.",
+          title: "Roman japonais vertical",
+          lead: "Bunko. Quatre chapitres avec sections, sauts et TOC live.",
         },
         western: {
-          title: "Poche occidental",
-          lead: "Trade · horizontal. Trois chapitres plus coda, avec sauts de page manuels.",
-        },
-        photo: {
-          title: "Album illustré / photo",
-          lead: "Carré. Cinq courts chapitres, planches photo, page de titre et TOC.",
+          title: "Trade paperback anglais",
+          lead: "Trade · horizontal. Trois chapitres plus coda, avec sauts manuels.",
         },
       },
       readTitle: "Lire un fichier .mybook",
@@ -129,7 +125,7 @@ export const appsFr: AppsDictionary = {
         tabFormat: "Format",
         tabPage: "Page",
         tabBlock: "Bloc",
-        tabPrompts: "IA",
+        tabVariables: "Noms",
         openLabel: "Paramètres",
         closeLabel: "Fermer",
       },
@@ -268,19 +264,21 @@ export const appsFr: AppsDictionary = {
         sizeError: "Cette image est trop grande (3 Mo max). Compressez-la d’abord.",
         readError: "Impossible de lire l’image.",
       },
-      prompts: {
-        heading: "Notes de prompt",
-        lead: "Gardez ici vos consignes habituelles et notes de référence. Elles ne sont jamais incluses dans les fichiers partagés.",
-        add: "+ Ajouter une note",
-        empty: "Aucune note pour l’instant.",
-        titlePlaceholder: "Nom de la note (ex. Ton de voix)",
-        bodyPlaceholder: "Écrivez les consignes que vous donnez à l’IA.",
-        copy: "Copier",
-        copied: "Copié",
-        copyFailed: "Impossible de copier. Veuillez sélectionner le texte manuellement.",
-        remove: "Supprimer cette note",
-        confirmRemove: "Supprimer cette note ?",
-      },
+    variables: {
+      heading: "Variables de nom",
+      lead: "Définissez des mots personnalisables. Écrivez {{name1}} dans le texte.",
+      tokenHint:
+        "Utilisez des doubles accolades (ex. {{name1}}). La pagination suit la substitution.",
+      add: "+ Ajouter une variable",
+      empty: "Aucune variable. Ajoutez-en une pour afficher un écran avant la lecture.",
+      idLabel: "Code (ID dans le texte)",
+      labelLabel: "Libellé (affiché au lecteur)",
+      labelPlaceholder: "ex. Nom du protagoniste",
+      defaultLabel: "Valeur par défaut",
+      defaultPlaceholder: "ex. Alice",
+      remove: "Supprimer cette variable",
+      confirmRemove: "Supprimer cette variable ?",
+    },
     },
     view: {
       close: "Fermer",
@@ -296,6 +294,11 @@ export const appsFr: AppsDictionary = {
       endRestart: "Relire",
       endEdit: "En faire mon brouillon",
       endEditConfirm: "Cela remplace le brouillon que vous éditez. Continuer ?",
+      variables: {
+        title: "Avant de lire",
+        lead: "Saisissez des noms ou mots. Les champs vides gardent la valeur par défaut.",
+        confirm: "Lire avec ces noms",
+      },
     },
   },
   characterRelation: {
@@ -476,7 +479,7 @@ export const appsFr: AppsDictionary = {
       shareX: "Partager sur X",
       shareXShort: "X",
       shareIntro: "🔐 Vous avez un message secret !",
-      shareOutro: "Seules les personnes avec la phrase secrète peuvent le décoder dans l’appli de chiffrement de My Tool Box 👇",
+      shareOutro: "Seules les personnes avec la phrase secrète peuvent le décoder dans l’appli de chiffrement de Blank Note 👇",
     },
     decrypt: {
       cipherLabel: "Texte chiffré (coller)",
@@ -521,7 +524,7 @@ export const appsFr: AppsDictionary = {
     },
     install: {
       button: "Ajouter cette appli à l’écran d’accueil",
-      buttonShort: "Ajouter à l’accueil",
+      buttonShort: "Installer",
       buttonTiny: "Ajouter",
       buttonAria: "Ajouter Message secret à votre écran d’accueil comme appli autonome",
       modalTitle: "Ajouter à l’écran d’accueil",
@@ -709,7 +712,7 @@ export const appsFr: AppsDictionary = {
     },
     install: {
       button: "Ajouter cette appli à votre écran d’accueil",
-      buttonShort: "Ajouter à l’accueil",
+      buttonShort: "Installer",
       buttonTiny: "Ajouter",
       buttonAria: "Ajouter Compresseur d’images par lot à votre écran d’accueil comme appli",
       modalTitle: "Ajouter à l’écran d’accueil",
@@ -805,7 +808,7 @@ export const appsFr: AppsDictionary = {
     },
     install: {
       button: "Ajouter cette appli à l’écran d’accueil",
-      buttonShort: "Ajouter à l’accueil",
+      buttonShort: "Installer",
       buttonTiny: "Ajouter",
       buttonAria: "Ajouter Créateur de formulaires à votre écran d’accueil comme appli autonome",
       modalTitle: "Ajouter à l’écran d’accueil",
@@ -858,7 +861,7 @@ export const appsFr: AppsDictionary = {
     },
     install: {
       button: "Ajouter cette appli à l’écran d’accueil",
-      buttonShort: "Ajouter à l’accueil",
+      buttonShort: "Installer",
       buttonTiny: "Ajouter",
       buttonAria: "Ajouter Link Stocker à votre écran d’accueil comme appli autonome",
       modalTitle: "Ajouter à l’écran d’accueil",
@@ -893,7 +896,7 @@ export const appsFr: AppsDictionary = {
     },
     bookmarklet: {
       title: "💻 Ordinateur : glissez vers la barre de favoris",
-      hint: "Glissez le bouton sur votre barre de favoris (remplacez-le après une mise à jour). Il envoie vers n’importe quel onglet My Tool Box ouvert et enregistre automatiquement ; l’onglet d’aide se ferme aussitôt.",
+      hint: "Glissez le bouton sur votre barre de favoris (remplacez-le après une mise à jour). Il envoie vers n’importe quel onglet Blank Note ouvert et enregistre automatiquement ; l’onglet d’aide se ferme aussitôt.",
       dragLabel: "Envoyer à Garder",
     },
     share: {
@@ -1086,7 +1089,7 @@ export const appsFr: AppsDictionary = {
     },
     install: {
       button: "Ajouter cette appli à l’écran d’accueil",
-      buttonShort: "Ajouter à l’accueil",
+      buttonShort: "Installer",
       buttonTiny: "Ajouter",
       buttonAria: "Ajouter Économies déjeuner à votre écran d’accueil comme appli autonome",
       modalTitle: "Ajouter à l’écran d’accueil",
@@ -1410,7 +1413,7 @@ export const appsFr: AppsDictionary = {
     },
     install: {
       button: "Ajouter cette appli à l’écran d’accueil",
-      buttonShort: "Ajouter à l’accueil",
+      buttonShort: "Installer",
       buttonTiny: "Ajouter",
       buttonAria: "Ajouter Modèles d’e-mail à votre écran d’accueil comme appli autonome",
       modalTitle: "Ajouter à l’écran d’accueil",
@@ -1501,7 +1504,7 @@ export const appsFr: AppsDictionary = {
     },
     install: {
       button: "Ajouter cette appli à l’écran d’accueil",
-      buttonShort: "Ajouter à l’accueil",
+      buttonShort: "Installer",
       buttonTiny: "Ajouter",
       buttonAria: "Ajouter Collecteur de palettes à votre écran d’accueil comme appli autonome",
       modalTitle: "Ajouter à l’écran d’accueil",
@@ -1655,7 +1658,7 @@ export const appsFr: AppsDictionary = {
     },
     install: {
       button: "Ajouter cette appli à votre écran d’accueil",
-      buttonShort: "Ajouter à l’accueil",
+      buttonShort: "Installer",
       buttonTiny: "Ajouter",
       buttonAria: "Ajouter Éditeur PDF à votre écran d’accueil comme appli",
       modalTitle: "Ajouter à l’écran d’accueil",
@@ -1784,7 +1787,7 @@ export const appsFr: AppsDictionary = {
     },
     install: {
       button: "📱 Ajouter à l’écran d’accueil",
-      buttonShort: "Ajouter à l’accueil",
+      buttonShort: "Installer",
       buttonTiny: "Ajouter",
       buttonAria: "Ajouter à l’écran d’accueil",
       modalTitle: "Ajouter à l’écran d’accueil",
@@ -1903,11 +1906,11 @@ export const appsFr: AppsDictionary = {
   robotFreethrow: {
     shell: {
       title: "Lancer de projectile",
-      description: "Réglez l’angle, la poussée et le spin pour marquer dans ce mini-jeu de physique de projectiles.",
+      description: "Réglez l’angle, la vitesse initiale et le spin pour marquer dans ce mini-jeu de physique de projectiles.",
     },
     install: {
       button: "Ajouter cette appli à l’écran d’accueil",
-      buttonShort: "Ajouter à l’accueil",
+      buttonShort: "Installer",
       buttonTiny: "Ajouter",
       buttonAria: "Ajouter Lancer de projectile à votre écran d’accueil comme appli autonome",
       modalTitle: "Ajouter à l’écran d’accueil",
@@ -2005,7 +2008,7 @@ export const appsFr: AppsDictionary = {
     },
     install: {
       button: "📱 Ajouter à l’écran d’accueil",
-      buttonShort: "Ajouter à l’accueil",
+      buttonShort: "Installer",
       buttonTiny: "Ajouter",
       buttonAria: "Ajouter cette appli à votre écran d’accueil",
       modalTitle: "Ajouter à l’écran d’accueil",

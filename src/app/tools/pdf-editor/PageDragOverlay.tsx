@@ -101,7 +101,7 @@ export default function PageDragOverlay({
         style={{ width: CARD_WIDTH, height: CARD_HEIGHT }}
       >
         <PageThumb page={page} blankLabel={labels.blank} />
-        <span className="absolute right-1.5 top-1.5 flex h-6 min-w-6 items-center justify-center rounded-full bg-zinc-950 px-1.5 text-[11px] font-semibold tabular-nums text-white shadow-sm ring-2 ring-white">
+        <span className="absolute right-1.5 top-1.5 flex h-6 min-w-6 items-center justify-center rounded-full bg-[var(--accent)] px-1.5 text-[11px] font-semibold tabular-nums text-zinc-900 shadow-sm ring-2 ring-white">
           {count}
         </span>
       </div>

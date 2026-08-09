@@ -119,7 +119,7 @@ export default function TemplateList({
               }}
               className={`group relative min-h-11 cursor-pointer rounded-md border px-3 py-2.5 transition-colors active:scale-[0.99] ${
                 selected
-                  ? "border-zinc-900 bg-zinc-900 text-white active:bg-zinc-800"
+                  ? "border-[var(--accent-strong)] bg-[var(--accent)] text-zinc-900 active:brightness-95"
                   : pinned
                     ? "border-amber-200/80 bg-amber-50/40 text-zinc-800 hover:border-amber-300 hover:bg-amber-50/70 active:bg-amber-100/80"
                     : "border-zinc-200/80 bg-white text-zinc-800 hover:border-zinc-300 hover:bg-zinc-50 active:bg-zinc-100"

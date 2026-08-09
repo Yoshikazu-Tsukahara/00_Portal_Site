@@ -121,7 +121,7 @@ function Step({
   return (
     <li className="flex gap-3 rounded-2xl border border-zinc-100 bg-zinc-50/80 px-3.5 py-3">
       <span
-        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-zinc-900 text-xs font-semibold text-white"
+        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-xs font-semibold text-zinc-900"
         aria-hidden
       >
         {n}

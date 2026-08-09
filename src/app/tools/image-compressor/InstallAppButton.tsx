@@ -5,7 +5,7 @@ import type { ImageCompressorDict } from "@/i18n/apps/imageCompressor";
 import InstallGuideModal from "./InstallGuideModal";
 import { usePwaInstall } from "./usePwaInstall";
 
-/** バックアップ横に置くコンパクトな「ホームに追加」ボタン */
+/** バックアップ横に置くコンパクトな「インストール」ボタン */
 export default function InstallAppButton({
   copy,
 }: {

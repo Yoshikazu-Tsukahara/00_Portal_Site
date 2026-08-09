@@ -260,7 +260,7 @@ export default function TemplateEditorModal({
                       key={item.id}
                       className={`flex min-h-11 cursor-pointer items-start gap-2 rounded-md border px-2.5 py-2 transition-colors active:scale-[0.99] md:min-h-0 ${
                         checked
-                          ? "border-zinc-900 bg-white active:bg-zinc-50"
+                          ? "border-[var(--accent-strong)] bg-white active:bg-[color-mix(in_srgb,var(--accent)_18%,white)]"
                           : "border-zinc-200/80 bg-white/60 hover:border-zinc-300 active:bg-zinc-50"
                       }`}
                     >
@@ -299,7 +299,7 @@ export default function TemplateEditorModal({
           <button
             type="button"
             disabled={!canSave}
-            className="btn-primary min-h-11 w-full active:scale-[0.98] active:bg-zinc-800 sm:min-h-0 sm:w-auto"
+            className="btn-primary min-h-11 w-full active:scale-[0.98] active:brightness-95 sm:min-h-0 sm:w-auto"
             onClick={() => {
               if (!canSave) return;
               onSave({

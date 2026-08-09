@@ -21,7 +21,6 @@ import {
   normalizeBook,
   normalizeStudio,
   type BookData,
-  type PromptMemo,
   type StudioData,
 } from "./types";
 
@@ -56,10 +55,6 @@ export default function BookVisualizerPage() {
       };
     });
     setNotice("");
-  }
-
-  function updatePrompts(prompts: PromptMemo[]) {
-    setData((prev) => ({ ...normalizeStudio(prev), prompts }));
   }
 
   function openReader(source: ViewSource) {
@@ -196,12 +191,7 @@ export default function BookVisualizerPage() {
           ) : null}
 
           {showEditor ? (
-            <EditMode
-              book={studio.book}
-              prompts={studio.prompts}
-              onChangeBook={updateBook}
-              onChangePrompts={updatePrompts}
-            />
+            <EditMode book={studio.book} onChangeBook={updateBook} />
           ) : (
             <HomeMode
               hasDraft={hasBookContent(studio.book)}

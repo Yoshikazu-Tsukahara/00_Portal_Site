@@ -3,7 +3,7 @@ import { appsKo } from "./apps/ko";
 
 /** 한국어 — 포털 공통 UI ＋ 앱 UI（legal 은 영어 폴백） */
 export const ko: PartialDictionary = {
-  brand: "My Tool Box",
+  brand: "Blank Note",
   common: {
     backToPortal: "← 포털로 돌아가기",
     loading: "불러오는 중…",
@@ -57,71 +57,71 @@ export const ko: PartialDictionary = {
   },
   tools: {
     "invoice-maker": {
-      title: "문서 메이커",
+      title: "문서",
       description: "청구·견적·납품·영수증을 A4로. 다국어 PDF.",
     },
     "mail-template": {
-      title: "메일 템플릿 정리",
+      title: "메일",
       description: "태그 분류와 변수 치환으로 메일 회신을 빠르게.",
     },
     "folder-generator": {
-      title: "폴더 일괄 생성",
+      title: "폴더",
       description: "이름 규칙으로 날짜·번호·목록을 조합해 일괄 생성.",
     },
     "pdf-editor": {
-      title: "간단 PDF 편집",
+      title: "PDF",
       description: "브라우저에서 병합·정렬·페이지 삭제까지.",
     },
     "image-compressor": {
-      title: "이미지 일괄 압축",
+      title: "이미지",
       description: "최대 폭과 화질을 지정해 브라우저에서 일괄 리사이즈·압축.",
     },
     "text-cleaner": {
-      title: "텍스트 정리",
+      title: "텍스트",
       description: "줄바꿈·공백·제어 문자를 한 번에. 사용자 규칙도 저장 가능.",
     },
     "media-metadata-editor": {
-      title: "미디어 메타데이터",
+      title: "메타데이터",
       description: "브라우저에서 음악·영상 태그와 커버를 편집.",
     },
     "character-relation-editor": {
-      title: "소설 인물 관계도",
+      title: "관계도",
       description: "인물 카드와 관계선으로 이야기의 관계를 시각적으로 정리.",
     },
     "book-visualizer": {
-      title: "AI Book Studio",
+      title: "Quarto",
       description: "용지와 조판을 지정해 지면을 직접 편집하고 .mybook으로 공유.",
     },
     "palette-collector": {
-      title: "Palette Collector",
+      title: "팔레트",
       description: "이미지에서 배색 추출. 자동 추출과 대비 검사 지원.",
     },
     "lunch-savings": {
-      title: "런치 저금",
+      title: "런치",
       description: "예산과의 차이를 탭으로 기록. 게임처럼 아끼며 저금.",
     },
     "link-stocker": {
-      title: "일단 킵",
+      title: "킵",
       description: "북마크까지는 아닌 URL을 OGP 카드로 보관.",
     },
     "ultimate-probability-slot": {
-      title: "궁극 확률 슬롯",
+      title: "슬롯",
       description: "직접 만든 저확률 슬롯으로 ‘당첨까지’ 또는 ‘연속 미스’에 도전.",
     },
     "pixel-drop-puzzle": {
-      title: "픽셀 틈새 낙하",
+      title: "픽셀",
       description: "사진을 틈에 떨어뜨리기. 서브픽셀 정밀 퍼즐.",
     },
     "robot-freethrow": {
-      title: "투사 프리스로",
-      description: "각도·추력·스핀으로 림을 노리는 투사 운동 미니게임.",
+      title: "프리스로",
+      description: "각도·초속·스핀으로 림을 노리는 투사 운동 미니게임.",
     },
     "crypto-message": {
-      title: "비밀 메시지",
+      title: "비밀",
       description: "암호로 암호화·복호화. 카이사르 해독 챌린지 포함.",
     },
     "monster-driver": {
-      title: "몬스터 드라이버",
+      title: "몬스터",
       description: "빨강에 서고 파랑에 출발. 깜빡이 기억의 1인칭 액션.",
     },
   },
@@ -199,7 +199,7 @@ export const ko: PartialDictionary = {
     emailHint: "선택 — 회신을 원하시면 입력해 주세요",
     messageLabel: "메시지",
     messagePlaceholder: "질문, 요청 또는 오류 내용을 입력해 주세요",
-    subjectPrefix: "【My Tool Box】문의",
+    subjectPrefix: "【Blank Note】문의",
     bodyLabels: {
       category: "문의 유형",
       app: "대상 앱",

@@ -100,7 +100,7 @@ function ListFileImport({
         }}
         className={`flex cursor-pointer flex-col items-center justify-center rounded-md border border-dashed px-3 py-3 text-center transition-colors ${
           isDragging
-            ? "border-zinc-950 bg-zinc-100"
+            ? "border-[var(--accent-strong)] bg-[color-mix(in_srgb,var(--accent)_28%,white)]"
             : "border-zinc-200 bg-white hover:border-zinc-300 hover:bg-zinc-50"
         }`}
       >

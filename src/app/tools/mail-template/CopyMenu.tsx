@@ -117,7 +117,7 @@ export default function CopyMenu({
         className={`btn-primary inline-flex min-h-11 w-full items-center justify-center gap-1.5 !px-3 !py-2 text-xs transition-all duration-300 active:scale-[0.98] sm:min-h-0 sm:w-auto sm:!py-1.5 sm:text-sm ${
           copied
             ? "!scale-[1.02] !bg-emerald-600 hover:!bg-emerald-600 active:!bg-emerald-700"
-            : "active:bg-zinc-800"
+            : "active:brightness-95"
         }`}
       >
         {copied ? mt.copy.done : mt.copy.button}

@@ -128,13 +128,13 @@ export const linkStockerJa: LinkStockerDict = {
     fetchFailed: "サイト情報の取得に失敗しました",
   },
   install: {
-    button: "このアプリをホーム画面に追加",
-    buttonShort: "ホームに追加",
-    buttonTiny: "追加",
-    buttonAria: "とりあえずキープをホーム画面に追加してアプリとして使う",
-    modalTitle: "ホーム画面に追加",
+    button: "このアプリをインストール",
+    buttonShort: "インストール",
+    buttonTiny: "インストール",
+    buttonAria: "とりあえずキープをインストールして、個別アプリとして使う",
+    modalTitle: "アプリをインストール",
     modalLead:
-      "Safari からホーム画面に追加すると、とりあえずキープだけを独立アプリとしてすぐ開けます。",
+      "対応ブラウザからインストールすると、とりあえずキープだけを個別アプリとしてすぐ開けます。",
     step1Title: "共有をタップ",
     step1Body: "画面下（または上）の共有アイコン［↑］をタップします。",
     step2Title: "「ホーム画面に追加」",
@@ -228,13 +228,13 @@ export const linkStockerEn: LinkStockerDict = {
     fetchFailed: "Failed to fetch site info",
   },
   install: {
-    button: "Add this app to Home Screen",
-    buttonShort: "Add to Home",
-    buttonTiny: "Add",
-    buttonAria: "Add Link Stocker to your home screen as a standalone app",
-    modalTitle: "Add to Home Screen",
+    button: "Install this app",
+    buttonShort: "Install",
+    buttonTiny: "Install",
+    buttonAria: "Install Link Stocker as a standalone app",
+    modalTitle: "Install app",
     modalLead:
-      "Add Link Stocker from Safari to open it as its own app — not the portal.",
+      "Install Link Stocker from Safari to open it as its own app — not the portal.",
     step1Title: "Tap Share",
     step1Body: "Tap the Share icon [↑] at the bottom (or top) of Safari.",
     step2Title: "Add to Home Screen",
@@ -269,7 +269,7 @@ export const linkStockerEn: LinkStockerDict = {
   },
   bookmarklet: {
     title: "💻 Desktop: drag to bookmarks bar",
-    hint: "Drag the button onto your bookmarks bar (replace it after updates). It hands off to any open My Tool Box tab and auto-saves; the helper tab closes right away.",
+    hint: "Drag the button onto your bookmarks bar (replace it after updates). It hands off to any open Blank Note tab and auto-saves; the helper tab closes right away.",
     dragLabel: "Send to Keep",
   },
   share: {

@@ -28,16 +28,16 @@ export const robotFreethrowJa: RobotFreethrowDict = {
   shell: {
     title: "投射フリースロー",
     description:
-      "角度・推力・スピンを指定してリングを狙う、投射運動のミニゲーム。",
+      "角度・初速・スピンを指定してリングを狙う、投射運動のミニゲーム。",
   },
   install: {
-    button: "このアプリをホーム画面に追加",
-    buttonShort: "ホームに追加",
-    buttonTiny: "追加",
-    buttonAria: "投射フリースローをホーム画面に追加してアプリとして使う",
-    modalTitle: "ホーム画面に追加",
+    button: "このアプリをインストール",
+    buttonShort: "インストール",
+    buttonTiny: "インストール",
+    buttonAria: "投射フリースローをインストールして、個別アプリとして使う",
+    modalTitle: "アプリをインストール",
     modalLead:
-      "Safari からホーム画面に追加すると、投射フリースローだけを独立アプリとしてすぐ開けます。",
+      "対応ブラウザからインストールすると、投射フリースローだけを個別アプリとしてすぐ開けます。",
     step1Title: "共有をタップ",
     step1Body: "画面下（または上）の共有アイコン［↑］をタップします。",
     step2Title: "「ホーム画面に追加」",
@@ -59,17 +59,17 @@ export const robotFreethrowEn: RobotFreethrowDict = {
   shell: {
     title: "Projectile Freethrow",
     description:
-      "Dial in angle, thrust, and spin to sink the shot in a projectile physics mini-game.",
+      "Dial in angle, initial speed, and spin to sink the shot in a projectile physics mini-game.",
   },
   install: {
-    button: "Add this app to Home Screen",
-    buttonShort: "Add to Home",
-    buttonTiny: "Add",
+    button: "Install this app",
+    buttonShort: "Install",
+    buttonTiny: "Install",
     buttonAria:
-      "Add Projectile Freethrow to your home screen as a standalone app",
-    modalTitle: "Add to Home Screen",
+      "Install Projectile Freethrow as a standalone app",
+    modalTitle: "Install app",
     modalLead:
-      "Add Projectile Freethrow from Safari to open it as its own app — not the portal.",
+      "Install Projectile Freethrow from Safari to open it as its own app — not the portal.",
     step1Title: "Tap Share",
     step1Body: "Tap the Share icon [↑] at the bottom (or top) of Safari.",
     step2Title: "Add to Home Screen",

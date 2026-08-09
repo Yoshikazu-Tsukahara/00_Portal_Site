@@ -259,7 +259,7 @@ export default function SetupModal({
                   onClick={() => setCurrency(code)}
                   className={`rounded-xl border px-3 py-2.5 text-left text-sm transition-colors ${
                     currency === code
-                      ? "border-zinc-800 bg-zinc-900 text-white"
+                      ? "border-[var(--accent-strong)] bg-[var(--accent)] text-zinc-900"
                       : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300 hover:bg-zinc-50"
                   }`}
                 >
@@ -283,7 +283,7 @@ export default function SetupModal({
                   onClick={() => applyPeriodType(opt.id)}
                   className={`rounded-xl border px-3 py-2.5 text-left text-sm transition-colors ${
                     periodType === opt.id
-                      ? "border-zinc-800 bg-zinc-900 text-white"
+                      ? "border-[var(--accent-strong)] bg-[var(--accent)] text-zinc-900"
                       : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300 hover:bg-zinc-50"
                   }`}
                 >

@@ -5,7 +5,7 @@ export const ROBOT_FREETHROW_MANIFEST = {
   name: "投射フリースロー",
   short_name: "フリースロー",
   description:
-    "角度・推力・スピンを指定してリングを狙う、投射運動のミニゲーム。",
+    "角度・初速・スピンを指定してリングを狙う、投射運動のミニゲーム。",
   id: "/robot-freethrow",
   start_url: "/robot-freethrow",
   scope: "/robot-freethrow",

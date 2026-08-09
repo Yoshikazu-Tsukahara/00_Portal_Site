@@ -6,6 +6,7 @@
 // - 表紙・扉・目次・裏表紙は pages
 // - 柱「章」・目次ノンブルがページ分割に追従する分量にする
 
+import type { BookFontId } from "./fonts";
 import {
   createFreeTextBlock,
   createId,
@@ -22,15 +23,14 @@ import {
   type BodyItem,
   type BookData,
   type BookPage,
-  type ImageBlock,
   type PageType,
   type TextBlock,
   type TextLevel,
 } from "./types";
 
-export type SampleId = "novel" | "western" | "photo";
+export type SampleId = "novel" | "western";
 
-export const SAMPLE_IDS: readonly SampleId[] = ["novel", "western", "photo"];
+export const SAMPLE_IDS: readonly SampleId[] = ["novel", "western"];
 
 /** プレースホルダー画像（単色グラデ＋ラベルの SVG） */
 function placeholderImage(
@@ -48,7 +48,7 @@ function placeholderImage(
     </linearGradient>
   </defs>
   <rect width="100%" height="100%" fill="url(#g)"/>
-  <text x="50%" y="50%" fill="rgba(255,255,255,0.88)" font-family="Georgia, serif" font-size="36" text-anchor="middle" dominant-baseline="middle">${label}</text>
+  <text x="50%" y="52%" fill="rgba(255,255,255,0.9)" font-family="Georgia, 'Times New Roman', serif" font-size="34" text-anchor="middle" dominant-baseline="middle">${label}</text>
 </svg>`;
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
@@ -57,27 +57,28 @@ function page(pageType: PageType, ...blocks: Block[]): BookPage {
   return { ...createPage(blocks, pageType), id: createId("pg") };
 }
 
-function imageWithCaption(dataUrl: string, caption: string): ImageBlock {
-  return { ...createImageBlock(dataUrl), caption };
-}
-
-function imageFullBleed(dataUrl: string): ImageBlock {
+function imageFullBleed(dataUrl: string): Block {
   return {
     ...createImageBlock(dataUrl),
     frame: fullBleedFrame(),
   };
 }
 
-/** 自由テキスト（配置・サイズ付き） */
+/** 自由テキスト（配置・サイズ・書体付き） */
 function freeText(
   text: string,
   frame: { x: number; y: number; w: number; h: number },
   fontScale: number,
   writingMode: "horizontal" | "vertical",
-  zIndex = 2,
+  options?: { zIndex?: number; fontFamily?: BookFontId },
 ) {
+  const zIndex = options?.zIndex ?? 2;
+  const fontFamily = options?.fontFamily;
+  const base = fontFamily
+    ? createFreeTextBlock(text, zIndex, writingMode, fontFamily)
+    : createFreeTextBlock(text, zIndex, writingMode);
   return {
-    ...createFreeTextBlock(text, zIndex, writingMode),
+    ...base,
     frame,
     fontScale,
   };
@@ -95,7 +96,6 @@ function breakPage(): BodyItem {
   return createPageBreak();
 }
 
-/** 段落を連結（和文は読点続き、欧文は空行区切り） */
 function joinJa(...parts: string[]): string {
   return parts.join("");
 }
@@ -106,7 +106,7 @@ function joinEn(...parts: string[]): string {
 
 /**
  * サンプル1：日本語小説（文庫・縦書き）
- * 柱＝章、目次＝章＋節、章末に手動ページ区切り。本文は複数ページに流れる分量。
+ * 柱＝章、目次＝章＋節、章末に手動ページ区切り。
  */
 function sampleNovel(): BookData {
   const ch1s1 = joinJa(
@@ -200,53 +200,64 @@ function sampleNovel(): BookData {
       para(ch4),
     ],
     bodyOverlays: [],
+    variables: [],
     pages: [
       page(
         "cover",
-        imageFullBleed(placeholderImage("COVER", "#3d342c", "#8a7360", 360, 512)),
+        imageFullBleed(
+          placeholderImage("吾輩", "#2f2924", "#8a7360", 360, 512),
+        ),
         freeText(
           "吾輩は猫である",
-          { x: 0.12, y: 0.28, w: 0.2, h: 0.5 },
+          { x: 0.12, y: 0.26, w: 0.2, h: 0.52 },
           0.055,
           "vertical",
+          { fontFamily: "shippori-mincho" },
         ),
         freeText(
           "夏目漱石",
           { x: 0.38, y: 0.45, w: 0.12, h: 0.25 },
           0.032,
           "vertical",
+          { fontFamily: "shippori-mincho" },
         ),
       ),
       page(
         "titlePage",
         freeText(
           "吾輩は猫である",
-          { x: 0.35, y: 0.2, w: 0.22, h: 0.55 },
+          { x: 0.34, y: 0.18, w: 0.22, h: 0.55 },
           0.06,
           "vertical",
+          { fontFamily: "shippori-mincho" },
         ),
         freeText(
           "夏目漱石",
-          { x: 0.58, y: 0.42, w: 0.12, h: 0.28 },
+          { x: 0.58, y: 0.4, w: 0.12, h: 0.28 },
           0.03,
           "vertical",
+          { fontFamily: "shippori-mincho" },
         ),
         freeText(
-          "サンプル改訂版",
-          { x: 0.72, y: 0.55, w: 0.1, h: 0.2 },
-          0.022,
+          "文庫・縦書きサンプル",
+          { x: 0.72, y: 0.52, w: 0.1, h: 0.28 },
+          0.02,
           "vertical",
+          { fontFamily: "shippori-mincho" },
         ),
       ),
       page("toc"),
       page(
         "backCover",
-        imageFullBleed(placeholderImage("BACK", "#2a2420", "#5c4e42", 360, 512)),
+        imageFullBleed(
+          placeholderImage("猫", "#1f1b18", "#5c4e42", 360, 512),
+        ),
         freeText(
           "名前はまだ無い——それでも吾輩は、ここにいる。",
-          { x: 0.25, y: 0.3, w: 0.35, h: 0.4 },
+          { x: 0.28, y: 0.28, w: 0.3, h: 0.42 },
           0.028,
           "vertical",
+          { fontFamily: "shippori-mincho" },
         ),
       ),
     ],
@@ -254,14 +265,14 @@ function sampleNovel(): BookData {
 }
 
 /**
- * サンプル2：洋書風（トレード・横書き）
+ * サンプル2：英語トレード判（横書き）
  * 章ごとに手動区切り。目次ノンブルと running chapter header の確認用。
  */
 function sampleWestern(): BookData {
   const c1a = joinEn(
     "There was a library at the end of the street that nobody seemed to notice until they needed it. Its windows were narrow, its door was painted the color of wet stone, and its sign hung slightly crooked, as if it had been thinking about falling for years and never quite decided.",
-    "On the morning I first stepped inside, rain was tapping the glass with the patience of an old friend. The air smelled of paper and dust and something faintly sweet—like tea left too long in a porcelain cup. A clock on the far wall had stopped at a quarter past three, and somehow that felt more honest than any running second hand.",
-    "A clerk looked up from a ledger and nodded once, the way people nod when they already know your name. “You’re late,” she said, though I had never been there before. I almost apologized. Instead I wiped rain from my sleeves and asked, without meaning to sound dramatic, whether the quiet was available for borrowing.",
+    "On the morning {{name1}} first stepped inside, rain was tapping the glass with the patience of an old friend. The air smelled of paper and dust and something faintly sweet—like tea left too long in a porcelain cup. A clock on the far wall had stopped at a quarter past three, and somehow that felt more honest than any running second hand.",
+    "{{name2}} looked up from a ledger and nodded once, the way people nod when they already know your name. “You’re late,” she said, though {{name1}} had never been there before. {{name1}} almost apologized. Instead {{name1}} wiped rain from the sleeves and asked, without meaning to sound dramatic, whether the quiet was available for borrowing.",
   );
 
   const c1b = joinEn(
@@ -295,7 +306,7 @@ function sampleWestern(): BookData {
   );
 
   const coda = joinEn(
-    "Author’s note: This sample is fiction for layout. Use it to check chapter headers, table-of-contents folios, manual page breaks, and long flowing body text in a Western trade trim.",
+    "Author’s note: This sample is fiction for layout practice in Quarto. Placeholders like {{name1}} are replaced when a reader opens the book—pagination runs after substitution so line breaks stay accurate.",
   );
 
   return {
@@ -347,212 +358,75 @@ function sampleWestern(): BookData {
       para(coda),
     ],
     bodyOverlays: [],
+    variables: [
+      {
+        id: "name1",
+        label: "Reader’s name",
+        defaultValue: "Alex",
+      },
+      {
+        id: "name2",
+        label: "The clerk",
+        defaultValue: "The clerk",
+      },
+    ],
     pages: [
       page(
         "cover",
         imageFullBleed(
-          placeholderImage("LIBRARY", "#1f2937", "#6b7280", 480, 720),
+          placeholderImage("QUIET", "#1f2937", "#6b7280", 480, 720),
         ),
         freeText(
           "Notes from a Quiet Library",
-          { x: 0.1, y: 0.35, w: 0.8, h: 0.2 },
+          { x: 0.1, y: 0.34, w: 0.8, h: 0.2 },
           0.045,
           "horizontal",
+          { fontFamily: "playfair-display" },
         ),
         freeText(
           "A. Reader",
           { x: 0.1, y: 0.58, w: 0.8, h: 0.08 },
           0.028,
           "horizontal",
+          { fontFamily: "eb-garamond" },
         ),
       ),
       page(
         "titlePage",
         freeText(
           "Notes from a Quiet Library",
-          { x: 0.12, y: 0.32, w: 0.76, h: 0.18 },
+          { x: 0.12, y: 0.3, w: 0.76, h: 0.18 },
           0.042,
           "horizontal",
+          { fontFamily: "playfair-display" },
         ),
         freeText(
           "A. Reader",
-          { x: 0.12, y: 0.55, w: 0.76, h: 0.08 },
+          { x: 0.12, y: 0.52, w: 0.76, h: 0.08 },
           0.026,
           "horizontal",
+          { fontFamily: "eb-garamond" },
         ),
         freeText(
-          "A layout sample in three chapters",
-          { x: 0.12, y: 0.7, w: 0.76, h: 0.06 },
+          "A trade-paperback layout sample",
+          { x: 0.12, y: 0.68, w: 0.76, h: 0.06 },
           0.02,
           "horizontal",
+          { fontFamily: "eb-garamond" },
         ),
       ),
       page("toc"),
       page(
         "backCover",
         imageFullBleed(
-          placeholderImage("ENDPAPER", "#111827", "#4b5563", 480, 720),
+          placeholderImage("END", "#111827", "#4b5563", 480, 720),
         ),
         freeText(
           "A short novel about rooms that keep time better than clocks.",
           { x: 0.12, y: 0.4, w: 0.76, h: 0.2 },
           0.028,
           "horizontal",
-        ),
-      ),
-    ],
-  };
-}
-
-/**
- * サンプル3：絵本・写真集（スクエア）
- * 画像ページ（自由配置）＋本文の短い章詩。目次は章のみ、柱は書名。
- */
-function samplePhoto(): BookData {
-  const morning = joinJa(
-    "カーテンのすきまから、薄い金が落ちてくる。まだ誰の声も起きていない時刻。机の端で湯気が立ち、写真機の蓋だけが少し冷たい。",
-    "朝は記録に向いている。誇張が少なく、影が正直だからだ。今日という頁の余白に、光だけを置いてみる。",
-  );
-
-  const street = joinJa(
-    "雨上がりの通りは、足音を返す。誰もいない午後ほど、建物の表情がよく見える。電信柱の染み、看板の欠け、水溜りにさかさまの空。",
-    "旅の写真は、名所よりこの種の沈黙を欲しがる。説明のいらない一枚が、いちばん長く残る。",
-  );
-
-  const desk = joinJa(
-    "ノート、ペン、レンズキャップ。机の上は小さな地形だ。書きかけの一文の隣に、今朝の接触板を置く。言葉と像は、互いに不足を補う。",
-    "写真のあとに短い言葉を添える。それだけで一冊の本になる——そう信じた日から、旅の荷が軽くなった。",
-  );
-
-  const night = joinJa(
-    "ランプの輪だけが残る夜。窓の外はインクで塗ったようで、内側だけが温かい。露出を落とすと、時間が粒になって写る。",
-    "夜の頁は少なくてよい。余白が広いほど、読者は自分の暗がりを差し挟める。",
-  );
-
-  const windowChap = joinJa(
-    "開いたままの窓枠と、遠い山。風がページをめくり、次の旅の題名を連れてくる。終わりはいつも、窓のまえで決まる。",
-    "見て、書いて、また見る。その往復が、この写真集の背表紙になっている。",
-  );
-
-  return {
-    title: "小さな窓の写真集",
-    author: "旅の記録係",
-    layout: "photo",
-    format: {
-      paperSize: "square",
-      charsPerLine: 22,
-      linesPerPage: 14,
-      columns: 1,
-      marginTop: 28,
-      marginRight: 28,
-      marginBottom: 28,
-      marginLeft: 28,
-      headerMode: "title",
-      headerAlign: "center",
-      headerOnPageTypes: defaultHeaderOnPageTypes(),
-      folioOnPageTypes: defaultFolioOnPageTypes(),
-      countInTotalPageTypes: defaultCountInTotalPageTypes(),
-      headerSpreadPlacement: "both",
-      folioAlign: "center",
-      tocDepth: "chapter",
-      tocColumns: 1,
-      fontFamilyH1: "noto-sans-jp",
-      fontFamilyH2: "noto-sans-jp",
-      fontFamilyP: "noto-sans-jp",
-    },
-    body: [
-      heading("h1", "朝"),
-      para(morning),
-      breakPage(),
-      heading("h1", "通り"),
-      para(street),
-      breakPage(),
-      heading("h1", "机"),
-      para(desk),
-      breakPage(),
-      heading("h1", "夜"),
-      para(night),
-      breakPage(),
-      heading("h1", "窓"),
-      para(windowChap),
-    ],
-    bodyOverlays: [],
-    pages: [
-      page(
-        "cover",
-        imageFullBleed(placeholderImage("WINDOW", "#8b7355", "#c4a882")),
-        freeText(
-          "小さな窓の写真集",
-          { x: 0.1, y: 0.4, w: 0.8, h: 0.12 },
-          0.05,
-          "horizontal",
-        ),
-        freeText(
-          "旅の記録係",
-          { x: 0.1, y: 0.56, w: 0.8, h: 0.08 },
-          0.028,
-          "horizontal",
-        ),
-      ),
-      page(
-        "titlePage",
-        freeText(
-          "小さな窓の写真集",
-          { x: 0.12, y: 0.38, w: 0.76, h: 0.12 },
-          0.048,
-          "horizontal",
-        ),
-        freeText(
-          "光と余白のための五章",
-          { x: 0.12, y: 0.54, w: 0.76, h: 0.08 },
-          0.024,
-          "horizontal",
-        ),
-      ),
-      page("toc"),
-      page(
-        "standard",
-        imageWithCaption(
-          placeholderImage("Morning Light", "#8b7355", "#c4a882"),
-          "朝の光が差し込む部屋",
-        ),
-      ),
-      page(
-        "standard",
-        imageWithCaption(
-          placeholderImage("Quiet Street", "#5c6b7a", "#9aafc0", 640, 480),
-          "雨上がりの通り——誰もいない午後",
-        ),
-      ),
-      page(
-        "standard",
-        imageWithCaption(
-          placeholderImage("Paper & Ink", "#6b5b4f", "#d4c4b0"),
-          "机の上のノートとペン",
-        ),
-      ),
-      page(
-        "standard",
-        imageWithCaption(
-          placeholderImage("Lamp Glow", "#2c1810", "#a67c52"),
-          "ランプの輪だけが残る夜",
-        ),
-      ),
-      page(
-        "standard",
-        imageWithCaption(
-          placeholderImage("Open Frame", "#4a5d4e", "#a8c3b0"),
-          "開いたままの窓枠と、遠い山",
-        ),
-      ),
-      page(
-        "backCover",
-        imageFullBleed(placeholderImage("FIN", "#3f3a36", "#9c8b7a")),
-        freeText(
-          "見て、書いて、また見る。",
-          { x: 0.15, y: 0.45, w: 0.7, h: 0.1 },
-          0.032,
-          "horizontal",
+          { fontFamily: "eb-garamond" },
         ),
       ),
     ],
@@ -566,8 +440,6 @@ export function createSampleBook(id: SampleId): BookData {
       return normalizeBook(sampleNovel());
     case "western":
       return normalizeBook(sampleWestern());
-    case "photo":
-      return normalizeBook(samplePhoto());
     default:
       return normalizeBook(sampleNovel());
   }

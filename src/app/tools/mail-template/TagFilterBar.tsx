@@ -30,7 +30,7 @@ export default function TagFilterBar({
         onClick={() => onChange(null)}
         className={`min-h-11 rounded-md border px-3 py-1.5 text-[11px] font-medium transition-colors active:scale-[0.98] md:min-h-0 md:px-2 md:py-0.5 md:text-[10px] ${
           selectedTagId === null
-            ? "border-zinc-900 bg-zinc-900 text-white active:bg-zinc-800"
+            ? "border-[var(--accent-strong)] bg-[var(--accent)] text-zinc-900 active:brightness-95"
             : "border-zinc-200 bg-white text-zinc-600 hover:border-zinc-300 hover:bg-zinc-50 active:bg-zinc-100"
         }`}
       >

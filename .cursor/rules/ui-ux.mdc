@@ -4,22 +4,34 @@ globs: src/app/**/*,src/components/**/*
 alwaysApply: false
 ---
 
-# UI/UX 統一ルール
+# UI/UX 統一ルール（Blank Note）
 
-参照: `src/app/globals.css`、`AppShell.tsx`、`Header.tsx`、`DataManager.tsx`  
-スマホ対応の適用手順 → `.cursor/skills/mobile-responsive/SKILL.md`  
-完成例 → `src/app/tools/mail-template/`
+デザイン原則の正本 → ルートの `design-rules.md`  
+参照実装 → `src/app/globals.css`、`AppShell.tsx`、`Header.tsx`、`DataManager.tsx`  
+スマホ対応の適用手順 → `.cursor/skills/mobile-responsive/SKILL.md`
 
-## 基本デザイン（特別な演出意図がない限り）
+## 基本デザイン
 
-- **配色**: zinc ベース（背景 `zinc-50`、文字 `zinc-900` / `zinc-500`、境界 `zinc-200`）
+- **ブランド**: Blank Note
+- **背景**: `#f8f8ff`（青みのある上品な白。真っ白は避ける）
+- **アクセント**: `#ccd5ff`（ペールブルー）1色のみ
+- **境界**: 1px シャープなボーダー（`zinc-200` またはアクセント薄め）。影は極力使わない
+- **余白**: 通常より広め
+- **フォント**: タイトル・ロゴは Space Mono（`font-display`）、本文は Noto Sans JP（`font-sans`）
+- **トランジション**: `transition-all duration-150` で統一
 - **共通クラス**: `btn-primary` / `btn-secondary` / `input-field` / `content-card`
 - **例外**: ゲーム／端末風 UI（`slot-*`, `pxd-*`, `cm-*`）は作業領域のみ独自可。**サイト枠は共通維持**
+
+## ランチャー（ポータル）
+
+- `/` … ピン留めアプリのホーム（デスクトップ風）
+- `/library` … 全アプリのライブラリ（⭐ でピン留め）
+- ピン留めは LocalStorage `blank-note:home-pins`
 
 ## ページ構成（Type B / C）— AppShell
 
 ```
-[サイト Header]  ロゴ … 表示幅トグル … 言語 … 応援
+[サイト Header]  ロゴ … Home/Library … 安心バッジ … 表示幅トグル … 言語 … 応援
 
 スマホ（〜md 未満）:
   行1  タイトル | titleAddon | 💾 | 📱
@@ -27,22 +39,23 @@ alwaysApply: false
   行3  説明文
 
 PC（md+）:
-  行1  ←ポータル | タイトル | 💾 | 📱 | 機能 actions
+  行1  タイトル | 💾 | 📱 | 機能 actions
   行2  説明文
 
 [作業領域]
 [サイト Footer]  ※ fillViewport では画面外のすぐ下（少しスクロールで到達）
 ```
 
-- スマホでは「ポータルに戻る」を出さない（Header ロゴで戻る）— **AppShell が実装済み**
+- 「ポータルに戻る」リンクは出さない（サイト Header の Blank Note ロゴで戻る）
 - 言語・バックアップ・インストールは `actions` に置かない
+- 戻る／設定／お気に入りは `src/components/icons/*` を使う（差し替えしやすい仮置き）
 
 ## スマホ対応（モバイルファースト）— 全アプリ共通
 
 ### レイアウト
 
 - 複数カラムは **デフォルト縦並び** → `md:` / `lg:` で横並び
-- 余白: スマホ `p-2`〜`p-4`、PC `md:p-4`〜`md:p-8`
+- 余白: スマホ `p-3`〜`p-5`、PC `md:p-6`〜`md:p-10`（広め）
 - コンテナ: `w-full max-w-full min-w-0 overflow-x-hidden`
 - テキスト: `break-words`（長い件名・パスは `break-all`）
 - 画像: `object-contain`、親は `overflow-hidden`
@@ -51,13 +64,13 @@ PC（md+）:
 
 - 主要操作はおおむね **44px**（`min-h-11`）を目安。ただし **ヘッダーの 💾／📱 はコンパクトのまま揃える**（`min-h-11` を付けない）
 - `hover:` に加え `active:scale-[0.98]` / `active:bg-*` を付ける
-- ホバー依存の操作（一覧の編集アイコンなど）はスマホでは常時表示
+- ホバー依存の操作はスマホでは常時表示
+- 変化は `duration-150`
 
 ### AppShell actions（機能ボタン）
 
 - 狭い画面でも **折り返さず1行**（`flex-nowrap`）
 - 長いラベルは辞書に Short を用意し、`sm:hidden` / `hidden sm:inline` で切替
-- 例: 「ラベル管理」→「ラベル」、「＋ 新規テンプレート追加」→「＋ 新規」
 - コンパクト時: `!px-2 !py-1.5 text-[11px]`、`sm:` 以上で通常サイズ
 
 ### インストールボタン（📱）
@@ -69,7 +82,7 @@ PC（md+）:
 ### ポータルカードのスマホバッジ
 
 - `src/data/tools.ts` の `isMobileSupported: true`
-- スマホ最適化が終わったアプリだけ付与（`ToolCard` がバッジ表示）
+- スマホ最適化が終わったアプリだけ付与
 
 ## 表示幅
 
@@ -92,6 +105,9 @@ PC（md+）:
 
 ## チェックリスト
 
+- [ ] 背景が `#f8f8ff` 系で、アクセントがペールブルー以外に散らばっていない
+- [ ] 影ではなく 1px ボーダーで区切られている
+- [ ] タイトル／ロゴに `font-display`、本文に `font-sans`
 - [ ] スマホでタイトル行が 💾／📱 と並び、戻るリンクがない
 - [ ] 機能ボタンが1行に収まる（必要なら Short ラベル）
 - [ ] 💾 と 📱 の高さが揃っている

@@ -141,7 +141,7 @@ export default function CharacterModal({
                   onClick={() => setDraft((d) => ({ ...d, accent: a }))}
                   className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] transition-colors ${
                     draft.accent === a
-                      ? "border-zinc-900 bg-zinc-50 text-zinc-900"
+                      ? "border-[var(--accent-strong)] bg-[color-mix(in_srgb,var(--accent)_22%,white)] text-zinc-900"
                       : "border-zinc-200 text-zinc-500 hover:border-zinc-300"
                   }`}
                 >

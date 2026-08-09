@@ -3,7 +3,7 @@
 import PwaInstallButton from "@/components/PwaInstallButton";
 import type { PaletteCollectorDict } from "@/i18n/apps/paletteCollector";
 
-/** Palette Collector 向け「ホームに追加」（共通ボタンへ委譲） */
+/** Palette Collector 向け「インストール」（共通ボタンへ委譲） */
 export default function InstallAppButton({
   copy,
 }: {

@@ -143,7 +143,7 @@ export default function PageCard({
         )}
       </div>
 
-      <span className="pointer-events-none absolute left-1.5 top-1.5 rounded bg-zinc-950/80 px-1.5 py-0.5 text-[10px] font-medium text-white">
+      <span className="pointer-events-none absolute left-1.5 top-1.5 rounded bg-[color-mix(in_srgb,var(--accent)_88%,#8b9ae0)] px-1.5 py-0.5 text-[10px] font-medium text-zinc-900">
         {displayIndex}
       </span>
 

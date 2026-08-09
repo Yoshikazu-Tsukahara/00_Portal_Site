@@ -336,7 +336,7 @@ export default function MailTemplatePage() {
           <button
             type="button"
             onClick={openCreate}
-            className="btn-primary min-w-0 flex-1 !px-2 !py-1.5 text-[11px] leading-tight active:scale-[0.98] active:bg-zinc-800 sm:flex-none sm:!px-3 sm:!py-1.5 sm:text-sm"
+            className="btn-primary min-w-0 flex-1 !px-2 !py-1.5 text-[11px] leading-tight active:scale-[0.98] active:brightness-95 sm:flex-none sm:!px-3 sm:!py-1.5 sm:text-sm"
           >
             <span className="sm:hidden">{mt.actions.newTemplateShort}</span>
             <span className="hidden sm:inline">{mt.actions.newTemplate}</span>

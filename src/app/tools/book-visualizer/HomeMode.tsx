@@ -22,7 +22,6 @@ type HomeModeProps = {
 const SAMPLE_ICONS: Record<SampleId, string> = {
   novel: "📕",
   western: "📘",
-  photo: "🖼️",
 };
 
 /**

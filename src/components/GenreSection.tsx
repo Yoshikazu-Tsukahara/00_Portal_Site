@@ -1,16 +1,39 @@
 "use client";
 
-import type { Genre, Tool } from "@/data/tools";
-import ToolCard from "@/components/ToolCard";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type KeyboardEvent,
+} from "react";
+import StoreAppCard from "@/components/StoreAppCard";
+import type { Genre } from "@/data/tools";
 import { useI18n } from "@/i18n";
 
-/** 横スクロール用にカードを2枚ずつペアにする */
-function chunkTools(tools: Tool[], size: number): Tool[][] {
-  const chunks: Tool[][] = [];
-  for (let i = 0; i < tools.length; i += size) {
-    chunks.push(tools.slice(i, i + size));
+/** レール1枚分の幅（カード幅 + gap）と、画面に収まる枚数 */
+function getRailPageMetrics(el: HTMLDivElement): {
+  stride: number;
+  pageCount: number;
+} {
+  const item = el.querySelector<HTMLElement>(".store-rail__item");
+  if (!item) {
+    return { stride: el.clientWidth, pageCount: 1 };
   }
-  return chunks;
+  const styles = getComputedStyle(el);
+  const gap = Number.parseFloat(styles.columnGap || styles.gap || "0") || 0;
+  const itemWidth = item.getBoundingClientRect().width;
+  const stride = itemWidth + gap;
+  if (stride <= 0) {
+    return { stride: el.clientWidth, pageCount: 1 };
+  }
+  // 完全に見える枚数（見切れは「次がある」合図。最低1）
+  const pageCount = Math.max(
+    1,
+    Math.floor((el.clientWidth + gap) / stride),
+  );
+  return { stride, pageCount };
 }
 
 export default function GenreSection({
@@ -22,72 +45,131 @@ export default function GenreSection({
   animationDelayMs?: number;
 }) {
   const { t } = useI18n();
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const [canPrev, setCanPrev] = useState(false);
+  const [canNext, setCanNext] = useState(false);
+  const headingId = `genre-heading-${genre.id}`;
   const copy = t.genres[genre.id] ?? {
     name: genre.label,
     description: "",
   };
-  const mobilePages = chunkTools(genre.tools, 2);
+
+  const syncScrollState = useCallback(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const max = el.scrollWidth - el.clientWidth;
+    setCanPrev(el.scrollLeft > 4);
+    setCanNext(max > 4 && el.scrollLeft < max - 4);
+  }, []);
+
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    syncScrollState();
+    el.addEventListener("scroll", syncScrollState, { passive: true });
+    const ro = new ResizeObserver(syncScrollState);
+    ro.observe(el);
+    return () => {
+      el.removeEventListener("scroll", syncScrollState);
+      ro.disconnect();
+    };
+  }, [syncScrollState, genre.tools.length]);
+
+  /** 矢印／キー：画面に収まる枚数ぶん（例: 3枚 or 4枚）まとめて送る */
+  const scrollByPage = (dir: -1 | 1) => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const { stride, pageCount } = getRailPageMetrics(el);
+    const maxLeft = Math.max(0, el.scrollWidth - el.clientWidth);
+    // いま先頭に近いカードのインデックスから、1ページ分進む／戻る
+    const currentIndex = Math.round(el.scrollLeft / stride);
+    const nextIndex = Math.max(0, currentIndex + dir * pageCount);
+    const nextLeft = Math.min(maxLeft, nextIndex * stride);
+    el.scrollTo({ left: nextLeft, behavior: "smooth" });
+  };
+
+  const onRailKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      scrollByPage(-1);
+    } else if (e.key === "ArrowRight") {
+      e.preventDefault();
+      scrollByPage(1);
+    } else if (e.key === "Home") {
+      e.preventDefault();
+      scrollerRef.current?.scrollTo({ left: 0, behavior: "smooth" });
+    } else if (e.key === "End") {
+      e.preventDefault();
+      const el = scrollerRef.current;
+      if (el) el.scrollTo({ left: el.scrollWidth, behavior: "smooth" });
+    }
+  };
 
   return (
     <section
       id={genre.id}
-      className="portal-fade-up py-12 sm:py-14"
+      className="portal-fade-up py-9 sm:py-12"
       style={{ animationDelay: `${animationDelayMs}ms` }}
+      aria-labelledby={headingId}
     >
-      <div className="mb-2 flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">
-        <h2 className="whitespace-nowrap text-lg font-semibold tracking-tight text-zinc-900 sm:text-xl">
-          {copy.name}
-        </h2>
-        <span className="whitespace-nowrap text-xs font-medium uppercase tracking-widest text-zinc-400">
-          {genre.label}
-        </span>
+      <div className="mb-1 flex min-w-0 items-end justify-between gap-3">
+        <div className="min-w-0">
+          <div className="flex min-w-0 flex-wrap items-baseline gap-x-2.5 gap-y-1">
+            <h2 id={headingId} className="store-section-title">
+              {copy.name}
+            </h2>
+            <span className="text-[12px] font-medium tracking-wide text-zinc-400">
+              {genre.label}
+            </span>
+          </div>
+          <p className="mt-1.5 max-w-2xl text-[13px] leading-relaxed text-zinc-500 sm:text-sm">
+            {copy.description}
+          </p>
+        </div>
+
+        <div className="hidden shrink-0 items-center gap-1.5 sm:flex">
+          <button
+            type="button"
+            className="store-scroll-btn"
+            aria-label={t.library.scrollPrev}
+            aria-controls={`genre-rail-${genre.id}`}
+            disabled={!canPrev}
+            onClick={() => scrollByPage(-1)}
+          >
+            <ChevronLeft className="size-4" strokeWidth={2.25} aria-hidden />
+          </button>
+          <button
+            type="button"
+            className="store-scroll-btn"
+            aria-label={t.library.scrollNext}
+            aria-controls={`genre-rail-${genre.id}`}
+            disabled={!canNext}
+            onClick={() => scrollByPage(1)}
+          >
+            <ChevronRight className="size-4" strokeWidth={2.25} aria-hidden />
+          </button>
+        </div>
       </div>
-      <p className="mb-8 max-w-2xl text-sm leading-relaxed text-zinc-500">
-        {copy.description}
-      </p>
 
-      {/*
-        狭い画面: 2枚ずつ見える横スクロール（カード増でも縦に伸びない）
-        ・先頭ページ左余白はジャンル見出しと揃える（内側 flex に padding）
-        sm以上: 従来どおり固定幅カードの折り返しグリッド
-      */}
       <div
-        className="overflow-x-auto overscroll-x-contain pb-1 [scrollbar-width:thin] snap-x snap-mandatory sm:overflow-visible sm:pb-0 sm:snap-none"
+        id={`genre-rail-${genre.id}`}
+        ref={scrollerRef}
+        className="store-rail"
         role="region"
-        aria-label={copy.name}
+        aria-labelledby={headingId}
+        tabIndex={0}
+        onKeyDown={onRailKeyDown}
       >
-        {/* モバイル: ページ単位（各ページ＝2カード）。pl/pr で端の余白を確保 */}
-        <div className="flex w-full gap-3 sm:hidden">
-          {mobilePages.map((page, pageIndex) => (
-            <div
-              key={`${genre.id}-page-${pageIndex}`}
-              className="grid w-full min-w-full shrink-0 snap-start snap-always grid-cols-2 gap-2.5"
-            >
-              {page.map((tool) => (
-                <ToolCard
-                  key={
-                    tool.comingSoon
-                      ? `${genre.id}-coming-soon-${pageIndex}`
-                      : tool.id
-                  }
-                  tool={tool}
-                  genreId={genre.id}
-                />
-              ))}
-            </div>
-          ))}
-        </div>
-
-        {/* PC: カード幅固定。余白が広がってもカードは伸びず、列数だけ増える */}
-        <div className="hidden grid-cols-[repeat(auto-fill,17.5rem)] justify-start gap-5 sm:grid">
-          {genre.tools.map((tool) => (
-            <ToolCard
-              key={tool.comingSoon ? `${genre.id}-coming-soon` : tool.id}
-              tool={tool}
-              genreId={genre.id}
-            />
-          ))}
-        </div>
+        {genre.tools.map((tool, index) => (
+          <div
+            key={
+              tool.comingSoon ? `${genre.id}-coming-soon-${index}` : tool.id
+            }
+            className="store-rail__item"
+          >
+            <StoreAppCard tool={tool} genreId={genre.id} />
+          </div>
+        ))}
       </div>
     </section>
   );

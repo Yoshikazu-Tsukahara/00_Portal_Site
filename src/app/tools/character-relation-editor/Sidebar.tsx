@@ -105,7 +105,7 @@ export default function Sidebar({
             <button
               type="button"
               onClick={onAddCharacter}
-              className="rounded-md bg-zinc-950 px-2 py-0.5 text-[10px] font-medium text-zinc-50 transition-colors hover:bg-zinc-800"
+              className="rounded-md bg-[var(--accent)] px-2 py-0.5 text-[10px] font-medium text-zinc-900 transition-colors hover:brightness-95"
             >
               {copy.sidebar.addCharacter}
             </button>

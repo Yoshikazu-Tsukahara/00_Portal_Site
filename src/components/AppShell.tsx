@@ -1,11 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { isValidElement, type ReactNode } from "react";
 
 import DataManager from "@/components/DataManager";
 import type { DataManagerConfig } from "@/lib/localData";
-import { LanguageToggle, useI18n } from "@/i18n";
+import { LanguageToggle } from "@/i18n";
 import { useLayout } from "@/lib/layout";
 import type { MinStageSize } from "@/lib/minigameStage";
 import { useStandaloneDisplay } from "@/lib/useStandaloneDisplay";
@@ -32,7 +31,7 @@ import { useStandaloneDisplay } from "@/lib/useStandaloneDisplay";
  * - お作法セット:
  *   1. layout.tsx で manifest / themeColor などのメタを宣言
  *   2. layout.tsx に `<PwaRuntime basePath classPrefix />`（SW 登録・活性クラス・履歴ロック）
- *   3. page.tsx で `<AppShell isPwa ...>`（standalone 時は戻るリンクを隠し、言語トグルを出す）
+ *   3. page.tsx で `<AppShell isPwa ...>`（standalone 時は言語トグルをヘッダー右に出す）
  *   4. 永続データがあるなら `dataManager` を渡す
  *   5. インストール導線は `afterDataManager` に置く
  * - 例: ランチ貯金、とりあえずキープ、究極確率スロット。
@@ -88,7 +87,7 @@ type AppShellProps = {
   wide?: boolean;
   /**
    * Type C（独立 PWA）として振る舞う。
-   * standalone 起動中は「ポータルに戻る」を隠し、言語トグルをヘッダー右に出す。
+   * standalone 起動中は言語トグルをヘッダー右に出す。
    */
   isPwa?: boolean;
   children: ReactNode;
@@ -112,10 +111,9 @@ function isDataManagerConfig(
  * スマホ:
  * 1行目 = タイトル + バックアップ + インストール
  * 2行目 = その他アクション（ある場合）
- * 「ポータルに戻る」は出さない（サイト Header のロゴで戻れる）
  *
- * PC（md+）:
- * 戻るリンク + タイトル行にアクションを横並び
+ * PC（md+）: タイトル行右端にアクションを横並び
+ * ポータルへの戻りはサイト Header の「Blank Note」ロゴで行う。
  */
 export default function AppShell({
   title,
@@ -130,7 +128,6 @@ export default function AppShell({
   children,
 }: AppShellProps) {
   // wide は deprecated（幅は LayoutToggle が管理）。受け取っても無視する。
-  const { t } = useI18n();
   const { isStandalone } = useStandaloneDisplay();
   const { contentClassName } = useLayout();
 
@@ -165,22 +162,8 @@ export default function AppShell({
           fillViewport ? "mb-2 pb-2" : "mb-4 pb-3"
         }`}
       >
-        {/* 1行目: タイトル + バックアップ + インストール（＋ PC 時は戻る／actions） */}
+        {/* 1行目: タイトル + バックアップ + インストール（＋ PC 時は actions） */}
         <div className="flex min-h-8 min-w-0 items-center gap-2 sm:gap-3">
-          {!isStandaloneApp ? (
-            <>
-              <Link
-                href="/"
-                className="hidden shrink-0 text-sm text-zinc-500 transition-colors hover:text-zinc-900 md:inline"
-              >
-                {t.common.backToPortal}
-              </Link>
-              <span
-                aria-hidden
-                className="hidden h-4 w-px shrink-0 bg-zinc-200 md:block"
-              />
-            </>
-          ) : null}
           <div className="flex min-w-0 flex-1 items-center gap-1.5 sm:gap-2">
             {/* flex-1 を付けない：バックアップ／インストールをタイトル直後に置く */}
             <h1 className="min-w-0 shrink truncate text-base font-semibold tracking-tight text-zinc-900">

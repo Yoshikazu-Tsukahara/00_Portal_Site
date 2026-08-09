@@ -13,6 +13,11 @@ import { getPaperTheme, paperThemeCssVars } from "./theme";
 import TocSync from "./TocSync";
 import type { TocPageSlice } from "./toc";
 import type { BookData } from "./types";
+import VariablesReaderModal from "./VariablesReaderModal";
+import {
+  applyVariablesToBook,
+  resolveVariableValues,
+} from "./variables";
 
 // page-flip は読み込み時に document を触るため、サーバー側では読み込まない
 const FlipBook = dynamic(() => import("./FlipBook"), { ssr: false });
@@ -60,8 +65,7 @@ function IconExitFullscreen() {
 
 /**
  * 没入型の読書画面。
- * 編集画面で作ったページをそのまま 3D フリップブックとしてめくる。
- * 操作 UI は数秒で消え、書籍タイプの開き方に応じてページ送りの向きが入れ替わる。
+ * 名前変換がある本は、置換 → paginateBody の順で紙面を組んでからめくる。
  */
 export default function ViewMode({
   book,
@@ -71,6 +75,20 @@ export default function ViewMode({
 }: ViewModeProps) {
   const { t } = useI18n();
   const copy = t.apps.bookVisualizer.view;
+  /** null = モーダル待ち。変数なし本は最初から空オブジェクトで開始 */
+  const [readerInput, setReaderInput] = useState<Record<string, string> | null>(
+    () => (book.variables.length > 0 ? null : {}),
+  );
+
+  const readyToRender = readerInput !== null;
+
+  /** 置換後の一時 Book（paginate の入力） */
+  const viewBook = useMemo(() => {
+    if (readerInput === null) return null;
+    const values = resolveVariableValues(book.variables, readerInput);
+    return applyVariablesToBook(book, values);
+  }, [book, readerInput]);
+
   const metrics = computePageMetrics(book.layout, book.format);
   const fontsKey = `${book.format.fontFamilyH1}|${book.format.fontFamilyH2}|${book.format.fontFamilyP}`;
   const layoutConfig = useMemo(
@@ -90,14 +108,17 @@ export default function ViewMode({
       book.format.columns,
     ],
   );
-  const bodyPages = useMemo(
-    () => paginateBody(book.body, layoutConfig),
-    [book.body, layoutConfig],
-  );
-  const sheets = useMemo(
-    () => buildSheets(book, bodyPages.length),
-    [book, bodyPages.length],
-  );
+
+  // 最重要: 置換済み body を渡してからページ分割する
+  const bodyPages = useMemo(() => {
+    if (!viewBook) return [];
+    return paginateBody(viewBook.body, layoutConfig);
+  }, [viewBook, layoutConfig]);
+
+  const sheets = useMemo(() => {
+    if (!viewBook) return [];
+    return buildSheets(viewBook, bodyPages.length);
+  }, [viewBook, bodyPages.length]);
 
   const rootRef = useRef<HTMLDivElement>(null);
   const flipRef = useRef<FlipController | null>(null);
@@ -149,6 +170,7 @@ export default function ViewMode({
   }, []);
 
   useEffect(() => {
+    if (!readyToRender) return;
     hideTimer.current = window.setTimeout(
       () => setChromeShown(false),
       CHROME_HIDE_DELAY,
@@ -156,7 +178,7 @@ export default function ViewMode({
     return () => {
       if (hideTimer.current !== null) window.clearTimeout(hideTimer.current);
     };
-  }, []);
+  }, [readyToRender]);
 
   useEffect(() => {
     const previous = document.body.style.overflow;
@@ -207,6 +229,7 @@ export default function ViewMode({
         onClose();
         return;
       }
+      if (!readyToRender) return;
       const forward = isRightToLeft ? "ArrowLeft" : "ArrowRight";
       const backward = isRightToLeft ? "ArrowRight" : "ArrowLeft";
       if (event.key === forward) {
@@ -219,7 +242,14 @@ export default function ViewMode({
     }
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [goNext, goPrev, isRightToLeft, onClose, revealChrome]);
+  }, [
+    goNext,
+    goPrev,
+    isRightToLeft,
+    onClose,
+    readyToRender,
+    revealChrome,
+  ]);
 
   const chromeClass = chromeVisible
     ? "opacity-100"
@@ -233,6 +263,8 @@ export default function ViewMode({
     ? { label: copy.prev, action: goPrev }
     : { label: copy.next, action: goNext };
 
+  const displayTitle = viewBook?.title.trim() || book.title.trim() || copy.untitled;
+
   return (
     <div
       ref={rootRef}
@@ -243,121 +275,143 @@ export default function ViewMode({
       data-digital={paperTheme.digital ? "true" : "false"}
       /* デジタルは CSS 側でダークモード追従するため、色変数は物理本テーマだけ注入 */
       style={paperTheme.digital ? undefined : themeStyle}
-      onPointerMove={revealChrome}
-      onPointerDown={revealChrome}
+      onPointerMove={readyToRender ? revealChrome : undefined}
+      onPointerDown={readyToRender ? revealChrome : undefined}
     >
-      <div
-        className={`absolute inset-x-0 top-0 z-20 flex items-center gap-2 px-3 py-2.5 transition-opacity duration-300 ${chromeClass}`}
-      >
-        <button
-          type="button"
-          onClick={onClose}
-          className="shrink-0 rounded-full border border-zinc-300/70 bg-white/80 px-3 py-1.5 text-[11px] text-zinc-600 transition-colors hover:bg-white"
-        >
-          ✕ {copy.close}
-        </button>
-        <p className="min-w-0 flex-1 truncate text-center text-[11px] text-zinc-500">
-          {book.title.trim() || copy.untitled}
-        </p>
-        <span className="shrink-0 text-[11px] tabular-nums text-zinc-500">
-          {total === 0
-            ? "—"
-            : fmt(copy.position, {
-                current: current + 1,
-                total,
-              })}
-        </span>
-        <button
-          type="button"
-          onClick={toggleFullscreen}
-          aria-label={isFullscreen ? copy.exitFullscreen : copy.fullscreen}
-          title={isFullscreen ? copy.exitFullscreen : copy.fullscreen}
-          className="shrink-0 rounded-full border border-zinc-300/70 bg-white/80 p-1.5 text-zinc-600 transition-colors hover:bg-white"
-        >
-          {isFullscreen ? <IconExitFullscreen /> : <IconFullscreen />}
-        </button>
-      </div>
+      {!readyToRender ? (
+        <>
+          <div className="absolute inset-x-0 top-0 z-30 flex items-center gap-2 px-3 py-2.5">
+            <button
+              type="button"
+              onClick={onClose}
+              className="shrink-0 rounded-full border border-zinc-300/70 bg-white/80 px-3 py-1.5 text-[11px] text-zinc-600 transition-colors hover:bg-white"
+            >
+              ✕ {copy.close}
+            </button>
+          </div>
+          <VariablesReaderModal
+            variables={book.variables}
+            onConfirm={setReaderInput}
+          />
+        </>
+      ) : null}
 
-      {/* 編集画面と同じ実測で目次を分割（書籍データは変更しない） */}
-      <TocSync
-        book={book}
-        metrics={metrics}
-        bodyPages={bodyPages}
-        onSlices={handleTocSlices}
-      />
+      {readyToRender && viewBook ? (
+        <>
+          <div
+            className={`absolute inset-x-0 top-0 z-20 flex items-center gap-2 px-3 py-2.5 transition-opacity duration-300 ${chromeClass}`}
+          >
+            <button
+              type="button"
+              onClick={onClose}
+              className="shrink-0 rounded-full border border-zinc-300/70 bg-white/80 px-3 py-1.5 text-[11px] text-zinc-600 transition-colors hover:bg-white"
+            >
+              ✕ {copy.close}
+            </button>
+            <p className="min-w-0 flex-1 truncate text-center text-[11px] text-zinc-500">
+              {displayTitle}
+            </p>
+            <span className="shrink-0 text-[11px] tabular-nums text-zinc-500">
+              {total === 0
+                ? "—"
+                : fmt(copy.position, {
+                    current: current + 1,
+                    total,
+                  })}
+            </span>
+            <button
+              type="button"
+              onClick={toggleFullscreen}
+              aria-label={isFullscreen ? copy.exitFullscreen : copy.fullscreen}
+              title={isFullscreen ? copy.exitFullscreen : copy.fullscreen}
+              className="shrink-0 rounded-full border border-zinc-300/70 bg-white/80 p-1.5 text-zinc-600 transition-colors hover:bg-white"
+            >
+              {isFullscreen ? <IconExitFullscreen /> : <IconFullscreen />}
+            </button>
+          </div>
 
-      <div className="bv-reader__stage relative min-h-0 flex-1">
-        {total > 0 ? (
-          <FlipBook
-            book={book}
+          {/* 編集画面と同じ実測で目次を分割（書籍データは変更しない） */}
+          <TocSync
+            book={viewBook}
             metrics={metrics}
             bodyPages={bodyPages}
-            sheets={sheets}
-            tocSlices={tocSlices}
-            rightToLeft={isRightToLeft}
-            coverType={paperTheme.coverType}
-            digital={paperTheme.digital}
-            onChangeIndex={setIndex}
-            onChangePortrait={setPortrait}
-            controllerRef={flipRef}
+            onSlices={handleTocSlices}
           />
-        ) : (
-          <p className="flex h-full items-center justify-center px-6 text-center text-sm text-zinc-500">
-            {copy.empty}
-          </p>
-        )}
 
-        {/* 本のドラッグを邪魔しないよう、ページ送りは画面端の小さなボタンにする */}
-        {total > 0 ? (
-          <>
-            <button
-              type="button"
-              onClick={leftZone.action}
-              aria-label={leftZone.label}
-              className={`bv-reader__arrow left-2 transition-opacity duration-300 ${chromeClass}`}
-            >
-              ‹
-            </button>
-            <button
-              type="button"
-              onClick={rightZone.action}
-              aria-label={rightZone.label}
-              className={`bv-reader__arrow right-2 transition-opacity duration-300 ${chromeClass}`}
-            >
-              ›
-            </button>
-          </>
-        ) : null}
-      </div>
+          <div className="bv-reader__stage relative min-h-0 flex-1">
+            {total > 0 ? (
+              <FlipBook
+                book={viewBook}
+                metrics={metrics}
+                bodyPages={bodyPages}
+                sheets={sheets}
+                tocSlices={tocSlices}
+                rightToLeft={isRightToLeft}
+                coverType={paperTheme.coverType}
+                digital={paperTheme.digital}
+                onChangeIndex={setIndex}
+                onChangePortrait={setPortrait}
+                controllerRef={flipRef}
+              />
+            ) : (
+              <p className="flex h-full items-center justify-center px-6 text-center text-sm text-zinc-500">
+                {copy.empty}
+              </p>
+            )}
 
-      {/* 最終ページ：ホーム／最初から／編集（旧奥付の操作） */}
-      {atLast ? (
-        <div
-          className={`absolute inset-x-0 bottom-0 z-20 flex flex-wrap items-center justify-center gap-2 bg-gradient-to-t from-white/85 to-transparent px-3 pb-4 pt-8 transition-opacity duration-300 ${chromeClass}`}
-        >
-          <button type="button" onClick={onGoHome} className="btn-primary">
-            {copy.endHome}
-          </button>
-          <button
-            type="button"
-            onClick={() => flipRef.current?.goTo(0)}
-            className="btn-secondary"
-          >
-            {copy.endRestart}
-          </button>
-          {onAdopt ? (
-            <button type="button" onClick={onAdopt} className="btn-secondary">
-              {copy.endEdit}
-            </button>
-          ) : null}
-        </div>
-      ) : (
-        <p
-          className={`pointer-events-none absolute inset-x-0 bottom-0 z-20 px-3 pb-3 pt-6 text-center text-[10px] text-zinc-500 transition-opacity duration-300 ${chromeClass}`}
-        >
-          {copy.hint}
-        </p>
-      )}
+            {/* 本のドラッグを邪魔しないよう、ページ送りは画面端の小さなボタンにする */}
+            {total > 0 ? (
+              <>
+                <button
+                  type="button"
+                  onClick={leftZone.action}
+                  aria-label={leftZone.label}
+                  className={`bv-reader__arrow left-2 transition-opacity duration-300 ${chromeClass}`}
+                >
+                  ‹
+                </button>
+                <button
+                  type="button"
+                  onClick={rightZone.action}
+                  aria-label={rightZone.label}
+                  className={`bv-reader__arrow right-2 transition-opacity duration-300 ${chromeClass}`}
+                >
+                  ›
+                </button>
+              </>
+            ) : null}
+          </div>
+
+          {/* 最終ページ：ホーム／最初から／編集（旧奥付の操作） */}
+          {atLast ? (
+            <div
+              className={`absolute inset-x-0 bottom-0 z-20 flex flex-wrap items-center justify-center gap-2 bg-gradient-to-t from-white/85 to-transparent px-3 pb-4 pt-8 transition-opacity duration-300 ${chromeClass}`}
+            >
+              <button type="button" onClick={onGoHome} className="btn-primary">
+                {copy.endHome}
+              </button>
+              <button
+                type="button"
+                onClick={() => flipRef.current?.goTo(0)}
+                className="btn-secondary"
+              >
+                {copy.endRestart}
+              </button>
+              {onAdopt ? (
+                <button type="button" onClick={onAdopt} className="btn-secondary">
+                  {copy.endEdit}
+                </button>
+              ) : null}
+            </div>
+          ) : (
+            <p
+              className={`pointer-events-none absolute inset-x-0 bottom-0 z-20 px-3 pb-3 pt-6 text-center text-[10px] text-zinc-500 transition-opacity duration-300 ${chromeClass}`}
+            >
+              {copy.hint}
+            </p>
+          )}
+        </>
+      ) : null}
     </div>
   );
 }

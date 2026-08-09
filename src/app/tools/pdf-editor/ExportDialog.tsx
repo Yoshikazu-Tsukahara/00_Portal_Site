@@ -125,7 +125,7 @@ export default function ExportDialog({
               aria-checked={addPageNumbers}
               onClick={() => setAddPageNumbers((v) => !v)}
               className={`relative h-5 w-9 shrink-0 rounded-full transition-colors ${
-                addPageNumbers ? "bg-zinc-900" : "bg-zinc-200"
+                addPageNumbers ? "bg-[var(--accent)]" : "bg-zinc-200"
               }`}
             >
               <span

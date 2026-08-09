@@ -333,7 +333,7 @@ export default function PaletteCollectorPage() {
       {toast ? (
         <div
           role="status"
-          className="fixed left-1/2 top-4 z-[60] -translate-x-1/2 rounded-full bg-zinc-900 px-4 py-2 text-sm font-medium text-white shadow-lg"
+          className="fixed left-1/2 top-4 z-[60] -translate-x-1/2 rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-medium text-zinc-900 shadow-lg"
         >
           {toast}
         </div>

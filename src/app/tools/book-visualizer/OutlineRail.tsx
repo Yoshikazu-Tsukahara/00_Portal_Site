@@ -110,7 +110,7 @@ function ThumbBox({
     >
       {scale > 0 ? (
         <div
-          className="pointer-events-none origin-top-left"
+          className="pointer-events-none absolute left-0 top-0 origin-top-left"
           style={{
             width: metrics.width,
             height: metrics.height,

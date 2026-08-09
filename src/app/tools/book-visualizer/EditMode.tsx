@@ -109,7 +109,6 @@ import {
   type BookPage,
   type FreeFrame,
   type FreeTextWritingMode,
-  type PromptMemo,
   type TextLevel,
 } from "./types";
 
@@ -127,9 +126,7 @@ type EditChromeMode = "normal" | "immersive" | "browser";
 
 type EditModeProps = {
   book: BookData;
-  prompts: PromptMemo[];
   onChangeBook: (patch: Partial<BookData>) => void;
-  onChangePrompts: (prompts: PromptMemo[]) => void;
 };
 
 /**
@@ -138,9 +135,7 @@ type EditModeProps = {
  */
 export default function EditMode({
   book,
-  prompts,
   onChangeBook,
-  onChangePrompts,
 }: EditModeProps) {
   const { t } = useI18n();
   const copy = t.apps.bookVisualizer;
@@ -1230,8 +1225,6 @@ export default function EditMode({
       onRemoveBlock={() => {
         removeSelectedBlock({ confirm: true });
       }}
-      prompts={prompts}
-      onChangePrompts={onChangePrompts}
     />
   );
 

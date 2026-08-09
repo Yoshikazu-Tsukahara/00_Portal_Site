@@ -16,7 +16,7 @@ export type Locale =
   | "pt";
 
 /** LocalStorage に保存するキー */
-export const LOCALE_STORAGE_KEY = "my-tool-box-locale";
+export const LOCALE_STORAGE_KEY = "blank-note-locale";
 
 /** 法的文書の1ブロック */
 export type LegalBlock =
@@ -58,6 +58,14 @@ export type Dictionary = {
     supportAria: string;
     supportTitle: string;
     langToggleAria: string;
+    /** ホーム（ランチャー）ナビ */
+    homeNav: string;
+    /** ライブラリ（ストア）ナビ */
+    libraryNav: string;
+    /** 外部送信ゼロ安心バッジ（通常） */
+    localOnlyBadge: string;
+    /** 狭い画面向け短縮 */
+    localOnlyBadgeShort: string;
     /** PC 向け表示幅切替（lg 以上で表示） */
     layoutToggle: {
       aria: string;
@@ -78,6 +86,82 @@ export type Dictionary = {
     heroTitleLine2: string;
     heroLead1: string;
     heroLead2: string;
+    /** ライブラリへ誘導 */
+    openLibrary: string;
+    /** ピンが空のとき */
+    emptyPins: string;
+    emptyPinsHint: string;
+    /** ホーム編集モード */
+    editHome: string;
+    doneEditing: string;
+    editHint: string;
+    removeAria: string;
+    dragAria: string;
+    openAria: string;
+    moveLeft: string;
+    moveRight: string;
+    reorderedAnnounce: string;
+    removedAnnounce: string;
+    editingAnnounce: string;
+    gridLabel: string;
+    /** フォルダ（グループ） */
+    folderDefaultName: string;
+    openFolderAria: string;
+    dissolveFolderAria: string;
+    folderDragAria: string;
+    renameFolderAria: string;
+    renameFolderPlaceholder: string;
+    closeFolder: string;
+    ejectFromFolder: string;
+    ejectFromFolderAria: string;
+    groupWithNext: string;
+    combineHint: string;
+    /** 既存フォルダへ重ねているとき */
+    combineAddHint: string;
+    folderCreatedAnnounce: string;
+    folderAddedAnnounce: string;
+    folderDissolvedAnnounce: string;
+    ejectedAnnounce: string;
+  };
+  library: {
+    title: string;
+    lead: string;
+    /** ホームにピン留め（PWAインストールとは別） */
+    install: string;
+    /** ピン留め済み表示 */
+    installed: string;
+    /** ホームから外す（短ラベル） */
+    uninstall: string;
+    /** ホームから外す（説明ページ用） */
+    removeFromHome: string;
+    /** アプリを開く */
+    openApp: string;
+    /** 未ピン留め時の案内 */
+    installHint: string;
+    /** ピン留め後：ホームから開く案内 */
+    openFromHome: string;
+    detailBack: string;
+    notFound: string;
+    scrollPrev: string;
+    scrollNext: string;
+    /** 説明セクション見出し */
+    aboutLabel: string;
+    /** できること */
+    highlightsLabel: string;
+    /** はじめかた */
+    gettingStartedLabel: string;
+    /** ヒント */
+    tipLabel: string;
+    updatedAtLabel: string;
+    devicesLabel: string;
+    /** 対応デバイス（1端末＝1チップ） */
+    deviceSmartphone: string;
+    deviceTablet: string;
+    deviceWindows: string;
+    deviceMac: string;
+    devicePcRecommended: string;
+    /** 全アプリ共通：端末内保存・非送信の注記 */
+    localDataNote: string;
   };
   genres: Record<
     string,
@@ -91,6 +175,17 @@ export type Dictionary = {
     {
       title: string;
       description: string;
+      /**
+       * 説明ページの概要。
+       * 文字列1本、または読みやすい段落の配列。
+       */
+      detail?: string | readonly string[];
+      /** できること（箇条書き） */
+      highlights?: readonly string[];
+      /** はじめかた（番号付きステップ） */
+      gettingStarted?: readonly string[];
+      /** 使い方のヒント */
+      tip?: string;
     }
   >;
   card: {
@@ -105,6 +200,10 @@ export type Dictionary = {
     pcRecommended: string;
     /** PC推奨バッジの title / aria */
     pcRecommendedHint: string;
+    /** ホームにピン留め */
+    pinToHome: string;
+    /** ホームから外す */
+    unpinFromHome: string;
   };
   footer: {
     tagline: string;

@@ -4,8 +4,8 @@ import type { AppsDictionary } from "../../apps";
 export const appsPt: AppsDictionary = {
   bookVisualizer: {
     shell: {
-      title: "AI Book Studio",
-      description: "Um editor DTP que diagrama a obra de IA na própria página. Escolha o tamanho do papel, defina caracteres e linhas, e o tamanho da fonte é calculado para você — depois finalize em estilo vertical, horizontal ou fotográfico e compartilhe como um arquivo .mybook.",
+      title: "Quarto",
+      description: "Um editor de livros focado na página. Escolha o tamanho, defina caracteres e linhas — o tamanho da fonte é calculado. Finalize em vertical ou horizontal e compartilhe como .mybook.",
     },
     loading: "Carregando…",
     paper: {
@@ -42,16 +42,12 @@ export const appsPt: AppsDictionary = {
       sampleConfirm: "Substituir o rascunho atual por este modelo?",
       samples: {
         novel: {
-          title: "Romance japonês",
-          lead: "Bunko · vertical. Quatro capítulos com seções, quebras e fólios de sumário ao vivo.",
+          title: "Romance japonês vertical",
+          lead: "Bunko. Quatro capítulos com seções, quebras e TOC ao vivo.",
         },
         western: {
-          title: "Paperback ocidental",
-          lead: "Trade · horizontal. Três capítulos mais coda, com quebras de página manuais.",
-        },
-        photo: {
-          title: "Livro ilustrado / de fotos",
-          lead: "Quadrado. Cinco capítulos curtos, pranchas fotográficas, página de título e sumário.",
+          title: "Trade paperback em inglês",
+          lead: "Trade · horizontal. Três capítulos mais coda, com quebras manuais.",
         },
       },
       readTitle: "Ler um arquivo .mybook",
@@ -129,7 +125,7 @@ export const appsPt: AppsDictionary = {
         tabFormat: "Formato",
         tabPage: "Página",
         tabBlock: "Bloco",
-        tabPrompts: "IA",
+        tabVariables: "Nomes",
         openLabel: "Configurações",
         closeLabel: "Fechar",
       },
@@ -268,19 +264,21 @@ export const appsPt: AppsDictionary = {
         sizeError: "Essa imagem é grande demais (máx. 3MB). Comprima-a primeiro.",
         readError: "Não foi possível ler a imagem.",
       },
-      prompts: {
-        heading: "Notas de prompt",
-        lead: "Guarde aqui suas instruções e notas de referência. Elas nunca entram em arquivos compartilhados.",
-        add: "+ Adicionar nota",
-        empty: "Nenhuma nota ainda.",
-        titlePlaceholder: "Nome da nota (ex.: Tom de voz)",
-        bodyPlaceholder: "Escreva as instruções que você entrega à IA.",
-        copy: "Copiar",
-        copied: "Copiado",
-        copyFailed: "Não foi possível copiar. Selecione o texto manualmente.",
-        remove: "Excluir esta nota",
-        confirmRemove: "Excluir esta nota?",
-      },
+    variables: {
+      heading: "Marcadores de nome",
+      lead: "Defina palavras que o leitor possa trocar. Escreva {{name1}} no texto.",
+      tokenHint:
+        "Use chaves duplas (ex.: {{name1}}). A paginação roda após a substituição.",
+      add: "+ Adicionar variável",
+      empty: "Ainda sem variáveis. Adicione uma para mostrar a tela antes de ler.",
+      idLabel: "Código (ID no texto)",
+      labelLabel: "Rótulo (para o leitor)",
+      labelPlaceholder: "ex.: Nome do protagonista",
+      defaultLabel: "Valor padrão",
+      defaultPlaceholder: "ex.: Alice",
+      remove: "Excluir esta variável",
+      confirmRemove: "Excluir esta variável?",
+    },
     },
     view: {
       close: "Fechar",
@@ -296,6 +294,11 @@ export const appsPt: AppsDictionary = {
       endRestart: "Ler de novo",
       endEdit: "Tornar este meu rascunho",
       endEditConfirm: "Isso substitui o rascunho que você está editando. Continuar?",
+      variables: {
+        title: "Antes de ler",
+        lead: "Digite nomes ou palavras. Campos vazios mantêm o padrão.",
+        confirm: "Ler com estes nomes",
+      },
     },
   },
   characterRelation: {
@@ -476,7 +479,7 @@ export const appsPt: AppsDictionary = {
       shareX: "Compartilhar no X",
       shareXShort: "X",
       shareIntro: "🔐 Você recebeu uma mensagem secreta!",
-      shareOutro: "Só quem tem a frase-senha consegue decodificar no app de cifra do My Tool Box 👇",
+      shareOutro: "Só quem tem a frase-senha consegue decodificar no app de cifra do Blank Note 👇",
     },
     decrypt: {
       cipherLabel: "Texto cifrado (colar)",
@@ -521,7 +524,7 @@ export const appsPt: AppsDictionary = {
     },
     install: {
       button: "Adicionar este app à Tela Inicial",
-      buttonShort: "Na Tela Inicial",
+      buttonShort: "Instalar",
       buttonTiny: "Adicionar",
       buttonAria: "Adicionar Mensagem Secreta à Tela Inicial como um app independente",
       modalTitle: "Adicionar à Tela Inicial",
@@ -709,7 +712,7 @@ export const appsPt: AppsDictionary = {
     },
     install: {
       button: "Adicionar este app à Tela Inicial",
-      buttonShort: "Na Tela Inicial",
+      buttonShort: "Instalar",
       buttonTiny: "Adicionar",
       buttonAria: "Adicionar Compressor de Imagens em Lote à Tela Inicial como um app",
       modalTitle: "Adicionar à Tela Inicial",
@@ -805,7 +808,7 @@ export const appsPt: AppsDictionary = {
     },
     install: {
       button: "Adicionar este app à Tela Inicial",
-      buttonShort: "Na Tela Inicial",
+      buttonShort: "Instalar",
       buttonTiny: "Adicionar",
       buttonAria: "Adicionar Gerador de Documentos à Tela Inicial como um app independente",
       modalTitle: "Adicionar à Tela Inicial",
@@ -858,7 +861,7 @@ export const appsPt: AppsDictionary = {
     },
     install: {
       button: "Adicionar este app à Tela Inicial",
-      buttonShort: "Na Tela Inicial",
+      buttonShort: "Instalar",
       buttonTiny: "Adicionar",
       buttonAria: "Adicionar Link Stocker à Tela Inicial como um app independente",
       modalTitle: "Adicionar à Tela Inicial",
@@ -893,7 +896,7 @@ export const appsPt: AppsDictionary = {
     },
     bookmarklet: {
       title: "💻 Desktop: arraste para a barra de favoritos",
-      hint: "Arraste o botão para a barra de favoritos (substitua após atualizações). Ele envia para qualquer aba aberta do My Tool Box e salva automaticamente; a aba auxiliar fecha na hora.",
+      hint: "Arraste o botão para a barra de favoritos (substitua após atualizações). Ele envia para qualquer aba aberta do Blank Note e salva automaticamente; a aba auxiliar fecha na hora.",
       dragLabel: "Enviar para Guardar",
     },
     share: {
@@ -1086,7 +1089,7 @@ export const appsPt: AppsDictionary = {
     },
     install: {
       button: "Adicionar este app à Tela Inicial",
-      buttonShort: "Na Tela Inicial",
+      buttonShort: "Instalar",
       buttonTiny: "Adicionar",
       buttonAria: "Adicionar Economia no Almoço à Tela Inicial como um app independente",
       modalTitle: "Adicionar à Tela Inicial",
@@ -1410,7 +1413,7 @@ export const appsPt: AppsDictionary = {
     },
     install: {
       button: "Adicionar este app à Tela Inicial",
-      buttonShort: "Na Tela Inicial",
+      buttonShort: "Instalar",
       buttonTiny: "Adicionar",
       buttonAria: "Adicionar Modelos de E-mail à Tela Inicial como um app independente",
       modalTitle: "Adicionar à Tela Inicial",
@@ -1501,7 +1504,7 @@ export const appsPt: AppsDictionary = {
     },
     install: {
       button: "Adicionar este app à Tela Inicial",
-      buttonShort: "Na Tela Inicial",
+      buttonShort: "Instalar",
       buttonTiny: "Adicionar",
       buttonAria: "Adicionar Coletor de Paletas à Tela Inicial como um app independente",
       modalTitle: "Adicionar à Tela Inicial",
@@ -1655,7 +1658,7 @@ export const appsPt: AppsDictionary = {
     },
     install: {
       button: "Adicionar este app à Tela Inicial",
-      buttonShort: "Na Tela Inicial",
+      buttonShort: "Instalar",
       buttonTiny: "Adicionar",
       buttonAria: "Adicionar Editor de PDF à Tela Inicial como um app",
       modalTitle: "Adicionar à Tela Inicial",
@@ -1784,7 +1787,7 @@ export const appsPt: AppsDictionary = {
     },
     install: {
       button: "📱 Adicionar à Tela Inicial",
-      buttonShort: "Na Tela Inicial",
+      buttonShort: "Instalar",
       buttonTiny: "Adicionar",
       buttonAria: "Adicionar à Tela Inicial",
       modalTitle: "Adicionar à Tela Inicial",
@@ -1903,11 +1906,11 @@ export const appsPt: AppsDictionary = {
   robotFreethrow: {
     shell: {
       title: "Arremesso de Projétil",
-      description: "Ajuste ângulo, impulso e giro para acertar a cesta neste minijogo de física de projéteis.",
+      description: "Ajuste ângulo, velocidade inicial e giro para acertar a cesta neste minijogo de física de projéteis.",
     },
     install: {
       button: "Adicionar este app à Tela Inicial",
-      buttonShort: "Na Tela Inicial",
+      buttonShort: "Instalar",
       buttonTiny: "Adicionar",
       buttonAria: "Adicionar Arremesso de Projétil à Tela Inicial como um app independente",
       modalTitle: "Adicionar à Tela Inicial",
@@ -2005,7 +2008,7 @@ export const appsPt: AppsDictionary = {
     },
     install: {
       button: "📱 Adicionar à Tela Inicial",
-      buttonShort: "Na Tela Inicial",
+      buttonShort: "Instalar",
       buttonTiny: "Adicionar",
       buttonAria: "Adicionar este app à Tela Inicial",
       modalTitle: "Adicionar à Tela Inicial",

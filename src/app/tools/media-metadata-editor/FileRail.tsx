@@ -54,7 +54,7 @@ export default function FileRail({
                 <div
                   className={`group flex items-stretch gap-0.5 rounded-md border transition ${
                     selected
-                      ? "border-zinc-900/15 bg-zinc-100"
+                      ? "border-[color-mix(in_srgb,var(--accent)_35%,transparent)] bg-[color-mix(in_srgb,var(--accent)_22%,white)]"
                       : "border-transparent hover:border-zinc-200 hover:bg-zinc-50"
                   }`}
                 >

@@ -4,7 +4,7 @@ export type LayoutMode = "default" | "wide" | "full";
 export const LAYOUT_MODES: LayoutMode[] = ["default", "wide", "full"];
 
 /** localStorage に保存するキー */
-export const LAYOUT_MODE_STORAGE_KEY = "my-tool-box:layout-mode";
+export const LAYOUT_MODE_STORAGE_KEY = "blank-note:layout-mode";
 
 /** html 要素の data 属性名（data-layout-mode） */
 export const LAYOUT_MODE_DATASET_ATTR = "layoutMode";

@@ -2,7 +2,7 @@
  * 全ツール共通のバックアップファイル形式。
  * 書き出し JSON はこの封筒（エンベロープ）で包む。
  */
-export const BACKUP_FORMAT = "my-toolbox-backup" as const;
+export const BACKUP_FORMAT = "blank-note-backup" as const;
 export const BACKUP_VERSION = 1 as const;
 
 export type BackupEnvelope<T = unknown> = {

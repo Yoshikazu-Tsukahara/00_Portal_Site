@@ -155,7 +155,7 @@ export default function TagMasterModal({
                     onClick={() => setDraftColor(c.id)}
                     className={`flex size-11 items-center justify-center rounded-md border transition-all active:scale-95 md:size-7 ${
                       selected
-                        ? "border-zinc-900 ring-1 ring-zinc-900"
+                        ? "border-[var(--accent-strong)] ring-1 ring-[var(--accent)]"
                         : "border-zinc-200 hover:border-zinc-400 active:bg-zinc-50"
                     }`}
                   >
@@ -176,7 +176,7 @@ export default function TagMasterModal({
               <button
                 type="button"
                 onClick={handleSubmit}
-                className="btn-primary min-h-11 !px-3 !py-2 !text-xs active:scale-[0.98] active:bg-zinc-800 sm:min-h-0 sm:!py-1.5"
+                className="btn-primary min-h-11 !px-3 !py-2 !text-xs active:scale-[0.98] active:brightness-95 sm:min-h-0 sm:!py-1.5"
               >
                 {editingId ? mt.tagMaster.update : mt.tagMaster.add}
               </button>

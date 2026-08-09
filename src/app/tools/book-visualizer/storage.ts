@@ -59,7 +59,10 @@ export function parseMyBook(text: string): BookData | null {
 
   const obj = parsed as Record<string, unknown>;
   // 封筒付き（正規の .mybook）と、本体だけの JSON の両方を受け付ける
-  const source = obj.format === MYBOOK_FORMAT ? obj.book : parsed;
+  // 旧ブランド名フォーマットも封筒として読む
+  const isEnvelope =
+    obj.format === MYBOOK_FORMAT || obj.format === "my-toolbox-mybook";
+  const source = isEnvelope ? obj.book : parsed;
   const book = normalizeBook(source);
   if (book.pages.length === 0 && !book.title.trim()) return null;
   return book;

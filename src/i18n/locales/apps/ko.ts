@@ -4,8 +4,8 @@ import type { AppsDictionary } from "../../apps";
 export const appsKo: AppsDictionary = {
   bookVisualizer: {
     shell: {
-      title: "AI 북 스튜디오",
-      description: "AI 작품을 페이지 위에서 바로 조판하는 DTP 에디터입니다. 용지 크기·자·행을 정하면 글자 크기가 계산되고, 세로·가로·포토 스타일로 마무리한 뒤 .mybook 파일로 공유할 수 있습니다.",
+      title: "Quarto",
+      description: "페이지 위에서 바로 조판하는 책 에디터입니다. 용지 크기·자·행을 정하면 글자 크기가 계산되고, 세로·가로로 마무리한 뒤 .mybook 파일로 공유할 수 있습니다.",
     },
     loading: "불러오는 중…",
     paper: {
@@ -42,16 +42,12 @@ export const appsKo: AppsDictionary = {
       sampleConfirm: "현재 초안을 이 샘플로 바꿀까요?",
       samples: {
         novel: {
-          title: "일본 소설",
-          lead: "문고 · 세로. 절·개행·실시간 TOC 면이 있는 4장.",
+          title: "일본어 세로쓰기 소설",
+          lead: "문고판. 절·개행·실시간 TOC 면이 있는 4장.",
         },
         western: {
-          title: "서양 페이퍼백",
+          title: "영어 트레이드 페이퍼백",
           lead: "트레이드 · 가로. 3장 + 코다, 수동 페이지 나누기.",
-        },
-        photo: {
-          title: "그림 / 포토북",
-          lead: "정사각. 짧은 5장, 포토 플레이트, 표제지와 TOC.",
         },
       },
       readTitle: ".mybook 파일 읽기",
@@ -129,7 +125,7 @@ export const appsKo: AppsDictionary = {
         tabFormat: "형식",
         tabPage: "페이지",
         tabBlock: "블록",
-        tabPrompts: "AI",
+        tabVariables: "이름 변환",
         openLabel: "설정",
         closeLabel: "닫기",
       },
@@ -268,19 +264,21 @@ export const appsKo: AppsDictionary = {
         sizeError: "이미지가 너무 큽니다 (최대 3MB). 먼저 압축하세요.",
         readError: "이미지를 읽을 수 없습니다.",
       },
-      prompts: {
-        heading: "프롬프트 메모",
-        lead: "자주 쓰는 지시와 참고 메모를 여기에 보관하세요. 공유 파일에는 포함되지 않습니다.",
-        add: "+ 메모 추가",
-        empty: "아직 메모 없음.",
-        titlePlaceholder: "메모 이름 (예: 말투)",
-        bodyPlaceholder: "AI에게 넘길 지시를 작성하세요.",
-        copy: "복사",
-        copied: "복사됨",
-        copyFailed: "복사할 수 없습니다. 텍스트를 직접 선택하세요.",
-        remove: "이 메모 삭제",
-        confirmRemove: "이 메모를 삭제할까요?",
-      },
+    variables: {
+      heading: "이름 변환",
+      lead: "읽는 이가 바꿀 단어를 정의합니다. 본문에 {{name1}}처럼 적으세요.",
+      tokenHint:
+        "이중 중괄호를 씁니다(예: {{name1}}). 치환 뒤에 페이지를 나누므로 레이아웃이 유지됩니다.",
+      add: "+ 변수 추가",
+      empty: "아직 변수가 없습니다. 추가하면 읽기 전에 입력 화면이 나옵니다.",
+      idLabel: "코드(본문에 쓸 ID)",
+      labelLabel: "표시 이름(독자용)",
+      labelPlaceholder: "예: 주인공 이름",
+      defaultLabel: "기본값",
+      defaultPlaceholder: "예: 앨리스",
+      remove: "이 변수 삭제",
+      confirmRemove: "이 변수를 삭제할까요?",
+    },
     },
     view: {
       close: "닫기",
@@ -296,6 +294,11 @@ export const appsKo: AppsDictionary = {
       endRestart: "다시 읽기",
       endEdit: "내 초안으로 만들기",
       endEditConfirm: "편집 중인 초안을 바꿉니다. 계속할까요?",
+      variables: {
+        title: "읽기 전 설정",
+        lead: "이름이나 호칭을 입력하세요. 비워 두면 기본값을 씁니다.",
+        confirm: "이 설정으로 읽기",
+      },
     },
   },
   characterRelation: {
@@ -476,7 +479,7 @@ export const appsKo: AppsDictionary = {
       shareX: "X로 공유",
       shareXShort: "X",
       shareIntro: "🔐 비밀 메시지가 도착했어요!",
-      shareOutro: "암호구가 있는 사람만 My Tool Box의 암호 앱에서 해독할 수 있어요 👇",
+      shareOutro: "암호구가 있는 사람만 Blank Note의 암호 앱에서 해독할 수 있어요 👇",
     },
     decrypt: {
       cipherLabel: "암호문 (붙여넣기)",
@@ -521,7 +524,7 @@ export const appsKo: AppsDictionary = {
     },
     install: {
       button: "이 앱을 홈 화면에 추가",
-      buttonShort: "홈에 추가",
+      buttonShort: "설치",
       buttonTiny: "추가",
       buttonAria: "비밀 메시지를 독립 앱으로 홈 화면에 추가",
       modalTitle: "홈 화면에 추가",
@@ -709,7 +712,7 @@ export const appsKo: AppsDictionary = {
     },
     install: {
       button: "이 앱을 홈 화면에 추가",
-      buttonShort: "홈에 추가",
+      buttonShort: "설치",
       buttonTiny: "추가",
       buttonAria: "일괄 이미지 압축을 독립 앱으로 홈 화면에 추가",
       modalTitle: "홈 화면에 추가",
@@ -805,7 +808,7 @@ export const appsKo: AppsDictionary = {
     },
     install: {
       button: "이 앱을 홈 화면에 추가",
-      buttonShort: "홈에 추가",
+      buttonShort: "설치",
       buttonTiny: "추가",
       buttonAria: "서식 메이커를 독립 앱으로 홈 화면에 추가",
       modalTitle: "홈 화면에 추가",
@@ -858,7 +861,7 @@ export const appsKo: AppsDictionary = {
     },
     install: {
       button: "이 앱을 홈 화면에 추가",
-      buttonShort: "홈에 추가",
+      buttonShort: "설치",
       buttonTiny: "추가",
       buttonAria: "링크 스토커를 독립 앱으로 홈 화면에 추가",
       modalTitle: "홈 화면에 추가",
@@ -893,7 +896,7 @@ export const appsKo: AppsDictionary = {
     },
     bookmarklet: {
       title: "💻 데스크톱: 북마크 바로 드래그",
-      hint: "버튼을 북마크 바로 드래그하세요 (업데이트 후 교체). 열려 있는 My Tool Box 탭으로 넘겨 자동 저장하고, 도우미 탭은 바로 닫힙니다.",
+      hint: "버튼을 북마크 바로 드래그하세요 (업데이트 후 교체). 열려 있는 Blank Note 탭으로 넘겨 자동 저장하고, 도우미 탭은 바로 닫힙니다.",
       dragLabel: "보관으로 보내기",
     },
     share: {
@@ -1086,7 +1089,7 @@ export const appsKo: AppsDictionary = {
     },
     install: {
       button: "이 앱을 홈 화면에 추가",
-      buttonShort: "홈에 추가",
+      buttonShort: "설치",
       buttonTiny: "추가",
       buttonAria: "점심 저축을 독립 앱으로 홈 화면에 추가",
       modalTitle: "홈 화면에 추가",
@@ -1410,7 +1413,7 @@ export const appsKo: AppsDictionary = {
     },
     install: {
       button: "이 앱을 홈 화면에 추가",
-      buttonShort: "홈에 추가",
+      buttonShort: "설치",
       buttonTiny: "추가",
       buttonAria: "메일 템플릿을 독립 앱으로 홈 화면에 추가",
       modalTitle: "홈 화면에 추가",
@@ -1501,7 +1504,7 @@ export const appsKo: AppsDictionary = {
     },
     install: {
       button: "이 앱을 홈 화면에 추가",
-      buttonShort: "홈에 추가",
+      buttonShort: "설치",
       buttonTiny: "추가",
       buttonAria: "팔레트 컬렉터를 독립 앱으로 홈 화면에 추가",
       modalTitle: "홈 화면에 추가",
@@ -1655,7 +1658,7 @@ export const appsKo: AppsDictionary = {
     },
     install: {
       button: "이 앱을 홈 화면에 추가",
-      buttonShort: "홈에 추가",
+      buttonShort: "설치",
       buttonTiny: "추가",
       buttonAria: "PDF 에디터를 독립 앱으로 홈 화면에 추가",
       modalTitle: "홈 화면에 추가",
@@ -1784,7 +1787,7 @@ export const appsKo: AppsDictionary = {
     },
     install: {
       button: "📱 홈 화면에 추가",
-      buttonShort: "홈에 추가",
+      buttonShort: "설치",
       buttonTiny: "추가",
       buttonAria: "홈 화면에 추가",
       modalTitle: "홈 화면에 추가",
@@ -1903,11 +1906,11 @@ export const appsKo: AppsDictionary = {
   robotFreethrow: {
     shell: {
       title: "발사체 프리스로",
-      description: "각도·추력·스핀을 조절해 슛을 넣는 발사체 물리 미니게임입니다.",
+      description: "각도·초속·스핀을 조절해 슛을 넣는 발사체 물리 미니게임입니다.",
     },
     install: {
       button: "이 앱을 홈 화면에 추가",
-      buttonShort: "홈에 추가",
+      buttonShort: "설치",
       buttonTiny: "추가",
       buttonAria: "발사체 프리스로를 독립 앱으로 홈 화면에 추가",
       modalTitle: "홈 화면에 추가",
@@ -2005,7 +2008,7 @@ export const appsKo: AppsDictionary = {
     },
     install: {
       button: "📱 홈 화면에 추가",
-      buttonShort: "홈에 추가",
+      buttonShort: "설치",
       buttonTiny: "추가",
       buttonAria: "이 앱을 홈 화면에 추가",
       modalTitle: "홈 화면에 추가",

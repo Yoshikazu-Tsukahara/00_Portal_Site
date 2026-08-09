@@ -3,7 +3,7 @@
 import PwaInstallButton from "@/components/PwaInstallButton";
 import type { InvoiceMakerDict } from "@/i18n/apps/invoiceMaker";
 
-/** 請求書メーカー向け「ホームに追加」（共通ボタンへ委譲） */
+/** 請求書メーカー向け「インストール」（共通ボタンへ委譲） */
 export default function InstallAppButton({
   copy,
 }: {

@@ -22,7 +22,7 @@ export function SidebarIconButton({
       onClick={onClick}
       className={`flex size-6 items-center justify-center rounded-md transition-colors ${
         active
-          ? "bg-zinc-900 text-white"
+          ? "bg-[var(--accent)] text-zinc-900"
           : danger
             ? "text-zinc-400 hover:bg-white hover:text-rose-600"
             : "text-zinc-400 hover:bg-white hover:text-zinc-700"

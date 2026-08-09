@@ -232,7 +232,7 @@ export default function LinkStockerPage() {
       }
       // 複数タブ同時受信でも 1 回だけ追加する
       try {
-        const claimKey = "my-tool-box:link-stocker:auto-claim";
+        const claimKey = "blank-note:link-stocker:auto-claim";
         const raw = window.localStorage.getItem(claimKey);
         if (raw) {
           const prev = JSON.parse(raw) as { url?: string; at?: number };
@@ -570,7 +570,7 @@ export default function LinkStockerPage() {
       {toast ? (
         <div
           role="status"
-          className="lunch-toast fixed left-1/2 top-20 z-[60] -translate-x-1/2 rounded-full bg-zinc-900 px-4 py-2 text-sm font-medium text-white shadow-lg"
+          className="lunch-toast fixed left-1/2 top-20 z-[60] -translate-x-1/2 rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-medium text-zinc-900 shadow-lg"
         >
           {toast}
         </div>

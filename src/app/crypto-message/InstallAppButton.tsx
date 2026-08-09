@@ -5,7 +5,7 @@ import type { CryptoMessageDict } from "@/i18n/apps/cryptoMessage";
 import InstallGuideModal from "./InstallGuideModal";
 import { usePwaInstall } from "./usePwaInstall";
 
-/** ヘッダー横のコンパクトな「ホームに追加」ボタン */
+/** ヘッダー横のコンパクトな「インストール」ボタン */
 export default function InstallAppButton({
   copy,
 }: {

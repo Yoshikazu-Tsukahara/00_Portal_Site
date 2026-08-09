@@ -13,9 +13,11 @@ import {
 import { useI18n } from "@/i18n";
 import {
   getPlainCaretOffset,
+  normalizeEditableText,
   readEditableText,
   syncEditableText,
 } from "./editableText";
+import { highlightVariablesHtml } from "./variables";
 import {
   bookFontCssFamily,
   fontFamiliesKey,
@@ -802,12 +804,20 @@ function EditableSlice({
 }) {
   const ref = useRef<HTMLDivElement>(null);
 
-  // 外からの本文変更を DOM へ反映。編集中（フォーカス中）は触らない
+  // 外からの本文変更を DOM へ反映。編集中は触らない。非編集時は {{id}} を強調
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
     if (active || document.activeElement === el) return;
-    syncEditableText(el, text);
+    const normalized = normalizeEditableText(text);
+    if (readEditableText(el) === normalized && el.querySelector(".bv-var-token")) {
+      return;
+    }
+    if (normalized.includes("{{")) {
+      el.innerHTML = highlightVariablesHtml(normalized);
+    } else {
+      syncEditableText(el, normalized);
+    }
   }, [text, active]);
 
   function emit() {
@@ -858,7 +868,16 @@ function EditableSlice({
           : undefined
       }
       onClick={editable ? (event) => event.stopPropagation() : undefined}
-      onFocus={editable ? onBeginEdit : undefined}
+      onFocus={
+        editable
+          ? () => {
+              // 編集開始時は強調 HTML を外し、プレーンテキストにする
+              const el = ref.current;
+              if (el) syncEditableText(el, text);
+              onBeginEdit();
+            }
+          : undefined
+      }
       onBlur={
         editable
           ? () => {

@@ -3,7 +3,7 @@ import { appsDe } from "./apps/de";
 
 /** Deutsch — Portal-UI + Apps (legal fällt auf Englisch zurück) */
 export const de: PartialDictionary = {
-  brand: "My Tool Box",
+  brand: "Blank Note",
   common: {
     backToPortal: "← Zurück zum Portal",
     loading: "Laden…",
@@ -57,71 +57,71 @@ export const de: PartialDictionary = {
   },
   tools: {
     "invoice-maker": {
-      title: "Beleg-Maker",
+      title: "Belege",
       description: "Rechnungen, Angebote, Lieferscheine und Quittungen im A4-PDF.",
     },
     "mail-template": {
-      title: "E-Mail-Vorlagen",
+      title: "Mail",
       description: "Tags und Variablen für schnellere Antworten.",
     },
     "folder-generator": {
-      title: "Ordner-Generator",
+      title: "Ordner",
       description: "Ordner per Regel mit Datum, Nummern und Listen erzeugen.",
     },
     "pdf-editor": {
-      title: "Einfacher PDF-Editor",
+      title: "PDF",
       description: "Zusammenführen, sortieren und Seiten löschen im Browser.",
     },
     "image-compressor": {
-      title: "Bildkompressor",
+      title: "Bilder",
       description: "Stapelweise skalieren und komprimieren im Browser.",
     },
     "text-cleaner": {
-      title: "Textbereinigung",
+      title: "Text",
       description: "Zeilenumbrüche, Leerzeichen und Steuerzeichen bereinigen.",
     },
     "media-metadata-editor": {
-      title: "Medien-Metadaten",
+      title: "Metadaten",
       description: "Tags und Cover von Audio/Video im Browser bearbeiten.",
     },
     "character-relation-editor": {
-      title: "Figuren-Netzwerk",
+      title: "Figuren",
       description: "Beziehungen einer Geschichte mit Karten und Linien ordnen.",
     },
     "book-visualizer": {
-      title: "AI Book Studio",
+      title: "Quarto",
       description: "Seitenlayout bearbeiten und als .mybook teilen.",
     },
     "palette-collector": {
-      title: "Palette Collector",
+      title: "Palette",
       description: "Farbpaletten aus Bildern, inkl. Kontrastprüfung.",
     },
     "lunch-savings": {
-      title: "Mittags-Sparbuch",
+      title: "Mittag",
       description: "Differenz zum Budget tippen und spielerisch sparen.",
     },
     "link-stocker": {
-      title: "Links parken",
+      title: "Links",
       description: "URLs als OGP-Karten behalten – nicht ganz Lesezeichen.",
     },
     "ultimate-probability-slot": {
-      title: "Wahrscheinlichkeits-Slot",
+      title: "Slot",
       description: "Eigene Niedrig-Odds-Maschine bis zum Treffer.",
     },
     "pixel-drop-puzzle": {
-      title: "Pixel-Spalt-Puzzle",
+      title: "Pixel",
       description: "Foto in den Spalt fallen lassen. Subpixel-Präzision.",
     },
     "robot-freethrow": {
-      title: "Wurf-Freistoß",
-      description: "Mit Winkel, Schub und Spin auf den Ring zielen.",
+      title: "Wurf",
+      description: "Mit Winkel, Anfangsgeschwindigkeit und Spin auf den Ring zielen.",
     },
     "crypto-message": {
-      title: "Geheimnachricht",
+      title: "Geheim",
       description: "Mit Passphrase ver-/entschlüsseln. Caesar-Challenge inklusive.",
     },
     "monster-driver": {
-      title: "Monster Driver",
+      title: "Monster",
       description: "Bei Rot stoppen, bei Blau starten. Ego-Action.",
     },
   },
@@ -199,7 +199,7 @@ export const de: PartialDictionary = {
     emailHint: "Optional — für eine Antwort bitte angeben",
     messageLabel: "Nachricht",
     messagePlaceholder: "Ihre Frage, Ihr Wunsch oder Fehlerdetails",
-    subjectPrefix: "[My Tool Box] Kontakt",
+    subjectPrefix: "[Blank Note] Kontakt",
     bodyLabels: {
       category: "Anfrageart",
       app: "Betroffene App",

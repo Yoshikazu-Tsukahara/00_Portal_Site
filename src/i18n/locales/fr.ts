@@ -3,7 +3,7 @@ import { appsFr } from "./apps/fr";
 
 /** Français — UI portail + apps (legal en anglais en secours) */
 export const fr: PartialDictionary = {
-  brand: "My Tool Box",
+  brand: "Blank Note",
   common: {
     backToPortal: "← Retour au portail",
     loading: "Chargement…",
@@ -57,71 +57,71 @@ export const fr: PartialDictionary = {
   },
   tools: {
     "invoice-maker": {
-      title: "Créateur de documents",
+      title: "Docs",
       description: "Factures, devis, bons et reçus en A4. PDF multi-langues et devises.",
     },
     "mail-template": {
-      title: "Modèles d’e-mail",
+      title: "Mail",
       description: "Tags et variables pour répondre plus vite.",
     },
     "folder-generator": {
-      title: "Générateur de dossiers",
+      title: "Dossiers",
       description: "Créez des dossiers en lot avec dates, numéros et listes.",
     },
     "pdf-editor": {
-      title: "Éditeur PDF simple",
+      title: "PDF",
       description: "Fusionnez, réordonnez et supprimez des pages dans le navigateur.",
     },
     "image-compressor": {
-      title: "Compresseur d’images",
+      title: "Images",
       description: "Redimensionnez et compressez par lots dans le navigateur.",
     },
     "text-cleaner": {
-      title: "Nettoyage de texte",
+      title: "Texte",
       description: "Nettoyez retours, espaces et caractères de contrôle.",
     },
     "media-metadata-editor": {
-      title: "Éditeur de métadonnées",
+      title: "Métadonnées",
       description: "Éditez tags et pochettes audio/vidéo dans le navigateur.",
     },
     "character-relation-editor": {
-      title: "Carte des personnages",
+      title: "Relations",
       description: "Organisez les relations d’une histoire avec cartes et liens.",
     },
     "book-visualizer": {
-      title: "AI Book Studio",
+      title: "Quarto",
       description: "Éditez la mise en page et partagez en .mybook.",
     },
     "palette-collector": {
-      title: "Palette Collector",
+      title: "Palette",
       description: "Extrayez des palettes d’images, avec contrôle de contraste.",
     },
     "lunch-savings": {
-      title: "Épargne déjeuner",
+      title: "Déjeuner",
       description: "Enregistrez l’écart au budget et économisez en jouant.",
     },
     "link-stocker": {
-      title: "Liens à garder",
+      title: "Liens",
       description: "Gardez des URL « presque favoris » en cartes OGP.",
     },
     "ultimate-probability-slot": {
-      title: "Machine à sous proba",
+      title: "Slot",
       description: "Défiez votre propre machine à très faible probabilité.",
     },
     "pixel-drop-puzzle": {
-      title: "Puzzle chute de pixel",
+      title: "Pixel",
       description: "Laissez tomber la photo dans la fente. Précision subpixel.",
     },
     "robot-freethrow": {
-      title: "Lancer projectile",
-      description: "Visez l’anneau avec angle, poussée et spin.",
+      title: "Lancer",
+      description: "Visez l’anneau avec angle, vitesse initiale et spin.",
     },
     "crypto-message": {
-      title: "Message secret",
+      title: "Secret",
       description: "Chiffrez avec une phrase secrète. Défi César inclus.",
     },
     "monster-driver": {
-      title: "Monster Driver",
+      title: "Monster",
       description: "Stop au rouge, partez au bleu. Action à la première personne.",
     },
   },
@@ -199,7 +199,7 @@ export const fr: PartialDictionary = {
     emailHint: "Facultatif — à remplir si vous souhaitez une réponse",
     messageLabel: "Message",
     messagePlaceholder: "Votre question, suggestion ou détail du bug",
-    subjectPrefix: "[My Tool Box] Contact",
+    subjectPrefix: "[Blank Note] Contact",
     bodyLabels: {
       category: "Type de demande",
       app: "App concernée",

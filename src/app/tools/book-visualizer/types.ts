@@ -1,4 +1,4 @@
-// AI クリエイターズ・DTP スタジオのデータ型と正規化処理
+// Quarto（紙面エディター）のデータ型と正規化処理
 // すべてブラウザ内で完結し、サーバー送信は行わない
 //
 // 構造:
@@ -22,7 +22,7 @@ export const APP_ID = "book-visualizer";
 export const STORAGE_KEY = "book-visualizer:v1";
 
 /** 共有ファイル（.mybook）の形式識別子 */
-export const MYBOOK_FORMAT = "my-toolbox-mybook";
+export const MYBOOK_FORMAT = "blank-note-mybook";
 export const MYBOOK_VERSION = 3;
 export const MYBOOK_EXTENSION = ".mybook";
 
@@ -258,6 +258,18 @@ export type PromptMemo = {
 };
 
 /**
+ * 名前変換用の変数（.mybook に含める）。
+ * 本文中の `{{id}}` を閲覧時に置換する。
+ */
+export type BookVariable = {
+  id: string;
+  /** 閲覧モーダルに出すラベル（例: 主人公の名前） */
+  label: string;
+  /** 未入力時・初期表示に使う値 */
+  defaultValue: string;
+};
+
+/**
  * 本文ページごとの自由配置。
  * index = 本文カラム番号。各要素は image / freeText のみ。
  */
@@ -278,6 +290,8 @@ export type BookData = {
   bodyOverlays: BodyOverlays;
   /** 表紙・目次など＋自由配置ブロック */
   pages: BookPage[];
+  /** 閲覧時の名前変換変数（空ならモーダルを出さない） */
+  variables: BookVariable[];
 };
 
 /** LocalStorage に保存するスタジオ全体の状態 */
@@ -923,6 +937,7 @@ export function emptyBook(): BookData {
     body: [createTextBlock()],
     bodyOverlays: [],
     pages: [],
+    variables: [],
   };
 }
 
@@ -1390,6 +1405,7 @@ export function normalizeBook(raw: unknown): BookData {
   }
 
   const layout = asLayout(obj.layout);
+  const variables = normalizeBookVariables(obj.variables);
   return {
     title: asString(obj.title),
     author: asString(obj.author),
@@ -1398,7 +1414,29 @@ export function normalizeBook(raw: unknown): BookData {
     body,
     bodyOverlays: normalizeBodyOverlays(obj.bodyOverlays),
     pages: normalizeCoverPageOrder(dedupeUniquePageTypes(nextPages)),
+    variables,
   };
+}
+
+function normalizeBookVariables(raw: unknown): BookVariable[] {
+  if (!Array.isArray(raw)) return [];
+  const seen = new Set<string>();
+  const list: BookVariable[] = [];
+  for (const item of raw) {
+    if (!item || typeof item !== "object") continue;
+    const obj = item as Record<string, unknown>;
+    const id = asString(obj.id)
+      .replace(/[^a-zA-Z0-9_]/g, "")
+      .replace(/^[^a-zA-Z]+/, "");
+    if (!id || seen.has(id)) continue;
+    seen.add(id);
+    list.push({
+      id,
+      label: asString(obj.label),
+      defaultValue: asString(obj.defaultValue),
+    });
+  }
+  return list;
 }
 
 function normalizePrompt(raw: unknown): PromptMemo | null {

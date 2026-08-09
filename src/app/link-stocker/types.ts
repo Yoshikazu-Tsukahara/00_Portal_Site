@@ -1,7 +1,7 @@
 /** LocalStorage キー（タグ構造変更のため v2） */
-export const STORAGE_KEY = "my-tool-box:link-stocker:v2";
+export const STORAGE_KEY = "blank-note:link-stocker:v2";
 /** 旧データ移行元 */
-export const STORAGE_KEY_V1 = "my-tool-box:link-stocker:v1";
+export const STORAGE_KEY_V1 = "blank-note:link-stocker:v1";
 
 /** ブックマークレット／タブ識別・BroadcastChannel 名 */
 export const LINK_STOCKER_WINDOW_NAME = "MyToolBox_LinkStocker_Tab";

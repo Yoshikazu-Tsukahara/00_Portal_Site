@@ -71,8 +71,9 @@ export function parseBackupPayload(
 
   const obj = parsed as Record<string, unknown>;
 
-  // 封筒形式
-  if (obj.format === BACKUP_FORMAT) {
+  // 封筒形式（旧ブランド名のバックアップも読み取り可）
+  const LEGACY_BACKUP_FORMAT = "my-toolbox-backup";
+  if (obj.format === BACKUP_FORMAT || obj.format === LEGACY_BACKUP_FORMAT) {
     if (typeof obj.appId !== "string" || obj.appId !== expectedAppId) {
       return {
         ok: false,

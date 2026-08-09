@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import KeepTabBridge from "@/app/link-stocker/KeepTabBridge";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
@@ -31,6 +31,8 @@ const STANDALONE_APP_PATHS = [
  * Header + Main をちょうど 100dvh にし、Footer はその直下（初期表示では見えない）に置く。
  */
 const FILL_VIEWPORT_PATHS = [
+  "/", // ホーム：ランチャーを画面いっぱいにし、Footer はスクロール先へ
+  // ライブラリはジャンル一覧が長いので通常のページスクロール（二重スクロール防止）
   "/robot-freethrow",
   "/ultimate-probability-slot",
   "/pixel-drop-puzzle",
@@ -64,9 +66,11 @@ const ALWAYS_ISOLATE_PATHS = ["/monster-driver"];
 
 function matchesAppPath(pathname: string | null, bases: string[]): boolean {
   if (!pathname) return false;
-  return bases.some(
-    (base) => pathname === base || pathname.startsWith(`${base}/`),
-  );
+  return bases.some((base) => {
+    // "/" はホームのみ（全パスにマッチさせない）
+    if (base === "/") return pathname === "/";
+    return pathname === base || pathname.startsWith(`${base}/`);
+  });
 }
 
 /**
@@ -85,6 +89,22 @@ function matchesAppPath(pathname: string | null, bases: string[]): boolean {
 export default function SiteChrome({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const { isStandalone, ready } = useStandaloneDisplay();
+  /**
+   * ライブラリカード用プレビュー（?preview=1）。
+   * useSearchParams は layout に Suspense が必要で、Header のハイドレーションが遅れ
+   * I18n の言語切替と交差して mismatch になるため、マウント後にだけ判定する。
+   * （SSR / ハイドレーション中は常に false＝サーバー HTML と一致）
+   */
+  const [isPreview, setIsPreview] = useState(false);
+  useEffect(() => {
+    try {
+      setIsPreview(
+        new URLSearchParams(window.location.search).get("preview") === "1",
+      );
+    } catch {
+      setIsPreview(false);
+    }
+  }, []);
   const isolatePwa =
     ready && isStandalone && matchesAppPath(pathname, STANDALONE_APP_PATHS);
   const isolateFullscreen = matchesAppPath(pathname, ALWAYS_ISOLATE_PATHS);
@@ -93,6 +113,15 @@ export default function SiteChrome({ children }: { children: ReactNode }) {
     pathname,
     MIN_STAGE_PAGE_SCROLL_PATHS,
   );
+
+  // プレビュー埋め込み：サイト枠を外し、アプリ本体だけを固定サイズで見せる
+  if (isPreview) {
+    return (
+      <div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-[var(--background)]">
+        {children}
+      </div>
+    );
+  }
 
   if (isolatePwa || isolateFullscreen) {
     // ミニゲーム PWA: 狭いときはページ全体が伸びる（中だけスクロールしない）

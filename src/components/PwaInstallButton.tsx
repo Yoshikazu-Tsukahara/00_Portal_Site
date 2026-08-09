@@ -5,7 +5,7 @@ import type { PwaInstallCopy } from "@/lib/pwa/installCopy";
 import { usePwaInstall } from "@/lib/pwa";
 import PwaInstallGuideModal from "@/components/PwaInstallGuideModal";
 
-/** タイトル横のコンパクトな「ホームに追加」ボタン（共通） */
+/** タイトル横のコンパクトな「インストール」ボタン（共通） */
 export default function PwaInstallButton({
   copy,
   className = "lunch-install-btn",

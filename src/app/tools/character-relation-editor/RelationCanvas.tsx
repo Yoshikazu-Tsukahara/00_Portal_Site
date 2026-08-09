@@ -66,6 +66,7 @@ export default function RelationCanvas({
   onCompleteLink,
   onUpdateRelation,
   onOpenDetail,
+  onLoadSample,
 }: {
   characters: Character[];
   relations: Relation[];
@@ -81,6 +82,8 @@ export default function RelationCanvas({
     patch: Partial<Pick<Relation, "label" | "strokeStyle" | "arrowHead">>,
   ) => void;
   onOpenDetail: (id: string) => void;
+  /** 空キャンバスからのサンプル読込 */
+  onLoadSample?: () => void;
 }) {
   const { t } = useI18n();
   const copy = t.apps.characterRelation;
@@ -551,9 +554,23 @@ export default function RelationCanvas({
               style={{ width: WORLD_W, height: WORLD_H }}
             >
               {characters.length === 0 ? (
-                <p className="absolute left-1/2 top-1/3 -translate-x-1/2 text-center text-sm text-zinc-400">
-                  {copy.canvas.empty}
-                </p>
+                <div className="absolute left-1/2 top-1/3 flex w-[min(18rem,90%)] -translate-x-1/2 flex-col items-center gap-3 text-center">
+                  <p className="text-sm text-zinc-400">{copy.canvas.empty}</p>
+                  {onLoadSample ? (
+                    <div className="flex flex-col items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={onLoadSample}
+                        className="btn-secondary !px-3 !py-1.5 text-xs"
+                      >
+                        {copy.canvas.emptyLoadSample}
+                      </button>
+                      <p className="text-[10px] leading-relaxed text-zinc-400">
+                        {copy.sample.hint}
+                      </p>
+                    </div>
+                  ) : null}
+                </div>
               ) : null}
 
               {characters.map((ch) => {
@@ -604,7 +621,7 @@ export default function RelationCanvas({
                   }
                   className={`rounded-md border px-2.5 py-1 text-[11px] transition-colors ${
                     active
-                      ? "border-zinc-900 bg-zinc-900 text-white"
+                      ? "border-[var(--accent-strong)] bg-[var(--accent)] text-zinc-900"
                       : "border-zinc-200 text-zinc-600 hover:border-zinc-300 hover:bg-zinc-50"
                   }`}
                 >
@@ -629,7 +646,7 @@ export default function RelationCanvas({
                   }
                   className={`rounded-md border px-2.5 py-1 text-[11px] transition-colors ${
                     active
-                      ? "border-zinc-900 bg-zinc-900 text-white"
+                      ? "border-[var(--accent-strong)] bg-[var(--accent)] text-zinc-900"
                       : "border-zinc-200 text-zinc-600 hover:border-zinc-300 hover:bg-zinc-50"
                   }`}
                 >
@@ -678,7 +695,7 @@ export default function RelationCanvas({
                 onClick={() => setPlacementMode(mode)}
                 className={`px-2.5 py-1.5 text-[11px] font-medium transition-colors ${
                   active
-                    ? "bg-zinc-900 text-white"
+                    ? "bg-[var(--accent)] text-zinc-900"
                     : "text-zinc-600 hover:bg-zinc-50"
                 }`}
               >

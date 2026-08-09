@@ -9,6 +9,15 @@ export type CharacterRelationDict = {
   cancel: string;
   close: string;
   confirmDeleteCharacter: string;
+  confirmLoadSample: string;
+  confirmClearAll: string;
+  sample: {
+    load: string;
+    loadShort: string;
+    clear: string;
+    clearShort: string;
+    hint: string;
+  };
   sidebar: {
     tabsLabel: string;
     characters: string;
@@ -30,6 +39,7 @@ export type CharacterRelationDict = {
   };
   canvas: {
     empty: string;
+    emptyLoadSample: string;
     noNote: string;
     labelPlaceholder: string;
     pickTarget: string;
@@ -139,6 +149,17 @@ export const characterRelationJa: CharacterRelationDict = {
   cancel: "キャンセル",
   close: "閉じる",
   confirmDeleteCharacter: "「{name}」を削除しますか？関連する線も消えます。",
+  confirmLoadSample:
+    "サンプル相関図を読み込みますか？いまのキャラクターと関係線は置き換わります。",
+  confirmClearAll:
+    "キャラクターと関係線をすべて削除しますか？この操作は取り消せません。",
+  sample: {
+    load: "サンプルを読み込む",
+    loadShort: "サンプル",
+    clear: "すべてクリア",
+    clearShort: "クリア",
+    hint: "体験用のデモです。いつでもクリアできます。",
+  },
   sidebar: {
     tabsLabel: "サイドバーの表示切り替え",
     characters: "キャラクター一覧",
@@ -160,6 +181,7 @@ export const characterRelationJa: CharacterRelationDict = {
   },
   canvas: {
     empty: "左の「追加」からキャラクターを配置してください",
+    emptyLoadSample: "またはサンプルで試す",
     noNote: "カード表示なし",
     labelPlaceholder: "関係性（例: ライバル）",
     pickTarget: "相手をクリック…",
@@ -273,6 +295,17 @@ export const characterRelationEn: CharacterRelationDict = {
   close: "Close",
   confirmDeleteCharacter:
     "Delete “{name}”? Related links will be removed too.",
+  confirmLoadSample:
+    "Load the sample diagram? Your current characters and relations will be replaced.",
+  confirmClearAll:
+    "Delete all characters and relations? This cannot be undone.",
+  sample: {
+    load: "Load sample",
+    loadShort: "Sample",
+    clear: "Clear all",
+    clearShort: "Clear",
+    hint: "A demo cast you can clear anytime.",
+  },
   sidebar: {
     tabsLabel: "Sidebar view",
     characters: "Characters",
@@ -294,6 +327,7 @@ export const characterRelationEn: CharacterRelationDict = {
   },
   canvas: {
     empty: "Add a character from the sidebar to begin",
+    emptyLoadSample: "Or try the sample",
     noNote: "Nothing on card",
     labelPlaceholder: "Relation (e.g. Rival)",
     pickTarget: "Click a target…",
