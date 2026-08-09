@@ -368,7 +368,7 @@ export default function LauncherGrid({
 
     // 2) 既存フォルダ上で離した → 短いホバーでも追加（並べ替えより優先）
     const overId = over ? String(over.id) : null;
-    if (overId && overId !== activeId && canCombine(activeId, overId)) {
+    if (over && overId && overId !== activeId && canCombine(activeId, overId)) {
       const overItem = items.find((item) => item.id === overId);
       if (
         overItem?.type === "folder" &&
