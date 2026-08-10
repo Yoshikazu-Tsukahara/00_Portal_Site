@@ -27,7 +27,6 @@ import {
   type ProbHistoryPoint,
   type RunSessionStats,
 } from "./experimentReport";
-import InstallAppButton from "./InstallAppButton";
 import {
   displayCumulativeProbability,
   fortuneCumulativeProbability,
@@ -400,7 +399,6 @@ export default function UltimateProbabilitySlotPage() {
       fillViewport
       minStageSize={SLOT_MIN_STAGE}
       isPwa
-      afterDataManager={<InstallAppButton copy={copy.install} />}
       dataManager={{
         appId: "ultimate-probability-slot",
         fileNamePrefix: "ultimate-probability-slot",

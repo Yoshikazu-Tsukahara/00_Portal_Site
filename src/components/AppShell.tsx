@@ -36,8 +36,9 @@ import { useStandaloneDisplay } from "@/lib/useStandaloneDisplay";
  *   2. layout.tsx に `<PwaRuntime basePath classPrefix />`（SW 登録・活性クラス・履歴ロック）
  *   3. page.tsx で `<AppShell isPwa ...>`（standalone 時は言語トグルをヘッダー右に出す）
  *   4. 永続データがあるなら `dataManager` を渡す
- *   5. インストール導線は `afterDataManager` に置く
- * - 例: ランチ貯金、とりあえずキープ、究極確率スロット。
+ *   5. インストール導線（`afterDataManager`）は **ランチ貯金のみ** に置く
+ *      （回遊・再訪問のため、他アプリでは非表示）
+ * - 例: ランチ貯金（インストールあり）、とりあえずキープ、究極確率スロット。
  *
  * ## Type D: 没入型（フルスクリーンのゲームなど）
  * - **AppShell は使わない**。独自ヘッダー + iframe で完全に隔離する。
@@ -45,7 +46,7 @@ import { useStandaloneDisplay } from "@/lib/useStandaloneDisplay";
  * - 例: モンスタードライバー。
  *
  * ## モバイル／縦型プレビュー時のヘッダー（全アプリ共通）
- * 1. アプリ名（表示優先。長い場合は `titleShort`）＋ バックアップ ＋ インストール（**文字なし・アイコンのみ**）
+ * 1. アプリ名（表示優先。長い場合は `titleShort`）＋ バックアップ ＋（ランチ貯金のみ）インストール（**文字なし・アイコンのみ**）
  * 2. 説明文
  * 3. プライバシー案内（PrivacyNotice）
  * 4. アプリ機能ボタン（actions）
@@ -80,8 +81,8 @@ type AppShellProps = {
    */
   dataManager?: DataManagerConfig | ReactNode;
   /**
-   * タイトル／バックアップの直後に置くコンパクトな操作
-   * （PWA の「ホーム画面に追加」など）
+   * タイトル／バックアップの直後に置くコンパクトな操作。
+   * PWA「ホーム画面に追加」はランチ貯金のみ渡す（他アプリでは未使用）。
    */
   afterDataManager?: ReactNode;
   /**

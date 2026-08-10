@@ -8,7 +8,6 @@ import { PIXEL_DROP_MIN_STAGE } from "@/lib/minigameStage";
 import { useStandaloneDisplay } from "@/lib/useStandaloneDisplay";
 import { readImageSize, type LoadedGameImage } from "./imageUtil";
 import { loadDefaultGameImage } from "./defaultImage";
-import InstallAppButton from "./InstallAppButton";
 import PlayField from "./PlayField";
 import ResetConfirmModal from "./ResetConfirmModal";
 import RulesIntroModal from "./RulesIntroModal";
@@ -297,7 +296,6 @@ export default function PixelDropPuzzlePage() {
       fillViewport
       minStageSize={PIXEL_DROP_MIN_STAGE}
       isPwa
-      afterDataManager={<InstallAppButton copy={copy.install} />}
       dataManager={{
         appId: "pixel-drop-puzzle",
         fileNamePrefix: "pixel-drop-puzzle",

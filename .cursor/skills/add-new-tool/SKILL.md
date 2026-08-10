@@ -44,7 +44,7 @@ description: Blank Note Portal に新規ツールまたは独立 PWA を追加�
 
 - 言語: **Header のみ**（AppShell に LanguageToggle を足さない）
 - バックアップ: `dataManager`（タイトル横）
-- PWA インストール: `afterDataManager`（バックアップ右）
+- PWA インストール: **付けない**（サイト方針でランチ貯金のみ表示）
 - 幅: `useLayout().contentClassName` / `fillViewport`
 - スマホ対応: skill `mobile-responsive`（完成例は `mail-template`）
 - 対応済みなら `tools.ts` に `isMobileSupported: true`
@@ -53,7 +53,7 @@ description: Blank Note Portal に新規ツールまたは独立 PWA を追加�
 
 - `layout.tsx` + `PwaRuntime`
 - manifest + icons（`lunch-savings` を参照）
-- `page.tsx` で `<AppShell isPwa ... afterDataManager={<InstallAppButton ... />} />`
+- `page.tsx` で `<AppShell isPwa ... />`（**InstallAppButton は付けない**）
 
 ### Step 7: 検証
 

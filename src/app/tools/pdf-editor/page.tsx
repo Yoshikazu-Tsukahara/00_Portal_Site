@@ -22,7 +22,6 @@ import ExportDialog, {
 import FileGroupList from "./FileGroupList";
 import { FILE_CARD_HEIGHT, FILE_CARD_WIDTH, FileCardFace } from "./FileCard";
 import HistoryToolbar from "./HistoryToolbar";
-import InstallAppButton from "./InstallAppButton";
 import PageDragOverlay from "./PageDragOverlay";
 import PageFilmstrip from "./PageFilmstrip";
 import PagePreviewModal from "./PagePreviewModal";
@@ -598,7 +597,6 @@ export default function PdfEditorPage() {
       actions={headerActions}
       fillViewport
       isPwa
-      afterDataManager={<InstallAppButton copy={copy.install} />}
       dataManager={{
         appId: "pdf-editor",
         fileNamePrefix: "pdf-editor",

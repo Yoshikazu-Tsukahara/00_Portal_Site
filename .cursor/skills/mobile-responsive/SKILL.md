@@ -14,7 +14,7 @@ description: >-
 ## ユーザーへの確認（未指定時）
 
 1. 対象アプリ（パス）
-2. PWA インストールボタンも付けるか（Type C 化が必要）
+2. Type C（独立 PWA）化が必要か（※インストールボタンはランチ貯金以外付けない）
 3. ポータルに `isMobileSupported: true` を付けるか（通常は対応完了後に Yes）
 
 ## Step 1: 現状把握
@@ -36,15 +36,14 @@ description: >-
   title={copy.shell.title}
   description={copy.shell.description}
   fillViewport          // 1画面ツールなら
-  isPwa                 // インストールするなら
+  isPwa                 // Type C なら（インストールボタンは付けない）
   dataManager={...}     // 永続データがあるなら
-  afterDataManager={<InstallAppButton copy={copy.install} />}
   actions={/* 機能ボタンのみ・1行コンパクト */}
 >
 ```
 
 - `actions` に言語・バックアップ・インストールを入れない
-- インストールを付けるなら Type C セット（下記 Step 5）
+- インストールボタンはランチ貯金以外に付けない
 
 ## Step 3: actions を1行コンパクトに
 
@@ -80,18 +79,16 @@ i18n に Short ラベルを ja/en 両方追加する。
 
 `fillViewport` 時: AppShell 作業領域は `overflow-y-auto overscroll-auto`。内部スクロールは端で親へチェーン（`overscroll-contain` 禁止）。
 
-## Step 5: PWA インストール（依頼時のみ）
+## Step 5: PWA（Type C・依頼時のみ）
 
-参照: `mail-template` または `lunch-savings`
+参照: `lunch-savings`（独立 PWA の型）。**インストールボタンはランチ貯金以外に付けない。**
 
 1. `pwaManifest.ts`（**`manifest.ts` という名前は使わない**）
 2. `manifest.webmanifest/route.ts` → `@/app/.../pwaManifest` を import
 3. `layout.tsx` + `<PwaRuntime basePath classPrefix />`
 4. `public/.../sw.js` + icons
-5. `InstallAppButton` / `usePwaInstall` /（任意）`InstallGuideModal`
-6. `SiteChrome.tsx` の `STANDALONE_APP_PATHS` にパス追加
-7. 辞書に `install`（`buttonTiny` 含む）
-8. Install ボタンは **DataManager と同じ高さ**（`min-h-11` を付けない）
+5. `SiteChrome.tsx` の `STANDALONE_APP_PATHS` にパス追加
+6. `InstallAppButton` は渡さない（サイト方針）
 
 ## Step 6: ポータルバッジ
 
@@ -117,9 +114,9 @@ isMobileSupported: true,
 
 オプション例:
 
-- 「PWA インストールも付ける」
 - 「バッジ（isMobileSupported）も付ける」
 - 「ヘッダー周りだけでよい／本体レイアウトまで」
+（※ インストールボタンはランチ貯金以外付けない）
 
 ## やらないこと
 

@@ -36,14 +36,14 @@ src/app/tools/my-tool/
 
 - `layout.tsx`: metadata, viewport, `<PwaRuntime basePath="..." classPrefix="..." />`
 - `public/*.webmanifest` または `manifest.webmanifest/route.ts`
-- `InstallAppButton` を `afterDataManager` に配置（既存アプリをコピー）
+- インストールボタン（`InstallAppButton` / `afterDataManager`）は **付けない**（例外はランチ貯金のみ）
 - UI 配置の全体像 → **`ui-ux.mdc`**
 
 ## 5b. 共通 UI（Type B/C 共通）
 
 - 言語: サイト Header のみ（AppShell `actions` に LanguageToggle を置かない）
 - バックアップ: `dataManager` prop
-- インストール: `afterDataManager` prop
+- インストール: 原則なし（ランチ貯金以外は `afterDataManager` に置かない）
 - 幅: `contentClassName`（`wide` prop は使わない）
 - スマホ: モバイルファースト（`.cursor/rules/ui-ux.mdc` / skill `mobile-responsive`）
 - 対応完了後: `tools.ts` に `isMobileSupported: true`

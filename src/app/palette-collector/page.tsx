@@ -16,7 +16,6 @@ import ContrastChecker from "./ContrastChecker";
 import { buildCssVariables, buildJsonExport } from "./exportFormat";
 import { compressImageForStorage, loadImageFromSrc } from "./imageLoad";
 import ImageStage from "./ImageStage";
-import InstallAppButton from "./InstallAppButton";
 import PaletteBoard from "./PaletteBoard";
 import SavedProjectsPanel from "./SavedProjectsPanel";
 import {
@@ -236,7 +235,6 @@ export default function PaletteCollectorPage() {
         title={copy.shell.title}
         description={copy.shell.description}
         isPwa
-        afterDataManager={<InstallAppButton copy={copy.install} />}
         dataManager={{
           appId: "palette-collector",
           fileNamePrefix: "palette-collector",

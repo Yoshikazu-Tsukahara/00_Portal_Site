@@ -5,7 +5,6 @@ import AppShell from "@/components/AppShell";
 import { useI18n } from "@/i18n";
 import CreatePanel from "./CreatePanel";
 import DecodePanel from "./DecodePanel";
-import InstallAppButton from "./InstallAppButton";
 import type { TopMode } from "./types";
 
 /**
@@ -24,7 +23,6 @@ export default function CryptoMessagePage() {
       description={copy.shell.description}
       fillViewport
       isPwa
-      afterDataManager={<InstallAppButton copy={copy.install} />}
     >
       <div className="cm-root min-w-0 w-full max-w-full overflow-x-hidden">
         <div className="cm-console min-w-0">

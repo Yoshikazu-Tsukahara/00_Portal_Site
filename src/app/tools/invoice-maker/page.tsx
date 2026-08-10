@@ -8,7 +8,6 @@ import {
   LoadInvoiceDialog,
   SaveInvoiceDialog,
 } from "./HistoryDialogs";
-import InstallAppButton from "./InstallAppButton";
 import InvoiceForm from "./InvoiceForm";
 import InvoiceSheet from "./InvoiceSheet";
 import PreviewModal from "./PreviewModal";
@@ -200,7 +199,6 @@ export default function InvoiceMakerPage() {
         title={copy.shell.title}
         description={copy.loading}
         isPwa
-        afterDataManager={<InstallAppButton copy={copy.install} />}
       >
         <p className="text-sm text-zinc-400">{copy.loading}</p>
       </AppShell>
@@ -215,7 +213,6 @@ export default function InvoiceMakerPage() {
       title={copy.shell.title}
       description={copy.shell.description}
       isPwa
-      afterDataManager={<InstallAppButton copy={copy.install} />}
       actions={
         <div
           className={

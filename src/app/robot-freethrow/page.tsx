@@ -6,7 +6,6 @@ import DesktopOnlyGate from "@/components/DesktopOnlyGate";
 import { useI18n } from "@/i18n";
 import { ROBOT_FREETHROW_MIN_STAGE } from "@/lib/minigameStage";
 import { useCompactLayout } from "@/lib/useCompactLayout";
-import InstallAppButton from "./InstallAppButton";
 
 /** iframe 内ゲームへ portal からの指示を送る */
 function postToGame(
@@ -60,7 +59,6 @@ export default function RobotFreethrowPage() {
       fillViewport
       minStageSize={ROBOT_FREETHROW_MIN_STAGE}
       isPwa
-      afterDataManager={<InstallAppButton copy={copy.install} />}
     >
       <DesktopOnlyGate title={copy.shell.title}>
         <div className="relative h-full min-h-0 w-full max-w-full min-w-0 flex-1 overflow-x-hidden overflow-hidden rounded-lg border border-zinc-200 bg-[#f3e6c8]">

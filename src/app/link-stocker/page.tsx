@@ -5,7 +5,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AppShell from "@/components/AppShell";
 import { useI18n } from "@/i18n";
 import { loadLocalJson, removeLocalJson, useLocalStorageState } from "@/lib/localData";
-import InstallAppButton from "./InstallAppButton";
 import LinkCard from "./LinkCard";
 import ShortcutHelpModal from "./ShortcutHelpModal";
 import TagManager from "./TagManager";
@@ -403,7 +402,6 @@ export default function LinkStockerPage() {
       title={copy.shell.title}
       description={copy.shell.description}
       isPwa
-      afterDataManager={<InstallAppButton copy={copy.install} />}
       dataManager={{
         appId: "link-stocker",
         fileNamePrefix: "link-stocker",

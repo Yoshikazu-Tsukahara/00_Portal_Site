@@ -8,7 +8,6 @@ import { fmt, useI18n } from "@/i18n";
 import { useLocalStorageState } from "@/lib/localData";
 import ImageGrid from "./ImageGrid";
 import ImageUploadZone from "./ImageUploadZone";
-import InstallAppButton from "./InstallAppButton";
 import SettingsPanel from "./SettingsPanel";
 import TotalSummary from "./TotalSummary";
 import {
@@ -266,7 +265,6 @@ export default function ImageCompressorPage() {
       title={copy.shell.title}
       description={copy.shell.description}
       isPwa
-      afterDataManager={<InstallAppButton copy={copy.install} />}
       dataManager={{
         appId: "image-compressor",
         fileNamePrefix: "image-compressor",

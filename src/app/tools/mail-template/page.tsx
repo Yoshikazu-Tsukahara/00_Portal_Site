@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import AppShell from "@/components/AppShell";
 import { fmt, useI18n } from "@/i18n";
-import InstallAppButton from "./InstallAppButton";
 import PreviewPane from "./PreviewPane";
 import TagFilterBar from "./TagFilterBar";
 import TagMasterModal from "./TagMasterModal";
@@ -347,7 +346,6 @@ export default function MailTemplatePage() {
       titleShort={mt.shell.titleShort}
       description={mt.shell.description}
       isPwa
-      afterDataManager={<InstallAppButton copy={mt.install} />}
       dataManager={{
         appId: "mail-template",
         fileNamePrefix: "mail-template",
