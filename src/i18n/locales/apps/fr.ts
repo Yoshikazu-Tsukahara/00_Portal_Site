@@ -1137,6 +1137,8 @@ export const appsFr: AppsDictionary = {
       desktopStep2Title: "Installer l’appli",
       desktopStep2Body: "Choisissez « Installer Économies déjeuner » / « Installer l’application » pour l’ajouter à l’écran d’accueil ou au bureau.",
       modalClose: "Compris",
+      tapAgain: "Prêt — touchez Installer encore une fois",
+      tapAgainShort: "Encore",
     },
   },
   mailTemplate: {

@@ -1137,6 +1137,8 @@ export const appsPt: AppsDictionary = {
       desktopStep2Title: "Instalar app",
       desktopStep2Body: "Escolha “Instalar Economia no Almoço” / “Instalar app” para adicioná-lo à Tela Inicial ou à área de trabalho.",
       modalClose: "Entendi",
+      tapAgain: "Pronto — toque em Instalar de novo",
+      tapAgainShort: "De novo",
     },
   },
   mailTemplate: {

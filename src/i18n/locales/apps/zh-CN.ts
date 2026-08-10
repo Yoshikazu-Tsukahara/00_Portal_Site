@@ -1693,6 +1693,8 @@ export const appsZhCN: AppsDictionary = {
       desktopStep2Title: "安装应用",
       desktopStep2Body: "选择“安装午餐储蓄”/“安装应用”，将其添加到主屏幕或桌面。",
       modalClose: "知道了",
+      tapAgain: "已就绪，请再点一次安装",
+      tapAgainShort: "再点一次",
     },
   },
   linkStocker: {

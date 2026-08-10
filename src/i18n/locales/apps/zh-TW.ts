@@ -1137,6 +1137,8 @@ export const appsZhTW: AppsDictionary = {
       desktopStep2Title: "安裝應用程式",
       desktopStep2Body: "選擇「安裝午餐存錢」／「安裝應用程式」，將其加到主畫面或桌面。",
       modalClose: "知道了",
+      tapAgain: "已就緒，請再點一次安裝",
+      tapAgainShort: "再點一次",
     },
   },
   mailTemplate: {

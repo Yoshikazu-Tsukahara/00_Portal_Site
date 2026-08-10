@@ -1693,6 +1693,8 @@ export const appsEs: AppsDictionary = {
       desktopStep2Title: "Instalar app",
       desktopStep2Body: "Elige “Instalar Ahorro del almuerzo” / “Instalar app” para añadirla a la pantalla de inicio o al escritorio.",
       modalClose: "Entendido",
+      tapAgain: "Listo: toca Instalar otra vez",
+      tapAgainShort: "Otra vez",
     },
   },
   linkStocker: {

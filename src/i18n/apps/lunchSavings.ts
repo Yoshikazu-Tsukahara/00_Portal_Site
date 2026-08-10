@@ -111,6 +111,9 @@ export type LunchSavingsDict = {
     desktopStep2Title: string;
     desktopStep2Body: string;
     modalClose: string;
+    /** BIP 準備完了後、もう一度タップを促すとき */
+    tapAgain: string;
+    tapAgainShort: string;
   };
 };
 
@@ -227,6 +230,8 @@ export const lunchSavingsJa: LunchSavingsDict = {
     desktopStep2Body:
       "「ランチ貯金をインストール」や「アプリをインストール」を選ぶとホーム／デスクトップに追加されます。",
     modalClose: "わかった",
+    tapAgain: "準備ができました。もう一度タップしてください",
+    tapAgainShort: "再タップ",
   },
 };
 
@@ -343,5 +348,7 @@ export const lunchSavingsEn: LunchSavingsDict = {
     desktopStep2Body:
       "Choose “Install Lunch Savings” / “Install app” to add it to your home screen or desktop.",
     modalClose: "Got it",
+    tapAgain: "Ready — tap Install once more",
+    tapAgainShort: "Tap again",
   },
 };

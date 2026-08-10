@@ -10,12 +10,14 @@
  */
 
 export type { PwaAppConfig, PwaScrollLock } from "./types";
-export { usePwaRuntime, ensurePwaServiceWorker } from "./usePwaRuntime";
+export { usePwaRuntime } from "./usePwaRuntime";
+export { ensurePwaServiceWorker } from "./swRegister";
 export {
   usePwaInstall,
   armPwaInstallCapture,
   PWA_INSTALLABLE_BASE_PATH,
   type BeforeInstallPromptEvent,
   type PwaInstallState,
+  type PwaInstallResult,
 } from "./usePwaInstall";
 export type { PwaInstallCopy } from "./installCopy";

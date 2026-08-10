@@ -1,5 +1,5 @@
 /* ランチ貯金専用 Service Worker（scope: /lunch-savings） */
-const CACHE_NAME = "lunch-savings-v3";
+const CACHE_NAME = "lunch-savings-v4";
 const PRECACHE = [
   "/lunch-savings",
   "/lunch-savings.webmanifest",
@@ -8,11 +8,22 @@ const PRECACHE = [
 ];
 
 self.addEventListener("install", (event) => {
+  // addAll は 1 件失敗で全体失敗するため、個別 put で install を落とさない
   event.waitUntil(
-    caches
-      .open(CACHE_NAME)
-      .then((cache) => cache.addAll(PRECACHE))
-      .then(() => self.skipWaiting()),
+    (async () => {
+      const cache = await caches.open(CACHE_NAME);
+      await Promise.all(
+        PRECACHE.map(async (url) => {
+          try {
+            const response = await fetch(url, { cache: "reload" });
+            if (response.ok) await cache.put(url, response);
+          } catch {
+            // オフライン等でも SW 自体は有効化する
+          }
+        }),
+      );
+      await self.skipWaiting();
+    })(),
   );
 });
 

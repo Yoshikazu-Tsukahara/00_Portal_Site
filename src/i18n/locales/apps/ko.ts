@@ -1137,6 +1137,8 @@ export const appsKo: AppsDictionary = {
       desktopStep2Title: "앱 설치",
       desktopStep2Body: "“점심 저축 설치” / “앱 설치”를 선택해 홈 화면이나 데스크톱에 추가하세요.",
       modalClose: "확인",
+      tapAgain: "준비됨 — 설치를 한 번 더 탭하세요",
+      tapAgainShort: "다시 탭",
     },
   },
   mailTemplate: {

@@ -17,4 +17,6 @@ export type PwaInstallCopy = {
   desktopStep2Title: string;
   desktopStep2Body: string;
   modalClose: string;
+  /** BIP 準備完了後、もう一度タップを促すとき */
+  tapAgain?: string;
 };

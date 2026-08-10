@@ -33,12 +33,10 @@ export default function PwaInstallButton({
     setBusy(true);
     try {
       const result = await prepareAndPrompt();
-      if (result === "guide" || result === "unavailable") {
-        // unavailable はリロード中のこともあり、その場合はモーダルを出さない
-        if (result === "guide") {
-          setGuideVariant("desktop");
-          setGuideOpen(true);
-        }
+      // armed / reloading は次操作待ち。guide のときだけ手動手順を出す
+      if (result === "guide") {
+        setGuideVariant("desktop");
+        setGuideOpen(true);
       }
     } finally {
       setBusy(false);

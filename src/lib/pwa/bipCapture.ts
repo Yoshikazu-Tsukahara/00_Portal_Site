@@ -61,3 +61,6 @@ export function clearCachedBip() {
   cachedBip = null;
   cachedBipPath = null;
 }
+
+// クライアントでこのモジュールが読まれた時点でリスナーを張る（useEffect より早い）
+armPwaInstallCapture();

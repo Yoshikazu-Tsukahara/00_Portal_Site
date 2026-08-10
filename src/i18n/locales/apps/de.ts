@@ -1693,6 +1693,8 @@ export const appsDe: AppsDictionary = {
       desktopStep2Title: "App installieren",
       desktopStep2Body: "Wähle „Mittagessen-Sparen installieren“ / „App installieren“, um sie zum Home-Bildschirm oder Desktop hinzuzufügen.",
       modalClose: "Verstanden",
+      tapAgain: "Bereit — tippe erneut auf Installieren",
+      tapAgainShort: "Nochmal",
     },
   },
   linkStocker: {

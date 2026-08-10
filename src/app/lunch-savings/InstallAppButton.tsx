@@ -15,6 +15,7 @@ export default function InstallAppButton({
   const [guideOpen, setGuideOpen] = useState(false);
   const [guideVariant, setGuideVariant] = useState<"ios" | "desktop">("desktop");
   const [busy, setBusy] = useState(false);
+  const [armedHint, setArmedHint] = useState(false);
 
   if (!canShow) return null;
 
@@ -28,9 +29,18 @@ export default function InstallAppButton({
     setBusy(true);
     try {
       const result = await prepareAndPrompt();
+      if (result === "armed") {
+        setArmedHint(true);
+        return;
+      }
       if (result === "guide") {
+        setArmedHint(false);
         setGuideVariant("desktop");
         setGuideOpen(true);
+        return;
+      }
+      if (result === "accepted" || result === "dismissed") {
+        setArmedHint(false);
       }
     } finally {
       setBusy(false);
@@ -44,14 +54,18 @@ export default function InstallAppButton({
         onClick={() => void handleClick()}
         disabled={busy}
         className="lunch-install-btn !px-2.5 !py-1 !text-[11px] active:scale-[0.98] sm:!px-3 sm:!py-1 sm:!text-xs"
-        aria-label={copy.buttonAria}
-        title={copy.button}
+        aria-label={armedHint ? copy.tapAgain : copy.buttonAria}
+        title={armedHint ? copy.tapAgain : copy.button}
       >
         <span aria-hidden className="text-[12px] leading-none sm:text-[13px]">
           📱
         </span>
-        <span className="app-shell-chrome-label hidden sm:inline">{copy.buttonShort}</span>
-        <span className="app-shell-chrome-label sm:hidden">{copy.buttonTiny}</span>
+        <span className="app-shell-chrome-label hidden sm:inline">
+          {armedHint ? copy.tapAgainShort : copy.buttonShort}
+        </span>
+        <span className="app-shell-chrome-label sm:hidden">
+          {armedHint ? copy.tapAgainShort : copy.buttonTiny}
+        </span>
       </button>
 
       <InstallGuideModal
