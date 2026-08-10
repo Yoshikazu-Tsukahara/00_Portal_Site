@@ -3,15 +3,18 @@
  *
  * 使い方:
  * 1. アプリの layout.tsx に `<PwaRuntime basePath="/xxx" classPrefix="xxx" />` を置く
- *    （manifest / themeColor などのメタは同じ layout.tsx で宣言する）
  * 2. アプリの page.tsx で `<AppShell isPwa ...>` を使う
- *    （standalone 起動時のヘッダー切り替えは AppShell 側が面倒を見る）
+ *
+ * インストール（manifest + SW + Install ボタン）は **ランチ貯金のみ**:
+ * `<PwaRuntime ... enableServiceWorker />` + manifest メタ + InstallAppButton
  */
 
 export type { PwaAppConfig, PwaScrollLock } from "./types";
 export { usePwaRuntime, ensurePwaServiceWorker } from "./usePwaRuntime";
 export {
   usePwaInstall,
+  armPwaInstallCapture,
+  PWA_INSTALLABLE_BASE_PATH,
   type BeforeInstallPromptEvent,
   type PwaInstallState,
 } from "./usePwaInstall";

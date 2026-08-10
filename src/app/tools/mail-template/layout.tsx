@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import PwaRuntime from "@/components/PwaRuntime";
-import { MAIL_TEMPLATE_MANIFEST_PATH } from "./pwaManifest";
 
 export const metadata: Metadata = {
   title: "スマートメールテンプレ管理",
@@ -8,23 +7,19 @@ export const metadata: Metadata = {
     "変数・ラベルで返信を即作成。データはブラウザ内に保存するメールテンプレート管理アプリ。",
   applicationName: "メールテンプレ",
   appleWebApp: {
-    capable: true,
+    capable: false,
     statusBarStyle: "default",
     title: "メールテンプレ",
   },
   formatDetection: {
     telephone: false,
   },
-  manifest: MAIL_TEMPLATE_MANIFEST_PATH,
   icons: {
     icon: [
       { url: "/icons/mail-template-192.png", sizes: "192x192", type: "image/png" },
       { url: "/icons/mail-template-512.png", sizes: "512x512", type: "image/png" },
     ],
     apple: [{ url: "/icons/mail-template-192.png", sizes: "192x192", type: "image/png" }],
-  },
-  other: {
-    "mobile-web-app-capable": "yes",
   },
 };
 

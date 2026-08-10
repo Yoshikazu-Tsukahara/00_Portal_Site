@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import PwaRuntime from "@/components/PwaRuntime";
-import { SLOT_PWA_MANIFEST_PATH } from "./manifest";
 
 export const metadata: Metadata = {
   title: "究極確率スロット",
@@ -8,15 +7,13 @@ export const metadata: Metadata = {
     "自作の天文学的低確率スロットで「当たるまで」「外し続ける」に挑む、無機質な演算エンジン。",
   applicationName: "究極確率スロット",
   appleWebApp: {
-    capable: true,
+    capable: false,
     statusBarStyle: "black-translucent",
     title: "究極確率スロット",
   },
   formatDetection: {
     telephone: false,
   },
-  /** 共通ポータル manifest ではなく、スロット専用を明示参照 */
-  manifest: SLOT_PWA_MANIFEST_PATH,
   icons: {
     icon: [
       {
@@ -31,9 +28,6 @@ export const metadata: Metadata = {
       },
     ],
     apple: [{ url: "/icons/ultimate-probability-slot-192.png", sizes: "192x192" }],
-  },
-  other: {
-    "mobile-web-app-capable": "yes",
   },
 };
 

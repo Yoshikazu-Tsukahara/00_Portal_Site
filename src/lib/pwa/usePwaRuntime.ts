@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useStandaloneDisplay } from "@/lib/useStandaloneDisplay";
 import type { PwaAppConfig } from "./types";
+import { armPwaInstallCapture } from "./bipCapture";
 
 /** PWA 対応アプリを開いている間ずっと付く共通クラス */
 const SHARED_ACTIVE_CLASS = "pwa-app-active";
@@ -108,6 +109,27 @@ export function ensurePwaServiceWorker(
   return pending;
 }
 
+/** 当該アプリの SW を解除（インストール不可に戻す） */
+async function unregisterAppServiceWorker(basePath: string): Promise<void> {
+  if (!("serviceWorker" in navigator)) return;
+  const scopePath = normalizeBasePath(basePath);
+  const scriptUrl = new URL(`${scopePath}/sw.js`, window.location.origin).href;
+  try {
+    const existing = await navigator.serviceWorker.getRegistrations();
+    await Promise.all(
+      existing.map(async (reg) => {
+        const scriptMatches =
+          reg.active?.scriptURL === scriptUrl ||
+          reg.waiting?.scriptURL === scriptUrl ||
+          reg.installing?.scriptURL === scriptUrl;
+        if (scriptMatches) await reg.unregister();
+      }),
+    );
+  } catch {
+    // ignore
+  }
+}
+
 /**
  * 独立 PWA（Type C）共通のランタイム処理。
  *
@@ -121,6 +143,7 @@ export function usePwaRuntime({
   basePath,
   classPrefix,
   scrollLock = "soft",
+  enableServiceWorker = false,
 }: PwaAppConfig): { isStandalone: boolean } {
   const { isStandalone } = useStandaloneDisplay();
 
@@ -128,8 +151,16 @@ export function usePwaRuntime({
     const isLocal = SW_LOCAL_HOSTS.includes(window.location.hostname);
     if (process.env.NODE_ENV !== "production" && !isLocal) return;
 
-    void ensurePwaServiceWorker(basePath);
-  }, [basePath]);
+    if (enableServiceWorker) {
+      // SW 登録より先に BIP を掴む（ページの Install ボタン hydration 前に発火しうる）
+      armPwaInstallCapture();
+      void ensurePwaServiceWorker(basePath);
+    } else {
+      // 過去に登録した SW が残るとブラウザの「インストール」が出続けるため解除
+      registrationByPath.delete(normalizeBasePath(basePath));
+      void unregisterAppServiceWorker(basePath);
+    }
+  }, [basePath, enableServiceWorker]);
 
   useEffect(() => {
     const classes = [SHARED_ACTIVE_CLASS, `${classPrefix}-app-active`];

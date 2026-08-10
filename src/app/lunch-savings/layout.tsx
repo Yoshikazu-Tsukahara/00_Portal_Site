@@ -45,7 +45,11 @@ export default function LunchSavingsLayout({
 }) {
   return (
     <>
-      <PwaRuntime basePath="/lunch-savings" classPrefix="lunch" />
+      <PwaRuntime
+        basePath="/lunch-savings"
+        classPrefix="lunch"
+        enableServiceWorker
+      />
       {children}
     </>
   );

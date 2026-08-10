@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import PwaRuntime from "@/components/PwaRuntime";
-import { PIXEL_DROP_PUZZLE_MANIFEST_PATH } from "./manifest";
 
 export const metadata: Metadata = {
   title: "極小ピクセル隙間落としパズル",
@@ -8,15 +7,13 @@ export const metadata: Metadata = {
     "写真を隙間に落とすだけ。判定は小数点以下のピクセル単位という、鬼畜な精度パズル。",
   applicationName: "極小ピクセル隙間落としパズル",
   appleWebApp: {
-    capable: true,
+    capable: false,
     statusBarStyle: "black-translucent",
     title: "隙間落としパズル",
   },
   formatDetection: {
     telephone: false,
   },
-  /** 共通ポータル manifest ではなく、本アプリ専用を明示参照 */
-  manifest: PIXEL_DROP_PUZZLE_MANIFEST_PATH,
   icons: {
     icon: [
       {
@@ -37,9 +34,6 @@ export const metadata: Metadata = {
         type: "image/png",
       },
     ],
-  },
-  other: {
-    "mobile-web-app-capable": "yes",
   },
 };
 

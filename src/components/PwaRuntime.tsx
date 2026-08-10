@@ -8,8 +8,9 @@ import { usePwaRuntime, type PwaAppConfig } from "@/lib/pwa";
  *
  * アプリの layout.tsx に 1 つ置く:
  * ```tsx
- * <PwaRuntime basePath="/lunch-savings" classPrefix="lunch" />
+ * <PwaRuntime basePath="/lunch-savings" classPrefix="lunch" enableServiceWorker />
  * ```
+ * ※ `enableServiceWorker` はランチ貯金のみ true（他アプリはインストール不可）。
  */
 export default function PwaRuntime(config: PwaAppConfig) {
   usePwaRuntime(config);

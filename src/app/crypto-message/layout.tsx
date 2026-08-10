@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import PwaRuntime from "@/components/PwaRuntime";
-import { CRYPTO_MESSAGE_MANIFEST_PATH } from "./manifest";
 
 export const metadata: Metadata = {
   title: "ひみつメッセージ",
@@ -8,14 +7,13 @@ export const metadata: Metadata = {
     "合言葉で暗号化・復号する『ひみつメッセージ』と、シーザー暗号を解き明かす『解読チャレンジ』。ハッカー演出全開の完全ローカル完結パズルツール。",
   applicationName: "ひみつメッセージ",
   appleWebApp: {
-    capable: true,
+    capable: false,
     statusBarStyle: "black-translucent",
     title: "ひみつメッセージ",
   },
   formatDetection: {
     telephone: false,
   },
-  manifest: CRYPTO_MESSAGE_MANIFEST_PATH,
   icons: {
     icon: [
       {
@@ -36,9 +34,6 @@ export const metadata: Metadata = {
         type: "image/png",
       },
     ],
-  },
-  other: {
-    "mobile-web-app-capable": "yes",
   },
 };
 

@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import PwaRuntime from "@/components/PwaRuntime";
-import { IMAGE_COMPRESSOR_MANIFEST_PATH } from "./pwaManifest";
 
 export const metadata: Metadata = {
   title: "画像一括軽量化",
@@ -8,14 +7,13 @@ export const metadata: Metadata = {
     "リサイズ・圧縮をブラウザ内で一括処理。ZIPで保存する画像軽量化アプリ。",
   applicationName: "画像軽量化",
   appleWebApp: {
-    capable: true,
+    capable: false,
     statusBarStyle: "default",
     title: "画像軽量化",
   },
   formatDetection: {
     telephone: false,
   },
-  manifest: IMAGE_COMPRESSOR_MANIFEST_PATH,
   icons: {
     icon: [
       {
@@ -36,9 +34,6 @@ export const metadata: Metadata = {
         type: "image/png",
       },
     ],
-  },
-  other: {
-    "mobile-web-app-capable": "yes",
   },
 };
 

@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import PwaRuntime from "@/components/PwaRuntime";
-import { LINK_STOCKER_MANIFEST_PATH } from "./manifest";
 
 export const metadata: Metadata = {
   title: "とりあえずキープ",
@@ -8,14 +7,13 @@ export const metadata: Metadata = {
     "とりあえずキープしたい URL を、OGP サムネ付きカードで視覚的に管理。公開メタ取得のため URL のみサーバー経由の通信があります。",
   applicationName: "とりあえずキープ",
   appleWebApp: {
-    capable: true,
+    capable: false,
     statusBarStyle: "black-translucent",
     title: "キープ",
   },
   formatDetection: {
     telephone: false,
   },
-  manifest: LINK_STOCKER_MANIFEST_PATH,
   icons: {
     icon: [
       {
@@ -31,9 +29,6 @@ export const metadata: Metadata = {
     ],
     apple: [{ url: "/icons/link-stocker-192.png", sizes: "192x192" }],
   },
-  other: {
-    "mobile-web-app-capable": "yes",
-  },
 };
 
 export const viewport: Viewport = {
@@ -44,7 +39,7 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-/** とりあえずキープ: 独立 PWA 向けメタ・SW */
+/** とりあえずキープ: standalone 表示用ランタイム（インストール不可） */
 export default function LinkStockerLayout({
   children,
 }: {

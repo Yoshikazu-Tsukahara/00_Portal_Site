@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import PwaRuntime from "@/components/PwaRuntime";
-import { PALETTE_COLLECTOR_MANIFEST_PATH } from "./manifest";
 
 export const metadata: Metadata = {
   title: "Palette Collector",
@@ -8,15 +7,13 @@ export const metadata: Metadata = {
     "画像からカラーコードを抽出し、自分だけのカラーパレットを作成・管理するツール。",
   applicationName: "Palette Collector",
   appleWebApp: {
-    capable: true,
+    capable: false,
     statusBarStyle: "black-translucent",
     title: "Palette",
   },
   formatDetection: {
     telephone: false,
   },
-  /** 共通ポータル manifest ではなく、専用 manifest を明示参照 */
-  manifest: PALETTE_COLLECTOR_MANIFEST_PATH,
   icons: {
     icon: [
       {
@@ -31,9 +28,6 @@ export const metadata: Metadata = {
       },
     ],
     apple: [{ url: "/icons/palette-collector-192.png", sizes: "192x192" }],
-  },
-  other: {
-    "mobile-web-app-capable": "yes",
   },
 };
 

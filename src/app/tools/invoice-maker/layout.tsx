@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import PwaRuntime from "@/components/PwaRuntime";
-import { INVOICE_MAKER_MANIFEST_PATH } from "./pwaManifest";
 
 export const metadata: Metadata = {
   title: "帳票メーカー",
@@ -8,14 +7,13 @@ export const metadata: Metadata = {
     "請求書・見積書・納品書・領収書をA4で作成。多言語・多通貨対応でPDF保存も一発。データはブラウザ内に保存。",
   applicationName: "帳票メーカー",
   appleWebApp: {
-    capable: true,
+    capable: false,
     statusBarStyle: "default",
     title: "帳票メーカー",
   },
   formatDetection: {
     telephone: false,
   },
-  manifest: INVOICE_MAKER_MANIFEST_PATH,
   icons: {
     icon: [
       {
@@ -32,9 +30,6 @@ export const metadata: Metadata = {
     apple: [
       { url: "/icons/invoice-maker-192.png", sizes: "192x192", type: "image/png" },
     ],
-  },
-  other: {
-    "mobile-web-app-capable": "yes",
   },
 };
 

@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import PwaRuntime from "@/components/PwaRuntime";
-import { ROBOT_FREETHROW_MANIFEST_PATH } from "./manifest";
 
 export const metadata: Metadata = {
   title: "投射フリースロー",
@@ -8,14 +7,13 @@ export const metadata: Metadata = {
     "角度・初速・スピンを指定してリングを狙う、投射運動のミニゲーム。",
   applicationName: "投射フリースロー",
   appleWebApp: {
-    capable: true,
+    capable: false,
     statusBarStyle: "black-translucent",
     title: "投射フリースロー",
   },
   formatDetection: {
     telephone: false,
   },
-  manifest: ROBOT_FREETHROW_MANIFEST_PATH,
   icons: {
     icon: [
       {
@@ -30,9 +28,6 @@ export const metadata: Metadata = {
       },
     ],
     apple: [{ url: "/icons/robot-freethrow-192.png", sizes: "192x192" }],
-  },
-  other: {
-    "mobile-web-app-capable": "yes",
   },
 };
 

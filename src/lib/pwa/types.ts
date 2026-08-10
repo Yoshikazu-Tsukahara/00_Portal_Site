@@ -21,6 +21,12 @@ export type PwaAppConfig = {
    * - "hard": 縦横ともバウンスを止める（ゲーム系）
    */
   scrollLock?: PwaScrollLock;
+  /**
+   * Service Worker を登録するか。
+   * インストール可能な PWA にする場合のみ true（現状はランチ貯金だけ）。
+   * false / 省略時は当該アプリの SW を解除し、ブラウザのインストール訴求を止める。
+   */
+  enableServiceWorker?: boolean;
 };
 
 export type PwaScrollLock = "soft" | "hard";
