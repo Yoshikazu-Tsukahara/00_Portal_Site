@@ -89,11 +89,21 @@ export type MailTemplateDict = {
     removeHistoryAria: string;
   };
   preview: {
+    /** タブ切替の aria-label */
+    tabAria: string;
+    /** 変数置換前の原稿タブ */
+    sourceHeading: string;
+    sourceHint: string;
+    /** 変数適用後のプレビュータブ */
     heading: string;
+    previewHint: string;
     subject: string;
     body: string;
     emptySubject: string;
     emptyBody: string;
+    /** 保存済みテンプレから原稿を戻す */
+    reload: string;
+    reloadHint: string;
   };
   copy: {
     button: string;
@@ -387,11 +397,17 @@ export const mailTemplateJa: MailTemplateDict = {
     removeHistoryAria: "「{value}」を履歴から削除",
   },
   preview: {
+    tabAria: "原稿とプレビューの切替",
+    sourceHeading: "編集",
+    sourceHint: "変数を入れる前の原稿です。{{変数名}} はそのまま編集できます。",
     heading: "プレビュー",
+    previewHint: "変数を入れた状態です（表示のみ）。コピーはここから。",
     subject: "件名",
     body: "本文",
     emptySubject: "（件名なし）",
     emptyBody: "（本文なし）",
+    reload: "テンプレを再読込",
+    reloadHint: "保存済みテンプレの内容で原稿を戻します",
   },
   copy: {
     button: "コピー",
@@ -685,11 +701,17 @@ Thank you,`,
     removeHistoryAria: "Remove “{value}” from history",
   },
   preview: {
+    tabAria: "Switch between edit and preview",
+    sourceHeading: "Edit",
+    sourceHint: "Edit the text before variables are filled. Keep {{placeholders}} as-is.",
     heading: "Preview",
+    previewHint: "Text with variables applied (read-only). Copy from here.",
     subject: "Subject",
     body: "Body",
     emptySubject: "(No subject)",
     emptyBody: "(No body)",
+    reload: "Reload template",
+    reloadHint: "Reset the draft to the saved template",
   },
   copy: {
     button: "Copy",

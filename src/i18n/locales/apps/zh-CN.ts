@@ -234,11 +234,17 @@ export const appsZhCN: AppsDictionary = {
       removeHistoryAria: "从历史中移除“{value}”",
     },
     preview: {
+      tabAria: "编辑与预览切换",
+      sourceHeading: "编辑",
+      sourceHint: "填写变量前的原稿。可直接编辑 {{变量名}}。",
       heading: "预览",
+      previewHint: "显示已填入变量后的结果（只读）。可从此处复制。",
       subject: "主题",
       body: "正文",
       emptySubject: "（无主题）",
       emptyBody: "（无正文）",
+      reload: "重新加载模板",
+      reloadHint: "用已保存的模板内容还原原稿",
     },
     copy: {
       button: "复制",

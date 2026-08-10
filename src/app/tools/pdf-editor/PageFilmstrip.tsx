@@ -28,7 +28,10 @@ type GridLayout = {
   availW: number;
 };
 
-/** コンテナ幅から1行あたりの列数を算出（左寄せ・カード間ギャップ前提） */
+/**
+ * コンテナ幅から「1行に載せられる列数」を算出。
+ * ページ枚数では縮めない（少ない枚数でも満行と同じギャップで左詰め）。
+ */
 export function computeGridLayout(
   containerW: number,
   pageCount: number,
@@ -42,14 +45,13 @@ export function computeGridLayout(
     1,
     Math.floor((availW + MIN_GAP_X) / (CARD_WIDTH + MIN_GAP_X)),
   );
-  const capped = Math.min(maxCols, pageCount);
 
-  for (let cols = capped; cols >= 1; cols--) {
+  for (let cols = maxCols; cols >= 1; cols--) {
     if (cols === 1) {
       if (availW >= CARD_WIDTH) return { cols, availW };
       continue;
     }
-    // 余りは右に残し、ギャップはカード間だけに分配
+    // 満行時のカード間ギャップが下限以上なら、その列数を採用
     const gap = (availW - cols * CARD_WIDTH) / (cols - 1);
     if (gap >= MIN_GAP_X) {
       return { cols, availW };
@@ -60,8 +62,8 @@ export function computeGridLayout(
 }
 
 /**
- * 左寄せ行のカード間ギャップ。
- * ウィンドウ幅を均等に使うため伸び縮み可。左右端には配らない。
+ * 満行列数を前提にしたカード間ギャップ（左詰め・余りは右端）。
+ * 最終行が欠けていても同じギャップを使う。
  */
 export function computeRowGap(availW: number, cols: number): number {
   if (cols <= 1) return MIN_GAP_X;
@@ -313,7 +315,7 @@ export default function PageFilmstrip({
         >
           <div className="flex w-full flex-col items-stretch" style={{ rowGap: GAP_Y }}>
             {rows.map((row, rowIndex) => {
-              // 最終行が欠けていても、満行と同じギャップで左から揃える
+              // 1行目も含め、ウィンドウ幅の満行列数でギャップを決め左から詰める
               const rowGap = computeRowGap(
                 gridLayout.availW,
                 gridLayout.cols,

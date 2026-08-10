@@ -1366,11 +1366,17 @@ export const appsFr: AppsDictionary = {
       removeHistoryAria: "Retirer « {value} » de l’historique",
     },
     preview: {
+      tabAria: "Basculer entre édition et aperçu",
+      sourceHeading: "Éditer",
+      sourceHint: "Brouillon avant variables. Vous pouvez modifier les {{espaces_réservés}}.",
       heading: "Aperçu",
+      previewHint: "Texte avec variables appliquées (lecture seule). Copiez depuis ici.",
       subject: "Objet",
       body: "Corps",
       emptySubject: "(Pas d’objet)",
       emptyBody: "(Pas de corps)",
+      reload: "Recharger le modèle",
+      reloadHint: "Rétablir le brouillon depuis le modèle enregistré",
     },
     copy: {
       button: "Copier",

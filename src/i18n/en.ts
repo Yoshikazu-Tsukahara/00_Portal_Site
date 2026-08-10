@@ -124,6 +124,10 @@ export const en: Dictionary = {
     devicePcRecommended: "PC recommended",
     localDataNote:
       "Your inputs and files are processed and stored only on this device—never sent to a server. Clearing browser data can wipe them, so back up or export anything important.",
+    filterAria: "Filter apps",
+    filterAll: "All",
+    filterUnpinned: "Not pinned",
+    filterEmpty: "No apps match this filter.",
   },
   genres: {
     business: {
@@ -439,21 +443,21 @@ export const en: Dictionary = {
     },
     "robot-freethrow": {
       title: "Projectile Shot",
-      description: "Aim with angle, initial speed, and spin in a projectile freethrow game.",
+      description: "Aim with angle, thrust, and spin in a projectile freethrow game.",
       detail: [
-        "Aim freethrow-like shots with angle, launch speed, and spin in mind. Fill sticky-note parameters, tap the shooter, and watch the arc—quick physics feel in the browser.",
+        "Aim freethrow-like shots with angle, thrust, and spin. The same thrust flies differently with ball mass, so weight matters. Fill sticky-note parameters, tap the shooter, and watch the arc.",
         "More playground than lab sim: feel the force and path. Controls lean desktop.",
       ],
       highlights: [
-        "Projectile freethrow with angle, speed, and spin",
+        "Projectile freethrow with angle, thrust, and spin (mass counts)",
         "Sticky-note parameters and tap-to-shoot checks",
         "Easy launch in browser or as a PWA",
         "Guidance follows the portal language",
       ],
       gettingStarted: [
-        "Fill sticky-note parameters (speed, height, and so on).",
+        "Fill sticky-note parameters (thrust, angle, and so on).",
         "Tap the on-screen shooter.",
-        "Watch the rim result and adjust aim and force.",
+        "Watch the rim result and adjust aim and thrust.",
       ],
       tip: "Keep focus on the game view for input. Miss big first, then walk the arc toward the rim.",
     },

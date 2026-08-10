@@ -1366,11 +1366,17 @@ export const appsZhTW: AppsDictionary = {
       removeHistoryAria: "從歷程移除「{value}」",
     },
     preview: {
+      tabAria: "編輯與預覽切換",
+      sourceHeading: "編輯",
+      sourceHint: "填入變數前的原稿。可直接編輯 {{變數名}}。",
       heading: "預覽",
+      previewHint: "顯示已填入變數後的結果（唯讀）。可從此處複製。",
       subject: "主旨",
       body: "正文",
       emptySubject: "（無主旨）",
       emptyBody: "（無正文）",
+      reload: "重新載入範本",
+      reloadHint: "以已儲存的範本內容還原原稿",
     },
     copy: {
       button: "複製",

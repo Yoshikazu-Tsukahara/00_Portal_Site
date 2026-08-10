@@ -20,6 +20,7 @@ import ExportDialog, {
   type ExportDialogValues,
 } from "./ExportDialog";
 import FileGroupList from "./FileGroupList";
+import { FILE_CARD_HEIGHT, FILE_CARD_WIDTH, FileCardFace } from "./FileCard";
 import HistoryToolbar from "./HistoryToolbar";
 import InstallAppButton from "./InstallAppButton";
 import PageDragOverlay from "./PageDragOverlay";
@@ -112,6 +113,17 @@ export default function PdfEditorPage() {
     clearSelection,
     syncSelection,
   } = usePageSelection(pageIds);
+
+  const fileSourceIds = useMemo(
+    () => fileGroups.map((g) => g.sourceId),
+    [fileGroups],
+  );
+  const {
+    selectedIds: selectedFileIds,
+    selectPage: selectFile,
+    clearSelection: clearFileSelection,
+    syncSelection: syncFileSelection,
+  } = usePageSelection(fileSourceIds);
   const {
     clipboard,
     clipboardCount,
@@ -189,6 +201,14 @@ export default function PdfEditorPage() {
   useEffect(() => {
     syncSelection(pageIds);
   }, [pageIds, syncSelection]);
+
+  useEffect(() => {
+    syncFileSelection(fileSourceIds);
+  }, [fileSourceIds, syncFileSelection]);
+
+  useEffect(() => {
+    if (viewMode !== "file") clearFileSelection();
+  }, [viewMode, clearFileSelection]);
 
   useEffect(() => {
     if (previewIndex === null) return;
@@ -684,6 +704,9 @@ export default function PdfEditorPage() {
             ) : (
               <FileGroupList
                 groups={fileGroups}
+                selectedIds={selectedFileIds}
+                onSelectFile={selectFile}
+                onClearSelection={clearFileSelection}
                 onRename={handleRenameFile}
                 onRemove={handleRemoveFile}
                 onDuplicate={handleDuplicateFile}
@@ -707,18 +730,17 @@ export default function PdfEditorPage() {
               <PageDragOverlay page={activePage} count={dragMoveCount} />
             ) : null}
             {viewMode === "file" && activeFileGroup ? (
-              <div className="flex h-14 w-full max-w-md items-center gap-2.5 rounded-lg border border-zinc-300 bg-white px-2.5 shadow-lg">
-                <span aria-hidden>📄</span>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-xs font-medium text-zinc-800">
-                    {activeFileGroup.name}
-                  </p>
-                  <p className="text-[11px] text-zinc-400">
-                    {fmt(copy.fileCard.pageCount, {
-                      count: activeFileGroup.pageCount,
-                    })}
-                  </p>
-                </div>
+              <div
+                className="shadow-lg"
+                style={{ width: FILE_CARD_WIDTH, height: FILE_CARD_HEIGHT }}
+              >
+                <FileCardFace
+                  name={activeFileGroup.name}
+                  pageCountLabel={fmt(copy.fileCard.pageCount, {
+                    count: activeFileGroup.pageCount,
+                  })}
+                  selected
+                />
               </div>
             ) : null}
           </DragOverlay>

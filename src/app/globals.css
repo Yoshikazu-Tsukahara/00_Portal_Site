@@ -851,8 +851,20 @@ html[data-layout-mode="full"] .layout-content {
     @apply relative z-[1] bg-white pb-16;
   }
 
+  /* 説明セクション見出し：マーカー＋アクセント下線で小タイトル感 */
   .store-detail-info__label {
-    @apply text-[13px] font-semibold tracking-tight text-zinc-500;
+    @apply mb-0.5 inline-block max-w-full text-[15px] font-semibold tracking-tight text-zinc-800 sm:text-base;
+    padding: 0.12em 0.4em 0.28em 0.28em;
+    line-height: 1.35;
+    background-image: linear-gradient(
+      to top,
+      color-mix(in srgb, var(--accent) 78%, transparent) 0%,
+      color-mix(in srgb, var(--accent) 78%, transparent) 42%,
+      transparent 42%
+    );
+    box-shadow: 0 2px 0 0 color-mix(in srgb, var(--accent) 35%, #8b9ae0);
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
   }
   .store-detail-section {
     @apply mt-10 sm:mt-12;

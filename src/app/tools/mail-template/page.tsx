@@ -26,7 +26,7 @@ import {
 } from "./storage";
 import {
   applyVariables,
-  buildFinalText,
+  combineDraftText,
   findEmptyVariableLabels,
   filterTemplates,
   resolveEnabledVariables,
@@ -59,6 +59,9 @@ export default function MailTemplatePage() {
   const [tagMasterOpen, setTagMasterOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterTagId, setFilterTagId] = useState<string | null>(null);
+  /** 変数置換前の原稿（編集用。{{変数}} を含む） */
+  const [sourceSubject, setSourceSubject] = useState("");
+  const [sourceBody, setSourceBody] = useState("");
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 767px)");
@@ -175,14 +178,38 @@ export default function MailTemplatePage() {
     });
   }, [enabledVariables]);
 
-  const previewSubject = selected
-    ? applyVariables(selected.subject, values)
-    : "";
-  const previewBody = selected ? applyVariables(selected.body, values) : "";
-  const finalText = selected
-    ? buildFinalText(selected.subject, selected.body, values, mt.combinedText)
-    : "";
+  const previewSubject = applyVariables(sourceSubject, values);
+  const previewBody = applyVariables(sourceBody, values);
+  const previewCombined = combineDraftText(
+    previewSubject,
+    previewBody,
+    mt.combinedText,
+  );
   const emptyLabels = findEmptyVariableLabels(enabledVariables, values);
+
+  // テンプレ切替時のみ、保存済み内容を原稿へ読み込む（変数はまだ入れない）
+  useEffect(() => {
+    if (!selectedId) {
+      setSourceSubject("");
+      setSourceBody("");
+      return;
+    }
+    const tpl = templates.find((x) => x.id === selectedId);
+    if (!tpl) {
+      setSourceSubject("");
+      setSourceBody("");
+      return;
+    }
+    setSourceSubject(tpl.subject);
+    setSourceBody(tpl.body);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- テンプレ ID 変更時のみ
+  }, [selectedId]);
+
+  function reloadSourceFromTemplate() {
+    if (!selected) return;
+    setSourceSubject(selected.subject);
+    setSourceBody(selected.body);
+  }
 
   const editorInitial: Draft | null = useMemo(() => {
     if (editorMode === "edit" && editingId) {
@@ -462,22 +489,28 @@ export default function MailTemplatePage() {
                       </button>
                     ) : null}
                   </div>
-                  <div className="border-b border-zinc-100 pb-2 md:pb-3">
-                    <VariableForm
-                      variables={enabledVariables}
-                      values={values}
-                      history={inputHistory}
-                      onChange={(key, value) =>
-                        setValues((prev) => ({ ...prev, [key]: value }))
-                      }
-                      onHistoryChange={setInputHistory}
-                    />
-                  </div>
                   <PreviewPane
-                    subject={previewSubject}
-                    body={previewBody}
-                    combinedText={finalText}
+                    sourceSubject={sourceSubject}
+                    sourceBody={sourceBody}
+                    previewSubject={previewSubject}
+                    previewBody={previewBody}
+                    combinedText={previewCombined}
                     emptyLabels={emptyLabels}
+                    resetKey={selectedId}
+                    onSourceSubjectChange={setSourceSubject}
+                    onSourceBodyChange={setSourceBody}
+                    onReloadFromTemplate={reloadSourceFromTemplate}
+                    variablesSlot={
+                      <VariableForm
+                        variables={enabledVariables}
+                        values={values}
+                        history={inputHistory}
+                        onChange={(key, value) =>
+                          setValues((prev) => ({ ...prev, [key]: value }))
+                        }
+                        onHistoryChange={setInputHistory}
+                      />
+                    }
                   />
                 </>
               ) : (

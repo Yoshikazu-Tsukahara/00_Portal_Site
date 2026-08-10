@@ -234,11 +234,17 @@ export const appsDe: AppsDictionary = {
       removeHistoryAria: "„{value}“ aus dem Verlauf entfernen",
     },
     preview: {
+      tabAria: "Bearbeiten und Vorschau umschalten",
+      sourceHeading: "Bearbeiten",
+      sourceHint: "Entwurf vor dem Einsetzen der Variablen. {{Platzhalter}} bleiben editierbar.",
       heading: "Vorschau",
+      previewHint: "Text mit eingesetzten Variablen (nur Anzeige). Hier kopieren.",
       subject: "Betreff",
       body: "Text",
       emptySubject: "(Kein Betreff)",
       emptyBody: "(Kein Text)",
+      reload: "Vorlage neu laden",
+      reloadHint: "Entwurf auf die gespeicherte Vorlage zurücksetzen",
     },
     copy: {
       button: "Kopieren",

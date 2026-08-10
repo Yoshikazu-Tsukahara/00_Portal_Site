@@ -59,6 +59,17 @@ export function buildFinalText(
 ): string {
   const s = applyVariables(subject, values).trim();
   const b = applyVariables(body, values).trim();
+  return combineDraftText(s, b, combined);
+}
+
+/** 編集済みの件名・本文をコピー用に結合（変数置換はしない） */
+export function combineDraftText(
+  subject: string,
+  body: string,
+  combined: MailTemplateDict["combinedText"],
+): string {
+  const s = subject.trim();
+  const b = body.trim();
   if (!s) return b;
   if (!b) return fmt(combined.subjectOnly, { subject: s });
   return fmt(combined.both, { subject: s, body: b });

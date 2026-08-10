@@ -234,11 +234,17 @@ export const appsEs: AppsDictionary = {
       removeHistoryAria: "Quitar “{value}” del historial",
     },
     preview: {
+      tabAria: "Cambiar entre editar y vista previa",
+      sourceHeading: "Editar",
+      sourceHint: "Borrador antes de rellenar variables. Puedes editar {{marcadores}}.",
       heading: "Vista previa",
+      previewHint: "Texto con variables aplicadas (solo lectura). Copia desde aquí.",
       subject: "Asunto",
       body: "Cuerpo",
       emptySubject: "(Sin asunto)",
       emptyBody: "(Sin cuerpo)",
+      reload: "Recargar plantilla",
+      reloadHint: "Restablecer el borrador a la plantilla guardada",
     },
     copy: {
       button: "Copiar",

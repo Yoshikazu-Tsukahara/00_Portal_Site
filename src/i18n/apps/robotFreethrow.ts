@@ -28,7 +28,7 @@ export const robotFreethrowJa: RobotFreethrowDict = {
   shell: {
     title: "投射フリースロー",
     description:
-      "角度・初速・スピンを指定してリングを狙う、投射運動のミニゲーム。",
+      "角度・推力・スピンを指定してリングを狙う、投射運動のミニゲーム。球の質量も計算に効く。",
   },
   install: {
     button: "このアプリをインストール",
@@ -59,7 +59,7 @@ export const robotFreethrowEn: RobotFreethrowDict = {
   shell: {
     title: "Projectile Freethrow",
     description:
-      "Dial in angle, initial speed, and spin to sink the shot in a projectile physics mini-game.",
+      "Dial in angle, thrust, and spin to sink the shot—ball mass changes how far the same thrust flies.",
   },
   install: {
     button: "Install this app",

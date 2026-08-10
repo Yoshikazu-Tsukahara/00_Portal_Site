@@ -1366,11 +1366,17 @@ export const appsKo: AppsDictionary = {
       removeHistoryAria: "기록에서 “{value}” 제거",
     },
     preview: {
+      tabAria: "편집과 미리보기 전환",
+      sourceHeading: "편집",
+      sourceHint: "변수를 넣기 전의 원고입니다. {{변수명}} 을 그대로 편집할 수 있습니다.",
       heading: "미리보기",
+      previewHint: "변수를 넣은 결과입니다(읽기 전용). 여기서 복사하세요.",
       subject: "제목",
       body: "본문",
       emptySubject: "(제목 없음)",
       emptyBody: "(본문 없음)",
+      reload: "템플릿 다시 불러오기",
+      reloadHint: "저장된 템플릿 내용으로 원고를 되돌립니다",
     },
     copy: {
       button: "복사",

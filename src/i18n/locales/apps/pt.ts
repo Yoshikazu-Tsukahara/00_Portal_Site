@@ -1366,11 +1366,17 @@ export const appsPt: AppsDictionary = {
       removeHistoryAria: "Remover “{value}” do histórico",
     },
     preview: {
+      tabAria: "Alternar entre editar e pré-visualização",
+      sourceHeading: "Editar",
+      sourceHint: "Rascunho antes das variáveis. Você pode editar {{marcadores}}.",
       heading: "Pré-visualização",
+      previewHint: "Texto com variáveis aplicadas (somente leitura). Copie daqui.",
       subject: "Assunto",
       body: "Corpo",
       emptySubject: "(Sem assunto)",
       emptyBody: "(Sem corpo)",
+      reload: "Recarregar modelo",
+      reloadHint: "Restaurar o rascunho a partir do modelo salvo",
     },
     copy: {
       button: "Copiar",

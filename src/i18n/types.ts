@@ -176,6 +176,11 @@ export type Dictionary = {
     devicePcRecommended: string;
     /** 全アプリ共通：端末内保存・非送信の注記 */
     localDataNote: string;
+    /** ライブラリ一覧フィルター */
+    filterAria: string;
+    filterAll: string;
+    filterUnpinned: string;
+    filterEmpty: string;
   };
   genres: Record<
     string,

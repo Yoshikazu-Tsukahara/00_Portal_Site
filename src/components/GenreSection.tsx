@@ -9,7 +9,7 @@ import {
   type KeyboardEvent,
 } from "react";
 import StoreAppCard from "@/components/StoreAppCard";
-import type { Genre } from "@/data/tools";
+import type { Genre, Tool } from "@/data/tools";
 import { useI18n } from "@/i18n";
 
 /** レール1枚分の幅（カード幅 + gap）と、画面に収まる枚数 */
@@ -38,13 +38,17 @@ function getRailPageMetrics(el: HTMLDivElement): {
 
 export default function GenreSection({
   genre,
+  tools: toolsProp,
   animationDelayMs = 0,
 }: {
   genre: Genre;
+  /** 省略時は genre.tools（フィルター適用時に上書き） */
+  tools?: Tool[];
   /** セクション全体のフェードイン遅延（ms） */
   animationDelayMs?: number;
 }) {
   const { t } = useI18n();
+  const tools = toolsProp ?? genre.tools;
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [canPrev, setCanPrev] = useState(false);
   const [canNext, setCanNext] = useState(false);
@@ -73,7 +77,7 @@ export default function GenreSection({
       el.removeEventListener("scroll", syncScrollState);
       ro.disconnect();
     };
-  }, [syncScrollState, genre.tools.length]);
+  }, [syncScrollState, tools.length]);
 
   /** 矢印／キー：画面に収まる枚数ぶん（例: 3枚 or 4枚）まとめて送る */
   const scrollByPage = (dir: -1 | 1) => {
@@ -160,7 +164,7 @@ export default function GenreSection({
         tabIndex={0}
         onKeyDown={onRailKeyDown}
       >
-        {genre.tools.map((tool, index) => (
+        {tools.map((tool, index) => (
           <div
             key={
               tool.comingSoon ? `${genre.id}-coming-soon-${index}` : tool.id
