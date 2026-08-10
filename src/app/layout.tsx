@@ -23,7 +23,7 @@ const notoSansJp = Noto_Sans_JP({
 export const metadata: Metadata = {
   title: "Blank Note",
   description:
-    "外部送信ゼロ・完全ローカル動作の個人開発ツールを、文房具テイストのランチャーでまとめたポータルサイトです。",
+    "入力・ファイルは端末内で処理する個人開発ツールを、文房具テイストのランチャーでまとめたポータルサイトです。",
   icons: {
     icon: [
       { url: "/icons/blank-note-32.png", sizes: "32x32", type: "image/png" },

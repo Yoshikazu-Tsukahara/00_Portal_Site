@@ -522,7 +522,7 @@ export default function LinkStockerPage() {
               <p className="mt-1.5 text-sm text-zinc-400">{copy.empty.hint}</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
               {filtered.map((link) => (
                 <LinkCard
                   key={link.id}

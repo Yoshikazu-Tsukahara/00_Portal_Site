@@ -9,7 +9,7 @@ type Props = {
 };
 
 /**
- * 「外部送信ゼロ・完全ローカル動作」の安心バッジ。
+ * 「入力・ファイルは端末内で処理」の安心バッジ。
  * サイトタイトル横など、サイト枠に常駐させる。
  */
 export default function LocalOnlyBadge({

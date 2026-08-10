@@ -143,20 +143,20 @@ export const es: PartialDictionary = {
     environmentLabel: "Entorno",
     noticeLabel: "Aviso",
     localOnly:
-      "🔒 Este sitio funciona 100% en local y no envía tus archivos ni datos a un servidor. Tampoco usa cookies de seguimiento personal. Solo medimos visitas y usos anonimizados para mejorar el sitio.",
+      "🔒 Los archivos y entradas de las herramientas se procesan y guardan en el navegador por defecto; el operador no recoge ni conserva su contenido. Sin cookies de seguimiento personal. Solo medimos visitas y usos anonimizados. Algunas herramientas pueden hacer peticiones de red limitadas (ver Privacidad).",
   },
   messages: {
     environment:
-      "Todas las herramientas funcionan en el navegador. Sin instalación, en Windows, Mac o móvil.",
+      "Las herramientas suelen funcionar en el navegador, sin instalación. Usables en Windows, Mac o móvil; algunas son para PC (sin móvil). Ver el sitio y el primer uso requieren internet; no garantizamos uso offline de todo el sitio.",
     persistence:
       "Los datos se guardan en LocalStorage del navegador. Pueden borrarse al limpiar caché o cambiar de dispositivo. Exporta con regularidad lo importante.",
     safety:
-      "Los datos que introduces se guardan solo en tu navegador. Nunca se envían al servidor del operador.",
-    safetyShort: "Los datos quedan en el navegador; no se envían al servidor.",
+      "Los datos que introduces se guardan en tu dispositivo (navegador) por defecto. El operador no recoge ni conserva ese contenido en servidores. Eso no cubre riesgos del dispositivo: haz copias de lo importante.",
+    safetyShort: "Los datos quedan en el navegador por defecto; el operador no recoge el contenido.",
     privacyBanner:
-      "Todo se procesa en este navegador. Nada se envía fuera.",
+      "Archivos y entradas se procesan en este navegador por defecto. El operador no recoge ni guarda su contenido.",
     privacyBannerShort:
-      "Todo ocurre en este navegador. Nada se envía al exterior.",
+      "En el dispositivo por defecto. No guardamos tus entradas.",
   },
   dataManager: {
     buttonTitle: "Datos (copia y restauración)",
@@ -169,7 +169,7 @@ export const es: PartialDictionary = {
     backupReasonHeading: "Por qué hacer copia",
     export: "📥 Exportar (guardar)",
     import: "📤 Importar (cargar)",
-    noData: "Esta herramienta solo actúa en la sesión y no guarda ajustes. Nada se envía fuera.",
+    noData: "Esta herramienta solo actúa en la sesión y no guarda ajustes. El operador no recoge ni guarda el contenido procesado.",
     exportOk: "Copia descargada.",
     exportFail: "Error al exportar.",
     importOk: "Datos cargados.",

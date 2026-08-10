@@ -77,6 +77,9 @@ export type CharacterRelationDict = {
     resetToDefault: string;
     favoriteHint: string;
     defaultHint: string;
+    /** 原点を画面中央へ */
+    goToOrigin: string;
+    goToOriginTitle: string;
   };
   fields: {
     name: string;
@@ -216,9 +219,11 @@ export const characterRelationJa: CharacterRelationDict = {
     memorize: "今の表示を記憶",
     reset: "表示をリセット",
     resetToFavorite: "記憶した表示位置へ戻す",
-    resetToDefault: "初期表示（100%・左上）へ戻す",
+    resetToDefault: "初期表示（100%・原点中央）へ戻す",
     favoriteHint: "リセットで記憶したズーム・位置へ戻ります",
     defaultHint: "Ctrl＋ホイールでもズームできます",
+    goToOrigin: "原点へ",
+    goToOriginTitle: "原点（＋）を画面の中央に表示",
   },
   fields: {
     name: "名前",
@@ -362,9 +367,11 @@ export const characterRelationEn: CharacterRelationDict = {
     memorize: "Remember view",
     reset: "Reset view",
     resetToFavorite: "Restore remembered zoom and position",
-    resetToDefault: "Reset to default (100%, top-left)",
+    resetToDefault: "Reset to default (100%, origin centered)",
     favoriteHint: "Reset restores your remembered zoom and scroll",
     defaultHint: "Ctrl + wheel also zooms",
+    goToOrigin: "Origin",
+    goToOriginTitle: "Center the origin (+) in the view",
   },
   fields: {
     name: "Name",

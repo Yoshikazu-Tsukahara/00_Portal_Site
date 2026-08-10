@@ -5,7 +5,7 @@ import { LINK_STOCKER_MANIFEST_PATH } from "./manifest";
 export const metadata: Metadata = {
   title: "とりあえずキープ",
   description:
-    "とりあえずキープしたい URL を、OGP サムネ付きカードで視覚的に管理。",
+    "とりあえずキープしたい URL を、OGP サムネ付きカードで視覚的に管理。公開メタ取得のため URL のみサーバー経由の通信があります。",
   applicationName: "とりあえずキープ",
   appleWebApp: {
     capable: true,

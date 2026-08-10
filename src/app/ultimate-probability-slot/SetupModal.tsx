@@ -149,21 +149,18 @@ export default function SetupModal({
         aria-labelledby={titleId}
         className="flex max-h-[92vh] w-full max-w-lg flex-col overflow-hidden rounded-t-3xl border border-zinc-800 bg-zinc-950 font-mono text-zinc-100 shadow-2xl sm:rounded-2xl"
       >
-        <div className="flex items-center justify-between border-b border-zinc-800 px-5 py-4">
-          <div>
-            <h2
-              id={titleId}
-              className="text-base font-semibold tracking-tight text-zinc-50"
-            >
-              {copy.title}
-            </h2>
-            <p className="mt-0.5 text-xs text-zinc-500">{copy.subtitle}</p>
-          </div>
+        <div className="flex items-center justify-between gap-3 border-b border-zinc-800 px-5 py-3.5">
+          <h2
+            id={titleId}
+            className="min-w-0 text-base font-semibold tracking-tight text-zinc-50"
+          >
+            {copy.title}
+          </h2>
           {initial ? (
             <button
               type="button"
               onClick={onClose}
-              className="rounded-md px-2 py-1 text-sm text-zinc-500 transition-colors hover:bg-zinc-900 hover:text-zinc-200"
+              className="shrink-0 rounded-md px-2 py-1 text-sm text-zinc-500 transition-colors hover:bg-zinc-900 hover:text-zinc-200"
               aria-label={copy.cancel}
             >
               ✕
@@ -171,7 +168,7 @@ export default function SetupModal({
           ) : null}
         </div>
 
-        <div className="flex-1 space-y-5 overflow-y-auto px-5 py-4">
+        <div className="flex-1 space-y-4 overflow-y-auto px-5 py-4">
           <div className="grid grid-cols-2 gap-3">
             <Stepper
               label={copy.reelsLabel}
@@ -189,10 +186,6 @@ export default function SetupModal({
             />
           </div>
 
-          <p className="rounded-lg border border-zinc-800 bg-zinc-900/40 px-3 py-2 text-[11px] leading-relaxed text-zinc-400">
-            {copy.autoMissHint}
-          </p>
-
           {/* JP 画像のみカスタマイズ */}
           <section className="rounded-xl border border-amber-400/25 bg-amber-400/[0.04] p-4">
             <div className="mb-3 flex items-baseline justify-between gap-2">
@@ -204,7 +197,7 @@ export default function SetupModal({
               </span>
             </div>
 
-            <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-stretch">
+            <div className="flex flex-col items-center gap-3 sm:flex-row sm:items-center">
               <div className="flex h-28 w-28 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-zinc-700 bg-black shadow-[inset_0_0_24px_rgba(0,0,0,0.6)]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -214,7 +207,7 @@ export default function SetupModal({
                 />
               </div>
 
-              <div className="flex min-w-0 flex-1 flex-col justify-center gap-2">
+              <div className="flex min-w-0 w-full flex-1 flex-col justify-center gap-2 sm:w-auto">
                 <label className="slot-spin-btn !py-2.5 cursor-pointer text-center !text-xs !tracking-[0.16em]">
                   {busy ? "…" : copy.uploadButton}
                   <input
@@ -237,9 +230,6 @@ export default function SetupModal({
                 >
                   {copy.resetJackpot}
                 </button>
-                <p className="text-[10px] leading-relaxed text-zinc-500">
-                  {copy.uploadHint}
-                </p>
               </div>
             </div>
           </section>

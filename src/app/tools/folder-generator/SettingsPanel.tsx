@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { useCallback, useRef, useState } from "react";
 import { fmt, useI18n } from "@/i18n";
 import type { FolderGeneratorDict } from "@/i18n/apps/folderGenerator";
-import { type VariableToken } from "./types";
+import { normalizeDateFormat, type VariableToken } from "./types";
 import { extractColumnValuesFromFile } from "./parseSpreadsheet";
 import { countListItems } from "./listUtils";
 import { getVariableMeta } from "./variableMeta";
@@ -172,21 +172,24 @@ function VariableSettingsCard({
             <select
               id={`${token.id}-format`}
               className="input-field w-full !py-1.5"
-              value={token.date.format}
+              value={normalizeDateFormat(token.date.format)}
               onChange={(e) =>
                 onChange(token.id, {
                   date: {
                     ...token.date,
-                    format: e.target.value as VariableToken["date"]["format"],
+                    format: normalizeDateFormat(e.target.value),
                   },
                 })
               }
             >
               <option value="yyyymmdd">{dateFormats.yyyymmdd}</option>
               <option value="yyyy-mm-dd">{dateFormats.yyyymmddDash}</option>
-              <option value="yyyy/mm/dd">{dateFormats.yyyymmddSlash}</option>
+              <option value="yyyy_mm_dd">{dateFormats.yyyymmddUnderscore}</option>
               <option value="yyyy年mm月dd日">{dateFormats.yyyymmddJa}</option>
             </select>
+            <p className="mt-1 text-[10px] leading-snug text-zinc-400">
+              {settingsCopy.folderNameHint}
+            </p>
           </div>
           <div>
             <label className={labelClass} htmlFor={`${token.id}-increment`}>

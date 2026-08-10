@@ -143,20 +143,20 @@ export const pt: PartialDictionary = {
     environmentLabel: "Ambiente",
     noticeLabel: "Aviso",
     localOnly:
-      "🔒 Este site funciona 100% localmente e não envia arquivos nem dados a um servidor. Sem cookies de rastreamento pessoal. Medimos apenas visitas e usos anonimizados.",
+      "🔒 Arquivos e entradas das ferramentas são processados e salvos no navegador por padrão; o operador não coleta nem guarda o conteúdo. Sem cookies de rastreamento pessoal. Medimos visitas e usos anonimizados. Alguns apps podem fazer pedidos de rede limitados (ver Privacidade).",
   },
   messages: {
     environment:
-      "Todas as ferramentas rodam no navegador. Sem instalação, no Windows, Mac ou celular.",
+      "As ferramentas geralmente rodam no navegador, sem instalação. Usáveis no Windows, Mac ou celular; algumas são para PC (sem mobile). Ver o site e o primeiro uso precisam de internet; não garantimos offline em todo o site.",
     persistence:
       "Os dados ficam no LocalStorage. Limpar cache ou trocar de aparelho pode apagá-los. Exporte o importante com frequência.",
     safety:
-      "O que você digita fica só no seu navegador e nunca vai para o servidor do operador.",
-    safetyShort: "Dados só no navegador; nada é enviado ao servidor.",
+      "O que você digita fica no seu aparelho (navegador) por padrão. O operador não coleta nem guarda esse conteúdo em servidores. Isso não cobre riscos do aparelho — faça backup do importante.",
+    safetyShort: "Dados no navegador por padrão; o operador não coleta o conteúdo.",
     privacyBanner:
-      "Tudo é processado neste navegador. Nada é enviado para fora.",
+      "Arquivos e entradas são processados neste navegador por padrão. O operador não coleta nem guarda o conteúdo.",
     privacyBannerShort:
-      "Tudo roda neste navegador. Nada é enviado para fora.",
+      "No aparelho por padrão. Não guardamos suas entradas.",
   },
   dataManager: {
     buttonTitle: "Dados (backup e restauração)",
@@ -169,7 +169,7 @@ export const pt: PartialDictionary = {
     backupReasonHeading: "Por que fazer backup",
     export: "📥 Exportar (salvar)",
     import: "📤 Importar (carregar)",
-    noData: "Esta ferramenta não guarda configurações. Nada é enviado para fora.",
+    noData: "Esta ferramenta não guarda configurações. O operador não coleta nem guarda o conteúdo processado.",
     exportOk: "Arquivo de backup baixado.",
     exportFail: "Falha ao exportar.",
     importOk: "Dados carregados.",

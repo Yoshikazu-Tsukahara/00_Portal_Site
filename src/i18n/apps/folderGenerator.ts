@@ -39,6 +39,8 @@ export type FolderGeneratorDict = {
     includeGitkeep: string;
     noVariables: string;
     format: string;
+    /** フォルダ名に使えない文字の注記 */
+    folderNameHint: string;
     increment: string;
     baseDate: string;
     numberStyle: string;
@@ -59,7 +61,7 @@ export type FolderGeneratorDict = {
   dateFormats: {
     yyyymmdd: string;
     yyyymmddDash: string;
-    yyyymmddSlash: string;
+    yyyymmddUnderscore: string;
     yyyymmddJa: string;
   };
   dateIncrement: {
@@ -139,6 +141,8 @@ export const folderGeneratorJa: FolderGeneratorDict = {
     includeGitkeep: ".gitkeep を同梱",
     noVariables: "変数未配置",
     format: "フォーマット",
+    folderNameHint:
+      "フォルダ名に使えない文字（ / \\ : * ? \" < > | ）は _ に置き換わります。",
     increment: "増分",
     baseDate: "基準日",
     numberStyle: "種類",
@@ -159,7 +163,7 @@ export const folderGeneratorJa: FolderGeneratorDict = {
   dateFormats: {
     yyyymmdd: "yyyymmdd（例: 20240719）",
     yyyymmddDash: "yyyy-mm-dd（例: 2024-07-19）",
-    yyyymmddSlash: "yyyy/mm/dd（例: 2024/07/19）",
+    yyyymmddUnderscore: "yyyy_mm_dd（例: 2024_07_19）",
     yyyymmddJa: "yyyy年mm月dd日",
   },
   dateIncrement: {
@@ -240,6 +244,8 @@ export const folderGeneratorEn: FolderGeneratorDict = {
     includeGitkeep: "Include .gitkeep files",
     noVariables: "No variables placed yet",
     format: "Format",
+    folderNameHint:
+      "Characters not allowed in folder names ( / \\ : * ? \" < > | ) are replaced with _.",
     increment: "Increment",
     baseDate: "Base date",
     numberStyle: "Style",
@@ -260,7 +266,7 @@ export const folderGeneratorEn: FolderGeneratorDict = {
   dateFormats: {
     yyyymmdd: "yyyymmdd (e.g. 20240719)",
     yyyymmddDash: "yyyy-mm-dd (e.g. 2024-07-19)",
-    yyyymmddSlash: "yyyy/mm/dd (e.g. 2024/07/19)",
+    yyyymmddUnderscore: "yyyy_mm_dd (e.g. 2024_07_19)",
     yyyymmddJa: "yyyy年mm月dd日 (Japanese style)",
   },
   dateIncrement: {

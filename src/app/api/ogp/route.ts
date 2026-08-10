@@ -55,6 +55,99 @@ function absUrl(maybe: string | undefined, base: URL): string | null {
   }
 }
 
+/** Instagram / Facebook CDN の stp=c{x}.{y}.{w}.{h}a で y=0（上端起点）か */
+function isTopCroppedCdnImage(url: string | null | undefined): boolean {
+  if (!url) return false;
+  try {
+    const stp = new URL(url).searchParams.get("stp") || "";
+    return /^c\d+\.0\.\d+\.\d+a/i.test(stp);
+  } catch {
+    return false;
+  }
+}
+
+/** カード表示向けに「上端クロップ・極小サムネ」を避けるスコア（高いほど良い） */
+function scorePreviewImage(url: string): number {
+  try {
+    const u = new URL(url);
+    const stp = u.searchParams.get("stp") || "";
+    let score = 0;
+    if (isTopCroppedCdnImage(url)) score -= 30;
+    else if (/^c\d+\.([1-9]\d*)\.\d+\.\d+a/i.test(stp)) score += 8;
+    else if (stp) score += 12;
+    else score += 6;
+    if (/_s100x100|_s150x150|_s206x206|s100x100|s150x150|s206x206/i.test(stp)) {
+      score -= 40;
+    }
+    if (/s640x640|s720x720|p640x640|s1080x1080|e35/i.test(stp)) score += 4;
+    if (
+      u.hostname.includes("cdninstagram.com") ||
+      u.hostname.includes("fbcdn.net")
+    ) {
+      score += 1;
+    }
+    return score;
+  } catch {
+    return -100;
+  }
+}
+
+function preferPreviewImage(
+  a: string | null | undefined,
+  b: string | null | undefined,
+): string | null {
+  if (a && b) {
+    return scorePreviewImage(a) >= scorePreviewImage(b) ? a : b;
+  }
+  return a || b || null;
+}
+
+/**
+ * HTML 全体からプレビュー画像候補を集め、上端クロップよりマシなものを選ぶ。
+ * Instagram の og:image は顔が切れる上端クロップ付き URL になりやすい。
+ */
+function pickBestPreviewImageFromHtml(
+  html: string,
+  base: URL,
+  current: string | null,
+): string | null {
+  const raw = new Set<string>();
+  if (current) raw.add(current);
+
+  const patterns: RegExp[] = [
+    /property=["']og:image(?::url|:secure_url)?["'][^>]*content=["']([^"']+)["']/gi,
+    /content=["']([^"']+)["'][^>]*property=["']og:image(?::url|:secure_url)?["']/gi,
+    /name=["']twitter:image(?::src)?["'][^>]*content=["']([^"']+)["']/gi,
+    /"display_url"\s*:\s*"([^"]+)"/g,
+    /"thumbnail_src"\s*:\s*"([^"]+)"/g,
+    /https:\\\/\\\/scontent[^"\\]+/g,
+    /https:\/\/scontent[^"'\\\s]+/g,
+  ];
+
+  for (const re of patterns) {
+    for (const m of html.matchAll(re)) {
+      const piece = (m[1] || m[0] || "")
+        .replace(/\\u0026/g, "&")
+        .replace(/\\\//g, "/")
+        .replace(/&amp;/g, "&");
+      if (piece.startsWith("http")) raw.add(piece);
+    }
+  }
+
+  let best: string | null = current;
+  let bestScore = current ? scorePreviewImage(current) : -1000;
+  for (const candidate of raw) {
+    const abs = absUrl(candidate, base);
+    if (!abs) continue;
+    const score = scorePreviewImage(abs);
+    if (score > bestScore) {
+      best = abs;
+      bestScore = score;
+    }
+  }
+  return best;
+}
+
 function pickMeta(
   $: cheerio.CheerioAPI,
   selectors: string[],
@@ -342,7 +435,7 @@ function parseOgp(html: string, finalUrl: URL): OgpResult {
     jsonLd.description ||
     "";
 
-  const image = absUrl(
+  const metaImage = absUrl(
     pickMeta($, [
       'meta[property="og:image:secure_url"]',
       'meta[property="og:image:url"]',
@@ -363,6 +456,8 @@ function parseOgp(html: string, finalUrl: URL): OgpResult {
       undefined,
     finalUrl,
   );
+  // Instagram 等は og:image が上端クロップ済みになりがちなので、HTML 内の別候補も比較
+  const image = pickBestPreviewImageFromHtml(html, finalUrl, metaImage);
 
   const siteName =
     pickMeta($, [
@@ -409,7 +504,8 @@ function mergeWithHints(
     url: base.url,
     title: (base.title || hints.title || host).slice(0, 200),
     description: (base.description || hints.description || "").slice(0, 400),
-    image: base.image || hintImage,
+    // ブックマークレットの og:image が上端クロップのとき、サーバー側の方が良ければそちらを使う
+    image: preferPreviewImage(base.image, hintImage),
     siteName: base.siteName || host,
     favicon: base.favicon || faviconFallbackUrl(host),
   };

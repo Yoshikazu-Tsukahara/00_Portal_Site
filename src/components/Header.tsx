@@ -20,6 +20,23 @@ const SUPPORT_URL = "https://buy.stripe.com/bJebIU2u3gi6gQP22bgbm01";
 /** fillViewport 用。実測したサイト Header 高さを CSS 変数へ反映する */
 const SITE_HEADER_HEIGHT_VAR = "--site-header-height";
 
+/** サイトタイトル（ワードマーク画像） */
+const BRAND_WORDMARK_SRC = "/brand/blank-note-wordmark.png";
+const BRAND_WORDMARK_SIZE = { width: 1024, height: 129 } as const;
+
+function BrandWordmark({ className }: { className?: string }) {
+  return (
+    <img
+      src={BRAND_WORDMARK_SRC}
+      alt=""
+      width={BRAND_WORDMARK_SIZE.width}
+      height={BRAND_WORDMARK_SIZE.height}
+      draggable={false}
+      className={`site-header__wordmark ${className ?? ""}`.trim()}
+    />
+  );
+}
+
 /** 応援（ハート）アイコン */
 function SupportHeartIcon({ className }: { className?: string }) {
   return (
@@ -45,6 +62,7 @@ type NavKey = "home" | "library";
 /** ホーム／ライブラリのスライド・アンダーバー付きナビ */
 function HeaderPrimaryNav({
   homeLabel,
+  homeAriaLabel,
   libraryLabel,
   homeActive,
   libraryActive,
@@ -53,6 +71,7 @@ function HeaderPrimaryNav({
   gapClassName,
 }: {
   homeLabel: ReactNode;
+  homeAriaLabel: string;
   libraryLabel: ReactNode;
   homeActive: boolean;
   libraryActive: boolean;
@@ -114,11 +133,12 @@ function HeaderPrimaryNav({
     ro.observe(nav);
     ro.observe(target);
     window.addEventListener("resize", measure);
+    // ワードマークは固定サイズなので homeLabel は依存に入れない
     return () => {
       ro.disconnect();
       window.removeEventListener("resize", measure);
     };
-  }, [activeKey, homeLabel, libraryLabel]);
+  }, [activeKey, libraryLabel]);
 
   return (
     <nav
@@ -129,6 +149,7 @@ function HeaderPrimaryNav({
       <Link
         ref={homeRef}
         href="/"
+        aria-label={homeAriaLabel}
         aria-current={homeActive ? "page" : undefined}
         className={`${brandClassName}${
           homeActive
@@ -214,13 +235,16 @@ export default function Header() {
           className={`site-header__bar site-header__bar--compact flex items-center gap-1.5 py-2.5 lg:hidden ${contentClassName}`}
         >
           <HeaderPrimaryNav
-            homeLabel={t.brand}
+            homeLabel={
+              <BrandWordmark className="h-3.5 w-auto max-w-[8.5rem] object-contain object-left" />
+            }
+            homeAriaLabel={t.brand}
             libraryLabel={t.header.libraryNav}
             homeActive={homeActive}
             libraryActive={libraryActive}
             gapClassName="gap-2"
-            brandClassName="site-header__brand inline-flex h-7 min-w-0 shrink items-center truncate font-display text-base font-bold leading-none tracking-tight transition-colors"
-            libraryClassName="inline-flex h-7 shrink-0 items-center font-display ml-3 text-[10px] font-bold uppercase leading-none tracking-[0.1em] transition-colors sm:ml-4"
+            brandClassName="site-header__brand inline-flex h-7 min-w-0 shrink-0 items-center justify-center leading-none transition-opacity"
+            libraryClassName="inline-flex h-7 shrink-0 items-center justify-center font-display ml-3 text-[10px] font-bold uppercase leading-none tracking-[0.1em] transition-colors sm:ml-4"
           />
 
           <div className="ml-auto flex shrink-0 items-center gap-1">
@@ -249,13 +273,16 @@ export default function Header() {
         >
           <div className="relative z-10 flex min-w-0 flex-1 items-center gap-3.5">
             <HeaderPrimaryNav
-              homeLabel={t.brand}
+              homeLabel={
+                <BrandWordmark className="h-4 w-auto object-contain object-left" />
+              }
+              homeAriaLabel={t.brand}
               libraryLabel={t.header.libraryNav}
               homeActive={homeActive}
               libraryActive={libraryActive}
               gapClassName="gap-3.5"
-              brandClassName="inline-flex h-8 shrink-0 items-center font-display text-xl font-bold leading-none tracking-tight transition-colors"
-              libraryClassName="inline-flex h-8 shrink-0 items-center font-display whitespace-nowrap text-xs font-bold uppercase leading-none tracking-[0.12em] transition-colors"
+              brandClassName="site-header__brand inline-flex h-8 shrink-0 items-center justify-center leading-none transition-opacity"
+              libraryClassName="inline-flex h-8 shrink-0 items-center justify-center font-display whitespace-nowrap text-xs font-bold uppercase leading-none tracking-[0.12em] transition-colors"
             />
             <LocalOnlyBadge className="local-only-badge--beside-title" />
           </div>

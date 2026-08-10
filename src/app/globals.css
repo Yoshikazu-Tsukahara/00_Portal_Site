@@ -979,9 +979,10 @@ html[data-layout-mode="full"] .layout-content {
     min-width: 0;
   }
 
-  /* ホーム／ライブラリ：スライドするアクセント・アンダーバー */
+  /* ホーム／ライブラリ：スライドするアクセント・アンダーバー
+     下余白を nav 自体に付けると、ヘッダー行の items-center 基準で中身が上へずれるので付けない */
   .site-header__nav {
-    @apply items-center pb-1;
+    @apply items-center;
   }
   .site-header__nav-link--active {
     @apply text-zinc-900;
@@ -992,9 +993,22 @@ html[data-layout-mode="full"] .layout-content {
   .site-header__nav-link--idle.site-header__brand {
     @apply text-zinc-900/70 hover:text-zinc-900;
   }
+  /* ワードマーク画像は文字色が効かないため、不透明度で同様のニュアンスを出す */
+  .site-header__wordmark {
+    display: block;
+    user-select: none;
+  }
+  .site-header__nav-link--idle.site-header__brand .site-header__wordmark {
+    opacity: 0.72;
+  }
+  .site-header__nav-link--idle.site-header__brand:hover .site-header__wordmark,
+  .site-header__nav-link--active.site-header__brand .site-header__wordmark {
+    opacity: 1;
+  }
   .site-header__nav-indicator {
-    @apply pointer-events-none absolute bottom-0 left-0 h-0.5 rounded-full;
-    /* 既存の decoration-[var(--accent)] に近い見え方 */
+    @apply pointer-events-none absolute left-0 h-0.5 rounded-full;
+    /* リンク直下に置き、nav のパディング非対称で文字が上ずれしないようにする */
+    bottom: -0.2rem;
     background-color: var(--accent);
     box-shadow: 0 0 0 0.5px color-mix(in srgb, var(--accent) 80%, #64748b);
   }

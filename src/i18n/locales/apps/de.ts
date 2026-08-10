@@ -462,7 +462,9 @@ export const appsDe: AppsDictionary = {
       includeGitkeep: ".gitkeep-Dateien einbeziehen",
       noVariables: "Noch keine Variablen platziert",
       format: "Format",
-      increment: "Schrittung",
+      folderNameHint:
+        "Zeichen, die in Ordnernamen unzulässig sind ( / \\ : * ? \" < > | ), werden durch _ ersetzt.",
+      increment: "Schreitung",
       baseDate: "Basisdatum",
       numberStyle: "Stil",
       startNumber: "Start bei",
@@ -482,7 +484,7 @@ export const appsDe: AppsDictionary = {
     dateFormats: {
       yyyymmdd: "yyyymmdd (z. B. 20240719)",
       yyyymmddDash: "yyyy-mm-dd (z. B. 2024-07-19)",
-      yyyymmddSlash: "yyyy/mm/dd (z. B. 2024/07/19)",
+      yyyymmddUnderscore: "yyyy_mm_dd (z. B. 2024_07_19)",
       yyyymmddJa: "yyyy年mm月dd日 (japanischer Stil)",
     },
     dateIncrement: {
@@ -1003,9 +1005,11 @@ export const appsDe: AppsDictionary = {
       memorize: "Ansicht merken",
       reset: "Ansicht zurücksetzen",
       resetToFavorite: "Gemerkte Zoomstufe und Position wiederherstellen",
-      resetToDefault: "Auf Standard zurücksetzen (100 %, oben links)",
+      resetToDefault: "Auf Standard zurücksetzen (100 %, Ursprung mittig)",
       favoriteHint: "Zurücksetzen stellt gemerkten Zoom und Scroll wieder her",
       defaultHint: "Strg + Mausrad zoomt ebenfalls",
+      goToOrigin: "Ursprung",
+      goToOriginTitle: "Ursprung (+) in die Bildmitte setzen",
     },
     fields: {
       name: "Name",
@@ -1694,7 +1698,8 @@ export const appsDe: AppsDictionary = {
   linkStocker: {
     shell: {
       title: "Link Stocker",
-      description: "„Vielleicht später“-URLs als visuelle Karten mit OGP-Vorschaubildern ablegen",
+      description:
+        "„Vielleicht später“-URLs als visuelle Karten mit OGP-Vorschaubildern ablegen (URL-Abruf für öffentliche Metadaten kann über den Site-Server laufen)",
     },
     form: {
       placeholder: "https:// einfügen",
@@ -1819,14 +1824,11 @@ export const appsDe: AppsDictionary = {
     },
     setup: {
       title: "Slot-Einstellungen",
-      subtitle: "Walzen und Symbolanzahl festlegen. Nur das Jackpot-Bild ist anpassbar.",
       reelsLabel: "Walzen",
       itemsLabel: "Symbole",
-      autoMissHint: "Miss-Icons sind klassische Slot-Symbole. Nur das Jackpot-Bild ist bearbeitbar.",
       jackpotTag: "★ JACKPOT",
       jackpotImageOnly: "IMAGE ONLY",
       uploadButton: "Bild hochladen",
-      uploadHint: "JPEG / PNG usw. Verkleinert und lokal gespeichert.",
       resetJackpot: "Auf Standard zurücksetzen",
       save: "Mit diesem Setup starten",
       cancel: "Abbrechen",

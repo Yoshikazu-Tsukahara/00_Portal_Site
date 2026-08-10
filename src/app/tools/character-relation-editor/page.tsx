@@ -7,6 +7,7 @@ import DesktopOnlyGate from "@/components/DesktopOnlyGate";
 import { fmt, useI18n } from "@/i18n";
 import { loadLocalJson, useLocalStorageState } from "@/lib/localData";
 import CharacterModal from "./CharacterModal";
+import ClearConfirmModal from "./ClearConfirmModal";
 import DetailEditor from "./DetailEditor";
 import RelationCanvas from "./RelationCanvas";
 import { createSampleDiagram } from "./sample";
@@ -43,7 +44,10 @@ export default function CharacterRelationEditorPage() {
   );
   const [linkFromId, setLinkFromId] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
   const [mainTab, setMainTab] = useState<MainTab>("canvas");
+  /** サンプル読込後にキャンバスを原点中央へ戻すためのトークン */
+  const [recenterToken, setRecenterToken] = useState(0);
 
   const selectedCharacter = useMemo(
     () => data.characters.find((c) => c.id === selectedCharacterId) ?? null,
@@ -199,12 +203,19 @@ export default function CharacterRelationEditorPage() {
     if (hasData && !window.confirm(copy.confirmLoadSample)) return;
     setData(createSampleDiagram(locale));
     resetSelection();
+    setMainTab("canvas");
+    setRecenterToken((n) => n + 1);
   }
 
-  /** キャラクターと関係線をすべて消す */
+  /** キャラクターと関係線をすべて消す（確認ダイアログを開く） */
   function handleClearAll() {
     if (data.characters.length === 0 && data.relations.length === 0) return;
-    if (!window.confirm(copy.confirmClearAll)) return;
+    setClearConfirmOpen(true);
+  }
+
+  /** 確認後に実際にクリアする */
+  function confirmClearAll() {
+    setClearConfirmOpen(false);
     setData(emptyDiagram());
     resetSelection();
   }
@@ -353,6 +364,7 @@ export default function CharacterRelationEditorPage() {
                   onUpdateRelation={handleUpdateRelation}
                   onOpenDetail={openDetail}
                   onLoadSample={handleLoadSample}
+                  recenterToken={recenterToken}
                 />
               ) : (
                 <DetailEditor
@@ -370,6 +382,12 @@ export default function CharacterRelationEditorPage() {
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         onSave={handleSaveCharacter}
+      />
+      <ClearConfirmModal
+        open={clearConfirmOpen}
+        copy={copy}
+        onCancel={() => setClearConfirmOpen(false)}
+        onConfirm={confirmClearAll}
       />
     </AppShell>
   );

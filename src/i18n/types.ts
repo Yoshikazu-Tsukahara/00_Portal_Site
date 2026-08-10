@@ -78,7 +78,7 @@ export type Dictionary = {
     homeNav: string;
     /** ライブラリ（ストア）ナビ */
     libraryNav: string;
-    /** 外部送信ゼロ安心バッジ（通常） */
+    /** 端末内処理の安心バッジ（通常） */
     localOnlyBadge: string;
     /** 狭い画面向け短縮 */
     localOnlyBadgeShort: string;

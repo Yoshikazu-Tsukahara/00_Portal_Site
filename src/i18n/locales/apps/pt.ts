@@ -386,9 +386,11 @@ export const appsPt: AppsDictionary = {
       memorize: "Memorizar visualização",
       reset: "Redefinir visualização",
       resetToFavorite: "Restaurar zoom e posição memorizados",
-      resetToDefault: "Redefinir para o padrão (100%, canto superior esquerdo)",
+      resetToDefault: "Redefinir para o padrão (100%, origem ao centro)",
       favoriteHint: "Redefinir restaura o zoom e a rolagem memorizados",
       defaultHint: "Ctrl + roda do mouse também faz zoom",
+      goToOrigin: "Origem",
+      goToOriginTitle: "Centralizar a origem (+) na vista",
     },
     fields: {
       name: "Nome",
@@ -611,6 +613,8 @@ export const appsPt: AppsDictionary = {
       includeGitkeep: "Incluir arquivos .gitkeep",
       noVariables: "Nenhuma variável posicionada ainda",
       format: "Formato",
+      folderNameHint:
+        "Caracteres inválidos em nomes de pasta ( / \\ : * ? \" < > | ) são substituídos por _.",
       increment: "Incremento",
       baseDate: "Data base",
       numberStyle: "Estilo",
@@ -631,7 +635,7 @@ export const appsPt: AppsDictionary = {
     dateFormats: {
       yyyymmdd: "yyyymmdd (ex.: 20240719)",
       yyyymmddDash: "yyyy-mm-dd (ex.: 2024-07-19)",
-      yyyymmddSlash: "yyyy/mm/dd (ex.: 2024/07/19)",
+      yyyymmddUnderscore: "yyyy_mm_dd (ex.: 2024_07_19)",
       yyyymmddJa: "yyyy年mm月dd日 (estilo japonês)",
     },
     dateIncrement: {
@@ -856,7 +860,8 @@ export const appsPt: AppsDictionary = {
   linkStocker: {
     shell: {
       title: "Link Stocker",
-      description: "Guarde URLs de “ver depois” como cards visuais com miniaturas OGP",
+      description:
+        "Guarde URLs de “ver depois” como cards visuais com miniaturas OGP (a URL pode passar pelo servidor do site para metadados públicos)",
     },
     form: {
       placeholder: "Cole https://",
@@ -2080,14 +2085,11 @@ export const appsPt: AppsDictionary = {
     },
     setup: {
       title: "Configurações do Slot",
-      subtitle: "Defina os rolos e a quantidade de símbolos. Só a imagem do jackpot é personalizável.",
       reelsLabel: "Rolos",
       itemsLabel: "Símbolos",
-      autoMissHint: "Os ícones de erro são símbolos clássicos de slot. Só a imagem do jackpot é editável.",
       jackpotTag: "★ JACKPOT",
       jackpotImageOnly: "IMAGE ONLY",
       uploadButton: "Enviar imagem",
-      uploadHint: "JPEG / PNG etc. Reduzida e salva localmente.",
       resetJackpot: "Restaurar padrão",
       save: "Começar com esta configuração",
       cancel: "Cancelar",

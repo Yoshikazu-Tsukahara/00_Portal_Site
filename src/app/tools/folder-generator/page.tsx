@@ -40,6 +40,7 @@ import {
   createDefaultVariable,
   createFolderNode,
   isVariableToken,
+  normalizeFolderTree,
   type FolderNode,
   type VariableKind,
   type VariableToken,
@@ -324,10 +325,11 @@ export default function FolderGeneratorPage() {
   }
 
   function loadTemplate(template: SavedTemplate) {
-    setRoot(structuredClone(template.root));
+    const nextRoot = normalizeFolderTree(structuredClone(template.root));
+    setRoot(nextRoot);
     setTotalCount(template.totalCount);
     setIncludeGitkeep(template.includeGitkeep);
-    setActiveNodeId(template.root.id);
+    setActiveNodeId(nextRoot.id);
     setMessage(null);
     setError(null);
   }

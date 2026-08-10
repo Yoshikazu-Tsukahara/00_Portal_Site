@@ -1,9 +1,11 @@
 /**
  * 初回ユーザー向けの固定サンプル相関図。
+ * 原点 (0,0) を中心に配置し、線種・矢印・カード表示項目を一通り見せる。
  * ID は sample- 接頭辞で識別し、ワンクリックで丸ごと消せる。
  */
 
 import type { Locale } from "@/i18n";
+import { GRID_SIZE } from "./styles";
 import type { Character, DiagramData, Relation } from "./types";
 
 /** サンプルキャラ／関係の ID 接頭辞 */
@@ -21,6 +23,11 @@ export function isSampleDiagram(data: DiagramData): boolean {
   return data.characters.every((c) => c.id.startsWith(SAMPLE_ID_PREFIX));
 }
 
+/** グリッドに揃えた座標（サンプル配置用） */
+function g(n: number): number {
+  return Math.round(n / GRID_SIZE) * GRID_SIZE;
+}
+
 function ch(
   id: string,
   partial: Omit<Character, "id" | "avatarDataUrl">,
@@ -32,17 +39,22 @@ function ch(
   };
 }
 
-function rel(
-  id: string,
-  partial: Omit<Relation, "id">,
-): Relation {
+function rel(id: string, partial: Omit<Relation, "id">): Relation {
   return {
     id: `${SAMPLE_ID_PREFIX}${id}`,
     ...partial,
   };
 }
 
-/** 架空ライトノベル風のデモ相関図を生成 */
+/**
+ * 原点を中心にした架空ライトノベル風デモ。
+ * 配置イメージ（カード左上 ≈ グリッド座標）:
+ *
+ *           白峰
+ *    月夜    ＋    影衆
+ *           蒼
+ *    烈            澪
+ */
 export function createSampleDiagram(locale: Locale): DiagramData {
   const lang = sampleLocale(locale);
   const ids = {
@@ -51,6 +63,17 @@ export function createSampleDiagram(locale: Locale): DiagramData {
     retsu: `${SAMPLE_ID_PREFIX}ch-retsu`,
     shiromine: `${SAMPLE_ID_PREFIX}ch-shiromine`,
     kageshu: `${SAMPLE_ID_PREFIX}ch-kageshu`,
+    mio: `${SAMPLE_ID_PREFIX}ch-mio`,
+  };
+
+  /** 原点 (0,0) 付近にカード中心が来るよう左上をオフセット */
+  const pos = {
+    aoi: { x: g(-96), y: g(-48) },
+    tsukuyo: { x: g(-336), y: g(-240) },
+    shiromine: { x: g(72), y: g(-312) },
+    retsu: { x: g(-312), y: g(192) },
+    kageshu: { x: g(312), y: g(-72) },
+    mio: { x: g(192), y: g(192) },
   };
 
   if (lang === "ja") {
@@ -60,15 +83,14 @@ export function createSampleDiagram(locale: Locale): DiagramData {
           name: "蒼",
           avatarPreset: "boy",
           accent: "sky",
-          x: 260,
-          y: 280,
+          ...pos.aoi,
           details: {
             note: "寡黙な剣士／物語の主人公",
             nickname: "蒼き影",
             age: "17",
             gender: "男",
             appearance: "黒髪・青い瞳。学校の制服に帯刀",
-            goal: "失踪した姉の行方を追う",
+            goal: "失踪した姉・澪の行方を追う",
             secret: "実は影衆の血を引いている",
             relationMemo: "月夜とは幼馴染。烈とは剣術部でライバル",
             backstory: "港町で育ったが、姉の失踪をきっかけに学園都市へ。",
@@ -79,8 +101,7 @@ export function createSampleDiagram(locale: Locale): DiagramData {
           name: "月夜",
           avatarPreset: "girl",
           accent: "violet",
-          x: 620,
-          y: 180,
+          ...pos.tsukuyo,
           details: {
             note: "図書委員／主人公の幼馴染",
             nickname: "夜の灯",
@@ -94,31 +115,11 @@ export function createSampleDiagram(locale: Locale): DiagramData {
           },
           cardVisibleKeys: ["note", "nickname"],
         }),
-        ch("ch-retsu", {
-          name: "烈",
-          avatarPreset: "man",
-          accent: "rose",
-          x: 180,
-          y: 500,
-          details: {
-            note: "剣術部のエース／主人公のライバル",
-            nickname: "紅蓮",
-            age: "18",
-            gender: "男",
-            appearance: "赤みがかった髪。常に勝負を挑む眼差し",
-            goal: "最強の剣士として認められたい",
-            secret: "影衆から情報を求められている",
-            relationMemo: "蒼には素直になれない。影衆との距離が曖昧",
-            backstory: "武術一筋の家柄。負けず嫌いで口は悪いが根は真面目。",
-          },
-          cardVisibleKeys: ["note", "age"],
-        }),
         ch("ch-shiromine", {
           name: "白峰",
           avatarPreset: "woman",
           accent: "amber",
-          x: 480,
-          y: 60,
+          ...pos.shiromine,
           details: {
             note: "歴史学の講師／蒼の師匠",
             nickname: "静かな雷",
@@ -132,12 +133,29 @@ export function createSampleDiagram(locale: Locale): DiagramData {
           },
           cardVisibleKeys: ["note", "nickname"],
         }),
+        ch("ch-retsu", {
+          name: "烈",
+          avatarPreset: "man",
+          accent: "rose",
+          ...pos.retsu,
+          details: {
+            note: "剣術部のエース／主人公のライバル",
+            nickname: "紅蓮",
+            age: "18",
+            gender: "男",
+            appearance: "赤みがかった髪。常に勝負を挑む眼差し",
+            goal: "最強の剣士として認められたい",
+            secret: "影衆から情報を求められている",
+            relationMemo: "蒼には素直になれない。影衆との距離が曖昧",
+            backstory: "武術一筋の家柄。負けず嫌いで口は悪いが根は真面目。",
+          },
+          cardVisibleKeys: ["note", "age"],
+        }),
         ch("ch-kageshu", {
           name: "影衆",
           avatarPreset: "org",
           accent: "zinc",
-          x: 900,
-          y: 360,
+          ...pos.kageshu,
           details: {
             note: "秘密結社／物語の脅威",
             nickname: "",
@@ -150,6 +168,24 @@ export function createSampleDiagram(locale: Locale): DiagramData {
             backstory: "数百年続く影の組織。表社会には存在しないことになっている。",
           },
           cardVisibleKeys: ["note"],
+        }),
+        ch("ch-mio", {
+          name: "澪",
+          avatarPreset: "other",
+          accent: "emerald",
+          ...pos.mio,
+          details: {
+            note: "蒼の姉／行方不明",
+            nickname: "潮鳴り",
+            age: "20",
+            gender: "女",
+            appearance: "蒼に似た青い瞳。最後に目撃されたのは港の倉庫街",
+            goal: "（不明）影衆の契約を止めようとしていた？",
+            secret: "自ら影衆に近づいた可能性がある",
+            relationMemo: "蒼が探し続ける存在。白峰も過去を知る",
+            backstory: "表向きは留学。実際は禁じられた調査に踏み込み消息を絶った。",
+          },
+          cardVisibleKeys: ["note", "nickname", "goal"],
         }),
       ],
       relations: [
@@ -174,10 +210,24 @@ export function createSampleDiagram(locale: Locale): DiagramData {
           strokeStyle: "solid",
           arrowHead: "end",
         }),
+        rel("rel-tsukuyo-shiromine", {
+          fromId: ids.tsukuyo,
+          toId: ids.shiromine,
+          label: "相談",
+          strokeStyle: "solid",
+          arrowHead: "start",
+        }),
         rel("rel-kageshu-tsukuyo", {
           fromId: ids.kageshu,
           toId: ids.tsukuyo,
           label: "狙う",
+          strokeStyle: "dashed",
+          arrowHead: "end",
+        }),
+        rel("rel-aoi-mio", {
+          fromId: ids.aoi,
+          toId: ids.mio,
+          label: "探す",
           strokeStyle: "dashed",
           arrowHead: "end",
         }),
@@ -187,6 +237,20 @@ export function createSampleDiagram(locale: Locale): DiagramData {
           label: "内通？",
           strokeStyle: "dotted",
           arrowHead: "none",
+        }),
+        rel("rel-shiromine-kageshu", {
+          fromId: ids.shiromine,
+          toId: ids.kageshu,
+          label: "因縁",
+          strokeStyle: "dotted",
+          arrowHead: "both",
+        }),
+        rel("rel-mio-kageshu", {
+          fromId: ids.mio,
+          toId: ids.kageshu,
+          label: "接触？",
+          strokeStyle: "dashed",
+          arrowHead: "start",
         }),
       ],
     };
@@ -198,15 +262,14 @@ export function createSampleDiagram(locale: Locale): DiagramData {
         name: "Aoi",
         avatarPreset: "boy",
         accent: "sky",
-        x: 260,
-        y: 280,
+        ...pos.aoi,
         details: {
           note: "Quiet swordsman / protagonist",
           nickname: "Azure Shadow",
           age: "17",
           gender: "Male",
           appearance: "Black hair, blue eyes; wears a blade with the school uniform",
-          goal: "Find his missing sister",
+          goal: "Find his missing sister, Mio",
           secret: "He carries Shadow Guild blood",
           relationMemo: "Childhood friends with Tsukuyo; rivals Retsu in fencing",
           backstory: "Raised in a port town; moved to the academy city after his sister vanished.",
@@ -217,8 +280,7 @@ export function createSampleDiagram(locale: Locale): DiagramData {
         name: "Tsukuyo",
         avatarPreset: "girl",
         accent: "violet",
-        x: 620,
-        y: 180,
+        ...pos.tsukuyo,
         details: {
           note: "Library aide / childhood friend",
           nickname: "Night Lamp",
@@ -232,31 +294,11 @@ export function createSampleDiagram(locale: Locale): DiagramData {
         },
         cardVisibleKeys: ["note", "nickname"],
       }),
-      ch("ch-retsu", {
-        name: "Retsu",
-        avatarPreset: "man",
-        accent: "rose",
-        x: 180,
-        y: 500,
-        details: {
-          note: "Fencing ace / rival",
-          nickname: "Crimson Blaze",
-          age: "18",
-          gender: "Male",
-          appearance: "Reddish hair; always looking for a rematch",
-          goal: "Be recognized as the strongest swordsman",
-          secret: "The Shadow Guild is pressuring him for information",
-          relationMemo: "Can't be honest with Aoi; ties to the Guild are unclear",
-          backstory: "From a martial family. Blunt and competitive, but earnest.",
-        },
-        cardVisibleKeys: ["note", "age"],
-      }),
       ch("ch-shiromine", {
         name: "Shiromine",
         avatarPreset: "woman",
         accent: "amber",
-        x: 480,
-        y: 60,
+        ...pos.shiromine,
         details: {
           note: "History lecturer / Aoi's mentor",
           nickname: "Quiet Thunder",
@@ -270,12 +312,29 @@ export function createSampleDiagram(locale: Locale): DiagramData {
         },
         cardVisibleKeys: ["note", "nickname"],
       }),
+      ch("ch-retsu", {
+        name: "Retsu",
+        avatarPreset: "man",
+        accent: "rose",
+        ...pos.retsu,
+        details: {
+          note: "Fencing ace / rival",
+          nickname: "Crimson Blaze",
+          age: "18",
+          gender: "Male",
+          appearance: "Reddish hair; always looking for a rematch",
+          goal: "Be recognized as the strongest swordsman",
+          secret: "The Shadow Guild is pressuring him for information",
+          relationMemo: "Can't be honest with Aoi; ties to the Guild are unclear",
+          backstory: "From a martial family. Blunt and competitive, but earnest.",
+        },
+        cardVisibleKeys: ["note", "age"],
+      }),
       ch("ch-kageshu", {
         name: "Shadow Guild",
         avatarPreset: "org",
         accent: "zinc",
-        x: 900,
-        y: 360,
+        ...pos.kageshu,
         details: {
           note: "Secret society / main threat",
           nickname: "",
@@ -288,6 +347,24 @@ export function createSampleDiagram(locale: Locale): DiagramData {
           backstory: "A centuries-old shadow order. Officially, it does not exist.",
         },
         cardVisibleKeys: ["note"],
+      }),
+      ch("ch-mio", {
+        name: "Mio",
+        avatarPreset: "other",
+        accent: "emerald",
+        ...pos.mio,
+        details: {
+          note: "Aoi's sister / missing",
+          nickname: "Tide Song",
+          age: "20",
+          gender: "Female",
+          appearance: "Blue eyes like Aoi's; last seen near the harbor warehouses",
+          goal: "(Unknown) Perhaps trying to stop the Guild's pact",
+          secret: "May have approached the Guild of her own will",
+          relationMemo: "The person Aoi keeps searching for; Shiromine knows her past",
+          backstory: "Said to be studying abroad. In truth she pursued a forbidden lead and vanished.",
+        },
+        cardVisibleKeys: ["note", "nickname", "goal"],
       }),
     ],
     relations: [
@@ -312,10 +389,24 @@ export function createSampleDiagram(locale: Locale): DiagramData {
         strokeStyle: "solid",
         arrowHead: "end",
       }),
+      rel("rel-tsukuyo-shiromine", {
+        fromId: ids.tsukuyo,
+        toId: ids.shiromine,
+        label: "Confides in",
+        strokeStyle: "solid",
+        arrowHead: "start",
+      }),
       rel("rel-kageshu-tsukuyo", {
         fromId: ids.kageshu,
         toId: ids.tsukuyo,
         label: "Hunting",
+        strokeStyle: "dashed",
+        arrowHead: "end",
+      }),
+      rel("rel-aoi-mio", {
+        fromId: ids.aoi,
+        toId: ids.mio,
+        label: "Searching",
         strokeStyle: "dashed",
         arrowHead: "end",
       }),
@@ -325,6 +416,20 @@ export function createSampleDiagram(locale: Locale): DiagramData {
         label: "Secret ties?",
         strokeStyle: "dotted",
         arrowHead: "none",
+      }),
+      rel("rel-shiromine-kageshu", {
+        fromId: ids.shiromine,
+        toId: ids.kageshu,
+        label: "Old feud",
+        strokeStyle: "dotted",
+        arrowHead: "both",
+      }),
+      rel("rel-mio-kageshu", {
+        fromId: ids.mio,
+        toId: ids.kageshu,
+        label: "Contact?",
+        strokeStyle: "dashed",
+        arrowHead: "start",
       }),
     ],
   };

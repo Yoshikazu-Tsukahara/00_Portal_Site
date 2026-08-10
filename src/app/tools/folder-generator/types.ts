@@ -2,12 +2,33 @@
 /** ツールボックスから置ける変数の種類 */
 export type VariableKind = "date" | "number" | "list";
 
+/** 日付フォーマット（/ はフォルダ名に使えないため _ 区切りを用意） */
+export type DateFormat =
+  | "yyyymmdd"
+  | "yyyy-mm-dd"
+  | "yyyy_mm_dd"
+  | "yyyy年mm月dd日";
+
 /** 日付ブロックの設定 */
 export type DateSettings = {
-  format: "yyyymmdd" | "yyyy-mm-dd" | "yyyy/mm/dd" | "yyyy年mm月dd日";
+  format: DateFormat;
   increment: "fixed" | "daily";
   baseDate: string;
 };
+
+/** 旧フォーマット（yyyy/mm/dd）などを現行値へ正規化 */
+export function normalizeDateFormat(format: string): DateFormat {
+  if (format === "yyyy/mm/dd") return "yyyy_mm_dd";
+  if (
+    format === "yyyymmdd" ||
+    format === "yyyy-mm-dd" ||
+    format === "yyyy_mm_dd" ||
+    format === "yyyy年mm月dd日"
+  ) {
+    return format;
+  }
+  return "yyyymmdd";
+}
 
 /** 番号ブロックの設定 */
 export type NumberSettings = {
@@ -53,6 +74,24 @@ export type FolderNode = {
 
 export function isVariableToken(token: FormatToken): token is VariableToken {
   return token.type !== "text";
+}
+
+/** 保存済みツリーの日付フォーマットを現行値へ揃える */
+export function normalizeFolderTree(node: FolderNode): FolderNode {
+  return {
+    ...node,
+    tokens: node.tokens.map((token) => {
+      if (!isVariableToken(token) || token.type !== "date") return token;
+      return {
+        ...token,
+        date: {
+          ...token.date,
+          format: normalizeDateFormat(token.date.format),
+        },
+      };
+    }),
+    children: node.children.map(normalizeFolderTree),
+  };
 }
 
 /** 今日の日付を YYYY-MM-DD で返す */

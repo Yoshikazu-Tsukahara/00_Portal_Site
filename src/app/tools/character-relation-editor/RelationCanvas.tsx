@@ -3,6 +3,7 @@
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -23,11 +24,12 @@ import {
   MAX_ZOOM,
   MIN_ZOOM,
   normalizeCanvasUiPrefs,
+  ORIGIN_PAD,
   RELATION_ARROW_HEADS,
   RELATION_STROKE_STYLES,
   VIEW_STORAGE_KEY,
-  WORLD_H,
-  WORLD_W,
+  WORLD_CONTENT_MIN,
+  WORLD_EDGE_PAD,
   ZOOM_STEP,
   type CanvasUiPrefs,
   type CanvasViewFavorite,
@@ -67,6 +69,7 @@ export default function RelationCanvas({
   onUpdateRelation,
   onOpenDetail,
   onLoadSample,
+  recenterToken = 0,
 }: {
   characters: Character[];
   relations: Relation[];
@@ -84,6 +87,8 @@ export default function RelationCanvas({
   onOpenDetail: (id: string) => void;
   /** 空キャンバスからのサンプル読込 */
   onLoadSample?: () => void;
+  /** 変わるたびに原点へ再センタリング（サンプル読込時など） */
+  recenterToken?: number;
 }) {
   const { t } = useI18n();
   const copy = t.apps.characterRelation;
@@ -102,6 +107,8 @@ export default function RelationCanvas({
   const skipLabelBlurRef = useRef(false);
   const zoomRef = useRef(zoom);
   const placementRef = useRef<PlacementMode>(prefs.placementMode);
+  /** ズーム適用後、レイアウト確定直後に合わせるスクロール先 */
+  const pendingScrollRef = useRef<{ left: number; top: number } | null>(null);
   zoomRef.current = zoom;
   placementRef.current = prefs.placementMode;
 
@@ -117,6 +124,24 @@ export default function RelationCanvas({
 
   const favorite = prefs.favorite;
   const placementMode = prefs.placementMode;
+  const didInitViewRef = useRef(false);
+
+  /** カード配置に応じて伸びる半無限コンテンツ領域（負座標は ORIGIN_PAD 側へはみ出し） */
+  const contentSize = useMemo(() => {
+    let maxX = WORLD_CONTENT_MIN;
+    let maxY = WORLD_CONTENT_MIN;
+    for (const c of characters) {
+      const h = cardHeights[c.id] ?? CARD_H;
+      maxX = Math.max(maxX, c.x + CARD_W + WORLD_EDGE_PAD);
+      maxY = Math.max(maxY, c.y + h + WORLD_EDGE_PAD);
+    }
+    return { w: Math.ceil(maxX), h: Math.ceil(maxY) };
+  }, [characters, cardHeights]);
+  const contentSizeRef = useRef(contentSize);
+  contentSizeRef.current = contentSize;
+
+  const worldW = ORIGIN_PAD + contentSize.w;
+  const worldH = ORIGIN_PAD + contentSize.h;
 
   function persistPrefs(next: CanvasUiPrefs) {
     setPrefs(next);
@@ -135,25 +160,81 @@ export default function RelationCanvas({
     labelInputRef.current?.select();
   }, [editingLabelId]);
 
+  /** ズーム変更後のスクロールを、描画レイアウトと同じフレームで確定させる */
+  useLayoutEffect(() => {
+    const pending = pendingScrollRef.current;
+    if (!pending) return;
+    pendingScrollRef.current = null;
+    const el = viewportRef.current;
+    if (!el) return;
+    el.scrollLeft = pending.left;
+    el.scrollTop = pending.top;
+    setScrollPos({ left: el.scrollLeft, top: el.scrollTop });
+  }, [zoom]);
+
+  /** 原点（＋）がビューポート中央に来るようスクロール */
+  const goToOrigin = useCallback((nextZoom?: number) => {
+    const el = viewportRef.current;
+    const z = clampZoom(nextZoom ?? zoomRef.current);
+    const target = el
+      ? {
+          left: ORIGIN_PAD * z - el.clientWidth / 2,
+          top: ORIGIN_PAD * z - el.clientHeight / 2,
+        }
+      : null;
+    zoomRef.current = z;
+    // ズーム値が同じだと useLayoutEffect が走らないので、その場合は即スクロール
+    if (el && target && z === zoom) {
+      el.scrollLeft = target.left;
+      el.scrollTop = target.top;
+      setScrollPos({ left: el.scrollLeft, top: el.scrollTop });
+      return;
+    }
+    if (target) pendingScrollRef.current = target;
+    setZoom(z);
+  }, [zoom]);
+
+  // 初回表示は原点を画面中央に
+  useEffect(() => {
+    if (didInitViewRef.current) return;
+    const el = viewportRef.current;
+    if (!el) return;
+    didInitViewRef.current = true;
+    goToOrigin(DEFAULT_ZOOM);
+  }, [goToOrigin]);
+
+  // サンプル読込など、外部からの再センタリング要求
+  useEffect(() => {
+    if (recenterToken <= 0) return;
+    goToOrigin(DEFAULT_ZOOM);
+  }, [recenterToken, goToOrigin]);
+
+  /**
+   * 指定座標（未指定ならビュー中央）を基準にズーム。
+   * scale と scroll を同一レイアウトフレームで合わせ、がたつきを防ぐ。
+   */
   const applyZoomAround = useCallback(
     (nextZoom: number, clientX?: number, clientY?: number) => {
       const el = viewportRef.current;
+      const prev = zoomRef.current;
       const z = clampZoom(nextZoom);
+      if (z === prev) return;
       if (!el) {
+        zoomRef.current = z;
         setZoom(z);
         return;
       }
       const rect = el.getBoundingClientRect();
       const cx = clientX ?? rect.left + rect.width / 2;
       const cy = clientY ?? rect.top + rect.height / 2;
-      const contentX = (el.scrollLeft + (cx - rect.left)) / zoomRef.current;
-      const contentY = (el.scrollTop + (cy - rect.top)) / zoomRef.current;
+      const contentX = (el.scrollLeft + (cx - rect.left)) / prev;
+      const contentY = (el.scrollTop + (cy - rect.top)) / prev;
+      zoomRef.current = z;
+      pendingScrollRef.current = {
+        left: contentX * z - (cx - rect.left),
+        top: contentY * z - (cy - rect.top),
+      };
       setZoom(z);
-      requestAnimationFrame(() => {
-        el.scrollLeft = contentX * z - (cx - rect.left);
-        el.scrollTop = contentY * z - (cy - rect.top);
-        setScrollPos({ left: el.scrollLeft, top: el.scrollTop });
-      });
     },
     [],
   );
@@ -164,8 +245,9 @@ export default function RelationCanvas({
     function onWheel(e: WheelEvent) {
       if (!(e.ctrlKey || e.metaKey)) return;
       e.preventDefault();
-      const delta = e.deltaY > 0 ? -ZOOM_STEP : ZOOM_STEP;
-      applyZoomAround(zoomRef.current + delta, e.clientX, e.clientY);
+      // トラックパッドの連続入力に合わせて等比ズーム（ボタンの ±0.1 刻みとは別）
+      const factor = Math.exp(-e.deltaY * 0.0018);
+      applyZoomAround(zoomRef.current * factor, e.clientX, e.clientY);
     }
     el.addEventListener("wheel", onWheel, { passive: false });
     return () => el.removeEventListener("wheel", onWheel);
@@ -179,8 +261,17 @@ export default function RelationCanvas({
       const z = zoomRef.current;
       const dx = (e.clientX - drag.startX) / z;
       const dy = (e.clientY - drag.startY) / z;
-      const x = Math.max(8, drag.origX + dx);
-      const y = Math.max(8, drag.origY + dy);
+      // 原点より手前（負座標）も可。パッド内に収める
+      const size = contentSizeRef.current;
+      const min = -(ORIGIN_PAD - GRID_SIZE * 2);
+      const x = Math.min(
+        Math.max(min, drag.origX + dx),
+        size.w - GRID_SIZE,
+      );
+      const y = Math.min(
+        Math.max(min, drag.origY + dy),
+        size.h - GRID_SIZE,
+      );
       onMoveCharacter(drag.id, x, y);
     }
 
@@ -189,10 +280,24 @@ export default function RelationCanvas({
         const z = zoomRef.current;
         const dx = (e.clientX - drag.startX) / z;
         const dy = (e.clientY - drag.startY) / z;
-        let x = Math.max(8, drag.origX + dx);
-        let y = Math.max(8, drag.origY + dy);
-        x = Math.max(0, snapToGrid(x, GRID_SIZE));
-        y = Math.max(0, snapToGrid(y, GRID_SIZE));
+        const size = contentSizeRef.current;
+        const min = -(ORIGIN_PAD - GRID_SIZE * 2);
+        let x = Math.min(
+          Math.max(min, drag.origX + dx),
+          size.w - GRID_SIZE,
+        );
+        let y = Math.min(
+          Math.max(min, drag.origY + dy),
+          size.h - GRID_SIZE,
+        );
+        x = Math.min(
+          Math.max(min, snapToGrid(x, GRID_SIZE)),
+          size.w - GRID_SIZE,
+        );
+        y = Math.min(
+          Math.max(min, snapToGrid(y, GRID_SIZE)),
+          size.h - GRID_SIZE,
+        );
         onMoveCharacter(drag.id, x, y);
       }
       setDrag(null);
@@ -225,19 +330,24 @@ export default function RelationCanvas({
   }
 
   function resetView() {
-    const el = viewportRef.current;
-    const target = favorite ?? {
-      zoom: DEFAULT_ZOOM,
-      scrollLeft: 0,
-      scrollTop: 0,
-    };
-    setZoom(clampZoom(target.zoom));
-    requestAnimationFrame(() => {
-      if (!el) return;
-      el.scrollLeft = target.scrollLeft;
-      el.scrollTop = target.scrollTop;
-      setScrollPos({ left: el.scrollLeft, top: el.scrollTop });
-    });
+    if (favorite) {
+      const el = viewportRef.current;
+      const z = clampZoom(favorite.zoom);
+      zoomRef.current = z;
+      if (el && z === zoom) {
+        el.scrollLeft = favorite.scrollLeft;
+        el.scrollTop = favorite.scrollTop;
+        setScrollPos({ left: el.scrollLeft, top: el.scrollTop });
+        return;
+      }
+      pendingScrollRef.current = {
+        left: favorite.scrollLeft,
+        top: favorite.scrollTop,
+      };
+      setZoom(z);
+      return;
+    }
+    goToOrigin(DEFAULT_ZOOM);
   }
 
   function startDrag(e: ReactPointerEvent, ch: Character) {
@@ -336,24 +446,46 @@ export default function RelationCanvas({
       >
         <div
           style={{
-            width: WORLD_W * zoom,
-            height: WORLD_H * zoom,
+            width: worldW * zoom,
+            height: worldH * zoom,
             position: "relative",
           }}
         >
           <div
-            className="absolute left-0 top-0 origin-top-left transition-transform duration-150 ease-out"
+            className="absolute left-0 top-0 origin-top-left will-change-transform"
             style={{
-              width: WORLD_W,
-              height: WORLD_H,
+              width: worldW,
+              height: worldH,
               transform: `scale(${zoom})`,
             }}
           >
+            {/* 論理原点 (0,0) を ORIGIN_PAD だけずらした作業領域 */}
+            <div
+              className="absolute"
+              style={{
+                left: ORIGIN_PAD,
+                top: ORIGIN_PAD,
+                width: contentSize.w,
+                height: contentSize.h,
+              }}
+            >
+            {/* 原点マーカー（グリッド交点に合わせた＋） */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute z-[1]"
+              style={{ left: 0, top: 0 }}
+              title="origin"
+            >
+              <span className="absolute left-0 top-1/2 h-px w-3.5 -translate-x-1/2 -translate-y-1/2 bg-zinc-400/90" />
+              <span className="absolute left-1/2 top-0 h-3.5 w-px -translate-x-1/2 -translate-y-1/2 bg-zinc-400/90" />
+              <span className="absolute left-1/2 top-1/2 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-zinc-500/80" />
+            </div>
+
             {/* 関係線（SVG） */}
             <svg
               className="pointer-events-none absolute left-0 top-0 overflow-visible"
-              width={WORLD_W}
-              height={WORLD_H}
+              width={contentSize.w}
+              height={contentSize.h}
             >
               <defs>
                 <marker
@@ -551,28 +683,8 @@ export default function RelationCanvas({
             {/* キャラクターカード */}
             <div
               className="relative"
-              style={{ width: WORLD_W, height: WORLD_H }}
+              style={{ width: contentSize.w, height: contentSize.h }}
             >
-              {characters.length === 0 ? (
-                <div className="absolute left-1/2 top-1/3 flex w-[min(18rem,90%)] -translate-x-1/2 flex-col items-center gap-3 text-center">
-                  <p className="text-sm text-zinc-400">{copy.canvas.empty}</p>
-                  {onLoadSample ? (
-                    <div className="flex flex-col items-center gap-1.5">
-                      <button
-                        type="button"
-                        onClick={onLoadSample}
-                        className="btn-secondary !px-3 !py-1.5 text-xs"
-                      >
-                        {copy.canvas.emptyLoadSample}
-                      </button>
-                      <p className="text-[10px] leading-relaxed text-zinc-400">
-                        {copy.sample.hint}
-                      </p>
-                    </div>
-                  ) : null}
-                </div>
-              ) : null}
-
               {characters.map((ch) => {
                 const active = ch.id === selectedCharacterId;
                 const linkingFrom = linkFromId === ch.id;
@@ -596,9 +708,33 @@ export default function RelationCanvas({
                 );
               })}
             </div>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* 空状態はビューポート中央（スクロール非依存） */}
+      {characters.length === 0 ? (
+        <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center p-4">
+          <div className="pointer-events-auto flex w-[min(18rem,90%)] flex-col items-center gap-3 text-center">
+            <p className="text-sm text-zinc-400">{copy.canvas.empty}</p>
+            {onLoadSample ? (
+              <div className="flex flex-col items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={onLoadSample}
+                  className="btn-secondary !px-3 !py-1.5 text-xs"
+                >
+                  {copy.canvas.emptyLoadSample}
+                </button>
+                <p className="text-[10px] leading-relaxed text-zinc-400">
+                  {copy.sample.hint}
+                </p>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
 
       {/* 線種・矢印パネル（選択時） */}
       {selectedRelation ? (
@@ -739,6 +875,15 @@ export default function RelationCanvas({
         <div className="flex overflow-hidden rounded-md border border-zinc-200/90 bg-white/95 shadow-md backdrop-blur-sm">
           <button
             type="button"
+            title={copy.view.goToOriginTitle}
+            aria-label={copy.view.goToOriginTitle}
+            onClick={() => goToOrigin()}
+            className="border-r border-zinc-100 px-2.5 py-1.5 text-[11px] font-medium text-zinc-600 transition-colors hover:bg-zinc-50"
+          >
+            {copy.view.goToOrigin}
+          </button>
+          <button
+            type="button"
             title={copy.view.memorize}
             onClick={memorizeView}
             className="border-r border-zinc-100 px-2.5 py-1.5 text-[11px] font-medium text-zinc-600 transition-colors hover:bg-zinc-50"
@@ -756,7 +901,7 @@ export default function RelationCanvas({
             {copy.view.reset}
           </button>
         </div>
-        <p className="max-w-[12rem] text-right text-[10px] leading-snug text-zinc-400">
+        <p className="max-w-[14rem] text-right text-[10px] leading-snug text-zinc-400">
           {favorite ? copy.view.favoriteHint : copy.view.defaultHint}
         </p>
       </div>

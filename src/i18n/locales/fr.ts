@@ -143,20 +143,20 @@ export const fr: PartialDictionary = {
     environmentLabel: "Environnement",
     noticeLabel: "Avis",
     localOnly:
-      "🔒 Ce site fonctionne 100 % en local et n’envoie ni fichiers ni saisies à un serveur. Pas de cookies de suivi personnel. Nous ne mesurons que des visites et usages anonymisés.",
+      "🔒 Les fichiers et saisies des outils sont traités et stockés dans le navigateur par défaut ; l’opérateur ne collecte ni ne conserve leur contenu. Pas de cookies de suivi personnel. Nous mesurons des visites et usages anonymisés. Certains outils peuvent faire des requêtes réseau limitées (voir Confidentialité).",
   },
   messages: {
     environment:
-      "Tous les outils tournent dans le navigateur. Sans installation, sur Windows, Mac ou mobile.",
+      "Les outils tournent en général dans le navigateur, sans installation. Utilisables sur Windows, Mac ou mobile ; certains sont orientés PC (non mobile). La consultation et la première utilisation nécessitent Internet ; le hors-ligne pour tout le site n’est pas garanti.",
     persistence:
       "Les données sont dans le LocalStorage du navigateur. Elles peuvent disparaître après un vidage de cache. Exportez régulièrement l’essentiel.",
     safety:
-      "Vos données restent dans votre navigateur et ne sont jamais envoyées au serveur de l’opérateur.",
-    safetyShort: "Données locales uniquement ; rien n’est envoyé au serveur.",
+      "Vos données restent sur votre appareil (navigateur) par défaut. L’opérateur ne collecte ni ne conserve ce contenu sur ses serveurs. Cela ne couvre pas les risques liés à l’appareil : sauvegardez l’essentiel.",
+    safetyShort: "Données dans le navigateur par défaut ; l’opérateur ne collecte pas le contenu.",
     privacyBanner:
-      "Tout est traité dans ce navigateur. Rien n’est envoyé à l’extérieur.",
+      "Fichiers et saisies sont traités dans ce navigateur par défaut. L’opérateur ne collecte ni ne stocke leur contenu.",
     privacyBannerShort:
-      "Tout se passe dans ce navigateur. Rien n’est envoyé ailleurs.",
+      "Sur l’appareil par défaut. Nous ne conservons pas vos saisies.",
   },
   dataManager: {
     buttonTitle: "Données (sauvegarde et restauration)",
@@ -169,7 +169,7 @@ export const fr: PartialDictionary = {
     backupReasonHeading: "Pourquoi sauvegarder",
     export: "📥 Exporter (sauver)",
     import: "📤 Importer (charger)",
-    noData: "Cet outil n’enregistre aucun réglage. Rien n’est envoyé à l’extérieur.",
+    noData: "Cet outil n’enregistre aucun réglage. L’opérateur ne collecte ni ne stocke le contenu traité.",
     exportOk: "Fichier de sauvegarde téléchargé.",
     exportFail: "Échec de l’export.",
     importOk: "Données chargées.",

@@ -31,14 +31,11 @@ export type UltimateProbabilitySlotDict = {
   };
   setup: {
     title: string;
-    subtitle: string;
     reelsLabel: string;
     itemsLabel: string;
-    autoMissHint: string;
     jackpotTag: string;
     jackpotImageOnly: string;
     uploadButton: string;
-    uploadHint: string;
     resetJackpot: string;
     save: string;
     cancel: string;
@@ -183,15 +180,11 @@ export const ultimateProbabilitySlotJa: UltimateProbabilitySlotDict = {
   },
   setup: {
     title: "スロット設定",
-    subtitle: "リール数と絵柄数で確率を決め、当たり画像だけ差し替え。",
     reelsLabel: "リール数",
     itemsLabel: "絵柄の種類",
-    autoMissHint:
-      "ハズレは王道絵柄が自動配置。変えられるのはジャックポット画像だけです。",
     jackpotTag: "★ JACKPOT",
     jackpotImageOnly: "IMAGE ONLY",
     uploadButton: "画像をアップロード",
-    uploadHint: "JPEG / PNG など。端末内で縮小して保存します。",
     resetJackpot: "デフォルトに戻す",
     save: "この設定で開始",
     cancel: "キャンセル",
@@ -380,15 +373,11 @@ export const ultimateProbabilitySlotEn: UltimateProbabilitySlotDict = {
   },
   setup: {
     title: "Slot Settings",
-    subtitle: "Set reels and symbol count. Only the jackpot image is custom.",
     reelsLabel: "Reels",
     itemsLabel: "Symbols",
-    autoMissHint:
-      "Miss icons are classic slot symbols. Only the jackpot image is editable.",
     jackpotTag: "★ JACKPOT",
     jackpotImageOnly: "IMAGE ONLY",
     uploadButton: "Upload image",
-    uploadHint: "JPEG / PNG etc. Downsized and saved locally.",
     resetJackpot: "Reset to default",
     save: "Start with this setup",
     cancel: "Cancel",

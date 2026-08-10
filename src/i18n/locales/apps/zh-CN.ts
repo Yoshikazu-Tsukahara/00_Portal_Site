@@ -462,6 +462,8 @@ export const appsZhCN: AppsDictionary = {
       includeGitkeep: "包含 .gitkeep 文件",
       noVariables: "尚未放置变量",
       format: "格式",
+      folderNameHint:
+        "文件夹名不能使用的字符（ / \\ : * ? \" < > | ）会替换为 _。",
       increment: "递增",
       baseDate: "基准日期",
       numberStyle: "样式",
@@ -482,7 +484,7 @@ export const appsZhCN: AppsDictionary = {
     dateFormats: {
       yyyymmdd: "yyyymmdd（例如 20240719）",
       yyyymmddDash: "yyyy-mm-dd（例如 2024-07-19）",
-      yyyymmddSlash: "yyyy/mm/dd（例如 2024/07/19）",
+      yyyymmddUnderscore: "yyyy_mm_dd（例如 2024_07_19）",
       yyyymmddJa: "yyyy年mm月dd日（日式）",
     },
     dateIncrement: {
@@ -1003,9 +1005,11 @@ export const appsZhCN: AppsDictionary = {
       memorize: "记住视图",
       reset: "重置视图",
       resetToFavorite: "恢复记住的缩放与位置",
-      resetToDefault: "重置为默认（100%，左上角）",
+      resetToDefault: "重置为默认（100%，原点居中）",
       favoriteHint: "重置会恢复您记住的缩放与滚动",
       defaultHint: "Ctrl + 滚轮也可缩放",
+      goToOrigin: "原点",
+      goToOriginTitle: "将原点（＋）置于画面中央",
     },
     fields: {
       name: "姓名",
@@ -1694,7 +1698,8 @@ export const appsZhCN: AppsDictionary = {
   linkStocker: {
     shell: {
       title: "链接收藏",
-      description: "把“以后再说”的 URL 存成带 OGP 缩略图的视觉卡片",
+      description:
+        "把“以后再说”的 URL 存成带 OGP 缩略图的视觉卡片（公开元数据获取时 URL 可能经本站服务器）",
     },
     form: {
       placeholder: "粘贴 https://",
@@ -1819,14 +1824,11 @@ export const appsZhCN: AppsDictionary = {
     },
     setup: {
       title: "老虎机设置",
-      subtitle: "设置转轮与符号数量。仅大奖图片可自定义。",
       reelsLabel: "转轮",
       itemsLabel: "符号",
-      autoMissHint: "未中图标是经典老虎机符号。仅大奖图片可编辑。",
       jackpotTag: "★ 大奖",
       jackpotImageOnly: "仅图片",
       uploadButton: "上传图片",
-      uploadHint: "JPEG / PNG 等。缩小后本地保存。",
       resetJackpot: "恢复默认",
       save: "用此设置开始",
       cancel: "取消",

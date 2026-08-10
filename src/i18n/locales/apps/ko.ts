@@ -386,9 +386,11 @@ export const appsKo: AppsDictionary = {
       memorize: "보기 기억",
       reset: "보기 초기화",
       resetToFavorite: "기억한 줌·위치로 복원",
-      resetToDefault: "기본값으로 초기화 (100%, 왼쪽 위)",
+      resetToDefault: "기본값으로 초기화 (100%, 원점 중앙)",
       favoriteHint: "초기화 시 기억한 줌·스크롤로 복원",
       defaultHint: "Ctrl + 휠로도 확대·축소",
+      goToOrigin: "원점",
+      goToOriginTitle: "원점(+)을 화면 중앙에 표시",
     },
     fields: {
       name: "이름",
@@ -611,6 +613,8 @@ export const appsKo: AppsDictionary = {
       includeGitkeep: ".gitkeep 파일 포함",
       noVariables: "아직 배치된 변수 없음",
       format: "형식",
+      folderNameHint:
+        "폴더 이름에 쓸 수 없는 문자( / \\ : * ? \" < > | )는 _ 로 바뀝니다.",
       increment: "증가",
       baseDate: "기준 날짜",
       numberStyle: "스타일",
@@ -631,7 +635,7 @@ export const appsKo: AppsDictionary = {
     dateFormats: {
       yyyymmdd: "yyyymmdd (예: 20240719)",
       yyyymmddDash: "yyyy-mm-dd (예: 2024-07-19)",
-      yyyymmddSlash: "yyyy/mm/dd (예: 2024/07/19)",
+      yyyymmddUnderscore: "yyyy_mm_dd (예: 2024_07_19)",
       yyyymmddJa: "yyyy年mm月dd日 (일본식)",
     },
     dateIncrement: {
@@ -856,7 +860,8 @@ export const appsKo: AppsDictionary = {
   linkStocker: {
     shell: {
       title: "링크 스토커",
-      description: "“나중에 볼” URL을 OGP 썸네일 카드로 보관합니다",
+      description:
+        "“나중에 볼” URL을 OGP 썸네일 카드로 보관합니다(공개 메타 조회 시 URL이 사이트 서버를 거칠 수 있음)",
     },
     form: {
       placeholder: "https:// 붙여넣기",
@@ -2080,14 +2085,11 @@ export const appsKo: AppsDictionary = {
     },
     setup: {
       title: "슬롯 설정",
-      subtitle: "릴과 심볼 수를 설정하세요. 잭팟 이미지만 커스텀입니다.",
       reelsLabel: "릴",
       itemsLabel: "심볼",
-      autoMissHint: "미스 아이콘은 클래식 슬롯 심볼입니다. 잭팟 이미지만 편집할 수 있습니다.",
       jackpotTag: "★ JACKPOT",
       jackpotImageOnly: "IMAGE ONLY",
       uploadButton: "이미지 업로드",
-      uploadHint: "JPEG / PNG 등. 축소되어 로컬에 저장됩니다.",
       resetJackpot: "기본값으로 초기화",
       save: "이 설정으로 시작",
       cancel: "취소",

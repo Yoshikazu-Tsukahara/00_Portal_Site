@@ -1,5 +1,5 @@
 import type { FolderNode, FormatToken, VariableToken } from "./types";
-import { isVariableToken } from "./types";
+import { isVariableToken, normalizeDateFormat } from "./types";
 import { resolveNodeCount } from "./treeUtils";
 
 /** フォルダ名に使えない文字を置き換える */
@@ -38,11 +38,11 @@ function formatDateValue(
   const m = String(date.getMonth() + 1).padStart(2, "0");
   const d = String(date.getDate()).padStart(2, "0");
 
-  switch (format) {
+  switch (normalizeDateFormat(format)) {
     case "yyyy-mm-dd":
       return `${y}-${m}-${d}`;
-    case "yyyy/mm/dd":
-      return `${y}/${m}/${d}`;
+    case "yyyy_mm_dd":
+      return `${y}_${m}_${d}`;
     case "yyyy年mm月dd日":
       return `${y}年${m}月${d}日`;
     case "yyyymmdd":

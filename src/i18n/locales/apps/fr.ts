@@ -386,9 +386,11 @@ export const appsFr: AppsDictionary = {
       memorize: "Mémoriser la vue",
       reset: "Réinitialiser la vue",
       resetToFavorite: "Restaurer le zoom et la position mémorisés",
-      resetToDefault: "Réinitialiser par défaut (100 %, haut-gauche)",
+      resetToDefault: "Réinitialiser par défaut (100 %, origine au centre)",
       favoriteHint: "Réinitialiser restaure votre zoom et défilement mémorisés",
       defaultHint: "Ctrl + molette zoome aussi",
+      goToOrigin: "Origine",
+      goToOriginTitle: "Centrer l'origine (+) dans la vue",
     },
     fields: {
       name: "Nom",
@@ -611,6 +613,8 @@ export const appsFr: AppsDictionary = {
       includeGitkeep: "Inclure les fichiers .gitkeep",
       noVariables: "Aucune variable placée pour l’instant",
       format: "Format",
+      folderNameHint:
+        "Les caractères interdits dans les noms de dossier ( / \\ : * ? \" < > | ) sont remplacés par _.",
       increment: "Incrément",
       baseDate: "Date de base",
       numberStyle: "Style",
@@ -631,7 +635,7 @@ export const appsFr: AppsDictionary = {
     dateFormats: {
       yyyymmdd: "yyyymmdd (ex. 20240719)",
       yyyymmddDash: "yyyy-mm-dd (ex. 2024-07-19)",
-      yyyymmddSlash: "yyyy/mm/dd (ex. 2024/07/19)",
+      yyyymmddUnderscore: "yyyy_mm_dd (ex. 2024_07_19)",
       yyyymmddJa: "yyyy年mm月dd日 (style japonais)",
     },
     dateIncrement: {
@@ -856,7 +860,8 @@ export const appsFr: AppsDictionary = {
   linkStocker: {
     shell: {
       title: "Link Stocker",
-      description: "Gardez les URL « pour plus tard » en cartes visuelles avec miniatures OGP",
+      description:
+        "Gardez les URL « pour plus tard » en cartes visuelles avec miniatures OGP (l’URL peut passer par le serveur du site pour les métadonnées publiques)",
     },
     form: {
       placeholder: "Collez https://",
@@ -2080,14 +2085,11 @@ export const appsFr: AppsDictionary = {
     },
     setup: {
       title: "Paramètres de la machine",
-      subtitle: "Définissez les rouleaux et le nombre de symboles. Seule l’image jackpot est personnalisable.",
       reelsLabel: "Rouleaux",
       itemsLabel: "Symboles",
-      autoMissHint: "Les icônes de raté sont des symboles classiques de machine. Seule l’image jackpot est modifiable.",
       jackpotTag: "★ JACKPOT",
       jackpotImageOnly: "IMAGE SEULEMENT",
       uploadButton: "Importer une image",
-      uploadHint: "JPEG / PNG etc. Réduit et enregistré localement.",
       resetJackpot: "Réinitialiser par défaut",
       save: "Commencer avec cette config",
       cancel: "Annuler",

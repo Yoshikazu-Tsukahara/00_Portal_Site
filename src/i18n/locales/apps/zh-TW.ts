@@ -386,9 +386,11 @@ export const appsZhTW: AppsDictionary = {
       memorize: "記住檢視",
       reset: "重設檢視",
       resetToFavorite: "還原記住的縮放與位置",
-      resetToDefault: "重設為預設（100%、左上）",
+      resetToDefault: "重設為預設（100%、原點置中）",
       favoriteHint: "重設會還原您記住的縮放與捲動",
       defaultHint: "Ctrl + 滾輪也可縮放",
+      goToOrigin: "原點",
+      goToOriginTitle: "將原點（＋）置於畫面中央",
     },
     fields: {
       name: "名稱",
@@ -611,6 +613,8 @@ export const appsZhTW: AppsDictionary = {
       includeGitkeep: "包含 .gitkeep 檔案",
       noVariables: "尚未放置變數",
       format: "格式",
+      folderNameHint:
+        "資料夾名稱不能使用的字元（ / \\ : * ? \" < > | ）會替換為 _。",
       increment: "遞增",
       baseDate: "基準日期",
       numberStyle: "樣式",
@@ -631,7 +635,7 @@ export const appsZhTW: AppsDictionary = {
     dateFormats: {
       yyyymmdd: "yyyymmdd（例如 20240719）",
       yyyymmddDash: "yyyy-mm-dd（例如 2024-07-19）",
-      yyyymmddSlash: "yyyy/mm/dd（例如 2024/07/19）",
+      yyyymmddUnderscore: "yyyy_mm_dd（例如 2024_07_19）",
       yyyymmddJa: "yyyy年mm月dd日（日式）",
     },
     dateIncrement: {
@@ -856,7 +860,8 @@ export const appsZhTW: AppsDictionary = {
   linkStocker: {
     shell: {
       title: "暫時收藏連結",
-      description: "把「之後再看」的 URL 存成帶 OGP 縮圖的視覺卡片",
+      description:
+        "把「之後再看」的 URL 存成帶 OGP 縮圖的視覺卡片（公開中繼資料取得時 URL 可能經本站伺服器）",
     },
     form: {
       placeholder: "貼上 https://",
@@ -2080,14 +2085,11 @@ export const appsZhTW: AppsDictionary = {
     },
     setup: {
       title: "老虎機設定",
-      subtitle: "設定輪軸與符號數量。僅大獎圖片可自訂。",
       reelsLabel: "輪軸",
       itemsLabel: "符號",
-      autoMissHint: "落空圖示為經典老虎機符號。僅大獎圖片可編輯。",
       jackpotTag: "★ JACKPOT",
       jackpotImageOnly: "IMAGE ONLY",
       uploadButton: "上傳圖片",
-      uploadHint: "JPEG / PNG 等。會縮小並儲存在本機。",
       resetJackpot: "重設為預設",
       save: "以此設定開始",
       cancel: "取消",

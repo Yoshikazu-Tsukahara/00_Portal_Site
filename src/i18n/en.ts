@@ -30,7 +30,7 @@ export const en: Dictionary = {
       },
       {
         title: "Data stays on this device",
-        body: "Nothing is sent to a server—it lives in this browser. Back up from each app before clearing data.",
+        body: "Tool inputs and files are stored in this browser by default. Back up from each app before clearing data.",
       },
     ],
     dontShowAgain: "Don’t show again",
@@ -47,8 +47,8 @@ export const en: Dictionary = {
     menuClose: "Close menu",
     homeNav: "Home",
     libraryNav: "Library",
-    localOnlyBadge: "Zero outbound · fully local",
-    localOnlyBadgeShort: "Fully local",
+    localOnlyBadge: "Inputs & files stay on-device",
+    localOnlyBadgeShort: "On-device",
     layoutToggle: {
       aria: "Switch content width",
       caption: "Width",
@@ -123,7 +123,7 @@ export const en: Dictionary = {
     deviceMac: "Mac",
     devicePcRecommended: "PC recommended",
     localDataNote:
-      "Your inputs and files are processed and stored only on this device—never sent to a server. Clearing browser data can wipe them, so back up or export anything important.",
+      "Inputs and files are processed and stored on this device by default; the operator does not collect or keep their contents. Clearing browser data can wipe them, so back up or export anything important. See the Privacy Policy for details.",
     filterAria: "Filter apps",
     filterAll: "All",
     filterUnpinned: "Not pinned",
@@ -297,8 +297,8 @@ export const en: Dictionary = {
       tip: "Embedding focuses on MP3 and some video containers; other types may mainly rename. Large videos can take a while to save.",
     },
     "character-relation-editor": {
-      title: "Character Map",
-      description: "Map story ties with character cards and labeled links.",
+      title: "Story Map",
+      description: "Map a cast with character cards and labeled relationship links.",
       detail: [
         "Place characters as cards and connect them with labeled links to map a novel, script, or TTRPG cast. Seeing who ties to whom on one canvas makes gaps and contradictions easier to spot.",
         "Profiles, line labels, and arrow directions stick around; zoom and view position are remembered for long-lived lore docs. Built for desktop.",
@@ -514,7 +514,7 @@ export const en: Dictionary = {
     unpinFromHome: "Unpin from Home",
   },
   footer: {
-    tagline: "A stationery-styled toolbox that stays fully local",
+    tagline: "A stationery-styled toolbox built for local-first use",
     navAria: "Site information",
     contact: "Contact",
     terms: "Terms of Use",
@@ -522,21 +522,21 @@ export const en: Dictionary = {
     environmentLabel: "Environment",
     noticeLabel: "Notes",
     localOnly:
-      "🔒 The Site runs 100% locally: your files and inputs are never sent to our servers. We do not use cookies for personal tracking. For improvement only, we measure anonymized page views and tool-usage counts.",
+      "🔒 Tool files and inputs are processed and stored in your browser by default; the operator does not collect or keep their contents. We do not use cookies for personal tracking. For improvement only, we measure anonymized page views and tool-usage counts. Some tools may make limited network requests (e.g. public page metadata)—see the Privacy Policy.",
   },
   messages: {
     environment:
-      "Every tool on this site runs entirely in your browser. No install is required—use it on Windows, Mac, smartphones, and more.",
+      "Tools on this site generally run in your browser—no install required. You can use them on Windows, Mac, smartphones, and more, though some tools are PC-oriented (not mobile-supported). Viewing the site and first-time use need an internet connection; we do not guarantee site-wide offline use.",
     persistence:
       "Saved data lives in your browser’s LocalStorage. Clearing cache or site data, or switching browsers/devices, can erase it. Please export (“Save”) important data regularly and keep a copy yourself.",
     safety:
-      "Data you enter or create with these tools stays only on your computer (in the browser). Nothing is sent to the operator’s servers, so the risk of external leakage is effectively zero.",
+      "Data you enter or create with these tools is stored on your device (in the browser) by default. The operator does not collect or keep that content on servers. This does not cover device-side risks (loss, malware, shared PCs)—please back up anything important.",
     safetyShort:
-      "Data stays in your browser and is never sent to a server.",
+      "Data stays in your browser by default; the operator does not collect its contents.",
     privacyBanner:
-      "Everything runs in this browser. Your files and inputs stay on your device.",
+      "Files and inputs are processed in this browser by default. The operator does not collect or store their contents.",
     privacyBannerShort:
-      "Runs in this browser. Nothing is sent elsewhere.",
+      "On-device by default. We don’t keep your inputs.",
   },
   dataManager: {
     buttonTitle: "Data management (backup & restore)",
@@ -550,7 +550,7 @@ export const en: Dictionary = {
     export: "📥 Export data (Save)",
     import: "📤 Import data (Load)",
     noData:
-      "This tool only runs in the current session and has no settings to save. Nothing is sent externally.",
+      "This tool only runs in the current session and has no settings to save. The operator does not collect or store processed content.",
     exportOk: "Backup file downloaded.",
     exportFail: "Export failed.",
     importOk: "Data imported.",
@@ -763,7 +763,7 @@ export const en: Dictionary = {
     },
     privacy: {
       title: "Privacy Policy",
-      updatedAt: "August 1, 2026",
+      updatedAt: "August 11, 2026",
       sections: [
         {
           title: "1. Introduction",
@@ -775,30 +775,34 @@ export const en: Dictionary = {
           ],
         },
         {
-          title: "2. Key point: fully local processing",
+          title: "2. Key point: local processing of tool content",
           blocks: [
             {
               type: "callout",
               parts: [
                 {
-                  text: "All tools on the Site (including text processing, image compression, mail templates, PDF editing, folder generation, and any other features) ",
+                  text: "Tools on the Site ",
                 },
                 {
-                  text: "run only in your device’s browser (a local environment).",
+                  text: "generally run in your device’s browser.",
                   strong: true,
                 },
                 {
-                  text: " Text, images, PDFs, templates, settings, and any other data or files you enter, create, or upload are ",
+                  text: " Text, images, PDFs, templates, settings, and other content or files you enter, create, or upload are ",
                 },
                 {
-                  text: "never sent to, stored on, or collected by the Operator’s servers.",
+                  text: "not collected or stored by the Operator on servers.",
                   strong: true,
                 },
               ],
             },
             {
               type: "p",
-              text: "Information that needs to persist is kept only in LocalStorage (or similar) on your device. Tool content is never under the Operator’s control, and the Operator cannot view, analyze, or share it with third parties.",
+              text: "Information that needs to persist is kept in LocalStorage (or similar) on your device by default. Tool content is not under the Operator’s control, and the Operator cannot view, analyze, or share it with third parties.",
+            },
+            {
+              type: "p",
+              text: "However, limited network activity may occur for delivery, improvement, or helper features, as described below. We do not guarantee site-wide offline use or zero external communication.",
             },
           ],
         },
@@ -825,11 +829,7 @@ export const en: Dictionary = {
           blocks: [
             {
               type: "p",
-              text: "The Site runs 100% locally and never sends your files or inputs to a server. We also do not use cookies for personal tracking.",
-            },
-            {
-              type: "p",
-              text: "For site improvement only, we use Vercel Analytics to measure anonymized page views and tool-usage counts. Personally identifiable information and any files or inputs inside tools are not included.",
+              text: "For site improvement only, we use Vercel Analytics to measure anonymized page views and tool-usage counts. Personally identifiable information and any files or inputs inside tools are not included. We do not use cookies for personal tracking.",
             },
             {
               type: "p",
@@ -838,7 +838,28 @@ export const en: Dictionary = {
           ],
         },
         {
-          title: "5. Cookies and similar technologies",
+          title: "5. Limited network activity and third-party services",
+          blocks: [
+            {
+              type: "p",
+              text: "The following activity is not meant to collect tool content, but it may leave the browser or pass through the Site’s servers:",
+            },
+            {
+              type: "ul",
+              items: [
+                "Link Stocker: to show public page metadata (e.g. OGP), a URL you save may be fetched via the Site’s servers. Your kept list itself is stored in LocalStorage",
+                "Some apps or static pages may load fonts from external providers (e.g. Google Fonts)",
+                "User-initiated actions: support checkout (e.g. Stripe), social sharing, contact via your email app, and links to external sites",
+              ],
+            },
+            {
+              type: "p",
+              text: "Individual apps installed as PWAs may work offline within their supported scope; that is not a guarantee for the whole Site.",
+            },
+          ],
+        },
+        {
+          title: "6. Cookies and similar technologies",
           blocks: [
             {
               type: "p",
@@ -851,34 +872,34 @@ export const en: Dictionary = {
           ],
         },
         {
-          title: "6. Sharing with third parties",
+          title: "7. Sharing with third parties",
           blocks: [
             {
               type: "p",
-              text: "The Operator does not provide, sell, or share user content generated or stored on your device (it is never sent to servers, so there is nothing to share). Except as required by law, the Operator will not improperly disclose information within its control.",
+              text: "The Operator does not provide, sell, or share user content generated or stored on your device. Except as required by law, the Operator will not improperly disclose information within its control (such as anonymized analytics).",
             },
           ],
         },
         {
-          title: "7. External links",
+          title: "8. External links",
           blocks: [
             {
               type: "p",
-              text: "The Site may link to external sites (e.g. note). Please review each site’s privacy policy. The Operator is not responsible for linked sites’ content or practices.",
+              text: "The Site may link to external sites (payments, social networks, references, etc.). Please review each site’s privacy policy. The Operator is not responsible for linked sites’ content or practices.",
             },
           ],
         },
         {
-          title: "8. Disclaimer",
+          title: "9. Disclaimer",
           blocks: [
             {
               type: "p",
-              text: "Browser changes, device settings, or third-party service outages (hosting, analytics, etc.) may cause unexpected data loss or display issues. Please protect your data with your own backups. See also the Terms of Use.",
+              text: "Browser changes, device settings, or third-party service outages (hosting, analytics, font delivery, etc.) may cause unexpected data loss or display issues. Please protect your data with your own backups. See also the Terms of Use.",
             },
           ],
         },
         {
-          title: "9. Changes to this Policy",
+          title: "10. Changes to this Policy",
           blocks: [
             {
               type: "p",
@@ -887,7 +908,7 @@ export const en: Dictionary = {
           ],
         },
         {
-          title: "10. Contact",
+          title: "11. Contact",
           blocks: [
             {
               type: "p",

@@ -72,7 +72,7 @@ CSS 変数（`globals.css`）:
 - `src/components/icons/BackIconButton.tsx`
 - `src/components/icons/SettingsIconButton.tsx`
 - `src/components/icons/FavoriteIconButton.tsx`
-- `src/components/LocalOnlyBadge.tsx` … 「外部送信ゼロ・完全ローカル動作」安心バッジ
+- `src/components/LocalOnlyBadge.tsx` … 「入力・ファイルは端末内で処理」安心バッジ
 
 ---
 

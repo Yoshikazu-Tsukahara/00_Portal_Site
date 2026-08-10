@@ -462,6 +462,8 @@ export const appsEs: AppsDictionary = {
       includeGitkeep: "Incluir archivos .gitkeep",
       noVariables: "Aún no hay variables colocadas",
       format: "Formato",
+      folderNameHint:
+        "Los caracteres no permitidos en nombres de carpeta ( / \\ : * ? \" < > | ) se sustituyen por _.",
       increment: "Incremento",
       baseDate: "Fecha base",
       numberStyle: "Estilo",
@@ -482,7 +484,7 @@ export const appsEs: AppsDictionary = {
     dateFormats: {
       yyyymmdd: "yyyymmdd (p. ej. 20240719)",
       yyyymmddDash: "yyyy-mm-dd (p. ej. 2024-07-19)",
-      yyyymmddSlash: "yyyy/mm/dd (p. ej. 2024/07/19)",
+      yyyymmddUnderscore: "yyyy_mm_dd (p. ej. 2024_07_19)",
       yyyymmddJa: "yyyy年mm月dd日 (estilo japonés)",
     },
     dateIncrement: {
@@ -1003,9 +1005,11 @@ export const appsEs: AppsDictionary = {
       memorize: "Recordar vista",
       reset: "Restablecer vista",
       resetToFavorite: "Restaurar zoom y posición recordados",
-      resetToDefault: "Restablecer a predeterminado (100%, arriba a la izquierda)",
+      resetToDefault: "Restablecer a predeterminado (100%, origen centrado)",
       favoriteHint: "Restablecer recupera tu zoom y desplazamiento recordados",
       defaultHint: "Ctrl + rueda también hace zoom",
+      goToOrigin: "Origen",
+      goToOriginTitle: "Centrar el origen (+) en la vista",
     },
     fields: {
       name: "Nombre",
@@ -1694,7 +1698,8 @@ export const appsEs: AppsDictionary = {
   linkStocker: {
     shell: {
       title: "Link Stocker",
-      description: "Guarda URLs de “para más tarde” como tarjetas visuales con miniaturas OGP",
+      description:
+        "Guarda URLs de “para más tarde” como tarjetas visuales con miniaturas OGP (la URL puede pasar por el servidor del sitio para metadatos públicos)",
     },
     form: {
       placeholder: "Pega https://",
@@ -1819,14 +1824,11 @@ export const appsEs: AppsDictionary = {
     },
     setup: {
       title: "Ajustes de la tragamonedas",
-      subtitle: "Define rodillos y cantidad de símbolos. Solo la imagen del jackpot es personalizable.",
       reelsLabel: "Rodillos",
       itemsLabel: "Símbolos",
-      autoMissHint: "Los iconos de fallo son símbolos clásicos de tragamonedas. Solo se puede editar la imagen del jackpot.",
       jackpotTag: "★ JACKPOT",
       jackpotImageOnly: "IMAGE ONLY",
       uploadButton: "Subir imagen",
-      uploadHint: "JPEG / PNG etc. Se reduce y se guarda localmente.",
       resetJackpot: "Restablecer predeterminado",
       save: "Empezar con esta configuración",
       cancel: "Cancelar",

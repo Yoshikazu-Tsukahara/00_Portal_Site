@@ -97,7 +97,8 @@ export type LinkStockerDict = {
 export const linkStockerJa: LinkStockerDict = {
   shell: {
     title: "とりあえずキープ",
-    description: "ブックマークするほどではない URL を、サムネ付きでサッと残す",
+    description:
+      "ブックマークするほどではない URL を、サムネ付きでサッと残す（公開メタ取得のため URL のみサーバー経由の通信あり）",
   },
   form: {
     placeholder: "https:// をペースト",
@@ -197,7 +198,8 @@ export const linkStockerJa: LinkStockerDict = {
 export const linkStockerEn: LinkStockerDict = {
   shell: {
     title: "Link Stocker",
-    description: "Park “maybe later” URLs as visual cards with OGP thumbs",
+    description:
+      "Park “maybe later” URLs as visual cards with OGP thumbs (URLs may be fetched via the site server for public metadata)",
   },
   form: {
     placeholder: "Paste https://",

@@ -119,11 +119,27 @@ export type CanvasUiPrefs = {
 };
 
 export const STORAGE_KEY = "character-relation-editor:v2";
-export const VIEW_STORAGE_KEY = "character-relation-editor:view";
+/** 原点パディング導入後の表示設定（旧キーは読み捨て） */
+export const VIEW_STORAGE_KEY = "character-relation-editor:view-v2";
 export const APP_ID = "character-relation-editor";
 
-export const WORLD_W = 1200;
-export const WORLD_H = 800;
+/**
+ * キャンバス座標系:
+ * - キャラ座標 (0,0) が論理原点
+ * - 描画時は ORIGIN_PAD 分だけ右下へオフセットし、原点を画面中央へスクロール可能にする
+ * - コンテンツ側は必要に応じて伸びる（半無限）
+ */
+/** 原点より手前の余白（GRID_SIZE の倍数） */
+export const ORIGIN_PAD = 4800;
+/** コンテンツ領域の最小サイズ */
+export const WORLD_CONTENT_MIN = 16000;
+/** 最遠のカードから外側へ確保する余白 */
+export const WORLD_EDGE_PAD = 4000;
+
+/** @deprecated 旧固定サイズ。動的算出を優先 */
+export const WORLD_W = ORIGIN_PAD + WORLD_CONTENT_MIN;
+/** @deprecated 旧固定サイズ。動的算出を優先 */
+export const WORLD_H = ORIGIN_PAD + WORLD_CONTENT_MIN;
 
 export const MIN_ZOOM = 0.5;
 export const MAX_ZOOM = 2;

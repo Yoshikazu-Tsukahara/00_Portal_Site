@@ -143,20 +143,20 @@ export const de: PartialDictionary = {
     environmentLabel: "Umgebung",
     noticeLabel: "Hinweis",
     localOnly:
-      "🔒 Diese Seite läuft zu 100 % lokal und sendet keine Dateien oder Eingaben an einen Server. Keine Tracking-Cookies. Wir zählen nur anonymisierte Besuche und Tool-Nutzung.",
+      "🔒 Dateien und Eingaben der Tools werden standardmäßig im Browser verarbeitet und gespeichert; der Betreiber sammelt oder speichert deren Inhalte nicht. Keine Tracking-Cookies. Wir zählen nur anonymisierte Besuche und Tool-Nutzung. Einige Tools können begrenzte Netzwerkanfragen stellen (siehe Datenschutz).",
   },
   messages: {
     environment:
-      "Alle Tools laufen im Browser. Keine Installation nötig – Windows, Mac oder Smartphone.",
+      "Tools laufen in der Regel im Browser – ohne Installation. Nutzbar unter Windows, Mac und Smartphone; manche Tools sind PC-orientiert (nicht mobil). Zum Ansehen und beim ersten Nutzen braucht es Internet; Offline für die ganze Site ist nicht garantiert.",
     persistence:
       "Daten liegen im LocalStorage. Cache-Löschen oder Gerätewechsel kann sie entfernen. Wichtiges regelmäßig exportieren.",
     safety:
-      "Eingaben bleiben nur in Ihrem Browser und werden nie an den Betreiber-Server gesendet.",
-    safetyShort: "Daten nur im Browser; nichts geht an den Server.",
+      "Eingaben bleiben standardmäßig auf Ihrem Gerät (Browser). Der Betreiber sammelt oder speichert deren Inhalte nicht auf Servern. Geräterisiken decken wir nicht ab – bitte sichern Sie Wichtiges.",
+    safetyShort: "Daten bleiben standardmäßig im Browser; der Betreiber sammelt keine Inhalte.",
     privacyBanner:
-      "Alles läuft in diesem Browser. Nichts wird nach außen gesendet.",
+      "Dateien und Eingaben werden standardmäßig in diesem Browser verarbeitet. Der Betreiber sammelt oder speichert deren Inhalte nicht.",
     privacyBannerShort:
-      "Läuft im Browser. Nichts wird nach außen gesendet.",
+      "Standardmäßig im Browser. Wir speichern keine Eingaben.",
   },
   dataManager: {
     buttonTitle: "Daten (Backup & Wiederherstellung)",
@@ -169,7 +169,7 @@ export const de: PartialDictionary = {
     backupReasonHeading: "Warum ein Backup?",
     export: "📥 Daten exportieren (Speichern)",
     import: "📤 Daten importieren (Laden)",
-    noData: "Dieses Tool speichert keine Einstellungen. Nichts wird nach außen gesendet.",
+    noData: "Dieses Tool speichert keine Einstellungen. Der Betreiber sammelt oder speichert verarbeitete Inhalte nicht.",
     exportOk: "Backup-Datei heruntergeladen.",
     exportFail: "Export fehlgeschlagen.",
     importOk: "Daten geladen.",
