@@ -10,7 +10,7 @@ const USAGE_GUIDE_VERSION = 1;
 
 type UsageGuidePrefs = {
   version: number;
-  /** true なら次回以降は出さない */
+  /** true なら次回以降は出さない（サイトを開き直しても出さない） */
   hideNextTime: boolean;
 };
 
@@ -20,7 +20,16 @@ const INITIAL_PREFS: UsageGuidePrefs = {
 };
 
 /**
+ * このタブのページロード中だけ有効な「閉じた」フラグ。
+ * React state だとルート遷移で Host が再マウントされ、毎回ガイドが再表示されてしまう。
+ * フルリロード／新規タブではモジュールが初期化され、チェックなしなら再び表示できる。
+ */
+let dismissedThisPageLoad = false;
+
+/**
  * 初回利用ガイドの表示制御。
+ * - チェックなしで閉じる: このサイト表示中は再表示しない（ページ移動でも出さない）
+ * - チェックありで閉じる: LocalStorage に保存し、次回以降の訪問でも出さない
  * プレビュー埋め込み・独立 PWA standalone・没入型では SiteChrome 側でマウントしない。
  */
 export default function UsageGuideHost() {
@@ -28,16 +37,18 @@ export default function UsageGuideHost() {
     USAGE_GUIDE_STORAGE_KEY,
     INITIAL_PREFS,
   );
-  /** このセッションで閉じたら再表示しない（チェックなしでも） */
-  const [closedThisSession, setClosedThisSession] = useState(false);
+  const [closedThisLoad, setClosedThisLoad] = useState(
+    () => dismissedThisPageLoad,
+  );
 
   const suppressed =
     prefs.hideNextTime && prefs.version === USAGE_GUIDE_VERSION;
-  const open = hydrated && !suppressed && !closedThisSession;
+  const open = hydrated && !suppressed && !closedThisLoad;
 
   const handleClose = useCallback(
     (dontShowAgain: boolean) => {
-      setClosedThisSession(true);
+      dismissedThisPageLoad = true;
+      setClosedThisLoad(true);
       if (dontShowAgain) {
         setPrefs({
           version: USAGE_GUIDE_VERSION,
