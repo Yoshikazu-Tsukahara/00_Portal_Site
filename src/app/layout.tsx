@@ -20,10 +20,49 @@ const notoSansJp = Noto_Sans_JP({
   display: "swap",
 });
 
+const SITE_TITLE = "Blank Note";
+const SITE_DESCRIPTION =
+  "日々の「めんどくさい」から脱却、登録不要・完全無料の業務ハックツール箱。サーバーへのデータ送信なしで実務でも安心です。";
+
+/** OGP 用の絶対 URL 解決。本番は Vercel / NEXT_PUBLIC_SITE_URL を優先 */
+const siteUrl = (() => {
+  const explicit = process.env.NEXT_PUBLIC_SITE_URL;
+  if (explicit) return explicit;
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  }
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  return "http://localhost:3000";
+})();
+
 export const metadata: Metadata = {
-  title: "Blank Note",
-  description:
-    "入力・ファイルは端末内で処理する個人開発ツールを、文房具テイストのランチャーでまとめたポータルサイトです。",
+  metadataBase: new URL(siteUrl),
+  title: SITE_TITLE,
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_TITLE,
+  openGraph: {
+    type: "website",
+    locale: "ja_JP",
+    siteName: SITE_TITLE,
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    images: [
+      {
+        url: "/og.png",
+        width: 1024,
+        height: 703,
+        alt: SITE_TITLE,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    images: ["/og.png"],
+  },
   icons: {
     icon: [
       { url: "/icons/blank-note-32.png", sizes: "32x32", type: "image/png" },
