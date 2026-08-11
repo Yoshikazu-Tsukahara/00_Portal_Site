@@ -125,6 +125,8 @@ export default function RelationCanvas({
   const favorite = prefs.favorite;
   const placementMode = prefs.placementMode;
   const didInitViewRef = useRef(false);
+  /** サンプル読込などの recenterToken を何回処理したか */
+  const handledRecenterRef = useRef(0);
 
   /** カード配置に応じて伸びる半無限コンテンツ領域（負座標は ORIGIN_PAD 側へはみ出し） */
   const contentSize = useMemo(() => {
@@ -175,7 +177,8 @@ export default function RelationCanvas({
   /** 原点（＋）がビューポート中央に来るようスクロール */
   const goToOrigin = useCallback((nextZoom?: number) => {
     const el = viewportRef.current;
-    const z = clampZoom(nextZoom ?? zoomRef.current);
+    const prevZoom = zoomRef.current;
+    const z = clampZoom(nextZoom ?? prevZoom);
     const target = el
       ? {
           left: ORIGIN_PAD * z - el.clientWidth / 2,
@@ -184,7 +187,7 @@ export default function RelationCanvas({
       : null;
     zoomRef.current = z;
     // ズーム値が同じだと useLayoutEffect が走らないので、その場合は即スクロール
-    if (el && target && z === zoom) {
+    if (el && target && z === prevZoom) {
       el.scrollLeft = target.left;
       el.scrollTop = target.top;
       setScrollPos({ left: el.scrollLeft, top: el.scrollTop });
@@ -192,7 +195,7 @@ export default function RelationCanvas({
     }
     if (target) pendingScrollRef.current = target;
     setZoom(z);
-  }, [zoom]);
+  }, []);
 
   // 初回表示は原点を画面中央に
   useEffect(() => {
@@ -203,9 +206,11 @@ export default function RelationCanvas({
     goToOrigin(DEFAULT_ZOOM);
   }, [goToOrigin]);
 
-  // サンプル読込など、外部からの再センタリング要求
+  // サンプル読込など、外部からの再センタリング要求（トークン変化時のみ）
   useEffect(() => {
     if (recenterToken <= 0) return;
+    if (recenterToken === handledRecenterRef.current) return;
+    handledRecenterRef.current = recenterToken;
     goToOrigin(DEFAULT_ZOOM);
   }, [recenterToken, goToOrigin]);
 
