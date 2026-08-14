@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 import SiteChrome from "@/components/SiteChrome";
 import { I18nProvider } from "@/i18n";
 import { LAYOUT_MODE_BOOTSTRAP_SCRIPT, LayoutProvider } from "@/lib/layout";
+import { HOME_SEO, pageMetadata, SITE_NAME } from "@/lib/seo";
 import "./globals.css";
 
 const spaceMono = Space_Mono({
@@ -20,10 +21,6 @@ const notoSansJp = Noto_Sans_JP({
   display: "swap",
 });
 
-const SITE_TITLE = "Blank Note";
-const SITE_DESCRIPTION =
-  "日々の「めんどくさい」から脱却、登録不要・完全無料の業務ハックツール箱。サーバーへのデータ送信なしで実務でも安心です。";
-
 /** OGP 用の絶対 URL 解決。本番は Vercel / NEXT_PUBLIC_SITE_URL を優先 */
 const siteUrl = (() => {
   const explicit = process.env.NEXT_PUBLIC_SITE_URL;
@@ -37,43 +34,24 @@ const siteUrl = (() => {
   return "http://localhost:3000";
 })();
 
-export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
-  title: SITE_TITLE,
-  description: SITE_DESCRIPTION,
-  applicationName: SITE_TITLE,
-  openGraph: {
-    type: "website",
-    locale: "ja_JP",
-    siteName: SITE_TITLE,
-    title: SITE_TITLE,
-    description: SITE_DESCRIPTION,
-    images: [
-      {
-        url: "/og.png",
-        width: 1024,
-        height: 703,
-        alt: SITE_TITLE,
-      },
-    ],
+export const metadata: Metadata = pageMetadata({
+  ...HOME_SEO,
+  path: "/",
+  extra: {
+    metadataBase: new URL(siteUrl),
+    applicationName: SITE_NAME,
+    icons: {
+      icon: [
+        { url: "/icons/blank-note-32.png", sizes: "32x32", type: "image/png" },
+        { url: "/icons/blank-note-192.png", sizes: "192x192", type: "image/png" },
+        { url: "/icons/blank-note-512.png", sizes: "512x512", type: "image/png" },
+      ],
+      apple: [
+        { url: "/icons/blank-note-180.png", sizes: "180x180", type: "image/png" },
+      ],
+    },
   },
-  twitter: {
-    card: "summary_large_image",
-    title: SITE_TITLE,
-    description: SITE_DESCRIPTION,
-    images: ["/og.png"],
-  },
-  icons: {
-    icon: [
-      { url: "/icons/blank-note-32.png", sizes: "32x32", type: "image/png" },
-      { url: "/icons/blank-note-192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icons/blank-note-512.png", sizes: "512x512", type: "image/png" },
-    ],
-    apple: [
-      { url: "/icons/blank-note-180.png", sizes: "180x180", type: "image/png" },
-    ],
-  },
-};
+});
 
 export default function RootLayout({
   children,

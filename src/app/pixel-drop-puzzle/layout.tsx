@@ -1,11 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import PwaRuntime from "@/components/PwaRuntime";
+import { pageMetadata, TOOL_SEO } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "極小ピクセル隙間落としパズル",
-  description:
-    "写真を隙間に落とすだけ。判定は小数点以下のピクセル単位という、鬼畜な精度パズル。",
-  applicationName: "極小ピクセル隙間落としパズル",
+export const metadata: Metadata = pageMetadata({
+  ...TOOL_SEO["pixel-drop-puzzle"],
+  path: "/pixel-drop-puzzle",
+  extra: {
+    applicationName: "極小ピクセル隙間落としパズル",
   appleWebApp: {
     capable: false,
     statusBarStyle: "black-translucent",
@@ -35,7 +36,8 @@ export const metadata: Metadata = {
       },
     ],
   },
-};
+  },
+});
 
 export const viewport: Viewport = {
   /** アクセントのグリーン（マニフェスト theme_color と一致） */

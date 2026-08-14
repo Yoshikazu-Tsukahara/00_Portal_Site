@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { pageMetadata, TOOL_SEO } from "@/lib/seo";
+
+export const metadata: Metadata = pageMetadata({
+  ...TOOL_SEO["book-visualizer"],
+  path: "/tools/book-visualizer",
+});
 
 /**
  * 書籍ビューア専用の Google Fonts。

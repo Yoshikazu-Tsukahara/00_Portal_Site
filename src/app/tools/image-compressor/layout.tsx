@@ -1,11 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import PwaRuntime from "@/components/PwaRuntime";
+import { pageMetadata, TOOL_SEO } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "画像一括軽量化",
-  description:
-    "リサイズ・圧縮をブラウザ内で一括処理。ZIPで保存する画像軽量化アプリ。",
-  applicationName: "画像軽量化",
+export const metadata: Metadata = pageMetadata({
+  ...TOOL_SEO["image-compressor"],
+  path: "/tools/image-compressor",
+  extra: {
+    applicationName: "画像軽量化",
   appleWebApp: {
     capable: false,
     statusBarStyle: "default",
@@ -35,7 +36,8 @@ export const metadata: Metadata = {
       },
     ],
   },
-};
+  },
+});
 
 export const viewport: Viewport = {
   themeColor: "#18181b",

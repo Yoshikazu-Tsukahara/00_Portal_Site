@@ -1,11 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import PwaRuntime from "@/components/PwaRuntime";
+import { pageMetadata, TOOL_SEO } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "とりあえずキープ",
-  description:
-    "とりあえずキープしたい URL を、OGP サムネ付きカードで視覚的に管理。公開メタ取得のため URL のみサーバー経由の通信があります。",
-  applicationName: "とりあえずキープ",
+export const metadata: Metadata = pageMetadata({
+  ...TOOL_SEO["link-stocker"],
+  path: "/link-stocker",
+  extra: {
+    applicationName: "とりあえずキープ",
   appleWebApp: {
     capable: false,
     statusBarStyle: "black-translucent",
@@ -29,7 +30,8 @@ export const metadata: Metadata = {
     ],
     apple: [{ url: "/icons/link-stocker-192.png", sizes: "192x192" }],
   },
-};
+  },
+});
 
 export const viewport: Viewport = {
   /** ランチ貯金と同系のエメラルド */

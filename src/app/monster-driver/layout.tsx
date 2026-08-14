@@ -1,11 +1,13 @@
 import type { Metadata, Viewport } from "next";
+import { pageMetadata, TOOL_SEO } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "モンスタードライバー",
-  description:
-    "赤信号で止まれ、青で飛び出せ。ウィンカー記憶と反応速度が試される一人称発進アクション。",
-  applicationName: "モンスタードライバー",
-};
+export const metadata: Metadata = pageMetadata({
+  ...TOOL_SEO["monster-driver"],
+  path: "/monster-driver",
+  extra: {
+    applicationName: "モンスタードライバー",
+  },
+});
 
 export const viewport: Viewport = {
   themeColor: "#0f172a",

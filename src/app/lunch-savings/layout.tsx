@@ -1,11 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import PwaRuntime from "@/components/PwaRuntime";
+import { pageMetadata, TOOL_SEO } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "ランチ貯金",
-  description:
-    "毎日のランチ代の差額をタップで記録。浮いたお金をゲーム感覚で貯めるアプリ。",
-  applicationName: "ランチ貯金",
+export const metadata: Metadata = pageMetadata({
+  ...TOOL_SEO["lunch-savings"],
+  path: "/lunch-savings",
+  extra: {
+    applicationName: "ランチ貯金",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -26,7 +27,8 @@ export const metadata: Metadata = {
   other: {
     "mobile-web-app-capable": "yes",
   },
-};
+  },
+});
 
 export const viewport: Viewport = {
   themeColor: "#10b981",

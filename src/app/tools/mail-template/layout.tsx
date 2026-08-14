@@ -1,11 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import PwaRuntime from "@/components/PwaRuntime";
+import { pageMetadata, TOOL_SEO } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "スマートメールテンプレ管理",
-  description:
-    "変数・ラベルで返信を即作成。データはブラウザ内に保存するメールテンプレート管理アプリ。",
-  applicationName: "メールテンプレ",
+export const metadata: Metadata = pageMetadata({
+  ...TOOL_SEO["mail-template"],
+  path: "/tools/mail-template",
+  extra: {
+    applicationName: "メールテンプレ",
   appleWebApp: {
     capable: false,
     statusBarStyle: "default",
@@ -21,7 +22,8 @@ export const metadata: Metadata = {
     ],
     apple: [{ url: "/icons/mail-template-192.png", sizes: "192x192", type: "image/png" }],
   },
-};
+  },
+});
 
 export const viewport: Viewport = {
   themeColor: "#18181b",

@@ -1,11 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import PwaRuntime from "@/components/PwaRuntime";
+import { pageMetadata, TOOL_SEO } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "帳票メーカー",
-  description:
-    "請求書・見積書・納品書・領収書をA4で作成。多言語・多通貨対応でPDF保存も一発。データはブラウザ内に保存。",
-  applicationName: "帳票メーカー",
+export const metadata: Metadata = pageMetadata({
+  ...TOOL_SEO["invoice-maker"],
+  path: "/tools/invoice-maker",
+  extra: {
+    applicationName: "帳票メーカー",
   appleWebApp: {
     capable: false,
     statusBarStyle: "default",
@@ -31,7 +32,8 @@ export const metadata: Metadata = {
       { url: "/icons/invoice-maker-192.png", sizes: "192x192", type: "image/png" },
     ],
   },
-};
+  },
+});
 
 export const viewport: Viewport = {
   themeColor: "#18181b",

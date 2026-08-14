@@ -1,11 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import PwaRuntime from "@/components/PwaRuntime";
+import { pageMetadata, TOOL_SEO } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "究極確率スロット",
-  description:
-    "自作の天文学的低確率スロットで「当たるまで」「外し続ける」に挑む、無機質な演算エンジン。",
-  applicationName: "究極確率スロット",
+export const metadata: Metadata = pageMetadata({
+  ...TOOL_SEO["ultimate-probability-slot"],
+  path: "/ultimate-probability-slot",
+  extra: {
+    applicationName: "究極確率スロット",
   appleWebApp: {
     capable: false,
     statusBarStyle: "black-translucent",
@@ -29,7 +30,8 @@ export const metadata: Metadata = {
     ],
     apple: [{ url: "/icons/ultimate-probability-slot-192.png", sizes: "192x192" }],
   },
-};
+  },
+});
 
 export const viewport: Viewport = {
   /** アクセントのゴールド（マニフェスト theme_color と一致） */

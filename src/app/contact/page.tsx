@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
+import { CONTACT_SEO, pageMetadata } from "@/lib/seo";
 import ContactContent from "./ContactContent";
 
-export const metadata: Metadata = {
-  title: "お問い合わせ / Contact | Blank Note",
-  description:
-    "Blank Note へのお問い合わせ。メールアプリから一般のお問い合わせ、またはアプリのご要望・不具合報告を送れます。",
-};
+export const metadata: Metadata = pageMetadata({
+  ...CONTACT_SEO,
+  path: "/contact",
+});
 
 export default function ContactPage() {
   return <ContactContent />;

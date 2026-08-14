@@ -1,11 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import PwaRuntime from "@/components/PwaRuntime";
+import { pageMetadata, TOOL_SEO } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "PDF編集",
-  description:
-    "結合・並び替え・回転・白紙挿入。ブラウザ内で完結する PDF エディタ。",
-  applicationName: "PDF編集",
+export const metadata: Metadata = pageMetadata({
+  ...TOOL_SEO["pdf-editor"],
+  path: "/tools/pdf-editor",
+  extra: {
+    applicationName: "PDF編集",
   appleWebApp: {
     capable: false,
     statusBarStyle: "default",
@@ -21,7 +22,8 @@ export const metadata: Metadata = {
     ],
     apple: [{ url: "/icons/pdf-editor-192.png", sizes: "192x192", type: "image/png" }],
   },
-};
+  },
+});
 
 export const viewport: Viewport = {
   themeColor: "#18181b",

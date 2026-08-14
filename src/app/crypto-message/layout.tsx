@@ -1,11 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import PwaRuntime from "@/components/PwaRuntime";
+import { pageMetadata, TOOL_SEO } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "ひみつメッセージ",
-  description:
-    "合言葉で暗号化・復号する『ひみつメッセージ』と、シーザー暗号を解き明かす『解読チャレンジ』。ハッカー演出全開の完全ローカル完結パズルツール。",
-  applicationName: "ひみつメッセージ",
+export const metadata: Metadata = pageMetadata({
+  ...TOOL_SEO["crypto-message"],
+  path: "/crypto-message",
+  extra: {
+    applicationName: "ひみつメッセージ",
   appleWebApp: {
     capable: false,
     statusBarStyle: "black-translucent",
@@ -35,7 +36,8 @@ export const metadata: Metadata = {
       },
     ],
   },
-};
+  },
+});
 
 export const viewport: Viewport = {
   themeColor: "#09090b",

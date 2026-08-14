@@ -1,11 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import PwaRuntime from "@/components/PwaRuntime";
+import { pageMetadata, TOOL_SEO } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "投射フリースロー",
-  description:
-    "角度・初速・スピンを指定してリングを狙う、投射運動のミニゲーム。",
-  applicationName: "投射フリースロー",
+export const metadata: Metadata = pageMetadata({
+  ...TOOL_SEO["robot-freethrow"],
+  path: "/robot-freethrow",
+  extra: {
+    applicationName: "投射フリースロー",
   appleWebApp: {
     capable: false,
     statusBarStyle: "black-translucent",
@@ -29,7 +30,8 @@ export const metadata: Metadata = {
     ],
     apple: [{ url: "/icons/robot-freethrow-192.png", sizes: "192x192" }],
   },
-};
+  },
+});
 
 export const viewport: Viewport = {
   themeColor: "#f3e6c8",

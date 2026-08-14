@@ -1,11 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import PwaRuntime from "@/components/PwaRuntime";
+import { pageMetadata, TOOL_SEO } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Palette Collector",
-  description:
-    "画像からカラーコードを抽出し、自分だけのカラーパレットを作成・管理するツール。",
-  applicationName: "Palette Collector",
+export const metadata: Metadata = pageMetadata({
+  ...TOOL_SEO["palette-collector"],
+  path: "/palette-collector",
+  extra: {
+    applicationName: "Palette Collector",
   appleWebApp: {
     capable: false,
     statusBarStyle: "black-translucent",
@@ -29,7 +30,8 @@ export const metadata: Metadata = {
     ],
     apple: [{ url: "/icons/palette-collector-192.png", sizes: "192x192" }],
   },
-};
+  },
+});
 
 export const viewport: Viewport = {
   themeColor: "#f9fafb",

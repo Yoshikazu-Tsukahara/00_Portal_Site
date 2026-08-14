@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
+import { TERMS_SEO, pageMetadata } from "@/lib/seo";
 import TermsContent from "./TermsContent";
 
-export const metadata: Metadata = {
-  title: "利用規約 / Terms of Use | Blank Note",
-  description:
-    "Blank Note の利用規約。個人開発の無料ツールとしての免責事項およびデータの取り扱いについて定めています。",
-};
+export const metadata: Metadata = pageMetadata({
+  ...TERMS_SEO,
+  path: "/terms",
+});
 
 export default function TermsPage() {
   return <TermsContent />;
