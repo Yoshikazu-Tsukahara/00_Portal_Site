@@ -4,7 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 import SiteChrome from "@/components/SiteChrome";
 import { I18nProvider } from "@/i18n";
 import { LAYOUT_MODE_BOOTSTRAP_SCRIPT, LayoutProvider } from "@/lib/layout";
-import { HOME_SEO, pageMetadata, SITE_NAME } from "@/lib/seo";
+import { getSiteOrigin, HOME_SEO, pageMetadata, SITE_NAME } from "@/lib/seo";
 import "./globals.css";
 
 const spaceMono = Space_Mono({
@@ -21,24 +21,11 @@ const notoSansJp = Noto_Sans_JP({
   display: "swap",
 });
 
-/** OGP 用の絶対 URL 解決。本番は Vercel / NEXT_PUBLIC_SITE_URL を優先 */
-const siteUrl = (() => {
-  const explicit = process.env.NEXT_PUBLIC_SITE_URL;
-  if (explicit) return explicit;
-  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
-    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
-  }
-  if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL}`;
-  }
-  return "http://localhost:3000";
-})();
-
 export const metadata: Metadata = pageMetadata({
   ...HOME_SEO,
   path: "/",
   extra: {
-    metadataBase: new URL(siteUrl),
+    metadataBase: new URL(getSiteOrigin()),
     applicationName: SITE_NAME,
     verification: {
       google: "_1XD2SzGOKXWybM2sjTZOUl3qMDMA62JwU4Hfr_LIs4",

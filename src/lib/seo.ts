@@ -3,6 +3,22 @@ import type { Metadata } from "next";
 /** サイト名（OGP siteName / タブ末尾） */
 export const SITE_NAME = "Blank Note";
 
+/**
+ * 絶対 URL のオリジン。
+ * 本番は NEXT_PUBLIC_SITE_URL → Vercel 本番ドメイン → プレビュー URL の順。
+ */
+export function getSiteOrigin(): string {
+  const explicit = process.env.NEXT_PUBLIC_SITE_URL;
+  if (explicit) return explicit.replace(/\/$/, "");
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  }
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  return "http://localhost:3000";
+}
+
 /** SNS シェア用の共通画像（public/og.png） */
 export const OG_IMAGE = {
   url: "/og.png",
