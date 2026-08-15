@@ -40,6 +40,9 @@ export const metadata: Metadata = pageMetadata({
   extra: {
     metadataBase: new URL(siteUrl),
     applicationName: SITE_NAME,
+    verification: {
+      google: "_1XD2SzGOKXWybM2sjTZOUl3qMDMA62JwU4Hfr_LIs4",
+    },
     icons: {
       icon: [
         { url: "/icons/blank-note-32.png", sizes: "32x32", type: "image/png" },
