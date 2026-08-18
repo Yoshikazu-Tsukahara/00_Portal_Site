@@ -1,4 +1,5 @@
 import type { AppsDictionary } from "../../apps";
+import { excelMergerKo } from "../../apps/excelMerger";
 
 /** アプリ内 UI 辞書（ko） */
 export const appsKo: AppsDictionary = {
@@ -672,6 +673,7 @@ export const appsKo: AppsDictionary = {
       listItems: "기획,디자인,개발",
     },
   },
+  excelMerger: excelMergerKo,
   imageCompressor: {
     shell: {
       title: "일괄 이미지 압축",

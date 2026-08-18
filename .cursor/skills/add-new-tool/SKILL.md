@@ -5,69 +5,93 @@ description: Blank Note Portal に新規ツールまたは独立 PWA を追加�
 
 # 新規ツール追加ワークフロー
 
-## 事前確認
+正本: ルートの `RULEBOOK.md`（ジャンル別ルール・例外・チェックリスト）。
 
-ユーザーに未指定なら確認:
+## 事前確認（未指定なら聞く）
 
-1. タイプ B（/tools）/ C（PWA）/ D（没入型）のどれか
-2. ポータル一覧に掲載するか
-3. LocalStorage / バックアップが必要か
+1. **ジャンル**: business / creators / utilities / minigames
+2. **タイプ**: B / C-shell / C-install / D（C-install は原則ランチ貯金のみ）
+3. バックアップが必要か
+4. スマホ対応までやるか（`isMobileSupported` は true/false 必須）
+5. ライブラリに掲載するか
 
-## 手順
+## Step 1: コピー元
 
-### Step 1: 参照テンプレートを選ぶ
+| 用途 | コピー元 |
+|------|----------|
+| B シンプル | `src/app/tools/text-cleaner/` |
+| B ファイル処理 | `src/app/tools/media-metadata-editor/` |
+| B キャンバス | `src/app/tools/character-relation-editor/` |
+| C-shell（枠だけ standalone） | `src/app/palette-collector/` または `link-stocker/` |
+| C-shell ファイル作業 | `src/app/tools/pdf-editor/` |
+| C-shell ミニゲーム舞台 | `src/app/pixel-drop-puzzle/` |
+| C-install | `src/app/lunch-savings/`（📱 はコピーしない） |
+| D 没入 | `src/app/monster-driver/` |
 
-| タイプ | コピー元 |
-|--------|----------|
-| B: シンプルツール | `src/app/tools/text-cleaner/` |
-| B: マスタデータ + モーダル | `src/app/tools/mail-template/` |
-| B: ファイル処理 | `src/app/tools/pdf-editor/` または `media-metadata-editor/` |
-| C: 独立 PWA | `src/app/lunch-savings/` |
+メールテンプレはスマホ UI の完成例。タイプは C-shell。
 
-### Step 2: ファイル作成
+## Step 2: ファイル
 
-- `page.tsx`: `"use client"`, `AppShell`, `useI18n`, `ready` 待ち
-- ロジックは `types.ts` / `storage.ts` / 機能別 `.tsx` に分割
-- 既存 import 順: React → `@/components` → `@/i18n` → `@/lib` → 相対 import
+- `page.tsx`: `"use client"`, `AppShell`, `useI18n`, `ready` 待ち（D 以外）
+- `layout.tsx`: `pageMetadata` + `TOOL_SEO`（C なら `PwaRuntime`）
+- ロジックは `types.ts` / `storage.ts` / 機能別 `.tsx`
+- import 順: React → `@/components` → `@/i18n` → `@/lib` → 相対
 
-### Step 3: i18n
+パス既定: business・creators は `/tools/<id>`、utilities・minigames は `/<id>`。
 
-1. `src/i18n/apps/<name>.ts` — 型, `*Ja`, `*En`, `shell`, UI 文案
-2. `src/i18n/apps/index.ts` — 型と export に追加
-3. `src/i18n/ja.ts` / `en.ts` — `tools.<kebab-id>` にカード文言
+## Step 3: i18n
 
-### Step 4: ポータル掲載（必要時）
+1. `src/i18n/apps/<camelCase>.ts` — 型, `*Ja`, `*En`, `shell`
+2. `src/i18n/apps/index.ts`
+3. `src/i18n/ja.ts` / `en.ts` の `tools.<kebab-id>`
+4. 他言語は en フォールバック可
 
-`src/data/tools.ts` の適切な genre に `{ id, icon, href }` を追加。
+## Step 4: 掲載と SEO
 
-### Step 5: 共通 UI 配置（`.cursor/rules/ui-ux.mdc`）
+- `src/data/tools.ts` のジャンルに追加。`isMobileSupported` を必ず付ける
+- `src/lib/seo.ts` の `TOOL_SEO`（sitemap は tools.ts から自動）
+- アイコン / カバーを置くなら `TOOLS_WITH_STATIC_*` にも追加
 
-- 言語: **Header のみ**（AppShell に LanguageToggle を足さない）
-- バックアップ: `dataManager`（タイトル横）
-- PWA インストール: **付けない**（サイト方針でランチ貯金のみ表示）
-- 幅: `useLayout().contentClassName` / `fillViewport`
-- スマホ対応: skill `mobile-responsive`（完成例は `mail-template`）
-- 対応済みなら `tools.ts` に `isMobileSupported: true`
+## Step 5: 共通 UI
 
-### Step 6: PWA（Type C のみ）
+- 言語: Header のみ
+- バックアップ: `dataManager`
+- インストール: 付けない
+- 幅: `contentClassName` / 必要なら `fillViewport`（**SiteChrome 配列も同時更新**）
+- C-shell: `isPwa` + `STANDALONE_APP_PATHS`
+- スマホ: skill `mobile-responsive`
 
-- `layout.tsx` + `PwaRuntime`
-- manifest + icons（`lunch-savings` を参照）
-- `page.tsx` で `<AppShell isPwa ... />`（**InstallAppButton は付けない**）
-
-### Step 7: 検証
+## Step 6: 検証
 
 ```bash
 npm run lint
-npm run build
 ```
 
-ブラウザで: ポータルリンク、言語切替、データ保存/復元（あれば）。
+ポータルリンク、言語切替、バックアップ（あれば）、タブ title が SEO 用になっていること。
 
-## 出力
+## 報告に含める
 
-作業完了報告に含める:
-
-- 追加したパス一覧
-- 選んだタイプと理由
+- 選んだジャンルとタイプ、その理由
+- 追加したパス
+- SiteChrome を更新した配列
 - 手動確認してほしい項目
+
+## ユーザーが貼る定型文
+
+正本は `RULEBOOK.md` §8。コロンより右だけ変える。
+
+```
+①参照ルール：RULEBOOK.md
+②デザイン：design-rules.md
+③方針：新規
+④ジャンル：業務効率化
+⑤タイプ：B
+⑥対象：
+⑦名前：
+⑧やること：
+⑨バックアップ：必要
+⑩スマホ：対応する
+⑪画面：ページスクロール
+⑫掲載：ライブラリに出す
+⑬やらないこと：範囲外のリファクタ・例外のついで解消・commit。ランチ貯金以外にインストール UI を付けない
+```

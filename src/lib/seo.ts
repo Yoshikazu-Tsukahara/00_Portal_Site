@@ -120,6 +120,12 @@ export const TOOL_SEO: Record<string, PageSeo> = {
     description:
       "面倒なフォルダ作成作業を一瞬で終わらせるブラウザ完結ツール。エクセルのリストから階層構造の空フォルダをZIPで一括ダウンロード。完全無料・登録不要・データ送信なし。Free batch folder creator from spreadsheet.",
   },
+  "excel-merger": {
+    title:
+      "【無料】Excelのシートを抽出・並べ替えて一括結合 | Free Excel Sheet Merger | Blank Note",
+    description:
+      "複数のExcelファイルをドラッグ＆ドロップし、シートを並べ替えて1つの.xlsxに結合できるブラウザ完結ツール。アップロード不要・登録不要・データ送信なし。Free online Excel sheet merger, no upload.",
+  },
   "invoice-maker": {
     title:
       "【登録不要】超シンプル無料請求書作成ツール | Free Simple Invoice Maker | Blank Note",

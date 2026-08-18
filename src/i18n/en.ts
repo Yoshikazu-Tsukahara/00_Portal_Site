@@ -214,6 +214,27 @@ export const en: Dictionary = {
       ],
       tip: "Save frequent layouts as templates. The live tree isn’t persisted—only templates are.",
     },
+    "excel-merger": {
+      title: "Sheet Merge",
+      description: "Organize Excel sheets in columns and merge by dragging.",
+      detail: [
+        "Drop several Excel files and each one becomes a vertical column. Sheets appear as cards you can reorder in place or drag onto another column to merge them into that workbook.",
+        "Nothing is uploaded: reading and export happen entirely in the browser, so internal spreadsheets stay on your machine. Designed primarily for desktop use.",
+      ],
+      highlights: [
+        "Drag and drop multiple .xlsx files at once",
+        "Kanban columns, one per file, with sheet cards",
+        "Reorder inside a column, or move sheets between files",
+        "Download a column as .xlsx, or all files as a ZIP",
+      ],
+      gettingStarted: [
+        "Drop .xlsx files into the area at the top.",
+        "Reorder sheet cards inside each file column.",
+        "Drag a sheet onto another column to merge it into that file.",
+        "Use a column’s Save button, or “Download all files” at the bottom.",
+      ],
+      tip: "Duplicate sheet names in one column are renamed automatically, e.g. “Sheet1 (2)”. Cell values, formulas, and merged cells carry over; charts, images, and some styling do not.",
+    },
     "pdf-editor": {
       title: "PDF Editor",
       description: "Merge, reorder, and delete pages entirely in the browser.",

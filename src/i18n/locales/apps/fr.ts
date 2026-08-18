@@ -1,4 +1,5 @@
 import type { AppsDictionary } from "../../apps";
+import { excelMergerFr } from "../../apps/excelMerger";
 
 /** アプリ内 UI 辞書（fr） */
 export const appsFr: AppsDictionary = {
@@ -672,6 +673,7 @@ export const appsFr: AppsDictionary = {
       listItems: "Planning,Design,Développement",
     },
   },
+  excelMerger: excelMergerFr,
   imageCompressor: {
     shell: {
       title: "Compresseur d’images par lot",

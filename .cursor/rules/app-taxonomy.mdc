@@ -1,0 +1,43 @@
+---
+description: 新規アプリの決め順・ジャンルと実装タイプ（B / C-shell / C-install / D）
+globs: src/app/**/*,src/data/tools.ts,src/lib/seo.ts,src/components/AppShell.tsx,src/components/SiteChrome.tsx
+alwaysApply: false
+---
+
+# 分類（要約）
+
+正本はルートの `RULEBOOK.md`。矛盾したら RULEBOOK を優先する。
+
+## 決め順
+
+1. ジャンル: `business` / `creators` / `utilities` / `minigames`
+2. タイプ: B / C-shell / C-install / D
+3. フラグ: バックアップ / スマホ（true|false） / 画面の埋め方
+
+ジャンルはライブラリの棚。タイプはサイト枠。`/tools/*` だから B ではない。
+
+## タイプ
+
+- **B**: AppShell。PwaRuntime なし。例: テキスト掃除
+- **C-shell**: `isPwa` + `PwaRuntime`（SW オフ）+ `STANDALONE_APP_PATHS`。インストールなし
+- **C-install**: ランチ貯金のみ。SW + manifest + 📱
+- **D**: AppShell なし。`ALWAYS_ISOLATE_PATHS`
+
+`isPwa` だけ付けて SiteChrome を更新しないのはバグ。
+
+## ジャンルの既定パス
+
+- business → `/tools/<id>`
+- creators → `/tools/<id>`（例外: 配色はルート）
+- utilities / minigames → `/<id>`
+
+## 画面
+
+`fillViewport` を付けたら `FILL_VIEWPORT_PATHS` も同時更新。ミニゲーム舞台は `MIN_STAGE_PAGE_SCROLL_PATHS` も。
+
+## やらないこと
+
+- ランチ貯金以外にインストール UI
+- C-shell に SW / manifest を足す
+- 未設定のまま `isMobileSupported` を省略
+- 例外を黙って消す（RULEBOOK §6）

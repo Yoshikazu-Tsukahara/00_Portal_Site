@@ -70,6 +70,10 @@ export const zhCN: PartialDictionary = {
       title: "文件夹生成",
       description: "按命名规则组合日期、编号与列表，一键批量创建。",
     },
+    "excel-merger": {
+      title: "工作表合并",
+      description: "抽取并重排 Excel 工作表，合并成一个文件。",
+    },
     "pdf-editor": {
       title: "PDF编辑",
       description: "在浏览器中完成合并、排序与页面删除。",

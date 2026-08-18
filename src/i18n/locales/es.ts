@@ -68,6 +68,10 @@ export const es: PartialDictionary = {
       title: "Carpetas lote",
       description: "Crea carpetas en lote con fechas, números y listas.",
     },
+    "excel-merger": {
+      title: "Combinar hojas",
+      description: "Extrae y reordena hojas de Excel en un solo archivo.",
+    },
     "pdf-editor": {
       title: "Editor PDF",
       description: "Combina, reordena y elimina páginas en el navegador.",

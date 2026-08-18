@@ -68,6 +68,10 @@ export const fr: PartialDictionary = {
       title: "Dossiers lot",
       description: "Créez des dossiers en lot avec dates, numéros et listes.",
     },
+    "excel-merger": {
+      title: "Fusion feuilles",
+      description: "Extrayez et réordonnez des feuilles Excel en un fichier.",
+    },
     "pdf-editor": {
       title: "Éditeur PDF",
       description: "Fusionnez, réordonnez et supprimez des pages dans le navigateur.",

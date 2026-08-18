@@ -40,11 +40,14 @@ export default function SomePage() {
 
 ## AppShell ルール
 
-- Type B/C ツールは `title` と `description` を **必須**
-- 1 画面レイアウトは `fillViewport`（Footer は隠さない）
-- Type C は `isPwa` + layout で `PwaRuntime` / manifest をセット
+分類の正本は `RULEBOOK.md`。
+
+- Type B / C-shell / C-install は `title` と `description` を **必須**
+- 1 画面レイアウトは `fillViewport`（SiteChrome の `FILL_VIEWPORT_PATHS` も同時更新）
+- C-shell: `isPwa` + `PwaRuntime`（SW なし）+ `STANDALONE_APP_PATHS`
+- C-install: ランチ貯金のみ（manifest + SW + 📱）
 - Type D は AppShell を使わない
-- 言語・バックアップ・PWA インストールの配置 → **`ui-ux.mdc` を参照**
+- 言語・バックアップ・インストールの配置 → **`ui-ux.mdc`**
 
 ## スタイル
 

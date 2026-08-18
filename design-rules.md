@@ -1,6 +1,6 @@
 # Blank Note — デザイン原則（正本）
 
-今後の UI 開発・AI 生成はこの文書を優先する。  
+見た目の正本。アプリの分類・ジャンル・追加手順は [`RULEBOOK.md`](./RULEBOOK.md)。  
 実装への落とし込みは `.cursor/rules/ui-ux.mdc` と `src/app/globals.css` を参照。
 
 ---

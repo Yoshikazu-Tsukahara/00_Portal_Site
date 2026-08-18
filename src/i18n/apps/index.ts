@@ -7,6 +7,8 @@ import {
 } from "./characterRelation";
 import type { CryptoMessageDict } from "./cryptoMessage";
 import { cryptoMessageEn, cryptoMessageJa } from "./cryptoMessage";
+import type { ExcelMergerDict } from "./excelMerger";
+import { excelMergerEn, excelMergerJa } from "./excelMerger";
 import type { FolderGeneratorDict } from "./folderGenerator";
 import {
   folderGeneratorEn,
@@ -50,6 +52,7 @@ export type AppsDictionary = {
   mailTemplate: MailTemplateDict;
   textCleaner: TextCleanerDict;
   folderGenerator: FolderGeneratorDict;
+  excelMerger: ExcelMergerDict;
   imageCompressor: ImageCompressorDict;
   invoiceMaker: InvoiceMakerDict;
   pdfEditor: PdfEditorDict;
@@ -69,6 +72,7 @@ export const appsJa: AppsDictionary = {
   mailTemplate: mailTemplateJa,
   textCleaner: textCleanerJa,
   folderGenerator: folderGeneratorJa,
+  excelMerger: excelMergerJa,
   imageCompressor: imageCompressorJa,
   invoiceMaker: invoiceMakerJa,
   pdfEditor: pdfEditorJa,
@@ -88,6 +92,7 @@ export const appsEn: AppsDictionary = {
   mailTemplate: mailTemplateEn,
   textCleaner: textCleanerEn,
   folderGenerator: folderGeneratorEn,
+  excelMerger: excelMergerEn,
   imageCompressor: imageCompressorEn,
   invoiceMaker: invoiceMakerEn,
   pdfEditor: pdfEditorEn,

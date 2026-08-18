@@ -68,6 +68,10 @@ export const ko: PartialDictionary = {
       title: "폴더 생성",
       description: "이름 규칙으로 날짜·번호·목록을 조합해 일괄 생성.",
     },
+    "excel-merger": {
+      title: "시트 결합",
+      description: "Excel 시트를 추출·정렬해 하나의 파일로 합칩니다.",
+    },
     "pdf-editor": {
       title: "PDF 편집",
       description: "브라우저에서 병합·정렬·페이지 삭제까지.",

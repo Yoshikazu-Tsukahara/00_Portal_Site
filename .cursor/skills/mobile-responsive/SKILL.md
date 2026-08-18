@@ -8,14 +8,15 @@ description: >-
 
 # 既存アプリのスマホ対応ワークフロー
 
-共通ルールの正本: `.cursor/rules/ui-ux.mdc`  
-完成例（コピー元）: `src/app/tools/mail-template/`
+分類の正本: `RULEBOOK.md`  
+UI 細部: `.cursor/rules/ui-ux.mdc`  
+完成例（コピー元）: `src/app/tools/mail-template/`（タイプは C-shell）
 
 ## ユーザーへの確認（未指定時）
 
 1. 対象アプリ（パス）
-2. Type C（独立 PWA）化が必要か（※インストールボタンはランチ貯金以外付けない）
-3. ポータルに `isMobileSupported: true` を付けるか（通常は対応完了後に Yes）
+2. Type C-shell 化が必要か（インストールボタンはランチ貯金以外付けない）
+3. `isMobileSupported` を true にするか false のままにするか（未設定で放置しない）
 
 ## Step 1: 現状把握
 
@@ -36,7 +37,7 @@ description: >-
   title={copy.shell.title}
   description={copy.shell.description}
   fillViewport          // 1画面ツールなら
-  isPwa                 // Type C なら（インストールボタンは付けない）
+  isPwa                 // C-shell / C-install なら（インストールボタンは付けない）
   dataManager={...}     // 永続データがあるなら
   actions={/* 機能ボタンのみ・1行コンパクト */}
 >
@@ -79,16 +80,13 @@ i18n に Short ラベルを ja/en 両方追加する。
 
 `fillViewport` 時: AppShell 作業領域は `overflow-y-auto overscroll-auto`。内部スクロールは端で親へチェーン（`overscroll-contain` 禁止）。
 
-## Step 5: PWA（Type C・依頼時のみ）
+## Step 5: PWA（C-shell・依頼時のみ）
 
-参照: `lunch-savings`（独立 PWA の型）。**インストールボタンはランチ貯金以外に付けない。**
+**インストールボタンはランチ貯金以外に付けない。** SW / manifest も C-install 以外は付けない。
 
-1. `pwaManifest.ts`（**`manifest.ts` という名前は使わない**）
-2. `manifest.webmanifest/route.ts` → `@/app/.../pwaManifest` を import
-3. `layout.tsx` + `<PwaRuntime basePath classPrefix />`
-4. `public/.../sw.js` + icons
-5. `SiteChrome.tsx` の `STANDALONE_APP_PATHS` にパス追加
-6. `InstallAppButton` は渡さない（サイト方針）
+1. `layout.tsx` + `<PwaRuntime basePath classPrefix />`（`enableServiceWorker` なし）
+2. `page.tsx` で `<AppShell isPwa>`
+3. `SiteChrome.tsx` の `STANDALONE_APP_PATHS` にパス追加
 
 ## Step 6: ポータルバッジ
 
@@ -107,16 +105,17 @@ isMobileSupported: true,
 
 ## ユーザーへの指示例（コピペ用）
 
-```
-〇〇アプリを、メールテンプレと同じ方針でスマホ対応して。
-ルールは .cursor/rules/ui-ux.mdc と skill mobile-responsive に従う。
-```
+正本は `RULEBOOK.md` §8。コロンより右だけ変える。
 
-オプション例:
-
-- 「バッジ（isMobileSupported）も付ける」
-- 「ヘッダー周りだけでよい／本体レイアウトまで」
-（※ インストールボタンはランチ貯金以外付けない）
+```
+①参照ルール：RULEBOOK.md
+②デザイン：design-rules.md
+③方針：スマホ対応
+⑥対象：/tools/mail-template
+⑧やること：メールテンプレと同じ方針でモバイルファーストにする
+⑩スマホ：対応する
+⑬やらないこと：インストール UI を付けない。依頼範囲外は触らない
+```
 
 ## やらないこと
 

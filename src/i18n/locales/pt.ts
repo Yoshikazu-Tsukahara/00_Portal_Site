@@ -68,6 +68,10 @@ export const pt: PartialDictionary = {
       title: "Pastas lote",
       description: "Crie pastas em lote com datas, números e listas.",
     },
+    "excel-merger": {
+      title: "Mesclar abas",
+      description: "Extraia e reordene planilhas Excel em um único arquivo.",
+    },
     "pdf-editor": {
       title: "Editor PDF",
       description: "Mesclar, reordenar e excluir páginas no navegador.",

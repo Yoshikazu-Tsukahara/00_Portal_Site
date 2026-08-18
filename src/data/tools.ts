@@ -1,7 +1,8 @@
 // ポータル掲載ツールの構造データ（表示文言は i18n 辞書側）
-// 新しいツールを追加する場合:
-// 1. ここに id / icon / href を追加（スマホ対応なら isMobileSupported: true）
-// 2. src/i18n/ja.ts と en.ts の tools / genres に文言を追加
+// 追加手順の正本: ルートの RULEBOOK.md
+// 1. ジャンル → タイプ → 3フラグを決める
+// 2. ここに id / icon / href / isMobileSupported を追加
+// 3. src/i18n と src/lib/seo.ts を更新
 
 export type Tool = {
   /** 辞書キー（tools[id]） */
@@ -109,6 +110,7 @@ export const TOOL_UPDATED_AT: Record<string, string> = {
   "invoice-maker": "2026-07-20",
   "mail-template": "2026-08-01",
   "folder-generator": "2026-06-12",
+  "excel-merger": "2026-08-18",
   "pdf-editor": "2026-07-28",
   "image-compressor": "2026-07-10",
   "text-cleaner": "2026-06-01",
@@ -157,6 +159,12 @@ export const genres: Genre[] = [
         id: "folder-generator",
         icon: "📁",
         href: "/tools/folder-generator",
+      },
+      {
+        id: "excel-merger",
+        icon: "📊",
+        href: "/tools/excel-merger",
+        isMobileSupported: false,
       },
       {
         id: "pdf-editor",

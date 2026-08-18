@@ -9,10 +9,8 @@ import UsageGuideHost from "@/components/UsageGuideHost";
 import { useStandaloneDisplay } from "@/lib/useStandaloneDisplay";
 
 /**
- * Type C（独立 PWA）のルートパス一覧。
- * ここに載っているアプリは「standalone 起動中だけ」Header / Footer を外す。
- * ブラウザで開いている間は Type B と同じくポータル枠のまま。
- * （page.tsx 側は `<AppShell isPwa>`、layout.tsx 側は `<PwaRuntime />` を使う）
+ * Type C-shell / C-install のルート。standalone 起動中だけ Header / Footer を外す。
+ * `isPwa` を付けたら必ずここにも足す（RULEBOOK.md）。
  */
 const STANDALONE_APP_PATHS = [
   "/lunch-savings",
@@ -65,9 +63,7 @@ const MIN_STAGE_PAGE_SCROLL_PATHS = [
 ];
 
 /**
- * Type D（没入型）のルートパス一覧。
- * ブラウザでも常にポータル枠を外し、フルスクリーンで出す（一人称ミニゲームなど）。
- * AppShell は使わず、各ページが独自ヘッダー + iframe を持つ。
+ * Type D（没入型）。常にポータル枠なし。AppShell は使わない（RULEBOOK.md）。
  */
 const ALWAYS_ISOLATE_PATHS = ["/monster-driver"];
 

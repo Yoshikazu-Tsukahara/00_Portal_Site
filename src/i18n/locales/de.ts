@@ -68,6 +68,10 @@ export const de: PartialDictionary = {
       title: "Ordnerbatch",
       description: "Ordner per Regel mit Datum, Nummern und Listen erzeugen.",
     },
+    "excel-merger": {
+      title: "Blätter mergen",
+      description: "Excel-Blätter extrahieren, sortieren und in einer Datei vereinen.",
+    },
     "pdf-editor": {
       title: "PDF-Editor",
       description: "Zusammenführen, sortieren und Seiten löschen im Browser.",

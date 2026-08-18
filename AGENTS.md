@@ -1,9 +1,11 @@
 # Blank Note — エージェント向けガイド
 
-個人開発ツールをまとめた Next.js ポータルサイト。**ブラウザ内完結**（LocalStorage、ファイル処理はクライアント側）が基本方針。  
-見た目は「上質な文房具」テイストのデスクトップ型ランチャー（OS 風ツールボックス）。
+個人開発ツールをまとめた Next.js ポータル。**ブラウザ内完結**（LocalStorage、ファイル処理はクライアント側）。  
+見た目は「上質な文房具」テイストのデスクトップ型ランチャー。
 
-デザイン原則の正本 → [`design-rules.md`](./design-rules.md)
+**アプリ追加・分類の正本 → [`RULEBOOK.md`](./RULEBOOK.md)**  
+デザインの正本 → [`design-rules.md`](./design-rules.md)  
+AI への定型指示 → `RULEBOOK.md` §8（①参照ルール：… の箇条書き。コロンより右を変える）
 
 ## 技術スタック
 
@@ -12,55 +14,50 @@
 - 多言語: `src/i18n/`（9言語、`ja` 定義を正・未訳は `en` フォールバック）
 - フォント: タイトル・ロゴ = Space Mono、本文 = Noto Sans JP
 
-## アプリの分類（新規追加時は最初に決める）
+## 新規アプリは先にこれを決める
 
-| タイプ | パス例 | AppShell | 備考 |
-|--------|--------|----------|------|
-| **B: 通常ツール** | `/tools/*` | あり（Footer 表示） | 業務・クリエイター向けツール |
-| **C: 独立 PWA** | `/lunch-savings` 等 | `isPwa` 付き | layout + PwaRuntime + manifest |
-| **D: 没入型** | `/monster-driver` 等 | なし | `SiteChrome.ALWAYS_ISOLATE_PATHS` に登録 |
+1. **ジャンル**（ライブラリの棚）: business / creators / utilities / minigames
+2. **実装タイプ**: B / C-shell / C-install / D
+3. **3フラグ**: バックアップ / スマホ / 画面の埋め方
 
-詳細ルールは `src/components/AppShell.tsx` 先頭コメントを参照。
+`/tools/*` だから Type B、ではない。詳細とチェックリストは RULEBOOK。
 
 ## 主要ディレクトリ
 
 ```
 src/
-├── app/           # 各ツールの page / layout / ロジック（/ = ホーム、/library = ライブラリ）
-├── components/    # AppShell, SiteChrome, icons, LocalOnlyBadge など共通 UI
-├── data/tools.ts  # ポータル掲載一覧（id / icon / href）
-├── i18n/          # 共通辞書 + apps/*（ツール別 UI 文言）
-└── lib/           # localData, layout, pwa など共通基盤
+├── app/           # 各ツールの page / layout（/ = ホーム、/library = ライブラリ）
+├── components/    # AppShell, SiteChrome, icons など共通 UI
+├── data/tools.ts  # ジャンルと掲載一覧
+├── i18n/          # 共通辞書 + apps/*
+└── lib/           # localData, layout, pwa, seo
 ```
 
-## UI/UX の統一（全アプリ共通）
+## 全体で揃えること
 
-- デザイン基調: Blank Note（背景 `#f8f8ff`、アクセント `#ccd5ff`、シャープな 1px ボーダー）
-- 表示幅: Header の LayoutToggle + `useLayout().contentClassName`
-- **言語スイッチ**: サイト Header のみ（PWA standalone 時は AppShell が代行）
-- **バックアップ**: `AppShell` の `dataManager`（タイトル横 💾）
-- **PWA インストール**: **ランチ貯金のみ** `AppShell` の `afterDataManager`（バックアップ右隣 📱）。他アプリでは出さない
-- **スマホ／縦型 AppShell**: 1行目=タイトル+💾+📱（アイコンのみ）→ 説明 → プライバシー案内 → 機能ボタン。ポータルへ戻るのはサイト Header のロゴ
-- **スマホ対応完了アプリ**: `src/data/tools.ts` で `isMobileSupported: true`
-- **ホームピン留め**: LocalStorage `blank-note:home-pins`
-
-詳細 → `.cursor/rules/ui-ux.mdc`  
-既存アプリへの適用手順 → `.cursor/skills/mobile-responsive/SKILL.md`
+- 言語スイッチ: サイト Header のみ（standalone 時は AppShell が代行）
+- バックアップ: `AppShell` の `dataManager`
+- **PWA インストール: ランチ貯金のみ**（他アプリに 📱 を付けない）
+- スマホ対応完了後: `tools.ts` で `isMobileSupported: true` または `false`
+- ホームピン留め: LocalStorage `blank-note:home-pins`
+- UI の短いタイトルと SEO 用 title は別（`src/lib/seo.ts`）
 
 ## 作業時の優先参照
 
-1. `design-rules.md`（デザインの正本）
-2. 触っているファイルの近傍コード（既存パターンに合わせる）
-3. `.cursor/rules/` の該当ルール（UI 変更時は `ui-ux.mdc`）
-4. 新規ツール追加時 → `.cursor/skills/add-new-tool/SKILL.md`
-5. 既存アプリのスマホ対応 → `.cursor/skills/mobile-responsive/SKILL.md`
+1. `RULEBOOK.md`（分類・ジャンル・追加）
+2. `design-rules.md`（見た目）
+3. 触っているファイルの近傍コード
+4. `.cursor/rules/`（UI は `ui-ux.mdc`、追加は `new-app.mdc`）
+5. 新規ツール → `.cursor/skills/add-new-tool/SKILL.md`
+6. 既存のスマホ対応 → `.cursor/skills/mobile-responsive/SKILL.md`
 
 ## やらないこと
 
-- サーバー API・DB 追加（このプロジェクトの範囲外）
+- サーバー API・DB 追加（例外は RULEBOOK に書いたものだけ）
 - ユーザー未依頼の git commit / push
 - 依頼範囲外の大規模リファクタ
-- ユーザー向け説明・コメント以外の英語混在（UI 文言の en 辞書は除く）
+- 依頼されていない例外の「ついで解消」
+- ユーザー向け説明・コメント以外の英語混在（UI の en 辞書は除く）
 
 <!-- BEGIN:nextjs-agent-rules -->
 # This is NOT the Next.js you know

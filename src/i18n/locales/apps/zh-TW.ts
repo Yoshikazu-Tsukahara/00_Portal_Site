@@ -1,4 +1,5 @@
 import type { AppsDictionary } from "../../apps";
+import { excelMergerZhTW } from "../../apps/excelMerger";
 
 /** アプリ内 UI 辞書（zh-TW） */
 export const appsZhTW: AppsDictionary = {
@@ -672,6 +673,7 @@ export const appsZhTW: AppsDictionary = {
       listItems: "企劃,設計,開發",
     },
   },
+  excelMerger: excelMergerZhTW,
   imageCompressor: {
     shell: {
       title: "圖片批次壓縮",

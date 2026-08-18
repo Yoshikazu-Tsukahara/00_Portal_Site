@@ -68,6 +68,10 @@ export const zhTW: PartialDictionary = {
       title: "資料夾生成",
       description: "依命名規則組合日期、編號與清單，一鍵批次建立。",
     },
+    "excel-merger": {
+      title: "工作表合併",
+      description: "抽取並重排 Excel 工作表，合併成一個檔案。",
+    },
     "pdf-editor": {
       title: "PDF編輯",
       description: "在瀏覽器中完成合併、排序與頁面刪除。",

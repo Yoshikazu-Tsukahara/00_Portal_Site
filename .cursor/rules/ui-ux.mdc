@@ -116,14 +116,14 @@ PC（広い viewport かつ縦型以外）:
 |------|----------|
 | ブラウザ | `Header.tsx` のみ（スマホもヘッダー直置きドロップダウン） |
 | PWA standalone | AppShell が自動表示 |
-| Type D | 独自薄い header 右端のみ |
+| Type D | 独自薄い header 右端のみ（RULEBOOK） |
 
 スマホ／縦型ヘッダー右端: 表示幅 DD → 言語 DD → ♡応援（アイコンのみ）
 
 ## バックアップ / PWA
 
 - バックアップ → `dataManager`
-- インストール → **ランチ貯金のみ** `afterDataManager` + `isPwa`（他アプリでは非表示。Type C のお作法は `AppShell` 先頭コメント）
+- インストール → **ランチ貯金のみ** `afterDataManager`（他アプリでは非表示。タイプは `RULEBOOK.md`）
 - Manifest 定義ファイル名は **`pwaManifest.ts`**（`manifest.ts` は Next 特殊ファイルと衝突）
 
 ## チェックリスト

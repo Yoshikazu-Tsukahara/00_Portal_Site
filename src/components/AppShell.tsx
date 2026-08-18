@@ -11,48 +11,16 @@ import type { MinStageSize } from "@/lib/minigameStage";
 import { useStandaloneDisplay } from "@/lib/useStandaloneDisplay";
 
 /**
- * アプリのタイプ分類と、AppShell の使い方ルール。
+ * タイプ分類の正本はルートの `RULEBOOK.md`。
  *
- * ポータル内のページは次の 3 タイプに分かれる。新規アプリはまずどれかを決める。
+ * - B: AppShell。PwaRuntime なし
+ * - C-shell: `isPwa` + layout の PwaRuntime（SW オフ）+ SiteChrome STANDALONE_APP_PATHS
+ * - C-install: ランチ貯金のみ。SW + 📱（`afterDataManager`）
+ * - D: AppShell を使わない。ALWAYS_ISOLATE_PATHS
  *
- * ## Type B: 通常ツール（`/tools/*` など）
- * - AppShell を使う。
- * - サイト共通の Header と **Footer は必ず表示する**。
- * - 1 画面に収めたい場合も `fillViewport` を使う（Footer は画面外のすぐ下に続く）。
- * - ミニゲームは `fillViewport` + `minStageSize` で、広いときはぴったり埋め、
- *   狭いときは最低サイズを保ったままスクロールする。
- * - LocalStorage を使うなら `dataManager` を渡す。
- * - 例: PDF編集、テキスト整形。
- * - ページ全体スクロール前提（内部スクロールなし）なら `fillViewport` を付けない
- *   （SiteChrome の FILL_VIEWPORT_PATHS からも外す）。例: メールテンプレ。
+ * `/tools/*` でも C-shell がありうる。fillViewport を付けたら FILL_VIEWPORT_PATHS も更新。
  *
- * ## Type C: 独立 PWA（ホーム画面から単体起動できるアプリ）
- * - AppShell を `isPwa` 付きで使う。
- * - ブラウザで開いている間は Type B と同じ見た目（Header / Footer あり）。
- * - **PWA として standalone 起動した時だけ** Header / Footer が消える
- *   （非表示の判定は `SiteChrome` 側、シェル内の出し分けは `isPwa` が担当）。
- * - お作法セット:
- *   1. layout.tsx で manifest / themeColor などのメタを宣言
- *   2. layout.tsx に `<PwaRuntime basePath classPrefix />`（SW 登録・活性クラス・履歴ロック）
- *   3. page.tsx で `<AppShell isPwa ...>`（standalone 時は言語トグルをヘッダー右に出す）
- *   4. 永続データがあるなら `dataManager` を渡す
- *   5. インストール導線（`afterDataManager`）は **ランチ貯金のみ** に置く
- *      （回遊・再訪問のため、他アプリでは非表示）
- * - 例: ランチ貯金（インストールあり）、とりあえずキープ、究極確率スロット。
- *
- * ## Type D: 没入型（フルスクリーンのゲームなど）
- * - **AppShell は使わない**。独自ヘッダー + iframe で完全に隔離する。
- * - `SiteChrome` の `ALWAYS_ISOLATE_PATHS` に登録し、常時 Header / Footer なし。
- * - 例: モンスタードライバー。
- *
- * ## モバイル／縦型プレビュー時のヘッダー（全アプリ共通）
- * 1. アプリ名（表示優先。長い場合は `titleShort`）＋ バックアップ ＋（ランチ貯金のみ）インストール（**文字なし・アイコンのみ**）
- * 2. 説明文
- * 3. プライバシー案内（PrivacyNotice）
- * 4. アプリ機能ボタン（actions）
- *
- * 判定は viewport 幅（〜767px）で行う
- * （表示幅トグルで中身だけ狭いとき用）。
+ * コンパクト時ヘッダー: タイトル + 💾 +（ランチ貯金のみ）📱 → 説明 → プライバシー案内 → actions
  */
 type AppShellProps = {
   /** アプリ名（ヘッダー1行目に表示） */
