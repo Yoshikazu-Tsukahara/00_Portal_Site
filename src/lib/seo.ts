@@ -122,9 +122,9 @@ export const TOOL_SEO: Record<string, PageSeo> = {
   },
   "excel-merger": {
     title:
-      "【無料】Excelのシートを抽出・並べ替えて一括結合 | Free Excel Sheet Merger | Blank Note",
+      "【無料】Excelシート抽出・結合。参照切れ警告つき | Free Excel Sheet Merger | Blank Note",
     description:
-      "複数のExcelファイルをドラッグ＆ドロップし、シートを並べ替えて1つの.xlsxに結合できるブラウザ完結ツール。アップロード不要・登録不要・データ送信なし。Free online Excel sheet merger, no upload.",
+      "複数のExcelをドラッグで整理・結合。他シート参照を警告し、数式を値にして書き出せるブラウザ完結ツール。アップロード不要・登録不要。Free Excel sheet merger with #REF! safeguards, no upload.",
   },
   "invoice-maker": {
     title:

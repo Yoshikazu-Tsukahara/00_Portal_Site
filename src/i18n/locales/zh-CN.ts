@@ -72,7 +72,7 @@ export const zhCN: PartialDictionary = {
     },
     "excel-merger": {
       title: "工作表合并",
-      description: "抽取并重排 Excel 工作表，合并成一个文件。",
+      description: "拖动合并工作表。跨表引用有警告，也可按值导出。",
     },
     "pdf-editor": {
       title: "PDF编辑",

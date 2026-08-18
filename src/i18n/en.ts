@@ -216,24 +216,25 @@ export const en: Dictionary = {
     },
     "excel-merger": {
       title: "Sheet Merge",
-      description: "Organize Excel sheets in columns and merge by dragging.",
+      description:
+        "Drag sheets to merge workbooks. Warns on cross-sheet refs and can export values only.",
       detail: [
-        "Drop several Excel files and each one becomes a vertical column. Sheets appear as cards you can reorder in place or drag onto another column to merge them into that workbook.",
-        "Nothing is uploaded: reading and export happen entirely in the browser, so internal spreadsheets stay on your machine. Designed primarily for desktop use.",
+        "Drop Excel files and each one becomes a vertical column (up to 5). Sheets appear as cards you can reorder in place or drag onto another column to merge them into that workbook.",
+        "Formulas, charts, and defined names that point at other sheets are flagged on the card, and related sheets share a light color. On export you can discard formulas and keep calculated values (recommended) to avoid #REF!. Nothing is uploaded—processing stays in the browser. Designed primarily for desktop use.",
       ],
       highlights: [
-        "Drag and drop multiple .xlsx files at once",
-        "Kanban columns, one per file, with sheet cards",
-        "Reorder inside a column, or move sheets between files",
-        "Download a column as .xlsx, or all files as a ZIP",
+        "Up to 5 .xlsx files as kanban columns",
+        "Warns on cross-sheet refs (formulas, charts, names, and more)",
+        "Related sheets share a light matching color",
+        "Export as values (recommended), per column or as a ZIP",
       ],
       gettingStarted: [
-        "Drop .xlsx files into the area at the top.",
+        "Drop .xlsx files into the area at the top (up to 5).",
         "Reorder sheet cards inside each file column.",
         "Drag a sheet onto another column to merge it into that file.",
-        "Use a column’s Save button, or “Download all files” at the bottom.",
+        "Keep “merge as values” on if you like, then Save a column or Download all files.",
       ],
-      tip: "Duplicate sheet names in one column are renamed automatically, e.g. “Sheet1 (2)”. Cell values, formulas, and merged cells carry over; charts, images, and some styling do not.",
+      tip: "Cards with other-sheet refs show a warning and a shared tint. Turn on “merge as values” when extracting sheets to avoid #REF!. Charts, images, and some styling do not carry over.",
     },
     "pdf-editor": {
       title: "PDF Editor",

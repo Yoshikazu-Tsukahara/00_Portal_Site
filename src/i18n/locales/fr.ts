@@ -70,7 +70,7 @@ export const fr: PartialDictionary = {
     },
     "excel-merger": {
       title: "Fusion feuilles",
-      description: "Extrayez et réordonnez des feuilles Excel en un fichier.",
+      description: "Glissez pour fusionner. Alerte les réfs. croisées ; export en valeurs.",
     },
     "pdf-editor": {
       title: "Éditeur PDF",

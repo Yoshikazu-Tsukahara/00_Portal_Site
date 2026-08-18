@@ -60,7 +60,7 @@ export const excelMergerJa: ExcelMergerDict = {
   shell: {
     title: "シート結合",
     description:
-      "ファイルごとに列を作り、シートをドラッグして整理・結合できます。",
+      "ファイルごとに列を作り、シートをドラッグして結合。他シート参照は色と警告で分かります。",
   },
   drop: {
     hint: ".xlsx をここにドラッグ＆ドロップ（最大5ファイル）",
@@ -123,7 +123,7 @@ export const excelMergerEn: ExcelMergerDict = {
   shell: {
     title: "Sheet Merge",
     description:
-      "One column per file. Drag sheets to reorder or merge into another workbook.",
+      "One column per file. Drag to merge. Cross-sheet refs are tinted and flagged.",
   },
   drop: {
     hint: "Drop .xlsx files here (up to 5 files)",
@@ -185,7 +185,7 @@ export const excelMergerEn: ExcelMergerDict = {
 export const excelMergerZhCN: ExcelMergerDict = {
   shell: {
     title: "工作表合并",
-    description: "每个文件一列。拖动工作表即可重排，或合并到另一文件。",
+    description: "每个文件一列。拖动即可合并。跨表引用会用颜色和警告标出。",
   },
   drop: {
     hint: "将 .xlsx 拖放到此处（最多 5 个文件）",
@@ -246,7 +246,7 @@ export const excelMergerZhCN: ExcelMergerDict = {
 export const excelMergerZhTW: ExcelMergerDict = {
   shell: {
     title: "工作表合併",
-    description: "每個檔案一欄。拖曳工作表即可重排，或合併到另一檔案。",
+    description: "每個檔案一欄。拖曳即可合併。跨表參照會以顏色與警告標示。",
   },
   drop: {
     hint: "將 .xlsx 拖放到這裡（最多 5 個檔案）",
@@ -308,7 +308,7 @@ export const excelMergerKo: ExcelMergerDict = {
   shell: {
     title: "시트 결합",
     description:
-      "파일마다 열을 만들고, 시트를 드래그해 정리·결합합니다.",
+      "파일마다 열을 만들고 드래그로 결합. 다른 시트 참조는 색과 경고로 표시합니다.",
   },
   drop: {
     hint: ".xlsx 파일을 여기에 끌어다 놓으세요 (최대 5개)",
@@ -371,7 +371,7 @@ export const excelMergerEs: ExcelMergerDict = {
   shell: {
     title: "Combinar hojas",
     description:
-      "Una columna por archivo. Arrastra hojas para reordenar o fusionarlas en otro libro.",
+      "Una columna por archivo. Arrastra para fusionar. Las refs. a otras hojas se marcan con color y aviso.",
   },
   drop: {
     hint: "Suelta aquí archivos .xlsx (hasta 5)",
@@ -434,7 +434,7 @@ export const excelMergerFr: ExcelMergerDict = {
   shell: {
     title: "Fusion de feuilles",
     description:
-      "Une colonne par fichier. Glissez les feuilles pour réordonner ou les fusionner dans un autre classeur.",
+      "Une colonne par fichier. Glissez pour fusionner. Les réfs. croisées sont colorées et signalées.",
   },
   drop: {
     hint: "Déposez des fichiers .xlsx ici (5 maximum)",
@@ -497,7 +497,7 @@ export const excelMergerDe: ExcelMergerDict = {
   shell: {
     title: "Blätter zusammenführen",
     description:
-      "Eine Spalte pro Datei. Blätter ziehen zum Umsortieren oder in eine andere Mappe verschieben.",
+      "Eine Spalte pro Datei. Ziehen zum Zusammenführen. Blattübergreifende Bezüge sind farbig markiert.",
   },
   drop: {
     hint: ".xlsx-Dateien hierher ziehen (max. 5)",
@@ -560,7 +560,7 @@ export const excelMergerPt: ExcelMergerDict = {
   shell: {
     title: "Mesclar planilhas",
     description:
-      "Uma coluna por arquivo. Arraste abas para reordenar ou mesclar em outra planilha.",
+      "Uma coluna por arquivo. Arraste para mesclar. Refs. a outras abas ganham cor e aviso.",
   },
   drop: {
     hint: "Solte arquivos .xlsx aqui (até 5)",

@@ -70,7 +70,7 @@ export const pt: PartialDictionary = {
     },
     "excel-merger": {
       title: "Mesclar abas",
-      description: "Extraia e reordene planilhas Excel em um único arquivo.",
+      description: "Arraste para mesclar. Avisa refs. cruzadas e pode exportar valores.",
     },
     "pdf-editor": {
       title: "Editor PDF",

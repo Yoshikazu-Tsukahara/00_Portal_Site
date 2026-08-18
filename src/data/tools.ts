@@ -65,6 +65,7 @@ const TOOLS_WITH_STATIC_ICON = new Set<string>([
   "crypto-message",
   "lunch-savings",
   "link-stocker",
+  "excel-merger",
 ]);
 
 /**
@@ -94,6 +95,7 @@ const TOOLS_WITH_STATIC_COVER = new Set<string>([
   "crypto-message",
   "lunch-savings",
   "link-stocker",
+  "excel-merger",
 ]);
 
 /** 静的カバーがあるときだけパスを返す（無ければ null → ライブプレビュー） */

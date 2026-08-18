@@ -70,7 +70,7 @@ export const es: PartialDictionary = {
     },
     "excel-merger": {
       title: "Combinar hojas",
-      description: "Extrae y reordena hojas de Excel en un solo archivo.",
+      description: "Arrastra hojas para fusionar. Avisa refs. y puede exportar valores.",
     },
     "pdf-editor": {
       title: "Editor PDF",

@@ -70,7 +70,7 @@ export const zhTW: PartialDictionary = {
     },
     "excel-merger": {
       title: "工作表合併",
-      description: "抽取並重排 Excel 工作表，合併成一個檔案。",
+      description: "拖曳合併工作表。跨表參照有警告，也可按值匯出。",
     },
     "pdf-editor": {
       title: "PDF編輯",

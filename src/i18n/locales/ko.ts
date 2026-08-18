@@ -70,7 +70,7 @@ export const ko: PartialDictionary = {
     },
     "excel-merger": {
       title: "시트 결합",
-      description: "Excel 시트를 추출·정렬해 하나의 파일로 합칩니다.",
+      description: "드래그로 시트를 결합. 다른 시트 참조 경고와 값 내보내기.",
     },
     "pdf-editor": {
       title: "PDF 편집",

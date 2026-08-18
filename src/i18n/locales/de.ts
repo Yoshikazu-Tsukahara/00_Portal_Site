@@ -70,7 +70,7 @@ export const de: PartialDictionary = {
     },
     "excel-merger": {
       title: "Blätter mergen",
-      description: "Excel-Blätter extrahieren, sortieren und in einer Datei vereinen.",
+      description: "Blätter per Drag mergen. Warnt bei Bezügen; Export als Werte möglich.",
     },
     "pdf-editor": {
       title: "PDF-Editor",
