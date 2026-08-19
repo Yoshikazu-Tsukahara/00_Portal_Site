@@ -1,5 +1,6 @@
 import type { AppsDictionary } from "../../apps";
 import { excelMergerPt } from "../../apps/excelMerger";
+import { frameExtractorEn } from "../../apps/frameExtractor";
 
 /** アプリ内 UI 辞書（pt） */
 export const appsPt: AppsDictionary = {
@@ -2246,4 +2247,5 @@ export const appsPt: AppsDictionary = {
       close: "Fechar",
     },
   },
+  frameExtractor: frameExtractorEn,
 };

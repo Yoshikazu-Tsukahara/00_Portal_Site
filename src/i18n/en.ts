@@ -318,6 +318,27 @@ export const en: Dictionary = {
       ],
       tip: "Embedding focuses on MP3 and some video containers; other types may mainly rename. Large videos can take a while to save.",
     },
+    "frame-extractor": {
+      title: "Frame Extractor",
+      description: "Step a video frame by frame and save stills locally.",
+      detail: [
+        "Open a video entirely in the browser, step one frame at a time (about 1/30 s), and save the exact moment at native resolution as PNG, JPEG, or WebP. Files never leave your device.",
+        "A nearby-frame filmstrip and optional burst ZIP are included. Precise stepping is aimed at desktop use.",
+      ],
+      highlights: [
+        "Drag-and-drop MP4 / WebM / MOV and more",
+        "1-frame steps, 0.1 s / 1 s jumps, 0.1×–2× speed",
+        "Nearby-frame thumbnails and keyboard shortcuts",
+        "Save the current frame, or a numbered burst ZIP",
+      ],
+      gettingStarted: [
+        "Drop a video file to load it.",
+        "Pause, then use arrows or buttons to find the frame.",
+        "Pick a format and save the current frame.",
+        "Optionally mark in/out and export a burst ZIP.",
+      ],
+      tip: "Match step fps to the source. For 60 fps footage, choose 60 so stepping lands on real frames.",
+    },
     "character-relation-editor": {
       title: "Story Map",
       description: "Map a cast with character cards and labeled relationship links.",

@@ -1,5 +1,6 @@
 import type { AppsDictionary } from "../../apps";
 import { excelMergerEs } from "../../apps/excelMerger";
+import { frameExtractorEn } from "../../apps/frameExtractor";
 
 /** アプリ内 UI 辞書（es） */
 export const appsEs: AppsDictionary = {
@@ -2247,4 +2248,5 @@ export const appsEs: AppsDictionary = {
       modalClose: "Entendido",
     },
   },
+  frameExtractor: frameExtractorEn,
 };

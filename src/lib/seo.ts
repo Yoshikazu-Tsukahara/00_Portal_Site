@@ -156,6 +156,12 @@ export const TOOL_SEO: Record<string, PageSeo> = {
     description:
       "MP3や動画のタイトル・アーティスト・カバーをブラウザ内で編集。登録不要、ファイルは端末外へ送りません。100% Private media metadata editor.",
   },
+  "frame-extractor": {
+    title:
+      "【無料】動画の1フレーム精密コマ送り・画像切り出し | Free Video Frame Extractor | Blank Note",
+    description:
+      "MP4 / WebM / MOV を1コマ単位で送り、決定的な瞬間を PNG / JPEG / WebP で保存。完全無料・登録不要・サーバー送信なし。Free local-first video frame grabber.",
+  },
   "character-relation-editor": {
     title:
       "【登録不要】小説・脚本の登場人物相関図作成 | Free Character Relationship Map | Blank Note",

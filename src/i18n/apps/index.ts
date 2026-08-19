@@ -14,6 +14,8 @@ import {
   folderGeneratorEn,
   folderGeneratorJa,
 } from "./folderGenerator";
+import type { FrameExtractorDict } from "./frameExtractor";
+import { frameExtractorEn, frameExtractorJa } from "./frameExtractor";
 import type { ImageCompressorDict } from "./imageCompressor";
 import {
   imageCompressorEn,
@@ -57,6 +59,7 @@ export type AppsDictionary = {
   invoiceMaker: InvoiceMakerDict;
   pdfEditor: PdfEditorDict;
   mediaMetadata: MediaMetadataDict;
+  frameExtractor: FrameExtractorDict;
   characterRelation: CharacterRelationDict;
   bookVisualizer: BookVisualizerDict;
   paletteCollector: PaletteCollectorDict;
@@ -77,6 +80,7 @@ export const appsJa: AppsDictionary = {
   invoiceMaker: invoiceMakerJa,
   pdfEditor: pdfEditorJa,
   mediaMetadata: mediaMetadataJa,
+  frameExtractor: frameExtractorJa,
   characterRelation: characterRelationJa,
   bookVisualizer: bookVisualizerJa,
   paletteCollector: paletteCollectorJa,
@@ -97,6 +101,7 @@ export const appsEn: AppsDictionary = {
   invoiceMaker: invoiceMakerEn,
   pdfEditor: pdfEditorEn,
   mediaMetadata: mediaMetadataEn,
+  frameExtractor: frameExtractorEn,
   characterRelation: characterRelationEn,
   bookVisualizer: bookVisualizerEn,
   paletteCollector: paletteCollectorEn,

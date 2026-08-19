@@ -1,5 +1,6 @@
 import type { AppsDictionary } from "../../apps";
 import { excelMergerKo } from "../../apps/excelMerger";
+import { frameExtractorEn } from "../../apps/frameExtractor";
 
 /** アプリ内 UI 辞書（ko） */
 export const appsKo: AppsDictionary = {
@@ -2246,4 +2247,5 @@ export const appsKo: AppsDictionary = {
       close: "닫기",
     },
   },
+  frameExtractor: frameExtractorEn,
 };

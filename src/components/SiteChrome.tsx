@@ -43,6 +43,8 @@ const FILL_VIEWPORT_PATHS = [
   // メディア・メタデータはスマホでページ全体スクロール（項目数で縦に伸びる）
   "/tools/character-relation-editor",
   "/tools/book-visualizer",
+  // コマ切り出し: 大画面プレイヤー＋操作を 1 画面に収める
+  "/tools/frame-extractor",
 ];
 
 /**
