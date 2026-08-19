@@ -49,7 +49,8 @@ description: Blank Note Portal に新規ツールまたは独立 PWA を追加�
 ## Step 4: 掲載と SEO
 
 - `src/data/tools.ts` のジャンルに追加。`isMobileSupported` を必ず付ける
-- `src/lib/seo.ts` の `TOOL_SEO`（sitemap は tools.ts から自動）
+- `src/lib/seo.ts` の `TOOL_SEO`
+- **sitemap**: `tools.ts` に載せるだけ（`src/lib/sitemap.ts` がビルド時に URL を収集）
 - アイコン / カバーを置くなら `TOOLS_WITH_STATIC_*` にも追加
 
 ## Step 5: 共通 UI

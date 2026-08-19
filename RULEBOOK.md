@@ -212,7 +212,8 @@ page の `fillViewport` と `SiteChrome` の配列は**同じ判定**にする�
 - [ ] `src/i18n/ja.ts` / `en.ts` の `tools.<id>`（title / description / detail）
 - [ ] 他言語は未訳なら en フォールバック可
 - [ ] `page.tsx` は `"use client"` + AppShell（Type D 以外）
-- [ ] `src/lib/seo.ts` の `TOOL_SEO`（sitemap の URL は `tools.ts` から自動）
+- [ ] `src/lib/seo.ts` の `TOOL_SEO`
+- [ ] **sitemap**: 手動更新不要 — `tools.ts` に追加すればデプロイ時に `/sitemap.xml` へ自動反映
 - [ ] `layout.tsx` で SEO metadata（`pageMetadata` + `TOOL_SEO`）
 
 ### タイプに応じて

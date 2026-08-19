@@ -3,6 +3,7 @@
 // 1. ジャンル → タイプ → 3フラグを決める
 // 2. ここに id / icon / href / isMobileSupported を追加
 // 3. src/i18n と src/lib/seo.ts を更新
+// 4. sitemap.xml は tools.ts 追加だけで自動反映（src/lib/sitemap.ts → src/app/sitemap.ts）
 
 export type Tool = {
   /** 辞書キー（tools[id]） */
