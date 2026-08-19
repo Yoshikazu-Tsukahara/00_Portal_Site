@@ -67,7 +67,8 @@ export default function FrameExtractorPage() {
   const [stripLoading, setStripLoading] = useState(false);
   const [busy, setBusy] = useState(false);
   const [bursting, setBursting] = useState(false);
-  const [sharpenEnabled, setSharpenEnabled] = useState(true);
+  // シャープネスは圧縮ノイズも強調しやすいため、初期はOFFにする
+  const [sharpenEnabled, setSharpenEnabled] = useState(false);
   const [burstCurrent, setBurstCurrent] = useState(0);
   const [burstIn, setBurstIn] = useState(0);
   const [burstOut, setBurstOut] = useState(0);

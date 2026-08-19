@@ -43,12 +43,28 @@ export function extOf(format: CaptureFormat): string {
 
 function waitForFrame(video: HTMLVideoElement): Promise<void> {
   return new Promise((resolve) => {
-    const rvfc = video.requestVideoFrameCallback?.bind(video);
-    if (typeof rvfc === "function") {
-      rvfc(() => resolve());
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      resolve();
+    };
+
+    // 一時停止中は新しいフレームが来ず rvfc が返らないブラウザがある
+    if (video.paused) {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(finish);
+      });
       return;
     }
-    requestAnimationFrame(() => resolve());
+
+    const rvfc = video.requestVideoFrameCallback?.bind(video);
+    if (typeof rvfc === "function") {
+      rvfc(() => finish());
+      window.setTimeout(finish, 500);
+      return;
+    }
+    requestAnimationFrame(finish);
   });
 }
 
@@ -126,12 +142,16 @@ export async function captureFrameBlob(
   await waitForFrame(video);
   const canvas = drawNative(video);
   if (sharpenEnabled) {
-    const ctx = canvas.getContext("2d");
-    if (!ctx) throw new Error("canvas_unavailable");
-    const { width, height } = canvas;
-    const img = ctx.getImageData(0, 0, width, height);
-    applySharpenKernel(img);
-    ctx.putImageData(img, 0, 0);
+    try {
+      const ctx = canvas.getContext("2d");
+      if (!ctx) throw new Error("canvas_unavailable");
+      const { width, height } = canvas;
+      const img = ctx.getImageData(0, 0, width, height);
+      applySharpenKernel(img);
+      ctx.putImageData(img, 0, 0);
+    } catch {
+      // セキュリティ制約などで getImageData 不可のときはシャープネスをスキップ
+    }
   }
   const mime = mimeOf(format);
   const q = format === "png" ? undefined : quality;
@@ -297,14 +317,22 @@ export async function captureFilmStrip(
 }
 
 export function downloadBlob(blob: Blob, fileName: string): void {
+  if (!blob || blob.size === 0) {
+    throw new Error("empty_blob");
+  }
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
   a.download = fileName;
+  a.rel = "noopener";
+  a.style.display = "none";
   document.body.appendChild(a);
   a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  // すぐ revoke するとダウンロードが失敗するブラウザがある
+  window.setTimeout(() => {
+    a.remove();
+    URL.revokeObjectURL(url);
+  }, 4000);
 }
 
 export function captureFileName(
