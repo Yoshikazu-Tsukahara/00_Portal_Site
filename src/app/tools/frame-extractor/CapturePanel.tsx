@@ -66,7 +66,7 @@ export default function CapturePanel({
   }
 
   return (
-    <section className="rounded-md border border-zinc-200/80 bg-white p-3 sm:p-4">
+    <section className="rounded-md border border-zinc-200/80 bg-white p-3">
       <div className="flex flex-col gap-3">
         <fieldset className="min-w-0">
           <legend className="mb-1 text-[11px] text-zinc-500">

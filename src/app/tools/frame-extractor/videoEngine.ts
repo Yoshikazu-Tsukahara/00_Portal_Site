@@ -111,6 +111,26 @@ export async function seekVideo(
   await waitForFrame(video);
 }
 
+/**
+ * 表示更新の確実性を最優先しない（=高速化）ためのシーク。
+ * 目的は「操作感を重くしない」ことで、保存のような厳密さは不要な箇所（コマ送り等）で使う。
+ */
+export async function seekVideoFast(
+  video: HTMLVideoElement,
+  time: number,
+): Promise<void> {
+  if (video.paused === false) video.pause();
+  const duration = Number.isFinite(video.duration) ? video.duration : 0;
+  const maxT = duration > 0 ? Math.max(0, duration - 1e-4) : 0;
+  const clamped = Math.min(Math.max(0, time), maxT);
+  if (Math.abs(video.currentTime - clamped) < 1e-4) return;
+  const wait = waitForSeeked(video);
+  video.currentTime = clamped;
+  await wait;
+  // seeked は「移動完了」だが、描画が追いついてない場合があるため軽く待つ
+  await waitForFrame(video);
+}
+
 function drawNative(
   video: HTMLVideoElement,
   destW?: number,

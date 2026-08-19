@@ -37,7 +37,7 @@ export default function FilmStrip({
         </p>
       ) : thumbs.length === 0 ? (
         <p className="py-6 text-center text-xs text-zinc-400">
-          {loading ? copy.filmstripEmpty : copy.filmstripFailed}
+          {loading ? copy.filmstripEmpty : copy.filmstripEmpty}
         </p>
       ) : (
         <div className="flex gap-1.5 overflow-x-auto overscroll-auto pb-1">

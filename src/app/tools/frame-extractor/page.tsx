@@ -35,6 +35,7 @@ import {
   frameToTime,
   lastFrameIndex,
   seekVideo,
+  seekVideoFast,
   timeToFrame,
 } from "./videoEngine";
 
@@ -51,6 +52,18 @@ export default function FrameExtractorPage() {
   const burstAbortRef = useRef<AbortController | null>(null);
   /** Object URL はイベント／アンマウントでのみ破棄する */
   const objectUrlRef = useRef<string | null>(null);
+
+  // シーク中にキーリピート連打が来ても、同時 seek せず「最後のターゲットへ順に追従」するための制御
+  const seekingRef = useRef(false);
+  const pendingSeekTimeRef = useRef<number | null>(null);
+  const seekTargetTimeRef = useRef<number | null>(null);
+  // 「どの中心フレームの前後フレームが完成しているか」
+  const stripReadyCenterFrameRef = useRef<number | null>(null);
+
+  // `openFile` が `refreshStrip` より先に宣言されているため、関数呼び出しは ref 経由にする
+  const refreshStripInvokerRef = useRef<
+    ((src: string, time: number) => Promise<void>) | null
+  >(null);
 
   const [session, setSession] = useState<VideoSession | null>(null);
   const [dragging, setDragging] = useState(false);
@@ -124,6 +137,12 @@ export default function FrameExtractorPage() {
       URL.revokeObjectURL(objectUrlRef.current);
       objectUrlRef.current = null;
     }
+
+    seekingRef.current = false;
+    pendingSeekTimeRef.current = null;
+    seekTargetTimeRef.current = null;
+    stripReadyCenterFrameRef.current = null;
+
     setSession(null);
     setPlaying(false);
     setCurrentTime(0);
@@ -169,17 +188,31 @@ export default function FrameExtractorPage() {
       objectUrlRef.current = url;
       setSession({ file, url, name: file.name });
       trackToolUsed("frame_extractor", "load");
+      // 初回の前後フレーム生成（矢印キーのゲート判定に必要）
+      if (refreshStripInvokerRef.current) {
+        void refreshStripInvokerRef.current(url, 0);
+      } else {
+        // `useEffect` で invokerRef をセットするため、念のため次ティックに再試行
+        window.setTimeout(() => {
+          void refreshStripInvokerRef.current?.(url, 0);
+        }, 0);
+      }
     },
     [clearSession, copy.unsupported],
   );
 
   const refreshStrip = useCallback(
     async (src: string, time: number) => {
-      if (playing) return;
+      // state の `playing` は更新遅延があり得るため、実際の動画状態を優先する
+      const v = videoRef.current;
+      if (v && !v.paused) return;
       stripAbortRef.current?.abort();
       const ac = new AbortController();
       stripAbortRef.current = ac;
       setStripLoading(true);
+      // 再生成中は古いサムネが残って「矢印操作がズレた」ように見えやすいため、先にクリアする
+      setThumbs([]);
+      stripReadyCenterFrameRef.current = null;
       try {
         const next = await captureFilmStrip(
           src,
@@ -188,7 +221,11 @@ export default function FrameExtractorPage() {
           videoRef.current?.duration || duration,
           ac.signal,
         );
-        if (!ac.signal.aborted) setThumbs(next);
+        if (!ac.signal.aborted) {
+          setThumbs(next);
+          // FilmStrip が生成した中心の目標位置を記録（矢印キー無効化の判定に使う）
+          stripReadyCenterFrameRef.current = timeToFrame(time, fps);
+        }
       } catch (err) {
         if ((err as DOMException).name !== "AbortError") {
           setThumbs([]);
@@ -197,26 +234,50 @@ export default function FrameExtractorPage() {
         setStripLoading(false);
       }
     },
-    [duration, fps, playing],
+    [duration, fps],
   );
 
+  // ref 経由で `openFile` から呼び出すための受け渡し（レンダー外で更新）
   useEffect(() => {
-    if (!session || playing || bursting) return;
-    const handle = window.setTimeout(() => {
-      void refreshStrip(session.url, currentTime);
-    }, 120);
-    return () => window.clearTimeout(handle);
-  }, [session, playing, bursting, currentTime, fps, refreshStrip]);
+    refreshStripInvokerRef.current = refreshStrip;
+  }, [refreshStrip]);
+
+  // FilmStrip の再生成は、シーク完了（onSeeked）で即時開始するため
+  // currentTime 監視のデバウンスは行わない。
 
   const seekTo = useCallback(async (time: number) => {
     const video = videoRef.current;
     if (!video) return;
+
+    // 押し続け（キーリピート）時に、次のターゲット計算の基準になる値を即更新
+    seekTargetTimeRef.current = time;
+
+    // すでにシーク中なら「最後の狙い」だけ更新して戻る
+    if (seekingRef.current) {
+      pendingSeekTimeRef.current = time;
+      return;
+    }
+
+    seekingRef.current = true;
+    pendingSeekTimeRef.current = null;
+
+    let target: number | null = time;
     try {
-      await seekVideo(video, time);
-      setCurrentTime(video.currentTime);
-      setPlaying(false);
+      // シーク完了→次の pending があれば、同じ call の中で順に追従
+      while (target != null) {
+        // 操作感優先：高速シーク（表示フレーム同期の厳密待ちを省略）
+        await seekVideoFast(video, target);
+        setCurrentTime(video.currentTime);
+        setPlaying(false);
+
+        target = pendingSeekTimeRef.current;
+        pendingSeekTimeRef.current = null;
+      }
     } catch {
       setError(copy.videoError);
+    } finally {
+      seekingRef.current = false;
+      seekTargetTimeRef.current = video.currentTime;
     }
   }, [copy.videoError]);
 
@@ -224,9 +285,12 @@ export default function FrameExtractorPage() {
     (delta: number) => {
       const video = videoRef.current;
       if (!video) return;
+
+      // seekTo が並列になっても、次のターゲット計算は「狙いの時刻」を基準にする
+      const baseTime = seekTargetTimeRef.current ?? video.currentTime;
       const frame = Math.min(
         lastFrameIndex(video.duration, fps),
-        Math.max(0, timeToFrame(video.currentTime, fps) + delta),
+        Math.max(0, timeToFrame(baseTime, fps) + delta),
       );
       void seekTo(frameToTime(frame, fps));
     },
@@ -237,7 +301,9 @@ export default function FrameExtractorPage() {
     (seconds: number) => {
       const video = videoRef.current;
       if (!video) return;
-      void seekTo(video.currentTime + seconds);
+
+      const baseTime = seekTargetTimeRef.current ?? video.currentTime;
+      void seekTo(baseTime + seconds);
     },
     [seekTo],
   );
@@ -512,15 +578,36 @@ export default function FrameExtractorPage() {
               onPause={() => {
                 setPlaying(false);
                 const v = videoRef.current;
-                if (v) setCurrentTime(v.currentTime);
+                if (v) {
+                  setCurrentTime(v.currentTime);
+                  // ユーザーのドラッグ等でのシークなら、次の矢印操作の基準を同期する
+                  if (!seekingRef.current) {
+                    seekTargetTimeRef.current = v.currentTime;
+                  }
+                }
               }}
               onTimeUpdate={() => {
                 const v = videoRef.current;
-                if (v) setCurrentTime(v.currentTime);
+                if (v) {
+                  setCurrentTime(v.currentTime);
+                  if (!seekingRef.current) {
+                    seekTargetTimeRef.current = v.currentTime;
+                  }
+                }
               }}
               onSeeked={() => {
                 const v = videoRef.current;
-                if (v) setCurrentTime(v.currentTime);
+                if (v) {
+                  setCurrentTime(v.currentTime);
+                  if (!seekingRef.current) {
+                    seekTargetTimeRef.current = v.currentTime;
+                  }
+                  // シーンバー操作やコマ送りでのシーク完了直後に、前後フレームを即再生成する
+                  // 保存中（busy）や連写中（bursting）は無駄な再生成を避ける
+                  if (!bursting && !busy) {
+                    void refreshStrip(session.url, v.currentTime);
+                  }
+                }
               }}
               onError={() => setError(copy.videoError)}
               onClick={togglePlay}
@@ -607,20 +694,18 @@ export default function FrameExtractorPage() {
         </div>
 
         <div
-          className={`flex min-w-0 flex-col gap-3 ${
-            compact ? "" : "min-h-0 overflow-y-auto overscroll-auto"
+          className={`flex min-w-0 flex-col gap-2 ${
+            compact ? "" : "min-h-0"
           }`}
         >
-          {thumbs.length > 0 ? (
-            <FilmStrip
-              copy={copy}
-              thumbs={thumbs}
-              currentFrame={currentFrame}
-              playing={playing}
-              loading={stripLoading}
-              onSelect={(time) => void seekTo(time)}
-            />
-          ) : null}
+          <FilmStrip
+            copy={copy}
+            thumbs={thumbs}
+            currentFrame={currentFrame}
+            playing={playing}
+            loading={stripLoading}
+            onSelect={(time) => void seekTo(time)}
+          />
           <CapturePanel
             copy={copy}
             format={format}
