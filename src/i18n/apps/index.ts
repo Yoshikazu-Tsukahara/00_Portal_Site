@@ -9,6 +9,8 @@ import type { CryptoMessageDict } from "./cryptoMessage";
 import { cryptoMessageEn, cryptoMessageJa } from "./cryptoMessage";
 import type { ExcelMergerDict } from "./excelMerger";
 import { excelMergerEn, excelMergerJa } from "./excelMerger";
+import type { ExifRemoverDict } from "./exifRemover";
+import { exifRemoverEn, exifRemoverJa } from "./exifRemover";
 import type { FolderGeneratorDict } from "./folderGenerator";
 import {
   folderGeneratorEn,
@@ -61,6 +63,7 @@ export type AppsDictionary = {
   invoiceMaker: InvoiceMakerDict;
   pdfEditor: PdfEditorDict;
   mediaMetadata: MediaMetadataDict;
+  exifRemover: ExifRemoverDict;
   frameExtractor: FrameExtractorDict;
   characterRelation: CharacterRelationDict;
   bookVisualizer: BookVisualizerDict;
@@ -83,6 +86,7 @@ export const appsJa: AppsDictionary = {
   invoiceMaker: invoiceMakerJa,
   pdfEditor: pdfEditorJa,
   mediaMetadata: mediaMetadataJa,
+  exifRemover: exifRemoverJa,
   frameExtractor: frameExtractorJa,
   characterRelation: characterRelationJa,
   bookVisualizer: bookVisualizerJa,
@@ -105,6 +109,7 @@ export const appsEn: AppsDictionary = {
   invoiceMaker: invoiceMakerEn,
   pdfEditor: pdfEditorEn,
   mediaMetadata: mediaMetadataEn,
+  exifRemover: exifRemoverEn,
   frameExtractor: frameExtractorEn,
   characterRelation: characterRelationEn,
   bookVisualizer: bookVisualizerEn,

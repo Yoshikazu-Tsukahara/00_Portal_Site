@@ -226,6 +226,12 @@ export const TOOL_SEO: Record<string, PageSeo> = {
     description:
       "MP3や動画のタイトル・アーティスト・カバーをブラウザ内で編集。登録不要、ファイルは端末外へ送りません。100% Private media metadata editor.",
   },
+  "exif-remover": {
+    title:
+      "【無料】写真のExif削除・位置情報を消す | Free Photo Exif Remover | Blank Note",
+    description:
+      "写真の位置情報（GPS）・撮影日時・カメラ情報などのExifをブラウザ内で削除。複数枚一括・ZIP保存対応。完全無料・登録不要・サーバー送信なし。Free local-first photo Exif remover.",
+  },
   "frame-extractor": {
     title:
       "【無料】動画の1フレーム精密コマ送り・画像切り出し | Free Video Frame Extractor | Blank Note",

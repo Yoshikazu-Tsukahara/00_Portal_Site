@@ -183,7 +183,7 @@ export default function LibraryAppDetailPage() {
       </section>
 
       <div className={`store-detail-body-wrap ${contentClassName}`}>
-        <div className="store-detail-body max-w-3xl pt-2 sm:pt-3">
+        <div className="store-detail-body pt-2 sm:pt-3">
           <section aria-labelledby="store-detail-about">
             <h2 id="store-detail-about" className="store-detail-info__label">
               {t.library.aboutLabel}

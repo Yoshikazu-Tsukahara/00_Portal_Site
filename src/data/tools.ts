@@ -122,6 +122,7 @@ export const TOOL_UPDATED_AT: Record<string, string> = {
   "image-compressor": "2026-07-10",
   "text-cleaner": "2026-06-01",
   "media-metadata-editor": "2026-05-22",
+  "exif-remover": "2026-08-21",
   "frame-extractor": "2026-08-19",
   "character-relation-editor": "2026-06-18",
   "book-visualizer": "2026-08-05",
@@ -203,6 +204,12 @@ export const genres: Genre[] = [
         id: "media-metadata-editor",
         icon: "🎵",
         href: "/tools/media-metadata-editor",
+        isMobileSupported: true,
+      },
+      {
+        id: "exif-remover",
+        icon: "🛡️",
+        href: "/tools/exif-remover",
         isMobileSupported: true,
       },
       {

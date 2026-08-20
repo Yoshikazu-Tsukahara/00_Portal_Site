@@ -2,6 +2,7 @@ import type { AppsDictionary } from "../../apps";
 import { excelMergerEn } from "../../apps/excelMerger";
 import { frameExtractorEn } from "../../apps/frameExtractor";
 import { urlCleanerEn } from "../../apps/urlCleaner";
+import { exifRemoverEn } from "../../apps/exifRemover";
 
 /** アプリ内 UI 辞書（id） */
 export const appsId: AppsDictionary = {
@@ -2243,5 +2244,6 @@ export const appsId: AppsDictionary = {
       modalClose: "Mengerti",
     },
   },
+  exifRemover: exifRemoverEn,
   urlCleaner: urlCleanerEn,
 };

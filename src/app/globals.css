@@ -790,38 +790,28 @@ html[data-layout-mode="full"] .layout-content {
 
   /*
    * ライブラリ詳細：ヒーロー（「このアプリについて」より上）
-   * 暗め背景 → ページ背景へ緩やかにフェード
+   * 暗め背景 → サイトのベース色へ（フェード帯は短め）
    */
   .store-detail-hero {
     position: relative;
     isolation: isolate;
-    background:
+    background-color: var(--background);
+    background-image:
       radial-gradient(
         120% 80% at 20% 0%,
         color-mix(in srgb, var(--accent) 22%, transparent) 0%,
         transparent 55%
       ),
       linear-gradient(
-        165deg,
+        180deg,
         #1f2026 0%,
-        #2a2c34 48%,
-        #32343d 100%
+        #2a2c34 52%,
+        #32343d 82%,
+        color-mix(in srgb, #32343d 40%, var(--background)) 93%,
+        var(--background) 100%
       );
-  }
-  .store-detail-hero::after {
-    content: "";
-    pointer-events: none;
-    position: absolute;
-    inset-inline: 0;
-    bottom: 0;
-    height: clamp(1.5rem, 4.5vw, 2.75rem);
-    /* ページ背景（#f8f8ff）ではなく純白へフェードして境目の濁りを防ぐ */
-    background: linear-gradient(
-      to bottom,
-      transparent 0%,
-      rgb(255 255 255 / 0.4) 48%,
-      #ffffff 100%
-    );
+    /* 下端の短いフェード帯 */
+    padding-bottom: clamp(0.75rem, 2vw, 1.25rem);
   }
   .store-detail-hero__inner {
     @apply relative z-[1] pb-8 pt-8 sm:pb-10 sm:pt-10;
@@ -848,7 +838,7 @@ html[data-layout-mode="full"] .layout-content {
       0 10px 24px rgba(0, 0, 0, 0.28);
   }
   .store-detail-body-wrap {
-    @apply relative z-[1] bg-white pb-16;
+    @apply relative z-[1] pb-16;
   }
 
   /* 説明セクション見出し：マーカー＋アクセント下線で小タイトル感 */
@@ -870,13 +860,16 @@ html[data-layout-mode="full"] .layout-content {
     @apply mt-10 sm:mt-12;
   }
   .store-detail-prose {
-    @apply mt-3 space-y-4 text-[15px] leading-[1.85] text-zinc-600 sm:text-base sm:leading-[1.9];
+    @apply mt-3 max-w-none space-y-4 text-[15px] leading-[1.85] text-zinc-600 sm:text-base sm:leading-[1.9];
+    /* 短い行末の孤立（「す。」だけ次行など）を抑える */
+    text-wrap: pretty;
   }
   .store-detail-bullets {
     @apply mt-3 space-y-2.5;
   }
   .store-detail-bullets > li {
     @apply relative pl-4 text-[15px] leading-relaxed text-zinc-700 sm:text-base sm:leading-[1.75];
+    text-wrap: pretty;
   }
   .store-detail-bullets > li::before {
     content: "";
@@ -887,6 +880,7 @@ html[data-layout-mode="full"] .layout-content {
   }
   .store-detail-steps > li {
     @apply flex gap-3 text-[15px] leading-relaxed text-zinc-700 sm:text-base sm:leading-[1.75];
+    text-wrap: pretty;
   }
   .store-detail-steps__index {
     font-family: var(--font-display);
@@ -894,12 +888,13 @@ html[data-layout-mode="full"] .layout-content {
   }
   .store-detail-tip {
     @apply mt-3 border-l-2 border-[color-mix(in_srgb,var(--accent)_80%,#9aa3b5)] pl-4 text-[15px] leading-relaxed text-zinc-600 sm:text-base sm:leading-[1.8];
+    text-wrap: pretty;
   }
   .store-device-chip {
     @apply inline-flex min-h-8 items-center rounded-full bg-[#f2f2f7] px-3.5 py-1.5 text-[13px] font-medium text-[#3a3a3c];
   }
   .store-local-note {
-    @apply flex max-w-3xl items-start gap-2.5 rounded-2xl bg-[color-mix(in_srgb,var(--accent)_26%,#f2f2f7)] px-4 py-3.5 text-sm leading-relaxed text-[#3a3a3c] sm:items-center sm:text-[15px];
+    @apply flex items-start gap-2.5 rounded-2xl bg-[color-mix(in_srgb,var(--accent)_26%,#f2f2f7)] px-4 py-3.5 text-sm leading-relaxed text-[#3a3a3c] sm:items-center sm:text-[15px];
   }
   .store-local-note p {
     @apply min-w-0 flex-1;

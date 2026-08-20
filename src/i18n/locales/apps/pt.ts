@@ -2,6 +2,7 @@ import type { AppsDictionary } from "../../apps";
 import { excelMergerPt } from "../../apps/excelMerger";
 import { frameExtractorEn } from "../../apps/frameExtractor";
 import { urlCleanerEn } from "../../apps/urlCleaner";
+import { exifRemoverEn } from "../../apps/exifRemover";
 
 /** アプリ内 UI 辞書（pt） */
 export const appsPt: AppsDictionary = {
@@ -2249,5 +2250,6 @@ export const appsPt: AppsDictionary = {
     },
   },
   frameExtractor: frameExtractorEn,
+  exifRemover: exifRemoverEn,
   urlCleaner: urlCleanerEn,
 };

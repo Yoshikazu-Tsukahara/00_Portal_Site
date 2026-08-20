@@ -318,6 +318,26 @@ export const en: Dictionary = {
       ],
       tip: "Embedding focuses on MP3 and some video containers; other types may mainly rename. Large videos can take a while to save.",
     },
+    "exif-remover": {
+      title: "Exif Remover",
+      description: "Remove GPS location, timestamps, and other photo metadata on-device.",
+      detail: [
+        "Remove GPS location, capture time, camera model, and other Exif metadata from photos entirely in your browser. Images are never uploaded. Batch processing is supported.",
+        "Useful before posting to social media or portfolios, and as a privacy check before client delivery.",
+      ],
+      highlights: [
+        "Drag-and-drop or click to choose multiple images",
+        "Canvas re-encode strips Exif completely",
+        "JPEG saved at maximum quality (1.0)",
+        "Download one file directly, or a ZIP for batches",
+      ],
+      gettingStarted: [
+        "Drop or select image files (multiple OK).",
+        "Wait until processing finishes.",
+        "Download with “Save safe image”.",
+      ],
+      tip: "Re-encoding via Canvas can cause a tiny JPEG quality shift. Keep the original and use this tool only for the public copy.",
+    },
     "frame-extractor": {
       title: "Frame Extractor",
       description: "Step a video frame by frame and save stills locally.",

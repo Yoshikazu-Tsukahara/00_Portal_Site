@@ -2,6 +2,7 @@ import type { AppsDictionary } from "../../apps";
 import { excelMergerZhCN } from "../../apps/excelMerger";
 import { frameExtractorEn } from "../../apps/frameExtractor";
 import { urlCleanerEn } from "../../apps/urlCleaner";
+import { exifRemoverEn } from "../../apps/exifRemover";
 
 /** アプリ内 UI 辞書（zh-CN） */
 export const appsZhCN: AppsDictionary = {
@@ -2250,5 +2251,6 @@ export const appsZhCN: AppsDictionary = {
     },
   },
   frameExtractor: frameExtractorEn,
+  exifRemover: exifRemoverEn,
   urlCleaner: urlCleanerEn,
 };
