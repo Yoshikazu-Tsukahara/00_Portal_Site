@@ -67,6 +67,7 @@ const TOOLS_WITH_STATIC_ICON = new Set<string>([
   "crypto-message",
   "lunch-savings",
   "link-stocker",
+  "url-cleaner",
   "excel-merger",
 ]);
 
@@ -126,6 +127,7 @@ export const TOOL_UPDATED_AT: Record<string, string> = {
   "palette-collector": "2026-07-02",
   "lunch-savings": "2026-07-15",
   "link-stocker": "2026-06-30",
+  "url-cleaner": "2026-08-20",
   "ultimate-probability-slot": "2026-05-10",
   "pixel-drop-puzzle": "2026-06-08",
   "robot-freethrow": "2026-07-25",
@@ -241,6 +243,13 @@ export const genres: Genre[] = [
         id: "link-stocker",
         icon: "🔗",
         href: "/link-stocker",
+      },
+      {
+        id: "url-cleaner",
+        icon: "✂️",
+        href: "/url-cleaner",
+        isMobileSupported: true,
+        omitLocalDataNote: true,
       },
     ],
   },

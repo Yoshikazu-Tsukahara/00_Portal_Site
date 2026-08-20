@@ -444,6 +444,26 @@ export const en: Dictionary = {
       ],
       tip: "Preview fetch can fail; the URL is still kept, and you can fix the title yourself.",
     },
+    "url-cleaner": {
+      title: "URL Cleaner & QR Gen",
+      description: "Shorten long URLs and generate a QR code on the spot.",
+      detail: [
+        "Drop a messy URL from social or email and get a clean link right away. Strips utm, pd_rd, and other tracking params while keeping what matters.",
+        "A QR code is generated in your browser from the cleaned URL, and you can save it as PNG. Nothing is sent to a server—cleaning and QR creation stay on your device.",
+      ],
+      highlights: [
+        "Auto-clean on paste",
+        "Strip sharing params on X, Instagram & TikTok",
+        "Rakuten, Yahoo Shopping, Mercari & other major stores",
+        "QR code generation & download for cleaned URLs",
+      ],
+      gettingStarted: [
+        "Paste a long URL in the top field.",
+        "The clean URL and QR code appear automatically.",
+        "Use Copy or Save QR when you are ready.",
+      ],
+      tip: "If the text isn’t a valid URL, nothing is shown. Trim the query string by hand if you want everything after ? removed.",
+    },
     "ultimate-probability-slot": {
       title: "Odds Slot",
       description: "Chase or dodge your own ultra-low-odds jackpot slot.",

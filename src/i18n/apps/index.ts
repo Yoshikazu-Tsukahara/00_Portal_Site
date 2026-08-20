@@ -49,6 +49,8 @@ import {
   ultimateProbabilitySlotEn,
   ultimateProbabilitySlotJa,
 } from "./ultimateProbabilitySlot";
+import type { UrlCleanerDict } from "./urlCleaner";
+import { urlCleanerEn, urlCleanerJa } from "./urlCleaner";
 
 export type AppsDictionary = {
   mailTemplate: MailTemplateDict;
@@ -69,6 +71,7 @@ export type AppsDictionary = {
   pixelDropPuzzle: PixelDropPuzzleDict;
   cryptoMessage: CryptoMessageDict;
   robotFreethrow: RobotFreethrowDict;
+  urlCleaner: UrlCleanerDict;
 };
 
 export const appsJa: AppsDictionary = {
@@ -90,6 +93,7 @@ export const appsJa: AppsDictionary = {
   pixelDropPuzzle: pixelDropPuzzleJa,
   cryptoMessage: cryptoMessageJa,
   robotFreethrow: robotFreethrowJa,
+  urlCleaner: urlCleanerJa,
 };
 
 export const appsEn: AppsDictionary = {
@@ -111,4 +115,5 @@ export const appsEn: AppsDictionary = {
   pixelDropPuzzle: pixelDropPuzzleEn,
   cryptoMessage: cryptoMessageEn,
   robotFreethrow: robotFreethrowEn,
+  urlCleaner: urlCleanerEn,
 };

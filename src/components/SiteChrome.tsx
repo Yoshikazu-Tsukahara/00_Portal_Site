@@ -17,6 +17,7 @@ const STANDALONE_APP_PATHS = [
   "/ultimate-probability-slot",
   "/pixel-drop-puzzle",
   "/link-stocker",
+  "/url-cleaner",
   "/palette-collector",
   "/crypto-message",
   "/robot-freethrow",

@@ -13,6 +13,7 @@ const apps = [
   "palette-collector",
   "robot-freethrow",
   "link-stocker",
+  "url-cleaner",
 ];
 
 async function render(name) {

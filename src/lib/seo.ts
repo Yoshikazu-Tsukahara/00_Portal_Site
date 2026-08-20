@@ -192,6 +192,12 @@ export const TOOL_SEO: Record<string, PageSeo> = {
     description:
       "ブックマークほどではないURLをOGP付きカードでキープ。完全無料・登録不要。公開メタ取得時のみURL通信あり。Free visual bookmark tool.",
   },
+  "url-cleaner": {
+    title:
+      "【無料】URLクリーナー&QR生成・長いURLの整形 | Free URL Cleaner & QR | Blank Note",
+    description:
+      "utm など付きの長い URL を短く整形し、QR コードもその場で生成。完全ローカル・登録不要・外部送信なし。Free local URL cleaner with QR code, no sign-up.",
+  },
   "ultimate-probability-slot": {
     title:
       "【無料】自作確率スロット・当たるまで計算 | Free Probability Slot Game | Blank Note",

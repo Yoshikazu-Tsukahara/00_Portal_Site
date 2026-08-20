@@ -1,6 +1,7 @@
 import type { AppsDictionary } from "../../apps";
 import { excelMergerZhTW } from "../../apps/excelMerger";
 import { frameExtractorEn } from "../../apps/frameExtractor";
+import { urlCleanerEn } from "../../apps/urlCleaner";
 
 /** アプリ内 UI 辞書（zh-TW） */
 export const appsZhTW: AppsDictionary = {
@@ -2248,4 +2249,5 @@ export const appsZhTW: AppsDictionary = {
     },
   },
   frameExtractor: frameExtractorEn,
+  urlCleaner: urlCleanerEn,
 };
