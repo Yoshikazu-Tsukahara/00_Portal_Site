@@ -2,6 +2,7 @@ import type { AppsDictionary } from "../../apps";
 import { appsDe } from "./de";
 import { appsEs } from "./es";
 import { appsFr } from "./fr";
+import { appsId } from "./id";
 import { appsKo } from "./ko";
 import { appsPt } from "./pt";
 import { appsZhCN } from "./zh-CN";
@@ -16,8 +17,9 @@ export const appsByLocale = {
   fr: appsFr,
   de: appsDe,
   pt: appsPt,
+  id: appsId,
 } as const satisfies Record<
-  "zh-CN" | "zh-TW" | "ko" | "es" | "fr" | "de" | "pt",
+  "zh-CN" | "zh-TW" | "ko" | "es" | "fr" | "de" | "pt" | "id",
   AppsDictionary
 >;
 
@@ -25,6 +27,7 @@ export {
   appsDe,
   appsEs,
   appsFr,
+  appsId,
   appsKo,
   appsPt,
   appsZhCN,

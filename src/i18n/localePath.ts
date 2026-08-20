@@ -18,7 +18,8 @@ export type UrlLocale =
   | "es"
   | "fr"
   | "de"
-  | "pt";
+  | "pt"
+  | "id";
 
 /** Locale → URL セグメント */
 export const LOCALE_TO_URL: Record<Locale, UrlLocale> = {
@@ -31,6 +32,7 @@ export const LOCALE_TO_URL: Record<Locale, UrlLocale> = {
   fr: "fr",
   de: "de",
   pt: "pt",
+  id: "id",
 };
 
 /** URL セグメント → Locale */
@@ -44,6 +46,7 @@ export const URL_TO_LOCALE: Record<UrlLocale, Locale> = {
   fr: "fr",
   de: "de",
   pt: "pt",
+  id: "id",
 };
 
 /** URL に使う言語一覧（表示順は LOCALES に合わせる） */

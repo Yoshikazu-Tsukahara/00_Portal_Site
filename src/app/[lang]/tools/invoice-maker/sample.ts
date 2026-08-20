@@ -257,6 +257,9 @@ function sampleBodyFor(siteLocale: Locale): SampleBody {
     case "pt":
       // 本文は英語デモを流用し、通貨・税率はポルトガル向け
       return { ...SAMPLE_EN, currency: "EUR", taxRatePercent: 23 };
+    case "id":
+      // 本文は英語デモ。通貨・税率はインドネシア向け（PPN 11%）
+      return { ...SAMPLE_EN, currency: "SGD", taxRatePercent: 11 };
     case "en":
     default:
       return SAMPLE_EN;

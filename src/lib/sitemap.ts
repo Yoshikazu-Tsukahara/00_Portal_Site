@@ -133,7 +133,7 @@ function toolEntries(origin: string, tool: Tool): MetadataRoute.Sitemap {
 
 /**
  * `/sitemap.xml` 用エントリを生成する。
- * 公開ルート × 9 言語を網羅。各エントリに `alternates.languages` を付与。
+ * 公開ルート × 全対応言語を網羅。各エントリに `alternates.languages` を付与。
  */
 export function buildSitemapEntries(origin: string): MetadataRoute.Sitemap {
   const staticEntries = SITEMAP_STATIC_PAGES.flatMap((page) =>

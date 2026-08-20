@@ -11,7 +11,7 @@ AI への定型指示 → `RULEBOOK.md` §8（①参照ルール：… の箇条
 
 - Next.js 16 / React 19 / TypeScript / Tailwind CSS 4
 - パスエイリアス: `@/*` → `src/*`
-- 多言語: `src/i18n/`（9言語、`ja` 定義を正・未訳は `en` フォールバック）
+- 多言語: `src/i18n/`（10言語、`ja` 定義を正・未訳は `en` フォールバック）
 - フォント: タイトル・ロゴ = Space Mono、本文 = Noto Sans JP
 
 ## 新規アプリは先にこれを決める

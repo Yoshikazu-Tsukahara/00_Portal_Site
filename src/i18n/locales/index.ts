@@ -3,6 +3,7 @@ import type { PartialDictionary } from "../localeMeta";
 import { de } from "./de";
 import { es } from "./es";
 import { fr } from "./fr";
+import { id } from "./id";
 import { ko } from "./ko";
 import { pt } from "./pt";
 import { zhCN } from "./zh-CN";
@@ -19,4 +20,5 @@ export const partialDictionaries: Partial<
   fr,
   de,
   pt,
+  id,
 };

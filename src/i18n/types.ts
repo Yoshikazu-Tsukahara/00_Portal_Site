@@ -1,7 +1,7 @@
 import type { AppsDictionary } from "./apps";
 
 /**
- * 対応言語（主要市場向け 9 言語）。
+ * 対応言語（主要市場向け）。
  * 内部辞書・LocalStorage はこのコード（`zh-CN` など）。
  * URL パスは小文字（`zh-cn`）— 変換は `localePath.ts`。
  */
@@ -14,7 +14,8 @@ export type Locale =
   | "es"
   | "fr"
   | "de"
-  | "pt";
+  | "pt"
+  | "id";
 
 /** LocalStorage に保存するキー */
 export const LOCALE_STORAGE_KEY = "blank-note-locale";

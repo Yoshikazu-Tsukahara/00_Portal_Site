@@ -46,6 +46,7 @@ const OG_LOCALE: Record<Locale, string> = {
   fr: "fr_FR",
   de: "de_DE",
   pt: "pt_BR",
+  id: "id_ID",
 };
 
 export type PageSeo = {

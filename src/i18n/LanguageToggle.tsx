@@ -18,7 +18,7 @@ type Props = {
 };
 
 /**
- * 9 言語対応の言語ドロップダウン。
+ * 対応言語のドロップダウン。
  * 選択すると `/[lang]/...` へ画面遷移する（LocalStorage 単独切替はしない）。
  */
 export default function LanguageToggle({

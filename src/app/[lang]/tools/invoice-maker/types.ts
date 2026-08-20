@@ -257,6 +257,7 @@ const DOC_LOCALE_BY_SITE: Record<Locale, DocLocale> = {
   fr: "fr",
   de: "de",
   pt: "en",
+  id: "en",
 };
 
 /** サイト言語に合わせた初期の帳票言語 */
@@ -279,6 +280,9 @@ export function defaultCurrencyFor(siteLocale: Locale): CurrencyCode {
     case "de":
     case "pt":
       return "EUR";
+    case "id":
+      // IDR は一覧に無いため SGD（近傍）で初期化。記号は CUSTOM で Rp も可
+      return "SGD";
     case "en":
     default:
       return "USD";
@@ -300,6 +304,8 @@ export function defaultTaxRateFor(siteLocale: Locale): number {
       return 19;
     case "pt":
       return 23;
+    case "id":
+      return 11;
     default:
       return 0;
   }
