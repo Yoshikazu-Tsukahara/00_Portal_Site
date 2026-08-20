@@ -1,0 +1,31 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "main": ".open-next/worker.js",
+  // Cloudflare Worker 名（WORKER_SELF_REFERENCE.service と必ず一致させる）
+  "name": "blank-note-portal",
+  "compatibility_date": "2026-08-15",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "images": {
+    "binding": "IMAGES"
+  },
+  "services": [
+    {
+      // OpenNext の自己参照。service は上の name と同じにすること
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "blank-note-portal"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "NEXT_INC_CACHE_R2_BUCKET",
+      "bucket_name": "blank-note-portal-opennext-cache"
+    }
+  ],
+  "observability": {
+    "enabled": true
+  }
+}

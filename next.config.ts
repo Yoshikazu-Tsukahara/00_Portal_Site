@@ -33,3 +33,8 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
+// Cloudflare / OpenNext のローカル開発用バインディング連携
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
+initOpenNextCloudflareForDev();
+
