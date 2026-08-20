@@ -13,7 +13,7 @@ import { useRef } from "react";
 import LauncherLockBadge from "@/components/LauncherLockBadge";
 import ToolGlyph from "@/components/ToolGlyph";
 import type { Tool } from "@/data/tools";
-import { fmt, useI18n } from "@/i18n";
+import { fmt, useI18n, useLocalizedHref } from "@/i18n";
 import {
   type LaunchOrigin,
   readLaunchOrigin,
@@ -80,6 +80,8 @@ export default function LauncherIcon({
   onLaunchApp,
 }: Props) {
   const { t } = useI18n();
+  const toHref = useLocalizedHref();
+  const appHref = toHref(tool.href);
   const { compact } = useCompactLayout();
   const copy = t.tools[tool.id] ?? { title: tool.id, description: "" };
   const title = copy.title;
@@ -138,7 +140,7 @@ export default function LauncherIcon({
       (e.currentTarget.querySelector(".launcher-icon__glyph") as Element | null) ??
       e.currentTarget;
     onLaunchApp({
-      href: tool.href,
+      href: appHref,
       icon: <ToolGlyph tool={tool} />,
       title,
       origin: readLaunchOrigin(glyph),
@@ -264,7 +266,7 @@ export default function LauncherIcon({
         </button>
       ) : (
         <a
-          href={tool.href}
+          href={appHref}
           className="launcher-icon group"
           aria-label={openLabel}
           onPointerDown={onPointerDownNormal}

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { stripLocalePrefix } from "@/i18n";
 import { useStandaloneDisplay } from "@/lib/useStandaloneDisplay";
 import {
   armPwaInstallCapture,
@@ -197,7 +198,7 @@ export function usePwaInstall(): PwaInstallState {
     ready &&
     !isStandalone &&
     !installed &&
-    isInstallableAppPath(normalizePath(pathname));
+    isInstallableAppPath(normalizePath(stripLocalePrefix(pathname)));
   const hasBip = deferred !== null || bipForCurrentPath() !== null;
 
   return {

@@ -2,7 +2,7 @@ import type {
   ProgressQuipTier,
   SavingsQuipsDict,
   TodayQuipTier,
-} from "../../app/lunch-savings/savingsQuips";
+} from "@/app/[lang]/lunch-savings/savingsQuips";
 
 export type LunchSavingsQuips = SavingsQuipsDict;
 

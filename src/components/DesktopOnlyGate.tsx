@@ -1,8 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import type { ReactNode } from "react";
-import { useI18n } from "@/i18n";
+import { LocaleLink, useI18n } from "@/i18n";
 import { useCompactLayout } from "@/lib/useCompactLayout";
 
 type Props = {
@@ -27,12 +26,12 @@ export default function DesktopOnlyGate({ title, children }: Props) {
       <p className="max-w-sm text-sm leading-relaxed text-zinc-600">
         {t.card.pcRecommendedHint}
       </p>
-      <Link
+      <LocaleLink
         href="/"
         className="inline-flex min-h-11 items-center justify-center rounded-md border border-zinc-300 bg-white px-4 text-sm font-medium text-zinc-800 transition-opacity hover:opacity-70"
       >
         {t.header.homeNav}
-      </Link>
+      </LocaleLink>
     </div>
   );
 }

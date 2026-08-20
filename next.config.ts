@@ -13,6 +13,16 @@ const nextConfig: NextConfig = {
         destination: "/lunch-savings",
         permanent: true,
       },
+      {
+        source: "/:lang/tools/lunch-savings",
+        destination: "/:lang/lunch-savings",
+        permanent: true,
+      },
+      {
+        source: "/:lang/tools/lunch-savings/:path*",
+        destination: "/:lang/lunch-savings",
+        permanent: true,
+      },
     ];
   },
   async headers() {

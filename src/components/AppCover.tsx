@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import ToolGlyph from "@/components/ToolGlyph";
 import { getToolCoverSrc, type Tool } from "@/data/tools";
+import { useLocalizedHref } from "@/i18n";
 
 /** プレビュー用の仮想ビューポート（カード枠に合わせて縮小表示） */
 const PREVIEW_WIDTH = 1280;
@@ -24,12 +25,13 @@ function previewUrl(href: string): string | null {
  * 静的画像（public/covers）があればそれを優先し、無ければライブ縮小プレビュー。
  */
 export default function AppCover({ tool, className = "" }: Props) {
+  const toHref = useLocalizedHref();
   const coverSrc = getToolCoverSrc(tool.id);
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.22);
   const [visible, setVisible] = useState(false);
   const [loaded, setLoaded] = useState(false);
-  const src = previewUrl(tool.href);
+  const src = previewUrl(toHref(tool.href));
 
   useEffect(() => {
     if (coverSrc) return;

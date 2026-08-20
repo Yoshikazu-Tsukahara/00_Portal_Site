@@ -4,9 +4,9 @@ import { buildSitemapEntries } from "@/lib/sitemap";
 
 /**
  * App Router の Metadata Route。
- * デプロイ（ビルド）のたびに `tools.ts` から URL を再収集して `/sitemap.xml` を生成する。
+ * 公開ルート × 9 言語を網羅し、各 URL に hreflang（alternates.languages）を付与する。
  *
- * 新規ツール追加時: `src/data/tools.ts` に載せるだけでよい（sitemap の手動更新は不要）。
+ * 新規ツール追加時: `src/data/tools.ts` に載せるだけでよい。
  */
 export default function sitemap(): MetadataRoute.Sitemap {
   return buildSitemapEntries(getSiteOrigin());

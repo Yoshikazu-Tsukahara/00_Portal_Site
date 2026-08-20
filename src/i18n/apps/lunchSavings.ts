@@ -1,5 +1,5 @@
 import type { AppShellCopy } from "./otherApps";
-import type { SavingsQuipsDict } from "../../app/lunch-savings/savingsQuips";
+import type { SavingsQuipsDict } from "@/app/[lang]/lunch-savings/savingsQuips";
 import {
   lunchSavingsQuipsEn,
   lunchSavingsQuipsJa,

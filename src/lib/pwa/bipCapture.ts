@@ -1,5 +1,7 @@
 "use client";
 
+import { stripLocalePrefix } from "@/i18n/localePath";
+
 /** Chromium 系の beforeinstallprompt イベント型 */
 export type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
@@ -15,7 +17,7 @@ let bipListenerBound = false;
 
 export function currentAppPath(): string {
   if (typeof window === "undefined") return "";
-  const path = window.location.pathname;
+  const path = stripLocalePrefix(window.location.pathname);
   return path.endsWith("/") && path.length > 1 ? path.slice(0, -1) : path;
 }
 

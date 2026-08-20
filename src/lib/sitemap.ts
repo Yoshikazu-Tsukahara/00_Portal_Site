@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getAllTools, getToolUpdatedAt, type Tool } from "@/data/tools";
+import { DEFAULT_LOCALE, LOCALES } from "@/i18n/localeMeta";
+import { localizedHref, toHrefLang } from "@/i18n/localePath";
 
 type ChangeFrequency = NonNullable<
   MetadataRoute.Sitemap[number]["changeFrequency"]
@@ -58,7 +60,7 @@ export const SITEMAP_STATIC_PAGES: StaticPageConfig[] = [
 
 /**
  * 存在するが検索対象にしないパス（リダイレクト・中継・旧 URL）。
- * robots.txt の disallow と揃える。
+ * robots.txt の disallow と揃える（言語プレフィックス無し）。
  */
 export const SITEMAP_EXCLUDED_PATHS = [
   "/tools/lunch-savings",
@@ -74,32 +76,68 @@ function toAbsoluteUrl(origin: string, path: string): string {
   return `${origin}${path}`;
 }
 
+/** 1 つの bare path に対する hreflang 絶対 URL マップ */
+export function sitemapLanguageAlternates(
+  origin: string,
+  barePath: string,
+): Record<string, string> {
+  const languages: Record<string, string> = {};
+  for (const locale of LOCALES) {
+    languages[toHrefLang(locale)] = toAbsoluteUrl(
+      origin,
+      localizedHref(locale, barePath),
+    );
+  }
+  languages["x-default"] = toAbsoluteUrl(
+    origin,
+    localizedHref(DEFAULT_LOCALE, barePath),
+  );
+  return languages;
+}
+
+/** bare path × 全言語の sitemap エントリ */
+function localizedEntries(
+  origin: string,
+  barePath: string,
+  meta: {
+    lastModified: Date;
+    changeFrequency: ChangeFrequency;
+    priority: number;
+  },
+): MetadataRoute.Sitemap {
+  const languages = sitemapLanguageAlternates(origin, barePath);
+  return LOCALES.map((locale) => ({
+    url: toAbsoluteUrl(origin, localizedHref(locale, barePath)),
+    lastModified: meta.lastModified,
+    changeFrequency: meta.changeFrequency,
+    priority: meta.priority,
+    alternates: { languages },
+  }));
+}
+
 function toolEntries(origin: string, tool: Tool): MetadataRoute.Sitemap {
   const lastModified = new Date(getToolUpdatedAt(tool.id));
   return [
-    {
-      url: toAbsoluteUrl(origin, tool.href),
+    ...localizedEntries(origin, tool.href, {
       lastModified,
       changeFrequency: "monthly",
       priority: 0.8,
-    },
-    {
-      url: toAbsoluteUrl(origin, `/library/${tool.id}`),
+    }),
+    ...localizedEntries(origin, `/library/${tool.id}`, {
       lastModified,
       changeFrequency: "monthly",
       priority: 0.6,
-    },
+    }),
   ];
 }
 
 /**
  * `/sitemap.xml` 用エントリを生成する。
- * 掲載ツールは `src/data/tools.ts` の `getAllTools()` からビルド時に収集。
+ * 公開ルート × 9 言語を網羅。各エントリに `alternates.languages` を付与。
  */
 export function buildSitemapEntries(origin: string): MetadataRoute.Sitemap {
-  const staticEntries: MetadataRoute.Sitemap = SITEMAP_STATIC_PAGES.map(
-    (page) => ({
-      url: toAbsoluteUrl(origin, page.path),
+  const staticEntries = SITEMAP_STATIC_PAGES.flatMap((page) =>
+    localizedEntries(origin, page.path, {
       lastModified: new Date(page.lastModified ?? DEFAULT_LAST_MODIFIED),
       changeFrequency: page.changeFrequency,
       priority: page.priority,

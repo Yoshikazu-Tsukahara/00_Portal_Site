@@ -1,9 +1,11 @@
 "use client";
 
 import { ChevronDown } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
 import { trackEvent } from "@/lib/analytics";
 import { useI18n } from "./I18nProvider";
 import { LOCALE_NATIVE_LABELS, LOCALE_SHORT_LABELS } from "./localeMeta";
+import { switchLocalePath } from "./localePath";
 import type { Locale } from "./types";
 
 type Props = {
@@ -17,7 +19,7 @@ type Props = {
 
 /**
  * 9 言語対応の言語ドロップダウン。
- * ブラウザのネイティブ select でアクセシブルに切替。
+ * 選択すると `/[lang]/...` へ画面遷移する（LocalStorage 単独切替はしない）。
  */
 export default function LanguageToggle({
   id = "site-lang-select",
@@ -25,6 +27,8 @@ export default function LanguageToggle({
   compact = false,
 }: Props) {
   const { locale, setLocale, locales, t } = useI18n();
+  const pathname = usePathname();
+  const router = useRouter();
 
   return (
     <div
@@ -42,8 +46,10 @@ export default function LanguageToggle({
         title={LOCALE_NATIVE_LABELS[locale]}
         onChange={(e) => {
           const next = e.target.value as Locale;
+          if (next === locale) return;
           setLocale(next);
           trackEvent("Language Changed", { locale: next });
+          router.push(switchLocalePath(next, pathname));
         }}
         className="lang-select__control"
       >

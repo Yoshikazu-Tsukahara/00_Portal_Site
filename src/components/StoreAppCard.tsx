@@ -1,10 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import AppCover from "@/components/AppCover";
 import ToolGlyph from "@/components/ToolGlyph";
 import type { Tool } from "@/data/tools";
-import { useI18n } from "@/i18n";
+import { LocaleLink, useI18n } from "@/i18n";
 import { useHomePins } from "@/lib/homePins";
 
 type Props = {
@@ -48,16 +47,16 @@ export default function StoreAppCard({ tool, genreId }: Props) {
 
   return (
     <article className="store-card" aria-labelledby={titleId}>
-      <Link
+      <LocaleLink
         href={detailHref}
         className="store-card__cover-link"
         aria-labelledby={titleId}
       >
         <AppCover tool={tool} />
-      </Link>
+      </LocaleLink>
 
       <div className="store-card__meta">
-        <Link
+        <LocaleLink
           href={detailHref}
           className="store-card__meta-link"
           aria-labelledby={titleId}
@@ -69,9 +68,9 @@ export default function StoreAppCard({ tool, genreId }: Props) {
             <span id={titleId} className="store-card__title" title={copy.title}>
               {copy.title}
             </span>
-            <span className="store-card__genre">{genreName}</span>
+            <span className="store-card__genre">{genreName}            </span>
           </span>
-        </Link>
+        </LocaleLink>
 
         <button
           type="button"

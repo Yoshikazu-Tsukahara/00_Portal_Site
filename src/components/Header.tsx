@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   useEffect,
@@ -11,7 +10,7 @@ import {
 } from "react";
 import LayoutToggle from "@/components/LayoutToggle";
 import LocalOnlyBadge from "@/components/LocalOnlyBadge";
-import { LanguageToggle, useI18n } from "@/i18n";
+import { LanguageToggle, LocaleLink, stripLocalePrefix, useI18n } from "@/i18n";
 import { useLayout } from "@/lib/layout";
 
 /** Stripe Checkout（開発者支援） */
@@ -146,7 +145,7 @@ function HeaderPrimaryNav({
       aria-label="Blank Note"
       className={`site-header__nav relative flex min-w-0 items-center ${gapClassName}`}
     >
-      <Link
+      <LocaleLink
         ref={homeRef}
         href="/"
         aria-label={homeAriaLabel}
@@ -158,8 +157,8 @@ function HeaderPrimaryNav({
         }`}
       >
         {homeLabel}
-      </Link>
-      <Link
+      </LocaleLink>
+      <LocaleLink
         ref={libraryRef}
         href="/library"
         aria-current={libraryActive ? "page" : undefined}
@@ -170,7 +169,7 @@ function HeaderPrimaryNav({
         }`}
       >
         {libraryLabel}
-      </Link>
+      </LocaleLink>
       {indicator ? (
         <span
           aria-hidden
@@ -220,9 +219,10 @@ export default function Header() {
     };
   }, [layoutMode]);
 
-  const homeActive = pathname === "/";
+  const barePath = stripLocalePrefix(pathname ?? "/");
+  const homeActive = barePath === "/";
   const libraryActive =
-    pathname === "/library" || Boolean(pathname?.startsWith("/library/"));
+    barePath === "/library" || barePath.startsWith("/library/");
 
   return (
     <header

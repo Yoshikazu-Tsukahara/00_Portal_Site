@@ -5,8 +5,7 @@
  * 上線は画面いっぱい。中身の列だけ layoutMode の幅に揃える。
  */
 
-import Link from "next/link";
-import { useI18n } from "@/i18n";
+import { LocaleLink, useI18n } from "@/i18n";
 import { useLayout } from "@/lib/layout";
 
 export default function Footer() {
@@ -31,26 +30,26 @@ export default function Footer() {
           aria-label={t.footer.navAria}
           className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm"
         >
-          <Link
+          <LocaleLink
             href="/contact"
             className="text-zinc-600 transition-all duration-150 hover:text-zinc-900"
           >
             {t.footer.contact}
-          </Link>
+          </LocaleLink>
           <span aria-hidden className="hidden h-3 w-px bg-zinc-200 sm:block" />
-          <Link
+          <LocaleLink
             href="/terms"
             className="text-zinc-600 transition-all duration-150 hover:text-zinc-900"
           >
             {t.footer.terms}
-          </Link>
+          </LocaleLink>
           <span aria-hidden className="hidden h-3 w-px bg-zinc-200 sm:block" />
-          <Link
+          <LocaleLink
             href="/privacy"
             className="text-zinc-600 transition-all duration-150 hover:text-zinc-900"
           >
             {t.footer.privacy}
-          </Link>
+          </LocaleLink>
         </nav>
 
         {/* 動作環境・注意事項・ローカル処理の安心メッセージ */}

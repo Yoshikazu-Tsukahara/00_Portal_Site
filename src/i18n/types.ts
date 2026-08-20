@@ -2,7 +2,8 @@ import type { AppsDictionary } from "./apps";
 
 /**
  * 対応言語（主要市場向け 9 言語）。
- * LocalStorage / URL でもこのコードを使う。
+ * 内部辞書・LocalStorage はこのコード（`zh-CN` など）。
+ * URL パスは小文字（`zh-cn`）— 変換は `localePath.ts`。
  */
 export type Locale =
   | "en"

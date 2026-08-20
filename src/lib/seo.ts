@@ -1,4 +1,12 @@
 import type { Metadata } from "next";
+import { DEFAULT_LOCALE, LOCALES } from "@/i18n/localeMeta";
+import {
+  fromUrlLocale,
+  localizedHref,
+  toHrefLang,
+} from "@/i18n/localePath";
+import { resolveDictionary } from "@/i18n/resolveDictionary";
+import type { Locale } from "@/i18n/types";
 
 /** サイト名（OGP siteName / タブ末尾） */
 export const SITE_NAME = "Blank Note";
@@ -27,36 +35,81 @@ export const OG_IMAGE = {
   alt: SITE_NAME,
 } as const;
 
+/** Open Graph の locale（アンダースコア形式） */
+const OG_LOCALE: Record<Locale, string> = {
+  en: "en_US",
+  ja: "ja_JP",
+  "zh-CN": "zh_CN",
+  "zh-TW": "zh_TW",
+  ko: "ko_KR",
+  es: "es_ES",
+  fr: "fr_FR",
+  de: "de_DE",
+  pt: "pt_BR",
+};
+
 export type PageSeo = {
   title: string;
   description: string;
 };
 
+/** URL セグメント `lang` → Locale（不正時は DEFAULT） */
+export function localeFromLangParam(lang: string | undefined | null): Locale {
+  if (!lang) return DEFAULT_LOCALE;
+  return fromUrlLocale(lang) ?? DEFAULT_LOCALE;
+}
+
 /**
- * title / description / openGraph / twitter を揃えた Metadata を返す。
- * PWA 用の icons などは extra に渡す（UI 文言はここでは扱わない）。
+ * hreflang 用の言語 → 絶対 URL マップ。
+ * `path` は言語プレフィックス無し（例: `/tools/excel-merger`）。
+ * `x-default` は DEFAULT_LOCALE（en）。
+ */
+export function hreflangLanguages(path: string = "/"): Record<string, string> {
+  const origin = getSiteOrigin();
+  const languages: Record<string, string> = {};
+  for (const locale of LOCALES) {
+    languages[toHrefLang(locale)] = `${origin}${localizedHref(locale, path)}`;
+  }
+  languages["x-default"] =
+    `${origin}${localizedHref(DEFAULT_LOCALE, path)}`;
+  return languages;
+}
+
+/**
+ * title / description / openGraph / twitter / hreflang を揃えた Metadata。
+ * `path` は言語無し。canonical と alternates は `locale` 付きで付与する。
  */
 export function pageMetadata({
+  locale,
   title,
   description,
-  path,
+  path = "/",
   extra,
 }: PageSeo & {
+  locale: Locale;
   path?: string;
   extra?: Metadata;
 }): Metadata {
+  const localizedPath = localizedHref(locale, path);
+  const absoluteUrl = `${getSiteOrigin()}${localizedPath}`;
+
   return {
     ...extra,
     title,
     description,
+    alternates: {
+      canonical: localizedPath,
+      languages: hreflangLanguages(path),
+      ...extra?.alternates,
+    },
     openGraph: {
       type: "website",
-      locale: "ja_JP",
+      locale: OG_LOCALE[locale],
       siteName: SITE_NAME,
       title,
       description,
       images: [OG_IMAGE],
-      ...(path ? { url: path } : {}),
+      url: absoluteUrl,
       ...extra?.openGraph,
     },
     twitter: {
@@ -69,7 +122,23 @@ export function pageMetadata({
   };
 }
 
-/** トップページ */
+/** サイト固定ページの種別 */
+export type SitePageKey =
+  | "home"
+  | "library"
+  | "contact"
+  | "terms"
+  | "privacy";
+
+const SITE_PAGE_PATH: Record<SitePageKey, string> = {
+  home: "/",
+  library: "/library",
+  contact: "/contact",
+  terms: "/terms",
+  privacy: "/privacy",
+};
+
+/** トップページ（ja 向け検索最適化文面。他言語は辞書から組み立て） */
 export const HOME_SEO: PageSeo = {
   title:
     "【無料・登録不要】業務ハックツール箱 | Free Local-first Online Tools | Blank Note",
@@ -104,7 +173,7 @@ export const PRIVACY_SEO: PageSeo = {
 };
 
 /**
- * 各ツールの検索向け title / description。
+ * 各ツールの検索向け title / description（主に ja）。
  * 画面上の短い UI タイトルとは別に、タブ・SNS・検索結果用。
  */
 export const TOOL_SEO: Record<string, PageSeo> = {
@@ -230,12 +299,110 @@ export const TOOL_SEO: Record<string, PageSeo> = {
   },
 };
 
-/** ツール ID の SEO。未登録はライブラリ用の汎用文面 */
+/** ツール ID の SEO。未登録はライブラリ用の汎用文面（後方互換） */
 export function toolSeo(toolId: string): PageSeo {
   return (
     TOOL_SEO[toolId] ?? {
-      title: `${toolId} | Free Online Tool | Blank Note`,
+      title: `${toolId} | Free Online Tool | ${SITE_NAME}`,
       description: LIBRARY_SEO.description,
     }
   );
+}
+
+/**
+ * 言語付きのツール SEO。
+ * ja は検索向けの `TOOL_SEO` を優先。他言語は i18n 辞書の title / description。
+ */
+export function toolSeoForLocale(locale: Locale, toolId: string): PageSeo {
+  const rich = TOOL_SEO[toolId];
+  if (locale === "ja" && rich) return rich;
+
+  const dict = resolveDictionary(locale);
+  const copy = dict.tools[toolId];
+  if (copy?.title) {
+    return {
+      title: `${copy.title} | ${SITE_NAME}`,
+      description: copy.description?.trim() || rich?.description || LIBRARY_SEO.description,
+    };
+  }
+  return toolSeo(toolId);
+}
+
+/**
+ * 言語付きの固定ページ SEO。
+ * ja は既存の検索最適化文面。他言語は辞書から組み立てる。
+ */
+export function sitePageSeo(locale: Locale, page: SitePageKey): PageSeo {
+  if (locale === "ja") {
+    switch (page) {
+      case "home":
+        return HOME_SEO;
+      case "library":
+        return LIBRARY_SEO;
+      case "contact":
+        return CONTACT_SEO;
+      case "terms":
+        return TERMS_SEO;
+      case "privacy":
+        return PRIVACY_SEO;
+    }
+  }
+
+  const t = resolveDictionary(locale);
+  switch (page) {
+    case "home":
+      return {
+        title: `${t.home.heroTitleLine1} ${t.home.heroTitleLine2} | ${SITE_NAME}`,
+        description: `${t.home.heroLead1} ${t.home.heroLead2}`,
+      };
+    case "library":
+      return {
+        title: `${t.library.title} | ${SITE_NAME}`,
+        description: t.library.lead,
+      };
+    case "contact":
+      return {
+        title: `${t.footer.contact} | ${SITE_NAME}`,
+        description: CONTACT_SEO.description,
+      };
+    case "terms":
+      return {
+        title: `${t.footer.terms} | ${SITE_NAME}`,
+        description: TERMS_SEO.description,
+      };
+    case "privacy":
+      return {
+        title: `${t.footer.privacy} | ${SITE_NAME}`,
+        description: PRIVACY_SEO.description,
+      };
+  }
+}
+
+/** 固定ページ用 Metadata を一発生成 */
+export function sitePageMetadata(
+  locale: Locale,
+  page: SitePageKey,
+  extra?: Metadata,
+): Metadata {
+  return pageMetadata({
+    locale,
+    ...sitePageSeo(locale, page),
+    path: SITE_PAGE_PATH[page],
+    extra,
+  });
+}
+
+/** ツールアプリ用 Metadata を一発生成（`path` は言語無し） */
+export function toolPageMetadata(
+  locale: Locale,
+  toolId: string,
+  path: string,
+  extra?: Metadata,
+): Metadata {
+  return pageMetadata({
+    locale,
+    ...toolSeoForLocale(locale, toolId),
+    path,
+    extra,
+  });
 }

@@ -13,7 +13,7 @@ import {
 import LauncherLockBadge from "@/components/LauncherLockBadge";
 import ToolGlyph from "@/components/ToolGlyph";
 import type { Tool } from "@/data/tools";
-import { fmt, useI18n } from "@/i18n";
+import { fmt, useI18n, useLocalizedHref } from "@/i18n";
 import type { HomeFolderItem } from "@/lib/homePins";
 import {
   type LaunchOrigin,
@@ -66,6 +66,7 @@ export default function LauncherFolderSheet({
   onLaunchApp,
 }: Props) {
   const { t } = useI18n();
+  const toHref = useLocalizedHref();
   const { compact } = useCompactLayout();
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
@@ -184,7 +185,7 @@ export default function LauncherFolderSheet({
       e.currentTarget;
     const copy = t.tools[tool.id] ?? { title: tool.id, description: "" };
     onLaunchApp({
-      href: tool.href,
+      href: toHref(tool.href),
       icon: <ToolGlyph tool={tool} />,
       title: copy.title,
       origin: readLaunchOrigin(glyph),
@@ -306,7 +307,7 @@ export default function LauncherFolderSheet({
                   </button>
                 ) : (
                   <a
-                    href={tool.href}
+                    href={toHref(tool.href)}
                     className="launcher-icon group launcher-folder-sheet__app"
                     aria-label={openLabel}
                     onClick={(e) => onAppClick(e, tool)}

@@ -2,10 +2,11 @@
 
 import { usePathname } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
-import KeepTabBridge from "@/app/link-stocker/KeepTabBridge";
+import KeepTabBridge from "@/app/[lang]/link-stocker/KeepTabBridge";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import UsageGuideHost from "@/components/UsageGuideHost";
+import { stripLocalePrefix } from "@/i18n";
 import { useStandaloneDisplay } from "@/lib/useStandaloneDisplay";
 
 /**
@@ -94,6 +95,8 @@ function matchesAppPath(pathname: string | null, bases: string[]): boolean {
  */
 export default function SiteChrome({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  /** パス判定は言語プレフィックス無しで行う */
+  const barePath = stripLocalePrefix(pathname ?? "/");
   const { isStandalone, ready } = useStandaloneDisplay();
   /**
    * ライブラリカード用プレビュー（?preview=1）。
@@ -112,15 +115,15 @@ export default function SiteChrome({ children }: { children: ReactNode }) {
     }
   }, []);
   const isolatePwa =
-    ready && isStandalone && matchesAppPath(pathname, STANDALONE_APP_PATHS);
-  const isolateFullscreen = matchesAppPath(pathname, ALWAYS_ISOLATE_PATHS);
-  const fillViewport = matchesAppPath(pathname, FILL_VIEWPORT_PATHS);
+    ready && isStandalone && matchesAppPath(barePath, STANDALONE_APP_PATHS);
+  const isolateFullscreen = matchesAppPath(barePath, ALWAYS_ISOLATE_PATHS);
+  const fillViewport = matchesAppPath(barePath, FILL_VIEWPORT_PATHS);
   const minStagePageScroll = matchesAppPath(
-    pathname,
+    barePath,
     MIN_STAGE_PAGE_SCROLL_PATHS,
   );
   const pageScrollStandalone = matchesAppPath(
-    pathname,
+    barePath,
     PAGE_SCROLL_STANDALONE_PATHS,
   );
 
