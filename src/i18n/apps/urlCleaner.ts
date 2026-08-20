@@ -19,20 +19,8 @@ export type UrlCleanerDict = {
   paste: {
     button: string;
     buttonAria: string;
-    openClipboard: string;
-    openClipboardAria: string;
     failed: string;
     empty: string;
-    mobileHint: string;
-  };
-  clipboardSheet: {
-    title: string;
-    hint: string;
-    empty: string;
-    use: string;
-    close: string;
-    retry: string;
-    manualHint: string;
   };
   qr: {
     title: string;
@@ -62,26 +50,14 @@ export const urlCleanerJa: UrlCleanerDict = {
   },
   empty: {
     title: "URL を貼ってください",
-    hint: "右の 📋 でペースト、または入力欄を長押し",
+    hint: "中央の「ペースト」、欄の端をクリックして直接入力、または長押し",
   },
   paste: {
     button: "ペースト",
     buttonAria: "クリップボードの内容を入力欄に貼り付ける",
-    openClipboard: "クリップボード",
-    openClipboardAria: "クリップボードの内容を確認してから貼り付ける",
-    failed: "読み取れませんでした。右のクリップボードボタンか、入力欄の長押しをお試しください。",
+    failed:
+      "読み取れませんでした。入力欄を長押しするか、キーボードのペーストをお試しください。",
     empty: "クリップボードが空です。先に URL をコピーしてください。",
-    mobileHint: "📋＝即ペースト　📑＝内容を確認してから入力",
-  },
-  clipboardSheet: {
-    title: "クリップボード",
-    hint: "内容を確認してから、入力欄へ送れます。",
-    empty: "クリップボードが空か、読み取れませんでした",
-    use: "入力欄に入れる",
-    close: "とじる",
-    retry: "再読み込み",
-    manualHint:
-      "自動読み取りできませんでした。下の欄を長押ししてペーストするか、キーボードのペーストを使ってください。",
   },
   qr: {
     title: "QRコード",
@@ -111,26 +87,13 @@ export const urlCleanerEn: UrlCleanerDict = {
   },
   empty: {
     title: "Paste a URL",
-    hint: "Tap 📋 to paste, or long-press the field",
+    hint: "Use Paste in the center, click the field edge to type, or long-press",
   },
   paste: {
     button: "Paste",
     buttonAria: "Paste clipboard text into the input field",
-    openClipboard: "Clipboard",
-    openClipboardAria: "Open clipboard preview before pasting",
-    failed: "Could not read clipboard. Try the clipboard button or long-press the field.",
+    failed: "Could not read clipboard. Long-press the field or use keyboard paste.",
     empty: "Clipboard is empty. Copy a URL first.",
-    mobileHint: "📋 = paste now　📑 = preview before input",
-  },
-  clipboardSheet: {
-    title: "Clipboard",
-    hint: "Review the text, then send it to the input field.",
-    empty: "Clipboard is empty or unavailable",
-    use: "Use in input",
-    close: "Close",
-    retry: "Reload",
-    manualHint:
-      "Auto-read failed. Long-press the field below to paste, or use your keyboard’s paste command.",
   },
   qr: {
     title: "QR code",

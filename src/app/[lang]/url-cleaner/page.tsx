@@ -2,7 +2,6 @@
 
 import {
   Check,
-  ClipboardList,
   ClipboardPaste,
   Copy,
   LoaderCircle,
@@ -11,16 +10,9 @@ import {
 import { useMemo, useState } from "react";
 import AppShell from "@/components/AppShell";
 import { useI18n } from "@/i18n";
-import ClipboardSheet from "./ClipboardSheet";
 import QrCodePanel from "./QrCodePanel";
 import { readClipboardText } from "./clipboard";
 import { cleanUrl } from "./cleanUrl";
-
-const fieldClass =
-  "min-w-0 flex-1 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 outline-none ring-emerald-400/40 focus:ring-2 disabled:opacity-60";
-
-const iconBtnClass =
-  "inline-flex size-11 shrink-0 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-50 text-zinc-700 shadow-sm transition hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-800 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50";
 
 export default function UrlCleanerPage() {
   const { t } = useI18n();
@@ -29,15 +21,12 @@ export default function UrlCleanerPage() {
   const [copied, setCopied] = useState(false);
   const [pasting, setPasting] = useState(false);
   const [pasteError, setPasteError] = useState<string | null>(null);
-  const [clipboardOpen, setClipboardOpen] = useState(false);
-  const [clipboardDraft, setClipboardDraft] = useState("");
-  const [clipboardReadFailed, setClipboardReadFailed] = useState(false);
 
   const cleaned = useMemo(() => cleanUrl(input), [input]);
   const savedChars =
     cleaned && input.trim() ? Math.max(0, input.trim().length - cleaned.length) : 0;
 
-  async function handleQuickPaste() {
+  async function handlePaste() {
     setPasteError(null);
     setPasting(true);
     try {
@@ -54,19 +43,6 @@ export default function UrlCleanerPage() {
     } finally {
       setPasting(false);
     }
-  }
-
-  async function handleOpenClipboard() {
-    setPasteError(null);
-    const result = await readClipboardText();
-    if (result.ok) {
-      setClipboardDraft(result.text);
-      setClipboardReadFailed(false);
-    } else {
-      setClipboardDraft("");
-      setClipboardReadFailed(true);
-    }
-    setClipboardOpen(true);
   }
 
   async function handleCopy() {
@@ -111,50 +87,42 @@ export default function UrlCleanerPage() {
             ) : null}
           </div>
 
-          <div className="flex gap-2">
+          <div className="relative rounded-xl border border-zinc-200 bg-white ring-emerald-400/40 focus-within:ring-2">
             <textarea
               value={input}
               onChange={(e) => {
                 setInput(e.target.value);
                 if (pasteError) setPasteError(null);
               }}
-              placeholder={copy.form.inputPlaceholder}
+              placeholder={input ? copy.form.inputPlaceholder : undefined}
               rows={2}
               spellCheck={false}
               autoComplete="off"
               aria-label={copy.form.inputLabel}
-              className={`${fieldClass} max-h-32 min-h-[3.25rem] resize-none break-all leading-snug`}
+              className={`max-h-32 w-full resize-none break-all rounded-xl bg-transparent px-3 py-2 text-sm leading-snug text-zinc-900 outline-none placeholder:text-zinc-400 ${
+                input
+                  ? "min-h-[3.25rem]"
+                  : "min-h-[4.5rem] sm:min-h-[5rem]"
+              }`}
             />
-            <div className="flex shrink-0 flex-col gap-1.5">
+            {!input ? (
               <button
                 type="button"
-                onClick={() => void handleQuickPaste()}
+                onClick={() => void handlePaste()}
                 disabled={pasting}
                 title={copy.paste.button}
                 aria-label={copy.paste.buttonAria}
-                className={iconBtnClass}
+                className="absolute left-1/2 top-1/2 z-10 inline-flex min-h-11 -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-xl border border-emerald-300 bg-emerald-50 px-4 text-sm font-semibold text-emerald-800 shadow-sm transition hover:border-emerald-400 hover:bg-emerald-100 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {pasting ? (
                   <LoaderCircle className="size-4 animate-spin" aria-hidden />
                 ) : (
                   <ClipboardPaste className="size-4" aria-hidden />
                 )}
+                <span>{copy.paste.button}</span>
               </button>
-              <button
-                type="button"
-                onClick={() => void handleOpenClipboard()}
-                title={copy.paste.openClipboard}
-                aria-label={copy.paste.openClipboardAria}
-                className={iconBtnClass}
-              >
-                <ClipboardList className="size-4" aria-hidden />
-              </button>
-            </div>
+            ) : null}
           </div>
-
-          <p className="mt-1.5 text-[10px] leading-snug text-zinc-400 sm:hidden">
-            {copy.paste.mobileHint}
-          </p>
 
           {pasteError ? (
             <p className="mt-1.5 text-[11px] font-medium leading-snug text-rose-600">
@@ -216,18 +184,6 @@ export default function UrlCleanerPage() {
           </div>
         )}
       </div>
-
-      <ClipboardSheet
-        open={clipboardOpen}
-        initialDraft={clipboardDraft}
-        initialReadFailed={clipboardReadFailed}
-        onClose={() => setClipboardOpen(false)}
-        onApply={(text) => {
-          setInput(text.trim());
-          setPasteError(null);
-        }}
-        labels={copy.clipboardSheet}
-      />
     </AppShell>
   );
 }

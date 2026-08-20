@@ -99,6 +99,7 @@ const TOOLS_WITH_STATIC_COVER = new Set<string>([
   "crypto-message",
   "lunch-savings",
   "link-stocker",
+  "url-cleaner",
   "excel-merger",
 ]);
 
